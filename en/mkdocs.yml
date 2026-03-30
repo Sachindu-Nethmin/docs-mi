@@ -48,8 +48,8 @@ theme:
          toggle:
            icon: material/brightness-7
            name: Switch to light mode
-    logo: assets/img/logo-for-light.svg
-    logo_light: assets/img/logo.svg
+    logo: assets/img/WSO2-logo-black.svg
+    logo_light: assets/img/WSO2-logo-white.svg
     favicon: assets/img/favicon.png
     features:
        - navigation.indexes
@@ -133,6 +133,7 @@ nav:
                   - Use Hashicorp Secrets: install-and-setup/setup/security/using-hashicorp-secrets.md
                   - Use Symmetric Encryption: install-and-setup/setup/security/single-key-encryption.md
               - Secure the Management API: install-and-setup/setup/security/securing-management-api.md
+              - Configure the Crypto Provider: install-and-setup/setup/security/configuring-the-crypto-provider.md
           - Message Brokers:
               - AMQP (RabbitMQ):
                   - Deploy RabbitMQ: install-and-setup/setup/brokers/deploy-rabbitmq.md
@@ -301,6 +302,7 @@ nav:
                     - How to Store and Forward Messages for Guaranteed Delivery: learn/integration-tutorials/storing-and-forwarding-messages.md
                     - How to Retry Failed Messages with a Delay: learn/examples/rabbitmq-examples/retry-delay-failed-msgs-rabbitmq.md
                     - How to Requeue a Message Preserving the Order: learn/examples/rabbitmq-examples/requeue-msgs-with-errors-rabbitmq.md
+                    - How to Manage Guaranteed Delivery with Non Blocking Client Acknowledgement: learn/examples/rabbitmq-examples/rabbitmq-nonblocking-client-ack.md
                     - How to Publish Unacked Messages to Dead Letter Exchange: learn/examples/rabbitmq-examples/move-msgs-to-dlq-rabbitmq.md
                 - How to Implement Dual Channel Scenario with RabbitMQ: learn/examples/rabbitmq-examples/request-response-rabbitmq.md
             - JMS examples:
@@ -335,6 +337,7 @@ nav:
             - How to Expose an RDBMS Datasource: learn/examples/data-integration/rdbms-data-service.md
             - How to Expose other Datasources:
                   - CSV Datasource: learn/examples/data-integration/csv-data-service.md
+                  - Excel Datasource: learn/examples/data-integration/excel-data-service.md
                   - Mongo Datasource: learn/examples/data-integration/mongo-data-service.md
                   - Carbon Datasource: learn/examples/data-integration/carbon-data-service.md
             - How to Expose Data in JSON Format: learn/examples/data-integration/json-with-data-service.md
@@ -817,6 +820,10 @@ nav:
               - 1.x:
                   # - Microsoft Azure Storage Example: reference/connectors/microsoft-azure-storage-connector/1.x/microsoft-azure-storage-connector-example.md
                   - Microsoft Azure Storage Reference: reference/connectors/microsoft-azure-storage-connector/1.x/microsoft-azure-storage-reference.md
+          - DB Connector:
+              - DB Connector Overview: reference/connectors/db-connector/db-connector-overview.md
+              - DB Connector Example: reference/connectors/db-connector/db-connector-example.md
+              - DB Connector Reference: reference/connectors/db-connector/db-connector-config.md
           - MongoDB Connector:
               - MongoDB Connector Overview: reference/connectors/mongodb-connector/mongodb-connector-overview.md
               - 3.x:
@@ -825,6 +832,11 @@ nav:
               - 2.x:
                 - MongoDB Connector Example: reference/connectors/mongodb-connector/2.x/mongodb-connector-example.md
                 - MongoDB Connector Reference: reference/connectors/mongodb-connector/2.x/mongodb-connector-config.md
+          - RabbitMQ (AMQP 1.0) Connector:
+              - RabbitMQ (AMQP 1.0) Connector Overview: reference/connectors/rabbitmq-amqp-1.0-connector/rabbitmq-amqp-1.0-connector-overview.md
+              - Set up RabbitMQ Broker: reference/connectors/rabbitmq-amqp-1.0-connector/rabbitmq-amqp-1.0-connector-setup.md
+              - RabbitMQ (AMQP 1.0) Connector Example: reference/connectors/rabbitmq-amqp-1.0-connector/rabbitmq-amqp-1.0-connector-example.md
+              - RabbitMQ (AMQP 1.0) Connector Reference: reference/connectors/rabbitmq-amqp-1.0-connector/rabbitmq-amqp-1.0-connector-reference.md
           - Redis Connector:
               - Redis Overview: reference/connectors/redis-connector/redis-connector-overview.md
               - Set up the Environment: reference/connectors/redis-connector/redis-connector-configuration.md
@@ -928,6 +940,9 @@ nav:
           - Google Pub/Sub Inbound Endpoint:
                 - Google Pub/Sub Inbound Endpoint Example: reference/connectors/google-pubsub-inbound/google-pubsub-inbound-endpoint-example.md
                 - Google Pub/Sub Inbound Endpoint Reference: reference/connectors/google-pubsub-inbound/google-pubsub-inbound-endpoint-reference.md
+          - RabbitMQ (AMQP 1.0) Inbound Endpoint:
+              - RabbitMQ (AMQP 1.0) Inbound Endpoint Example: reference/connectors/rabbitmq-amqp-1.0-connector/rabbitmq-amqp-1.0-inbound-endpoint-example.md
+              - RabbitMQ (AMQP 1.0) Inbound Endpoint Reference: reference/connectors/rabbitmq-amqp-1.0-connector/rabbitmq-amqp-1.0-inbound-endpoint-reference.md
           - SMPP Inbound Endpoint:
               - SMPP Inbound Endpoint Example: reference/connectors/smpp-connector/smpp-inbound-endpoint-example.md
               - SMPP Inbound Endpoint Reference: reference/connectors/smpp-connector/smpp-inbound-endpoint-config.md
@@ -1062,6 +1077,7 @@ nav:
                   - Monitor Logs: observe-and-manage/classic-observability-logs/monitoring-logs.md
                   - Monitor Correlation Logs: observe-and-manage/classic-observability-logs/monitoring-correlation-logs.md
                   - Monitor Audit Logs: observe-and-manage/classic-observability-logs/monitoring-mi-audit-logs.md
+                  - OpenTelemetry Based Logs: observe-and-manage/classic-observability-logs/opentelemetry-logs.md
               - Traces:
                   - OpenTelemetry: observe-and-manage/classic-observability-traces/monitoring-with-opentelemetry-mi.md
               - Metrics:
@@ -1070,6 +1086,7 @@ nav:
                       - Moesif Dashboards: observe-and-manage/classic-observability-metrics/moesif-metrics/dashboards.md
                   - JMX Monitoring with JMX: observe-and-manage/classic-observability-metrics/jmx-monitoring.md
                   - SNMP Monitoring with SNMP: observe-and-manage/classic-observability-metrics/snmp-monitoring.md
+                  - OpenTelemetry Based Metrics: observe-and-manage/classic-observability-metrics/opentelemetry-metrics.md
               - TCP Messages:
                   - Starting TCPMon: observe-and-manage/classic-observability-tcp/starting-tcp-mon.md
                   - Message Monitoring with TCPMon: observe-and-manage/classic-observability-tcp/message-monitoring-with-tcpmon.md
@@ -1078,6 +1095,7 @@ nav:
               - Overview: observe-and-manage/cloud-native-observability-overview.md
               - Configure for VM based MI Deployment: observe-and-manage/setting-up-cloud-native-observability-on-a-vm.md
               - Configure for K8s based MI Deployment: observe-and-manage/setting-up-cloud-native-observability-in-kubernetes.md
+              - Configure with OpenTelemetry: observe-and-manage/setting-up-opentelemetry-observability.md
               - Access the Dashboard: observe-and-manage/viewing-cloud-native-observability-statistics.md
       - Analytics:
           - ELK Based Analytics:
@@ -1225,6 +1243,76 @@ extra:
       options: [verticle-line]
     - title: Install and Setup
       options: [verticle-line]
+  home_page_cards:
+    - section:
+        - title: Get Started
+          icon: octicons/rocket-16
+          icon_color: icon-color-1
+          list_items:
+            - title: Introduction
+              url: Get Started|Introduction
+            - title: Key Concepts
+              url: Get Started|Key Concepts
+            - title: Build your first Integration
+              url: Get Started|Build your first Integration|Build your first Integration
+            - title: Build your first AI Integration
+              url: Get Started|Build your first AI Integration|Build your first AI Integration
+            - title: What's New
+              url: Get Started|About this Release
+        - title: Community & Support
+          icon: octicons/light-bulb-16
+          icon_color: icon-color-2
+          list_items:
+            - title: GitHub
+              url: https://github.com/wso2/product-micro-integrator/issues
+            - title: Discord
+              url: https://discord.com/invite/wso2
+            - title: Enterprise Support
+              url: https://wso2.com/subscription/
+    - section:
+        - title: Install & Setup
+          icon: octicons/download-16
+          icon_color: icon-color-3
+          list_items:
+            - title: "Install WSO2 Integrator: MI"
+              url: "Install and Setup|Install|Install the WSO2 Integrator: MI|Install MI"
+            - title: VS Code extension for MI
+              url: "Develop|WSO2 MI for VSCode|WSO2 Integrator: MI for VSCode Overview"
+            - title: Integration Control Plane
+              url: Install and Setup|Install|Install the Integration Control Plane|Install the Integration Control Plane
+        - title: References
+          icon: octicons/gear-16
+          icon_color: icon-color-1
+          list_items:
+            - title: Product Configurations
+              url: References|Product Configurations|MI Configuration Catalog
+            - title: Integration Properties
+              url: /en/latest/reference/mediators/property-reference/generic-properties/
+            - title: Mediators
+              url: /en/latest/reference/mediators/about-mediators/
+            - title: Connectors
+              url: References|Connectors|Connectors Overview
+    - section:
+        - title: Tutorials
+          icon: octicons/book-16
+          icon_color: icon-color-4
+          list_items:
+            - title: Routing and Transformation
+              url: Learn|Message Routing|What is Message Routing
+            - title: Service Orchestration
+              url: Learn|Service Orchestration|What is Service Orchestration
+            - title: Asynchronous Messaging
+              url: Learn|Asynchronous Message Processing|What is Asynchronous Message Processing
+            - title: File Processing
+              url: Learn|File Processing|What is File Processing
+            - title: Data Integration
+              url: Learn|Data Integration|What is Data Integration
+            - title: SaaS and B2B Integration
+              url: Learn|SaaS and B2B Connectivity|What is SaaS and B2B Connectivity
+            - title: Enterprise Integration Patterns
+              url: Learn|Enterprise Integration Patterns|Overview
+            - title: View all
+              url: Learn|Overview
   nav_icons:
     Home:
       icon: octicons/home-16
@@ -1258,6 +1346,7 @@ extra:
       link: https://www.youtube.com/user/WSO2TechFlicks
     - icon: fontawesome/brands/x-twitter
       link: https://twitter.com/intent/follow?screen_name=wso2
+
   choreo_connect: # not applied in "includes" section, update "includes" separately
     version: 1.2.0
     envoy_version: v1.24.1 # for GA release
@@ -1268,3 +1357,4 @@ extra:
   #base_path: http://localhost:8000/en/latest
   base_path: https://mi.docs.wso2.com/en/4.6.0
   envoy_path: https://www.envoyproxy.io/docs/envoy/v1.24.1
+
