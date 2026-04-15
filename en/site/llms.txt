@@ -1,5 +1,0 @@
-# WSO2 Micro Integrator Documentation
-> Optimized for AI agents, LLMs, and developers
-
-## Site Map
-- [Comprehensive file index](./llms-full.txt)
