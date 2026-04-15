@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>http-connector-example.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># HTTP Connector Example
+
+The HTTP Connector enables you to send HTTP or HTTPS requests within an integration sequence. 
+
+## What you&#x27;ll build
+
+This example explains how to use the HTTP Connector to send HTTP requests effectively in your integration projects.
+
+If you do not want to configure this yourself, you can simply [get the project](#get-the-project) and run it.
+
+## Set up the integration project
+
+1. Follow the steps in the [Create a Project]({{base_path}}/develop/create-integration-project/) documentation to set up the integration project.
+
+2. Create a new `HTTP` connection.
+    1. Navigate to **Project Overview** and click on **Add Artifact**.
+    2. Select **Connections** under **Other Artifacts**.
+       
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/connections-artifact.png&quot; title=&quot;Add connections artifact&quot; width=&quot;800&quot; alt=&quot;Add connections artifact&quot;/&gt;
+   
+    3. Select **HTTP** connector.
+    4. Add the dependencies if not yet added.
+    5. Use the following values to create the connection.
+        - **Connection Name** - `JsonPlaceHolderConnection`
+        - **Base URL** - `http://jsonplaceholder.typicode.com`
+        - **Auth Type** - `None`
+
+## Add integration logic
+
+1. Navigate to the **Project Overview** page and click **Add Artifact**.
+
+2. Under **Create an Integration**, select **API**.
+
+3. Specify the API name as `JsonPlaceHolder` and the API context as `/jsonplaceholder`.
+
+4. Create a resource with resource path `/getOnePost/{id}` and select `GET` as the method. This resource will retrieve information about a post.
+
+5. Select the created resource, and click the **+** sign. Then, select the **GET** operation under the HTTP connector to send a GET request.
+
+6. In the form that opens, provide the following details:
+    - **Connection** - `JsonPlaceHolderConnection`
+    - **Relative Path** - `/posts/${params.pathParams.id}`
+    - **Headers** - &quot;&quot;
+    - **Output Variable Name** - `http_get_1`
+    - **Overwrite Message Body** - keep selected
+
+7. Click the **+** icon below the **GET** operation and add a respond mediator.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/http-connector-example-resource-1.png&quot; title=&quot;HTTP connector example resource 1&quot; width=&quot;100%&quot; alt=&quot;HTTP connector example resource 1&quot;/&gt;
+
+8. For the `JsonPlaceHolder` API, create another resource with resource path `/commentsForPost?postId={postId}` and select `GET` as the method. This resource will get comments for a post.
+
+9. Select the created resource, and click the **+** sign. Then, select the **GET** operation under the HTTP connector to send a GET request.
+
+10. In the form that opens, provide the following details:
+    - **Connection** - `JsonPlaceHolderConnection`
+    - **Relative Path** - `/comments?postId=${params.queryParams.postId}`
+    - **Headers** - &quot;&quot;
+    - **Output Variable Name** - `http_get_1`
+    - **Overwrite Message Body** - keep selected
+
+11. Click the **+** icon below the **GET** operation and add a respond mediator.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/http-connector-example-resource-2.png&quot; title=&quot;HTTP connector example resource 2&quot; width=&quot;100%&quot; alt=&quot;HTTP connector example resource 2&quot;/&gt;
+
+12. For the `JsonPlaceHolder` API, create another resource with resource path `/createPost` and select `POST` as the method. This resource will handle post creation.
+
+13. Select the resource, and click the **+** sign. Then, select the **POST** operation under the HTTP connector to send a POST request.
+
+14. In the form that opens, provide the following details:
+    - **Connection** - `JsonPlaceHolderConnection`
+    - **Relative Path** - `/posts`
+    - **Headers** - &quot;&quot;
+    - **Content Type** - Select `JSON`
+    - **Request Body** - `${payload}`
+    - **Output Variable Name** - `http_post_1`
+    - **Overwrite Message Body** - keep selected
+
+15. Click the **+** icon below the **POST** operation and add a respond mediator.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/http-connector-example-resource-3.png&quot; title=&quot;HTTP connector example resource 3&quot; width=&quot;100%&quot; alt=&quot;HTTP connector example resource 3&quot;/&gt;
+
+16. Create a resource for the `JsonPlaceHolder` API with the resource path `/replacePost` and select `PUT` as the method. This resource will replace an existing post.
+
+17. Select the resource, and click the **+** sign. Then, select the **PUT** operation under the HTTP connector to send a PUT request.
+
+18. In the form that opens, provide the following details:
+    - **Connection** - `JsonPlaceHolderConnection`
+    - **Relative Path** - `/posts/1`
+    - **Headers** - &quot;&quot;
+    - **Content Type** - Select `JSON`
+    - **Request Body** -
+        ```json
+        {
+            &quot;userId&quot;: 1,
+            &quot;id&quot;: 1,
+            &quot;title&quot;: &quot;christmas holiday&quot;,
+            &quot;body&quot;: &quot;christmas holiday is coming&quot;
+        }
+        ```
+    - **Output Variable Name** - `http_put_1`
+    - **Overwrite Message Body** - keep selected
+
+19. Click the **+** icon below the **PUT** operation and add a respond mediator.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/http-connector-example-resource-4.png&quot; title=&quot;HTTP connector example resource 4&quot; width=&quot;100%&quot; alt=&quot;HTTP connector example resource 4&quot;/&gt;
+
+20. Create a resource for the `JsonPlaceHolder` API with the resource path `/updatePost` and select `PATCH` as the method. This resource will update an existing post.
+
+21. Select the resource, and click the **+** sign. Then, select the **PATCH** operation to send a PATCH request.
+
+22. In the form that opens, provide the following details:
+    - **Connection** - `JsonPlaceHolderConnection`
+    - **Relative Path** - `/posts/1`
+    - **Headers** - &quot;&quot;
+    - **Content Type** - Select `JSON`
+    - **Payload** - `${payload}`
+    - **Output Variable Name** - `http_patch_1`
+    - **Overwrite Message Body** - keep selected
+
+23. Click the **+** icon below the **PATCH** operation and add a respond mediator.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/http-connector-example-resource-5.png&quot; title=&quot;HTTP connector example resource 5&quot; width=&quot;100%&quot; alt=&quot;HTTP connector example resource 5&quot;/&gt;
+
+24. Create a resource for the `JsonPlaceHolder` API with the resource path `/deletePost` and select `DELETE` as the method. This resource will handle post deletion.
+
+25. Select the resource, and click the **+** sign. Then, select the **DELETE** operation to send a DELETE request.
+
+26. In the form that opens, provide the following details:
+    - **Connection** - `JsonPlaceHolderConnection`
+    - **Relative Path** - `/posts/1`
+    - **Headers** - &quot;&quot;
+    - **Output Variable Name** - `http_delete_1`
+    - **Overwrite Message Body** - keep selected
+
+27. Click the **+** icon below the **DELETE** operation and add a respond mediator.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/http-connector-example-resource-6.png&quot; title=&quot;HTTP connector example resource 6&quot; width=&quot;100%&quot; alt=&quot;HTTP connector example resource 6&quot;/&gt;
+
+## Get the project
+
+You can download the ZIP file and extract the contents to get the project code.
+
+&lt;a href=&quot;{{base_path}}/assets/attachments/connectors/http-connector.zip&quot;&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+&lt;/a&gt;
+
+## Deployment
+
+Follow these steps to deploy the exported CApp in the integration runtime.
+
+**Deploying on WSO2 Integrator: MI**
+To deploy and run the project, refer to the [Build and Run]({{base_path}}/develop/deploy-artifacts/#build-and-run) guide.
+
+You can further refer the application deployed through the CLI tool. See the instructions on [managing integrations from the CLI]({{base_path}}/observe-and-manage/managing-integrations-with-micli).
+
+## Test
+
+### HTTP GET operation
+
+Test getting a post. Send an HTTP request as below.
+
+```bash
+curl -X &#x27;GET&#x27; &#x27;http://localhost:8290/jsonplaceholder/getOnePost/1&#x27; -H &#x27;accept: */*&#x27;
+```
+
+**Expected response**:
+
+```json
+{
+    &quot;userId&quot;: 1,
+    &quot;id&quot;: 1,
+    &quot;title&quot;: &quot;sunt aut facere repellat provident occaecati excepturi optio reprehenderit&quot;,
+    &quot;body&quot;: &quot;quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto&quot;
+}
+```
+
+Test getting given comments for a post. Send an HTTP request as below.
+    
+```bash
+curl -X &#x27;GET&#x27; &#x27;http://localhost:8290/jsonplaceholder/commentsForPost?postId=1&#x27; -H &#x27;accept: */*&#x27;
+```
+
+**Expected response**:
+
+```json
+[
+    {
+        &quot;postId&quot;: 1,
+        &quot;id&quot;: 1,
+        &quot;name&quot;: &quot;id labore ex et quam laborum&quot;,
+        &quot;email&quot;: &quot;Eliseo@gardner.biz&quot;,
+        &quot;body&quot;: &quot;laudantium enim quasi est quidem magnam voluptate ipsam eos\ntempora quo necessitatibus\ndolor quam autem quasi\nreiciendis et nam sapiente accusantium&quot;
+    },
+    {
+        &quot;postId&quot;: 1,
+        &quot;id&quot;: 2,
+        &quot;name&quot;: &quot;quo vero reiciendis velit similique earum&quot;,
+        &quot;email&quot;: &quot;Jayne_Kuhic@sydney.com&quot;,
+        &quot;body&quot;: &quot;est natus enim nihil est dolore omnis voluptatem numquam\net omnis occaecati quod ullam at\nvoluptatem error expedita pariatur\nnihil sint nostrum voluptatem reiciendis et&quot;
+    },
+    {
+        &quot;postId&quot;: 1,
+        &quot;id&quot;: 3,
+        &quot;name&quot;: &quot;odio adipisci rerum aut animi&quot;,
+        &quot;email&quot;: &quot;Nikita@garfield.biz&quot;,
+        &quot;body&quot;: &quot;quia molestiae reprehenderit quasi aspernatur\naut expedita occaecati aliquam eveniet laudantium\nomnis quibusdam delectus saepe quia accusamus maiores nam est\ncum et ducimus et vero voluptates excepturi deleniti ratione&quot;
+    },
+    {
+        &quot;postId&quot;: 1,
+        &quot;id&quot;: 4,
+        &quot;name&quot;: &quot;alias odio sit&quot;,
+        &quot;email&quot;: &quot;Lew@alysha.tv&quot;,
+        &quot;body&quot;: &quot;non et atque\noccaecati deserunt quas accusantium unde odit nobis qui voluptatem\nquia voluptas consequuntur itaque dolor\net qui rerum deleniti ut occaecati&quot;
+    },
+    {
+        &quot;postId&quot;: 1,
+        &quot;id&quot;: 5,
+        &quot;name&quot;: &quot;vero eaque aliquid doloribus et culpa&quot;,
+        &quot;email&quot;: &quot;Hayden@althea.biz&quot;,
+        &quot;body&quot;: &quot;harum non quasi et ratione\ntempore iure ex voluptates in ratione\nharum architecto fugit inventore cupiditate\nvoluptates magni quo et&quot;
+    }
+]
+```
+
+### HTTP POST operation 
+
+Test creating a post.
+
+```bash
+curl -X &#x27;POST&#x27; &#x27;http://localhost:8290/jsonplaceholder/createPost&#x27; \
+  -H &#x27;accept: */*&#x27; \
+  -H &#x27;Content-Type: application/json&#x27; \
+  -d &#x27;{ &quot;userId&quot;: 200, &quot;id&quot;: 1, &quot;title&quot;: &quot;new post&quot; }&#x27;
+```
+
+**Expected response**:
+
+```json
+{
+    &quot;userId&quot;: 200,
+    &quot;id&quot;: 101,
+    &quot;title&quot;: &quot;new post&quot;
+}
+```
+
+### HTTP PUT operation 
+
+Test replacing a post.
+
+```bash
+curl -X &#x27;PUT&#x27; &#x27;http://localhost:8290/jsonplaceholder/replacePost&#x27; \
+  -H &#x27;accept: */*&#x27; \
+  -H &#x27;Content-Type: application/json&#x27; \
+  -d &#x27;{}&#x27;
+```
+
+**Expected response**:
+
+```json
+{
+    &quot;userId&quot;: 1,
+    &quot;id&quot;: 1,
+    &quot;title&quot;: &quot;christmas holiday&quot;,
+    &quot;body&quot;: &quot;christmas holiday is coming&quot;
+}
+```
+
+### HTTP PATCH operation
+
+Test updating the post.
+
+```bash
+curl -X &#x27;PATCH&#x27; &#x27;http://localhost:8290/jsonplaceholder/updatePost&#x27; \
+  -H &#x27;accept: */*&#x27; \
+  -H &#x27;Content-Type: application/json&#x27; \
+  -d &#x27;{ &quot;title&quot;: &quot;holiday is over&quot; }&#x27;
+```
+
+**Expected response**:
+
+```json
+{
+    &quot;userId&quot;: 1,
+    &quot;id&quot;: 1,
+    &quot;title&quot;: &quot;holiday is over&quot;,
+    &quot;body&quot;: &quot;quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto&quot;
+}
+```
+
+### HTTP DELETE operation
+
+Test deleting the post.
+
+```bash
+curl -X &#x27;DELETE&#x27; &#x27;http://localhost:8290/jsonplaceholder/deletePost&#x27; -H &#x27;accept: */*&#x27;
+```
+
+**Expected response**:
+
+```json
+{}
+```
+
+## How to create a HTTPS Connection?
+
+1. Navigate to the project overview page and click **Add Artifact**. 
+2. Under **Other Artifacts**, select **Connections**.
+3. Choose the **HTTPS** connection.
+4. Use the following values to configure the connection:
+    - **Connection Name** - `HTTPSConnection`
+    - **Base URL** - HTTPS URL Path
+    - **Auth Type** - `None`
+5. If a certificate is required for the HTTPS connection, it must be added as a certificate type configurable of the project. For more details on adding certificate type configurable, refer to the [Externalized Configuration]({{base_path}}/develop/externalized-configuration/) documentation.
+</body>
+</html>

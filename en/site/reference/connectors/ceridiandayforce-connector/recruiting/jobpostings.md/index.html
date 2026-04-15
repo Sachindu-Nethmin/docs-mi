@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>jobpostings.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Working with Job Postings
+
+### Overview 
+
+The following operations allow you to retrieve job postings
+
+| Operation | Description |
+| ------------- |-------------|
+|[GET Job Postings](#retrieving-job-postings)| Get the job postings available through the candidate portal. |
+
+### Operation details
+
+This section provides more details on each of the operations.
+
+#### Retrieving Job Postings
+We can use GET Job Postings operation with required parameters to search for job postings
+
+**GET Job Postings**
+```xml
+&lt;ceridiandayforce.getJobPostings&gt;
+    &lt;companyName&gt;{$ctx:companyName}&lt;/companyName&gt;
+    &lt;parentCompanyName&gt;{$ctx:parentCompanyName}&lt;/parentCompanyName&gt;
+    &lt;internalJobBoardCode&gt;{$ctx:internalJobBoardCode}&lt;/internalJobBoardCode&gt;
+    &lt;includeActivePostingOnly&gt;{$ctx:includeActivePostingOnly}&lt;/includeActivePostingOnly&gt;
+    &lt;lastUpdateTimeFrom&gt;{$ctx:lastUpdateTimeFrom}&lt;/lastUpdateTimeFrom&gt;
+    &lt;lastUpdateTimeTo&gt;{$ctx:lastUpdateTimeTo}&lt;/lastUpdateTimeTo&gt;
+    &lt;datePostedFrom&gt;{$ctx:datePostedFrom}&lt;/datePostedFrom&gt;
+    &lt;datePostedTo&gt;{$ctx:datePostedTo}&lt;/datePostedTo&gt;
+    &lt;htmlDescription&gt;{$ctx:htmlDescription}&lt;/htmlDescription&gt;
+&lt;/ceridiandayforce.getJobPostings&gt;
+```
+
+**Properties**
+
+* companyName (Optional- string): Company name. Example: XYZ Co.
+* parentCompanyName (Optional - string): Parent Company name. Example: Ceridian
+* internalJobBoardCode (Optional - string): XRefCode of Job Board. Example: CANDIDATEPORTAL
+* includeActivePostingOnly (Optional - boolean): If true, then exclude inactive postings from the result. If False, then the &#x27;Last Update Time From&#x27; and &#x27;Last Update Time To&#x27; parameters are required and the range specified between the &#x27;Last Update Time From&#x27; and &#x27;Last Update Time To&#x27; parameters must not be larger than 1 month. Example: True
+* lastUpdateTimeFrom (Optional - string): A starting timestamp of last updated job posting. Example: 2017-01-01T13:24:56
+* lastUpdateTimeTo (Optional - string): An ending timestamp of last updated job posting. Example: 2017-02-01T13:24:56
+* datePostedFrom (Optional - string): A starting timestamp of job posting date. Example: 2017-01-01T13:24:56
+* datePostedTo (Optional - string): An ending timestamp of job posting date. Example: 2017-02-01T13:24:56
+* htmlDescription (Optional - boolean): A flag to feed the jobs over with html formatting or plain text description
+
+**Sample request**
+
+Following is a sample request that can be handled by this operation.
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;
+}
+```
+
+**Sample response**
+
+Given below is a sample response for this operation.
+
+```json
+[
+    {
+        &quot;Title&quot;: &quot;Magasin 120 - Assistant gérant&quot;,
+        &quot;Description&quot;: &quot;Objectif de poste d’assistant gérant de magasin : soutient ses clients par la formation du personnel, de l’achat et de l’étalage des produits.\n Tâches reliées du poste d’assistant gérant de magasin :\n -Former le personnel du magasin ; orienter les nouvelles embauches vers les produits et des matériaux de formation ; offrir des séances de formation ; l&#x27;évaluer les résultats et les besoins d’apprentissage des associés en collaboration avec le gérant du magasin ; élaborer et appliquer les nouvelles formations  produit. - Évalue la concurrence en visitant les magasins concurrents ; la collecte d&#x27;informations tels que le style, la qualité et les prix de marchandise compétitifs. - Achats d’inventaire via recherche de nouveaux produits ; anticiper l&#x27;intérêt des acheteurs ; négocier des réductions de prix de volume ; placer et accélérer les commandes ; confirmer la réception. - Attirer les clients par l’exposition de la marchandise en façade ; respecter les suggestions et les horaires d&#x27;étalage ; mise en place ou d’assemblage de propriétés d&#x27;étalages préfabriqués ; la préparation des marchandises affichées dans les fenêtres et vitrines et sur le plancher de vente. - Favoriser les ventes en présentant la marchandise et les produits aux clients. – Aider aux clients en fournissant des informations ; répondre aux questions ; obtenir la marchandise demandée ; effectuer les transactions de paiement ; la préparation des marchandises pour la livraison. – Préparer les soldes et la relation client en analysant les rapports et la catégorisation de renseignements sur les ventes ; identifier et étudier les plaintes et les suggestions de services rapportés par les clients. - Maintient l’environnement du magasin propre et sécuritaire par le développement et l&#x27;édition des itinéraires d&#x27;évacuation ; la  détermination et la documentation des emplacements de matériaux et de produits chimiques potentiellement dangereux. - Maintient l&#x27;inventaire en cochant la marchandise pour déterminer les niveaux de stock ; anticiper la demande. - Préparer des rapports par la collecte, l&#x27;analyse et la synthèse des informations. - Maintient un service de qualité en établissant et en appliquant des normes de l&#x27;organisation. - Maintenir une connaissance professionnelle et technique en participant à des ateliers éducatifs ; revue des publications professionnelles ; établir des réseaux personnels ; l&#x27;analyse comparative des meilleurs pratiques state-of-the-art ; participation à des associations professionnelles.  - Contribue à l&#x27;effort d&#x27;équipe.\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/Posting/View/9&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/JobApplication?postingId=9&quot;,
+        &quot;City&quot;: &quot;Alpharetta&quot;,
+        &quot;State&quot;: &quot;GA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:21:51.937&quot;,
+        &quot;ReferenceNumber&quot;: 9,
+        &quot;CultureCode&quot;: &quot;fr-CA&quot;,
+        &quot;ParentRequisitionCode&quot;: 5,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Store 120 - Assistant Manager&quot;,
+        &quot;Description&quot;: &quot;Job Purpose:\n   • Serves customers by training staff; purchasing and displaying products.\nJob Duties:\n   • Trains store staff by reviewing and revising orientation to products and sales training materials; delivering training sessions; reviewing staff job results and learning needs with retail store manager; developing and implementing new product training.\n   • Evaluates competition by visiting competing stores; gathering information such as style, quality, and prices of competitive merchandise.\n   • Purchases inventory by researching emerging products; anticipating buyer interest; negotiating volume price breaks; placing and expediting orders; verifying receipt.\n   • Attracts customers by originating display ideas; following display suggestions or schedules; constructing or assembling prefabricated display properties; producing merchandise displays in windows and showcases, and on sales floor.\n   • Promotes sales by demonstrating merchandise and products to customers.\n   • Helps customers by providing information; answering questions; obtaining merchandise requested; completing payment transactions; preparing merchandise for delivery.\n   • Prepares sales and customer relations reports by analyzing and categorizing sales information; identifying and investigating customer complaints and service suggestions.\n   • Maintains a safe and clean store environment by developing and publishing evacuation routes; determining and documenting locations of potentially dangerous materials and chemicals.\n   • Maintains inventory by checking merchandise to determine inventory levels; anticipating customer demand.\n   • Prepares reports by collecting, analyzing, and summarizing information.\n   • Maintains quality service by establishing and enforcing organization standards.\n   • Maintains professional and technical knowledge by attending educational workshops; reviewing professional publications; establishing personal networks; benchmarking state-of-the-art practices; participating in professional societies.\n   • Contributes to team effort by accomplishing related results as needed.\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/Posting/View/9&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/JobApplication?postingId=9&quot;,
+        &quot;City&quot;: &quot;Alpharetta&quot;,
+        &quot;State&quot;: &quot;GA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:21:51.937&quot;,
+        &quot;ReferenceNumber&quot;: 9,
+        &quot;CultureCode&quot;: &quot;en-US&quot;,
+        &quot;ParentRequisitionCode&quot;: 5,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Magasin 110 – Associé aux accessoires&quot;,
+        &quot;Description&quot;: &quot;But Vente aux détails : Sert clients, aide à sélectionner des produits.\n\nTâches reliées du poste de Vente aux détails : -\nAccueillir les clients et offrir de l&#x27;assistance. - Dirige clients vers les racks et\nles compteurs ; leur suggère des articles. - Conseille les clients en\nfournissant des informations sur les produits. - Aide à la clientèle à\neffectuer des sélections en bâtissant la confiance, offrant des suggestions\net des opinions. – Documente les ventes par la mise à jour des profils\nclient. - Traite les paiements ; traitement des chèques , espèces, et carte de\nmagasin ou autre cartes de crédit . – Avise les clients des rabais pour\nclients privilégiés. - Contribue à l&#x27;effort d&#x27;équipe.\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/Posting/View/17&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/JobApplication?postingId=17&quot;,
+        &quot;City&quot;: &quot;San Francisco&quot;,
+        &quot;State&quot;: &quot;CA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:19:41.263&quot;,
+        &quot;ReferenceNumber&quot;: 17,
+        &quot;CultureCode&quot;: &quot;fr-CA&quot;,
+        &quot;ParentRequisitionCode&quot;: 3,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Store 110 - Accessories Associate&quot;,
+        &quot;Description&quot;: &quot;Job Purpose:\n   • Serves customers by helping them select products.\nJob Duties:\n   • Welcomes customers by greeting them; offering them assistance.\n   • Directs customers by escorting them to racks and counters; suggesting items.\n   • Advises customers by providing information on products.\n   • Helps customer make selections by building customer confidence; offering suggestions and opinions.\n   • Documents sale by creating or updating customer profile records.\n   • Processes payments by totaling purchases; processing checks, cash, and store or other credit cards.\n   • Keeps clientele informed by notifying them of preferred customer sales and future merchandise of potential interest.\n   • Contributes to team effort by accomplishing related results as needed.\nRetail Salesperson Skills and Qualifications:\n   • Listening\n   • Customer Service\n   • Meeting Sales Goals\n   • Selling to Customer Needs\n   • Product Knowledge\n   • Verbal Communication\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/Posting/View/17&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/JobApplication?postingId=17&quot;,
+        &quot;City&quot;: &quot;San Francisco&quot;,
+        &quot;State&quot;: &quot;CA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:19:41.263&quot;,
+        &quot;ReferenceNumber&quot;: 17,
+        &quot;CultureCode&quot;: &quot;en-US&quot;,
+        &quot;ParentRequisitionCode&quot;: 3,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Magasin 110 - Associé - Hommes&quot;,
+        &quot;Description&quot;: &quot;But Vente aux détails : Sert clients en les aidant à\nsélectionner des produits .\n\nTâches reliées du poste de Vente aux détails : - Accueillir\nles clients en leur offrant une assistance . - Dirige clients vers les racks et\nles compteurs ; leur suggère des articles. - Conseille les clients en\nfournissant des informations sur les produits . - Aide la clientèle à effectuer\ndes sélections en bâtissant la confiance des clients ; offrant des suggestions\net des opinions . – Documente les ventes en faisant la mise à jour des profils\nclient. - Traite les paiements; traitement des chèques , espèces, et carte de\nmagasin ou autre cartes de crédit . – Avise les clients des soldes pour clients\nprivilégiés. - Contribue à l&#x27;effort d&#x27;équipe en accomplissant des résultats\nconnexes au besoin .\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/Posting/View/19&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/JobApplication?postingId=19&quot;,
+        &quot;City&quot;: &quot;San Francisco&quot;,
+        &quot;State&quot;: &quot;CA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:11:50.573&quot;,
+        &quot;ReferenceNumber&quot;: 19,
+        &quot;CultureCode&quot;: &quot;fr-CA&quot;,
+        &quot;ParentRequisitionCode&quot;: 2,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Store 110 - Men&#x27;s Associate&quot;,
+        &quot;Description&quot;: &quot;Job Purpose:\n   • Serves customers by helping them select products.\nJob Duties:\n   • Welcomes customers by greeting them; offering them assistance.\n   • Directs customers by escorting them to racks and counters; suggesting items.\n   • Advises customers by providing information on products.\n   • Helps customer make selections by building customer confidence; offering suggestions and opinions.\n   • Documents sale by creating or updating customer profile records.\n   • Processes payments by totaling purchases; processing checks, cash, and store or other credit cards.\n   • Keeps clientele informed by notifying them of preferred customer sales and future merchandise of potential interest.\n   • Contributes to team effort by accomplishing related results as needed.\nRetail Salesperson Skills and Qualifications:\n   • Listening\n   • Customer Service\n   • Meeting Sales Goals\n   • Selling to Customer Needs\n   • Product Knowledge\n   • Verbal Communication\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/Posting/View/19&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/JobApplication?postingId=19&quot;,
+        &quot;City&quot;: &quot;San Francisco&quot;,
+        &quot;State&quot;: &quot;CA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:11:50.573&quot;,
+        &quot;ReferenceNumber&quot;: 19,
+        &quot;CultureCode&quot;: &quot;en-US&quot;,
+        &quot;ParentRequisitionCode&quot;: 2,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Magasin 120 - Associés des dames&quot;,
+        &quot;Description&quot;: &quot;But Vente aux détails : Sert clients en les aidant à\nsélectionner des produits .\n\nTâches reliées du poste de Vente aux détails : - Accueillir\nles clients en leur offrant une assistance . - Dirige clients vers les racks et\nles compteurs ; leur suggère des articles. - Conseille les clients en\nfournissant des informations sur les produits . - Aide la clientèle à effectuer\ndes sélections en bâtissant la confiance des clients ; offrant des suggestions\net des opinions . – Documente les ventes en faisant la mise à jour des profils\nclient. - Traite les paiements; traitement des chèques , espèces, et carte de\nmagasin ou autre cartes de crédit . – Avise les clients des soldes pour clients\nprivilégiés. - Contribue à l&#x27;effort d&#x27;équipe en accomplissant des résultats\nconnexes au besoin .\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/Posting/View/21&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/JobApplication?postingId=21&quot;,
+        &quot;AddressLine1&quot;: &quot;11720 Amberpark Drive&quot;,
+        &quot;City&quot;: &quot;Alpharetta&quot;,
+        &quot;State&quot;: &quot;GA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;30009&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:17:45.723&quot;,
+        &quot;ReferenceNumber&quot;: 21,
+        &quot;CultureCode&quot;: &quot;fr-CA&quot;,
+        &quot;ParentRequisitionCode&quot;: 1,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Store 120 - Womens Associate&quot;,
+        &quot;Description&quot;: &quot;Job Purpose:\n   • Serves customers by helping them select products.\nJob Duties:\n   • Welcomes customers by greeting them; offering them assistance.\n   • Directs customers by escorting them to racks and counters; suggesting items.\n   • Advises customers by providing information on products.\n   • Helps customer make selections by building customer confidence; offering suggestions and opinions.\n   • Documents sale by creating or updating customer profile records.\n   • Processes payments by totaling purchases; processing checks, cash, and store or other credit cards.\n   • Keeps clientele informed by notifying them of preferred customer sales and future merchandise of potential interest.\n   • Contributes to team effort by accomplishing related results as needed.\nRetail Salesperson Skills and Qualifications:\n   • Listening\n   • Customer Service\n   • Meeting Sales Goals\n   • Selling to Customer Needs\n   • Product Knowledge\n   • Verbal Communication\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/Posting/View/21&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/JobApplication?postingId=21&quot;,
+        &quot;AddressLine1&quot;: &quot;11720 Amberpark Drive&quot;,
+        &quot;City&quot;: &quot;Alpharetta&quot;,
+        &quot;State&quot;: &quot;GA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;30009&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:17:45.723&quot;,
+        &quot;ReferenceNumber&quot;: 21,
+        &quot;CultureCode&quot;: &quot;en-US&quot;,
+        &quot;ParentRequisitionCode&quot;: 1,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Store 118 - Store Manager&quot;,
+        &quot;Description&quot;: &quot;Store Manager Job Purpose: Serves customers by providing merchandise; supervising staff.\nRetail Store Manager Job Duties: - Completes store operational requirements by scheduling and assigning employees; following up on work results. - Maintains store staff by recruiting, selecting, orienting, and training employees. - Maintains store staff job results by coaching, counseling, and disciplining employees; planning, monitoring, and appraising job results. - Achieves financial objectives by preparing an annual budget; scheduling expenditures; analyzing variances; initiating corrective actions. - Identifies current and future customer requirements by establishing rapport with potential and actual customers and other persons in a position to understand service requirements. - Ensures availability of merchandise and services by approving contracts; maintaining inventories. - Formulates pricing policies by reviewing merchandising activities; determining additional needed sales promotion; authorizing clearance sales; studying trends. - Markets merchandise by studying advertising, sales promotion, and display plans; analyzing operating and financial statements for profitability ratios. - Secures merchandise by implementing security systems and measures. - Protects employees and customers by providing a safe and clean store environment. - Maintains the stability and reputation of the store by complying with legal requirements. - Determines marketing strategy changes by reviewing operating and financial statements and departmental sales records. - Maintains professional and technical knowledge by attending educational workshops; reviewing professional publications; establishing personal networks; participating in professional societies. - Maintains operations by initiating, coordinating, and enforcing program, operational, and personnel policies and procedures. - Contributes to team effort by accomplishing related results as needed.&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/Posting/View/33&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/JobApplication?postingId=33&quot;,
+        &quot;City&quot;: &quot;Philadelphia&quot;,
+        &quot;State&quot;: &quot;PA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-16T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2016-04-15T11:54:07.283&quot;,
+        &quot;ReferenceNumber&quot;: 33,
+        &quot;CultureCode&quot;: &quot;en-US&quot;,
+        &quot;ParentRequisitionCode&quot;: 6,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Team Member&quot;,
+        &quot;Description&quot;: &quot;Team Member Job Purpose: Serves customers by helping them select products and delivering a great in-store experience.\n\nTeam Member Job Duties:\n- Welcomes customers by greeting them and offering them assistance.\n- Provides expert advice on the full range of brands and products available.\n- Offers solutions and in-store experiences that build customer confidence.\n- Documents sale by creating or updating customer profile records.\n- Processes payments by totaling purchases; processing checks, cash, and store or other credit cards.\n- Keeps customers informed by notifying them of sales and future products of potential interest.\n- Boosts store sales through refill and store presentation.\n- Works with the team to achieve store goals and objectives together.\n\nTeam Member Skills and Experience:\n- Recommended 2+ years of industry experience.\n- Some Customer Service experience required.\n- Strong communication skills and ability to explain product features and functionalities.\n- Experience with Point of Sale systems is a bonus.\n\nAs a Team Member, you will have the opportunity to be part of a dynamic and engaging work environment. The fast paced environment and strong company culture fosters both personal and professional growth. With consistent growth, our company provides many opportunities for advancement and encourages cross-functional experience.&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-GB/ddn/Posting/View/65&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-GB/ddn/JobApplication?postingId=65&quot;,
+        &quot;AddressLine1&quot;: &quot;54 Park St&quot;,
+        &quot;City&quot;: &quot;Sydney&quot;,
+        &quot;State&quot;: &quot;NSW&quot;,
+        &quot;Country&quot;: &quot;AU&quot;,
+        &quot;PostalCode&quot;: &quot;2000&quot;,
+        &quot;DatePosted&quot;: &quot;2017-08-03T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-08-03T14:34:14.993&quot;,
+        &quot;ReferenceNumber&quot;: 65,
+        &quot;CultureCode&quot;: &quot;en-GB&quot;,
+        &quot;ParentRequisitionCode&quot;: 12,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    }
+]
+```
+
+**Related Dayforce documentation**
+
+[https://developers.dayforce.com/Build/API-Explorer/Recruiting/Get-Job-Postings.aspx](https://developers.dayforce.com/Build/API-Explorer/Recruiting/Get-Job-Postings.aspx)
+
+### Sample configuration
+
+Following example illustrates how to connect to Dayforce with the init operation and query operation.
+
+1.Create a sample proxy as below :
+```xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
+       name=&quot;query&quot;
+       startOnLoad=&quot;true&quot;
+       statistics=&quot;disable&quot;
+       trace=&quot;disable&quot;
+       transports=&quot;http,https&quot;&gt;
+   &lt;target&gt;
+      &lt;inSequence&gt;
+         &lt;log level=&quot;full&quot; separator=&quot;,&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.username)&quot; name=&quot;username&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.password)&quot; name=&quot;password&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.clientNamespace)&quot; name=&quot;clientNamespace&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.apiVersion)&quot; name=&quot;apiVersion&quot;/&gt;
+         &lt;ceridiandayforce.init&gt;
+            &lt;username&gt;{$ctx:username}&lt;/username&gt;
+            &lt;password&gt;{$ctx:password}&lt;/password&gt;
+            &lt;clientNamespace&gt;{$ctx:clientNamespace}&lt;/clientNamespace&gt;
+            &lt;apiVersion&gt;{$ctx:apiVersion}&lt;/apiVersion&gt;
+         &lt;/ceridiandayforce.init&gt;
+         &lt;ceridiandayforce.getJobPostings/&gt;
+         &lt;send/&gt;
+      &lt;/inSequence&gt;
+   &lt;/target&gt;
+   &lt;description/&gt;
+&lt;/proxy&gt;
+                                
+```
+
+2.Create a json file named query.json and copy the configurations given below to it:
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;
+}
+```
+3.Replace the credentials with your values.
+
+4.Execute the following curl command:
+
+```bash
+curl http://localhost:8280/services/query -H &quot;Content-Type: application/json&quot; -d @query.json
+```
+5.Dayforce returns HTTP Code 200 with the following response body
+
+```json
+[
+    {
+        &quot;Title&quot;: &quot;Magasin 120 - Assistant gérant&quot;,
+        &quot;Description&quot;: &quot;Objectif de poste d’assistant gérant de magasin : soutient ses clients par la formation du personnel, de l’achat et de l’étalage des produits.\n Tâches reliées du poste d’assistant gérant de magasin :\n -Former le personnel du magasin ; orienter les nouvelles embauches vers les produits et des matériaux de formation ; offrir des séances de formation ; l&#x27;évaluer les résultats et les besoins d’apprentissage des associés en collaboration avec le gérant du magasin ; élaborer et appliquer les nouvelles formations  produit. - Évalue la concurrence en visitant les magasins concurrents ; la collecte d&#x27;informations tels que le style, la qualité et les prix de marchandise compétitifs. - Achats d’inventaire via recherche de nouveaux produits ; anticiper l&#x27;intérêt des acheteurs ; négocier des réductions de prix de volume ; placer et accélérer les commandes ; confirmer la réception. - Attirer les clients par l’exposition de la marchandise en façade ; respecter les suggestions et les horaires d&#x27;étalage ; mise en place ou d’assemblage de propriétés d&#x27;étalages préfabriqués ; la préparation des marchandises affichées dans les fenêtres et vitrines et sur le plancher de vente. - Favoriser les ventes en présentant la marchandise et les produits aux clients. – Aider aux clients en fournissant des informations ; répondre aux questions ; obtenir la marchandise demandée ; effectuer les transactions de paiement ; la préparation des marchandises pour la livraison. – Préparer les soldes et la relation client en analysant les rapports et la catégorisation de renseignements sur les ventes ; identifier et étudier les plaintes et les suggestions de services rapportés par les clients. - Maintient l’environnement du magasin propre et sécuritaire par le développement et l&#x27;édition des itinéraires d&#x27;évacuation ; la  détermination et la documentation des emplacements de matériaux et de produits chimiques potentiellement dangereux. - Maintient l&#x27;inventaire en cochant la marchandise pour déterminer les niveaux de stock ; anticiper la demande. - Préparer des rapports par la collecte, l&#x27;analyse et la synthèse des informations. - Maintient un service de qualité en établissant et en appliquant des normes de l&#x27;organisation. - Maintenir une connaissance professionnelle et technique en participant à des ateliers éducatifs ; revue des publications professionnelles ; établir des réseaux personnels ; l&#x27;analyse comparative des meilleurs pratiques state-of-the-art ; participation à des associations professionnelles.  - Contribue à l&#x27;effort d&#x27;équipe.\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/Posting/View/9&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/JobApplication?postingId=9&quot;,
+        &quot;City&quot;: &quot;Alpharetta&quot;,
+        &quot;State&quot;: &quot;GA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:21:51.937&quot;,
+        &quot;ReferenceNumber&quot;: 9,
+        &quot;CultureCode&quot;: &quot;fr-CA&quot;,
+        &quot;ParentRequisitionCode&quot;: 5,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Store 120 - Assistant Manager&quot;,
+        &quot;Description&quot;: &quot;Job Purpose:\n   • Serves customers by training staff; purchasing and displaying products.\nJob Duties:\n   • Trains store staff by reviewing and revising orientation to products and sales training materials; delivering training sessions; reviewing staff job results and learning needs with retail store manager; developing and implementing new product training.\n   • Evaluates competition by visiting competing stores; gathering information such as style, quality, and prices of competitive merchandise.\n   • Purchases inventory by researching emerging products; anticipating buyer interest; negotiating volume price breaks; placing and expediting orders; verifying receipt.\n   • Attracts customers by originating display ideas; following display suggestions or schedules; constructing or assembling prefabricated display properties; producing merchandise displays in windows and showcases, and on sales floor.\n   • Promotes sales by demonstrating merchandise and products to customers.\n   • Helps customers by providing information; answering questions; obtaining merchandise requested; completing payment transactions; preparing merchandise for delivery.\n   • Prepares sales and customer relations reports by analyzing and categorizing sales information; identifying and investigating customer complaints and service suggestions.\n   • Maintains a safe and clean store environment by developing and publishing evacuation routes; determining and documenting locations of potentially dangerous materials and chemicals.\n   • Maintains inventory by checking merchandise to determine inventory levels; anticipating customer demand.\n   • Prepares reports by collecting, analyzing, and summarizing information.\n   • Maintains quality service by establishing and enforcing organization standards.\n   • Maintains professional and technical knowledge by attending educational workshops; reviewing professional publications; establishing personal networks; benchmarking state-of-the-art practices; participating in professional societies.\n   • Contributes to team effort by accomplishing related results as needed.\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/Posting/View/9&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/JobApplication?postingId=9&quot;,
+        &quot;City&quot;: &quot;Alpharetta&quot;,
+        &quot;State&quot;: &quot;GA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:21:51.937&quot;,
+        &quot;ReferenceNumber&quot;: 9,
+        &quot;CultureCode&quot;: &quot;en-US&quot;,
+        &quot;ParentRequisitionCode&quot;: 5,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Magasin 110 – Associé aux accessoires&quot;,
+        &quot;Description&quot;: &quot;But Vente aux détails : Sert clients, aide à sélectionner des produits.\n\nTâches reliées du poste de Vente aux détails : -\nAccueillir les clients et offrir de l&#x27;assistance. - Dirige clients vers les racks et\nles compteurs ; leur suggère des articles. - Conseille les clients en\nfournissant des informations sur les produits. - Aide à la clientèle à\neffectuer des sélections en bâtissant la confiance, offrant des suggestions\net des opinions. – Documente les ventes par la mise à jour des profils\nclient. - Traite les paiements ; traitement des chèques , espèces, et carte de\nmagasin ou autre cartes de crédit . – Avise les clients des rabais pour\nclients privilégiés. - Contribue à l&#x27;effort d&#x27;équipe.\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/Posting/View/17&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/JobApplication?postingId=17&quot;,
+        &quot;City&quot;: &quot;San Francisco&quot;,
+        &quot;State&quot;: &quot;CA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:19:41.263&quot;,
+        &quot;ReferenceNumber&quot;: 17,
+        &quot;CultureCode&quot;: &quot;fr-CA&quot;,
+        &quot;ParentRequisitionCode&quot;: 3,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Store 110 - Accessories Associate&quot;,
+        &quot;Description&quot;: &quot;Job Purpose:\n   • Serves customers by helping them select products.\nJob Duties:\n   • Welcomes customers by greeting them; offering them assistance.\n   • Directs customers by escorting them to racks and counters; suggesting items.\n   • Advises customers by providing information on products.\n   • Helps customer make selections by building customer confidence; offering suggestions and opinions.\n   • Documents sale by creating or updating customer profile records.\n   • Processes payments by totaling purchases; processing checks, cash, and store or other credit cards.\n   • Keeps clientele informed by notifying them of preferred customer sales and future merchandise of potential interest.\n   • Contributes to team effort by accomplishing related results as needed.\nRetail Salesperson Skills and Qualifications:\n   • Listening\n   • Customer Service\n   • Meeting Sales Goals\n   • Selling to Customer Needs\n   • Product Knowledge\n   • Verbal Communication\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/Posting/View/17&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/JobApplication?postingId=17&quot;,
+        &quot;City&quot;: &quot;San Francisco&quot;,
+        &quot;State&quot;: &quot;CA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:19:41.263&quot;,
+        &quot;ReferenceNumber&quot;: 17,
+        &quot;CultureCode&quot;: &quot;en-US&quot;,
+        &quot;ParentRequisitionCode&quot;: 3,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Magasin 110 - Associé - Hommes&quot;,
+        &quot;Description&quot;: &quot;But Vente aux détails : Sert clients en les aidant à\nsélectionner des produits .\n\nTâches reliées du poste de Vente aux détails : - Accueillir\nles clients en leur offrant une assistance . - Dirige clients vers les racks et\nles compteurs ; leur suggère des articles. - Conseille les clients en\nfournissant des informations sur les produits . - Aide la clientèle à effectuer\ndes sélections en bâtissant la confiance des clients ; offrant des suggestions\net des opinions . – Documente les ventes en faisant la mise à jour des profils\nclient. - Traite les paiements; traitement des chèques , espèces, et carte de\nmagasin ou autre cartes de crédit . – Avise les clients des soldes pour clients\nprivilégiés. - Contribue à l&#x27;effort d&#x27;équipe en accomplissant des résultats\nconnexes au besoin .\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/Posting/View/19&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/JobApplication?postingId=19&quot;,
+        &quot;City&quot;: &quot;San Francisco&quot;,
+        &quot;State&quot;: &quot;CA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:11:50.573&quot;,
+        &quot;ReferenceNumber&quot;: 19,
+        &quot;CultureCode&quot;: &quot;fr-CA&quot;,
+        &quot;ParentRequisitionCode&quot;: 2,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Store 110 - Men&#x27;s Associate&quot;,
+        &quot;Description&quot;: &quot;Job Purpose:\n   • Serves customers by helping them select products.\nJob Duties:\n   • Welcomes customers by greeting them; offering them assistance.\n   • Directs customers by escorting them to racks and counters; suggesting items.\n   • Advises customers by providing information on products.\n   • Helps customer make selections by building customer confidence; offering suggestions and opinions.\n   • Documents sale by creating or updating customer profile records.\n   • Processes payments by totaling purchases; processing checks, cash, and store or other credit cards.\n   • Keeps clientele informed by notifying them of preferred customer sales and future merchandise of potential interest.\n   • Contributes to team effort by accomplishing related results as needed.\nRetail Salesperson Skills and Qualifications:\n   • Listening\n   • Customer Service\n   • Meeting Sales Goals\n   • Selling to Customer Needs\n   • Product Knowledge\n   • Verbal Communication\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/Posting/View/19&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/JobApplication?postingId=19&quot;,
+        &quot;City&quot;: &quot;San Francisco&quot;,
+        &quot;State&quot;: &quot;CA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:11:50.573&quot;,
+        &quot;ReferenceNumber&quot;: 19,
+        &quot;CultureCode&quot;: &quot;en-US&quot;,
+        &quot;ParentRequisitionCode&quot;: 2,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Magasin 120 - Associés des dames&quot;,
+        &quot;Description&quot;: &quot;But Vente aux détails : Sert clients en les aidant à\nsélectionner des produits .\n\nTâches reliées du poste de Vente aux détails : - Accueillir\nles clients en leur offrant une assistance . - Dirige clients vers les racks et\nles compteurs ; leur suggère des articles. - Conseille les clients en\nfournissant des informations sur les produits . - Aide la clientèle à effectuer\ndes sélections en bâtissant la confiance des clients ; offrant des suggestions\net des opinions . – Documente les ventes en faisant la mise à jour des profils\nclient. - Traite les paiements; traitement des chèques , espèces, et carte de\nmagasin ou autre cartes de crédit . – Avise les clients des soldes pour clients\nprivilégiés. - Contribue à l&#x27;effort d&#x27;équipe en accomplissant des résultats\nconnexes au besoin .\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/Posting/View/21&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/fr-CA/ddn/JobApplication?postingId=21&quot;,
+        &quot;AddressLine1&quot;: &quot;11720 Amberpark Drive&quot;,
+        &quot;City&quot;: &quot;Alpharetta&quot;,
+        &quot;State&quot;: &quot;GA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;30009&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:17:45.723&quot;,
+        &quot;ReferenceNumber&quot;: 21,
+        &quot;CultureCode&quot;: &quot;fr-CA&quot;,
+        &quot;ParentRequisitionCode&quot;: 1,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Store 120 - Womens Associate&quot;,
+        &quot;Description&quot;: &quot;Job Purpose:\n   • Serves customers by helping them select products.\nJob Duties:\n   • Welcomes customers by greeting them; offering them assistance.\n   • Directs customers by escorting them to racks and counters; suggesting items.\n   • Advises customers by providing information on products.\n   • Helps customer make selections by building customer confidence; offering suggestions and opinions.\n   • Documents sale by creating or updating customer profile records.\n   • Processes payments by totaling purchases; processing checks, cash, and store or other credit cards.\n   • Keeps clientele informed by notifying them of preferred customer sales and future merchandise of potential interest.\n   • Contributes to team effort by accomplishing related results as needed.\nRetail Salesperson Skills and Qualifications:\n   • Listening\n   • Customer Service\n   • Meeting Sales Goals\n   • Selling to Customer Needs\n   • Product Knowledge\n   • Verbal Communication\n\n\nCareers at our Company...\n\nWhether you are taking the first step toward beginning your career or are a professional looking for an exciting new opportunity, we offer a wide array of challenging and creative paths.\nSee Other Job Opportunities&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/Posting/View/21&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/JobApplication?postingId=21&quot;,
+        &quot;AddressLine1&quot;: &quot;11720 Amberpark Drive&quot;,
+        &quot;City&quot;: &quot;Alpharetta&quot;,
+        &quot;State&quot;: &quot;GA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;30009&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-13T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-01-16T14:17:45.723&quot;,
+        &quot;ReferenceNumber&quot;: 21,
+        &quot;CultureCode&quot;: &quot;en-US&quot;,
+        &quot;ParentRequisitionCode&quot;: 1,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Store 118 - Store Manager&quot;,
+        &quot;Description&quot;: &quot;Store Manager Job Purpose: Serves customers by providing merchandise; supervising staff.\nRetail Store Manager Job Duties: - Completes store operational requirements by scheduling and assigning employees; following up on work results. - Maintains store staff by recruiting, selecting, orienting, and training employees. - Maintains store staff job results by coaching, counseling, and disciplining employees; planning, monitoring, and appraising job results. - Achieves financial objectives by preparing an annual budget; scheduling expenditures; analyzing variances; initiating corrective actions. - Identifies current and future customer requirements by establishing rapport with potential and actual customers and other persons in a position to understand service requirements. - Ensures availability of merchandise and services by approving contracts; maintaining inventories. - Formulates pricing policies by reviewing merchandising activities; determining additional needed sales promotion; authorizing clearance sales; studying trends. - Markets merchandise by studying advertising, sales promotion, and display plans; analyzing operating and financial statements for profitability ratios. - Secures merchandise by implementing security systems and measures. - Protects employees and customers by providing a safe and clean store environment. - Maintains the stability and reputation of the store by complying with legal requirements. - Determines marketing strategy changes by reviewing operating and financial statements and departmental sales records. - Maintains professional and technical knowledge by attending educational workshops; reviewing professional publications; establishing personal networks; participating in professional societies. - Maintains operations by initiating, coordinating, and enforcing program, operational, and personnel policies and procedures. - Contributes to team effort by accomplishing related results as needed.&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/Posting/View/33&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-US/ddn/JobApplication?postingId=33&quot;,
+        &quot;City&quot;: &quot;Philadelphia&quot;,
+        &quot;State&quot;: &quot;PA&quot;,
+        &quot;Country&quot;: &quot;USA&quot;,
+        &quot;PostalCode&quot;: &quot;&quot;,
+        &quot;DatePosted&quot;: &quot;2014-06-16T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2016-04-15T11:54:07.283&quot;,
+        &quot;ReferenceNumber&quot;: 33,
+        &quot;CultureCode&quot;: &quot;en-US&quot;,
+        &quot;ParentRequisitionCode&quot;: 6,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    },
+    {
+        &quot;Title&quot;: &quot;Team Member&quot;,
+        &quot;Description&quot;: &quot;Team Member Job Purpose: Serves customers by helping them select products and delivering a great in-store experience.\n\nTeam Member Job Duties:\n- Welcomes customers by greeting them and offering them assistance.\n- Provides expert advice on the full range of brands and products available.\n- Offers solutions and in-store experiences that build customer confidence.\n- Documents sale by creating or updating customer profile records.\n- Processes payments by totaling purchases; processing checks, cash, and store or other credit cards.\n- Keeps customers informed by notifying them of sales and future products of potential interest.\n- Boosts store sales through refill and store presentation.\n- Works with the team to achieve store goals and objectives together.\n\nTeam Member Skills and Experience:\n- Recommended 2+ years of industry experience.\n- Some Customer Service experience required.\n- Strong communication skills and ability to explain product features and functionalities.\n- Experience with Point of Sale systems is a bonus.\n\nAs a Team Member, you will have the opportunity to be part of a dynamic and engaging work environment. The fast paced environment and strong company culture fosters both personal and professional growth. With consistent growth, our company provides many opportunities for advancement and encourages cross-functional experience.&quot;,
+        &quot;ClientSiteName&quot;: &quot;Client Careers Site&quot;,
+        &quot;ClientSiteXRefCode&quot;: &quot;CANDIDATEPORTAL&quot;,
+        &quot;CompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;ParentCompanyName&quot;: &quot;XYZ Co..PRDemo3 - April18th-2017-Hf7\rUpdated life event form for emps\rUpdated Pay group pp#s&quot;,
+        &quot;JobDetailsUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-GB/ddn/Posting/View/65&quot;,
+        &quot;ApplyUrl&quot;: &quot;https://usconfigr57.dayforcehcm.com/CandidatePortal/en-GB/ddn/JobApplication?postingId=65&quot;,
+        &quot;AddressLine1&quot;: &quot;54 Park St&quot;,
+        &quot;City&quot;: &quot;Sydney&quot;,
+        &quot;State&quot;: &quot;NSW&quot;,
+        &quot;Country&quot;: &quot;AU&quot;,
+        &quot;PostalCode&quot;: &quot;2000&quot;,
+        &quot;DatePosted&quot;: &quot;2017-08-03T00:00:00&quot;,
+        &quot;LastUpdated&quot;: &quot;2017-08-03T14:34:14.993&quot;,
+        &quot;ReferenceNumber&quot;: 65,
+        &quot;CultureCode&quot;: &quot;en-GB&quot;,
+        &quot;ParentRequisitionCode&quot;: 12,
+        &quot;JobType&quot;: 0,
+        &quot;TravelRequired&quot;: 0
+    }
+]
+```
+</body>
+</html>

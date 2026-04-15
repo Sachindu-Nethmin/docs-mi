@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>fix-transport-parameters.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># FIX parameters
+
+When you implement an integration use case that requires a FIX connection, you can use the following FIX parameters in your [proxy service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service) artifact.
+
+!!! Info
+    The WSO2 Integrator: MI can use the FIX transport only if the FIX transport listener and sender are enabled and configured at the server level. Read about the [FIX transport]({{base_path}}/install-and-setup/setup/transport-configurations/configuring-transports/#configuring-the-fix-transport).
+
+{!reference/synapse-properties/pull/proxy-service-add-properties-pull.md!}
+
+See [Creating a Proxy Service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service) for instructions.
+
+## Service-Level parameters
+
+&lt;table&gt;
+      &lt;tr&gt;
+         &lt;th&gt;
+          Parameter
+         &lt;/th&gt;
+         &lt;th&gt;
+           Description
+         &lt;/th&gt;
+      &lt;/tr&gt;
+   &lt;tbody&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+			   transport.fix.AcceptorConfigURL
+         &lt;/td&gt;
+         &lt;td&gt;
+            URL to the Quickfix/J acceptor configuration file (see notes below).&lt;/br&gt;&lt;/br&gt; This is required for receiving messages over FIX.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            transport.fix.InitiatorConfigURL
+         &lt;/td&gt;
+         &lt;td&gt;
+            URL to the Quickfix/J initiator configuration file (see notes below).&lt;/br&gt;&lt;/br&gt;
+            Required for sending messages over FIX.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            transport.fix.AcceptorLogFactory
+         &lt;/td&gt;
+         &lt;td&gt;
+            Log factory implementation to be used for the FIX acceptor (determines how logging is done at the acceptor level).&lt;/br&gt;&lt;/br&gt;
+            Possible values are &lt;code&gt;console&lt;/code&gt;, &lt;code&gt;file&lt;/code&gt;, and &lt;code&gt;jdbc&lt;/code&gt;.&lt;/br&gt;&lt;/br&gt;
+            Logging is disabled by default.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            transport.fix.InitiatorLogFactory
+         &lt;/td&gt;
+         &lt;td&gt;
+            Log factory implementation to be used for the FIX acceptor (determines how logging is done at the acceptor level).&lt;/br&gt;&lt;/br&gt;
+            Possible values are &lt;code&gt;console&lt;/code&gt;, &lt;code&gt;file&lt;/code&gt;, and &lt;code&gt;jdbc&lt;/code&gt;.&lt;/br&gt;&lt;/br&gt;
+            Logging is disabled by default.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            transport.fix.AcceptorMessageStore
+         &lt;/td&gt;
+         &lt;td&gt;
+            Message store mechanism to be used with the acceptor (determines how the FIX message store is maintained).&lt;/br&gt;&lt;/br&gt;
+            Possible values are &lt;code&gt;memory&lt;/code&gt;, &lt;code&gt;file&lt;/code&gt;, &lt;code&gt;sleepycat&lt;/code&gt;, and &lt;code&gt;jdbc&lt;/code&gt;.&lt;/br&gt;&lt;/br&gt;
+            The default value is &lt;code&gt;memory&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            transport.fix.InitiatorMessageStore
+         &lt;/td&gt;
+         &lt;td&gt;
+            Message store mechanism to be used with the initiator (determines how the FIX message store is maintained).&lt;/br&gt;&lt;/br&gt;
+            Possible values are &lt;code&gt;memory&lt;/code&gt;, &lt;code&gt;file&lt;/code&gt;, &lt;code&gt;sleepycat&lt;/code&gt;, and &lt;code&gt;jdbc&lt;/code&gt;.&lt;/br&gt;&lt;/br&gt;
+            The default value is &lt;code&gt;memory&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            transport.fix.ResponseDeliverToCompID
+         &lt;/td&gt;
+         &lt;td&gt;
+            If the response FIX messages should be delivered to a location different to the location where the request originated, use this property to set the DeliverToCompID field of the FIX messages.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            transport.fix.ResponseDeliverToSubID
+         &lt;/td&gt;
+         &lt;td&gt;
+            If the response FIX messages should be delivered to a location different to the location where the request originated, use this property to set the DeliverToSubID field of the FIX messages.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            transport.fix.ResponseDeliverToLocationID
+         &lt;/td&gt;
+         &lt;td&gt;
+            If the response FIX messages should be delivered to a location different to the location where the request originated, use this property to set the DeliverToLocationID field of the FIX messages.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            transport.fix.endAllToInSequence
+         &lt;/td&gt;
+         &lt;td&gt;
+            By default, all received FIX messages (including responses) will be directed to the &lt;code&gt;inSequence&lt;/code&gt; of the proxy service. Use this property to override that behavior.&lt;br/&gt;&lt;br/&gt;
+            By default, this setting is &lt;code&gt;true&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            transport.fix.BeginStringValidation
+         &lt;/td&gt;
+         &lt;td&gt;
+            Whether the transport should validate &lt;code&gt;BeginString&lt;/code&gt; values when forwarding FIX messages across sessions.&lt;br/&gt;&lt;br/&gt;
+            By default, this setting is &lt;code&gt;true&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            transport.fix.DropExtraResponses
+         &lt;/td&gt;
+         &lt;td&gt;
+            In situations where the FIX recipient sends multiple responses per request, use this parameter to drop excessive responses and use only the first one.&lt;br/&gt;&lt;br/&gt;
+            By default, this setting is &lt;code&gt;false&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+   &lt;/tbody&gt;
+&lt;/table&gt;
+</body>
+</html>

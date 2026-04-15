@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>switch-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Switch Mediator
+
+The **Switch Mediator** evaluates a Synapse expression and returns a result. This result is then matched against the regular expressions defined in each switch case, in the specified order. If a matching case is found, it is executed, and the remaining cases are not processed. If none of the case statements match the default case will be executed.
+
+## Syntax
+
+```xml
+    &lt;switch source=&quot;[expression]&quot;&gt;
+        &lt;case regex=&quot;string&quot;&gt;
+            mediator+
+        &lt;/case&gt;+
+        &lt;default&gt;
+            mediator+
+        &lt;/default&gt;
+    &lt;/switch&gt;
+```
+
+## Configuration
+
+The parameters available to configure the Switch mediator are as follows.
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Expression&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;The Synapse expression to be evaluated which should return a string.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Cases&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;This section displays the number of cases currently added to the switch mediator and option to add a new case.&lt;/p&gt;
+&lt;p&gt;&lt;br /&gt;
+&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+### Adding a new case
+
+1.  To add a case, click on the Switch mediator to open the **Edit Switch Mediator** panel. Then click **Add new case** under the **Cases** section.
+2.  It will open a form where a regular expression can be added in the **Regex Pattern** parameter. Once submitted, it will add an empty case under the switch mediator as a child.
+3.  Click on the &lt;strong&gt;+&lt;/strong&gt; mark under a case to add the mediator(s) you want to execute when this case matches the switching value.
+
+## Examples
+
+In this example, the [Variable mediator]({{base_path}}/reference/mediators/variable-mediator) sets the variable named `symbol` on the current message depending on the evaluation of the expression. The expression will get the symbol value and match it against the values `MSFT` and `IBM`. If the symbol value does not match either of these symbols, the default case will be executed.
+
+```xml
+&lt;switch source=&quot;${payload.request.symbol}&quot;&gt;
+    &lt;case regex=&quot;IBM&quot;&gt;
+        &lt;!-- the variable mediator sets a variable on the *current* message --&gt;
+        &lt;variable name=&quot;symbol&quot; type=&quot;STRING&quot; value=&quot;Great stock - IBM&quot;/&gt;
+    &lt;/case&gt;
+    &lt;case regex=&quot;MSFT&quot;&gt;
+        &lt;variable name=&quot;symbol&quot; type=&quot;STRING&quot; value=&quot;Are you sure? - MSFT&quot;/&gt;
+    &lt;/case&gt;
+    &lt;default&gt;
+        &lt;!-- it is possible to assign the result of an expression as well --&gt;
+        &lt;variable name=&quot;symbol&quot; type=&quot;STRING&quot; expression=&quot;${&#x27;Normal Stock - &#x27; + payload.request.symbol}&quot;/&gt;
+    &lt;/default&gt;
+&lt;/switch&gt;
+```
+</body>
+</html>

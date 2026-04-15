@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>pub-sub-using-mqtt.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Use MQTT Transport
+This sample demonstrates how to run a Pub-Sub use case using MQTT as the broker.  the MQTT listener in the WSO2 Integrator: MI consumes messages from a MQTT topic, and the MQTT sender publishes messages to a MQTT topic.
+
+## Synapse configuration
+
+```xml
+&lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;SampleProxy&quot; transports=&quot;mqtt&quot; startOnLoad=&quot;true&quot; trace=&quot;disable&quot;&gt;
+    &lt;description/&gt;
+    &lt;target&gt;
+        &lt;endpoint&gt;
+            &lt;address uri=&quot;mqtt:/SampleProxy?mqtt.server.host.name=localhost&amp;amp;mqtt.server.port=1883&amp;amp;mqtt.client.id=esb.test.sender&amp;amp;mqtt.topic.name=esb.test2&amp;amp;mqtt.subscription.qos=2&amp;amp;mqtt.blocking.sender=true&quot;/&gt;
+        &lt;/endpoint&gt;
+        &lt;inSequence&gt;
+            &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+            &lt;property name=&quot;FORCE_SC_ACCEPTED&quot; value=&quot;true&quot; scope=&quot;axis2&quot; type=&quot;STRING&quot;/&gt;
+        &lt;/inSequence&gt;
+        &lt;outSequence&gt;
+            &lt;send/&gt;
+        &lt;/outSequence&gt;
+    &lt;/target&gt;
+    &lt;parameter name=&quot;mqtt.connection.factory&quot;&gt;mqttConFactory&lt;/parameter&gt;
+    &lt;parameter name=&quot;mqtt.topic.name&quot;&gt;esb.test1&lt;/parameter&gt;
+    &lt;parameter name=&quot;mqtt.subscription.qos&quot;&gt;2&lt;/parameter&gt;
+    &lt;parameter name=&quot;mqtt.content.type&quot;&gt;text/plain&lt;/parameter&gt;
+    &lt;parameter name=&quot;mqtt.session.clean&quot;&gt;false&lt;/parameter&gt;
+&lt;/proxy&gt;  
+```
+
+Add the following configurations to enable the MQTT listener and sender in `&lt;MI_HOME&gt;/conf/deployment.toml` file.
+
+```toml
+[transport.mqtt]
+listener.enable = true
+listener.hostname = &quot;localhost&quot;
+listener.connection_factory = &quot;mqttConFactory&quot;
+listener.server_port = 1883
+listener.client_id = &quot;client-id-1234&quot;
+listener.topic_name = &quot;esb.test2&quot;
+
+sender.enable = true
+```
+
+## Build and run
+
+-   Download the `org.eclipse.paho.client.mqttv3-1.1.0.jar`
+    file.
+-   Download [mosquitto MQTT broker](http://mosquitto.org/).
+-   Copy the `org.eclipse.paho.client.mqttv3-1.1.0.jar` file to the `MI_HOME/lib/` directory.
+-   Start the MQTT broker.
+
+Invoke the proxy service:
+
+-   Execute the following command to start the MQTT subscriber on the
+    *esb.test2* topic:
+
+    ```bash
+    mosquitto_sub -h localhost -t esb.test2
+    ```
+
+-   Execute the following command to run the MQTT publisher to publish
+    to the *esb.test1* topic:
+
+    ```bash
+    mosquitto_pub -h localhost -p 1883 -t esb.test1  -m {&quot;company&quot;:&quot;WSO2&quot;}
+    ```
+
+When you analyze the output messages on the MQTT subscriber console, you
+will see the following log:
+
+```bash
+{&quot;company&quot;:&quot;WSO2&quot;}
+```
+</body>
+</html>

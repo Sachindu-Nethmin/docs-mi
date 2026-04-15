@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>kafka-inbound-endpoint-config.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Kafka Inbound Endpoint Reference
+
+## Mandatory parameters
+
+The following parameters are required when configuring Kafka Inbound Endpoint.
+
+&lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;bootstrap.servers&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The Kafka brokers listed as &lt;code&gt;host1:port1&lt;/code&gt; and &lt;code&gt;host2:port2&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;key.deserializer&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Deserializer class for key that implements the &lt;code&gt;org.apache.kafka.common.serialization.Deserializer&lt;/code&gt; interface.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;value.deserializer&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Deserializer class for value that implements the &lt;code&gt;org.apache.kafka.common.serialization.Deserializer&lt;/code&gt; interface.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;group.id&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The consumer group ID.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;poll.timeout&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The max time to block in the consumer waiting for records.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;topic.name&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The name of the topic.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;contentType&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The content type of the message.&lt;/td&gt;
+        &lt;/tr&gt;
+&lt;/table&gt;
+
+## Optional parameters
+
+&lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Default Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;topic.pattern&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The name pattern of the topic.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;topic.partitions&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;A comma-separated list of partitions for the topic to which the consumer is subscribed.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;enable.auto.commit&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Whether the consumer will automatically commit offsets periodically at the interval set by &lt;code&gt;auto.commit.interval.ms&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;true&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;auto.commit.interval.ms&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Offsets are committed automatically with a frequency controlled by the config.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;5000&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;failure.retry.count&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The offset set to the same record until the failure retry count exceeds.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;-1&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;session.timeout.ms&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The timeout used to detect client failures when using Kafka’s group management facility.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;10000&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;fetch.min.bytes&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The minimum amount of data the server should return for a fetch request.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;1&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;heartbeat.interval.ms&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The expected time between heartbeats to the consumer coordinator when using Kafka’s group management facilities.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;3000&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;max.partition.fetch.bytes&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The maximum amount of data per-partition the server will return. Records are fetched in batches by the consumer.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;1048576&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;key.delegate.deserializer&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Property name for the delegate key deserializer.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;value.delegate.deserializer&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Property name for the delegate value deserializer.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;schema.registry.url&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Comma-separated list of URLs for Schema Registry instances that can be used to register or look up schemas.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;basic.auth.credentials.source&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Specify how to pick the credentials for the Basic authentication header.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;basic.auth.user.info&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Specify the user info for the Basic authentication in the form of &lt;code&gt;{username}:{password}&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;ssl.key.password&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The password of the private key in the key store file or the PEM key specified in &lt;code&gt;ssl.keystore.key&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;ssl.keystore.location&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The location of the key store file. This is optional for client and can be used for two-way authentication for client.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;ssl.keystore.password&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The store password for the key store file. This is optional for client and only needed if &lt;code&gt;ssl.keystore.location&lt;/code&gt; is configured.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;ssl.truststore.location&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The location of the trust store file.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;ssl.truststore.password&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The password for the trust store file.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;auto.offset.reset&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Defines what to do when there is no initial offset in Kafka or if the current offset does not exist any more on the server.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;latest&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;connections.max.idle.ms&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Close idle connections after the number of milliseconds specified by this config.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;540000&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;exclude.internal.topics&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Whether internal topics matching a subscribed pattern should be excluded from the subscription.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;true&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;fetch.max.bytes&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The maximum amount of data the server should return for a fetch request.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;52428800&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;max.poll.interval.ms&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The maximum delay between invocations of &lt;code&gt;poll()&lt;/code&gt; when using consumer group management.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;300000&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;max.poll.records&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The maximum number of records returned in a single call to &lt;code&gt;poll()&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;500&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;partition.assignment.strategy&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;A list of class names or class types, ordered by preference, of supported partition assignment strategies that the client will use to distribute partition ownership amongst consumer instances when group management is used.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;org.apache.kafka.clients.consumer.RangeAssignor&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;receive.buffer.bytes&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The size of the TCP receive buffer (SO_RCVBUF) to use when reading data.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;65536&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;request.timeout.ms&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The configuration controls the maximum amount of time the client will wait for the response of a request.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;305000&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.jaas.config&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;JAAS login context parameters for SASL connections in the format used by JAAS configuration files.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.client.callback.handler.class&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The fully qualified name of a SASL client callback handler class that implements the &lt;code&gt;AuthenticateCallbackHandler&lt;/code&gt; interface.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.login.class&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The fully qualified name of a class that implements the Login interface.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.kerberos.service.name&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The Kerberos principal name that Kafka runs as.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.mechanism&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;SASL mechanism used for client connections.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;security.protocol&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Protocol used to communicate with brokers.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;send.buffer.bytes&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The size of the TCP send buffer (SO_SNDBUF) to use when sending data.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;131072&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;ssl.enabled.protocols&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The list of protocols enabled for SSL connections.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;ssl.keystore.type&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The file format of the key store file.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;ssl.protocol&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The SSL protocol used to generate the SSLContext.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;ssl.provider&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The name of the security provider used for SSL connections.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;ssl.truststore.type&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The file format of the trust store file.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;check.crcs&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Automatically check the CRC32 of the records consumed. This ensures no on-the-wire or on-disk corruption to the messages occurred.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;true&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;client.id&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;An id string to pass to the server when making requests.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;fetch.max.wait.ms&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The maximum amount of time the server will block before answering the fetch request if there isn’t sufficient data to immediately satisfy the requirement given by fetch.min.bytes.&lt;/td&gt;
+            &lt;td&gt;500&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;interceptor.classes&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;A list of classes to use as interceptors.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;metadata.max.age.ms&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The period of time in milliseconds after which we force a refresh of metadata even if we haven’t seen any partition leadership changes to proactively discover any new brokers or partitions.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;300000&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;metric.reporters&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;A list of classes to use as metrics reporters.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;metrics.num.samples&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The number of samples maintained to compute metrics.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;2&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;metrics.recording.level&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The highest recording level for metrics.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;INFO&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;metrics.sample.window.ms&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The window of time a metrics sample is computed over.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;30000&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;reconnect.backoff.ms&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The base amount of time to wait before attempting to reconnect to a given host.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;50&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;retry.backoff.ms&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The amount of time to wait before attempting to retry a failed request to a given topic partition.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;100&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.kerberos.kinit.cmd&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Kerberos kinit command path.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.kerberos.min.time.before.relogin&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Login thread sleep time between refresh attempts.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.kerberos.ticket.renew.jitter&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Percentage of random jitter added to the renewal time.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.kerberos.ticket.renew.window.factor&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Login thread will sleep until the specified window factor of time from last refresh to ticket’s expiry has been reached, at which time it will try to renew the ticket.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;ssl.cipher.suites&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;A list of cipher suites.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;ssl.endpoint.identification.algorithm&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The endpoint identification algorithm to validate server hostname using server certificate.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;ssl.keymanager.algorithm&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The algorithm used by key manager factory for SSL connections.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;ssl.secure.random.implementation&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The SecureRandom PRNG implementation to use for SSL cryptography operations.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;ssl.trustmanager.algorithm&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The algorithm used by trust manager factory for SSL connections.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.oauthbearer.token.endpoint.url&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The URL for the OAuth/OIDC identity provider.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.oauthbearer.scope.claim.name&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The OAuth claim for the scope is often named “scope”, but this (optional) setting can provide a different name to use for the scope included in the JWT payload’s claims if the OAuth/OIDC provider uses a different name for that claim.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.login.callback.handler.class&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The fully qualified name of a SASL login callback handler class that implements the AuthenticateCallbackHandler interface.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.login.connect.timeout.ms&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The (optional) value in milliseconds for the external authentication provider connection timeout.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.login.read.timeout.ms&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The (optional) value in milliseconds for the external authentication provider read timeout.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.login.retry.backoff.ms&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The (optional) value in milliseconds for the initial wait between login attempts to the external authentication provider.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;sasl.login.retry.backoff.max.ms&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The (optional) value in milliseconds for the maximum wait between login attempts to the external authentication provider.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;kafka.header.prefix&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The prefix for Kafka headers.&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;avro.use.logical.type.converters&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Whether to enable the use of logical type converters in Avro. This parameter is available only with Kafka Inbound Endpoint v1.2.2 and above.&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;False&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+&lt;/table&gt;
+
+---
+
+## Manual offset control
+
+Manual offset committing gives you explicit control over when Kafka offsets are committed, ensuring that messages are acknowledged only after successful processing. Follow the steps below to configure manual offset commit behavior in WSO2 Kafka Inbound Endpoint.
+
+
+### Step 1: Disable auto commit
+
+Disabling auto commit ensures that the WSO2 Kafka Inbound Endpoint does not commit the Kafka offset automatically, allowing your mediation logic to determine when an offset should be committed.
+
+To disable auto commit, set the following parameter in your Kafka inbound endpoint configuration:
+
+```xml
+&lt;parameter name=&quot;enable.auto.commit&quot;&gt;false&lt;/parameter&gt;
+```
+
+### Step 2: Use `SET_ROLLBACK_ONLY` to prevent commit on failure
+
+Add the following property to your **onError sequence** to signal the Inbound Endpoint not to commit the current offset if message processing fails. This will cause the same message to be re-polled in the next cycle.
+
+
+```xml
+&lt;property name=&quot;SET_ROLLBACK_ONLY&quot; value=&quot;true&quot; scope=&quot;default&quot; type=&quot;STRING&quot;&gt;&lt;/property&gt;
+```
+
+### Step 3: Configure retry behavior using `failure.retry.count` (optional)
+
+Add this parameter to the inbound endpoint to control the retry behavior:
+
+```xml
+&lt;parameter name=&quot;failure.retry.count&quot;&gt;N&lt;/parameter&gt;
+```
+
+- `N` is the number of retry attempts for a failed message.
+- If not set or set to `-1` (default), the same message will be retried indefinitely.
+- If the retry count is exceeded, the offset will move to the next record, and the failed message will be discarded.
+
+
+!!! Note
+    Manual offset committing is **reliable only when used with sequential and synchronous mediation flows**.
+    
+    **Why?**&lt;br&gt;
+    
+    - In parallel processing mode in the current connector architecture, the actual result of message processing may be ignored, and offsets may get committed under the assumption that the processing was successful. This may lead to message loss, especially if some records fail during message processing&lt;br&gt;
+    - Additionally, asynchronous mediation flows (e.g., using `non-blocking Call mediator`, using `Clone` and `Iterate` mediators with `sequential` mode disabled, or `Scatter-Gather` and `Foreach` mediators with `parallelExecution` mode enabled) can cause offsets to be committed before message processing completes, which may lead to unprocessed messages being skipped.
+
+
+    **Recommendation**
+
+    To ensure reliable manual offset committing:
+    
+    - Use **sequential processing** with **synchronous flows** wherever possible.
+    - For throughput and scalability:
+        - Configure your Kafka topic with **multiple partitions**.
+        - Run **multiple Kafka Inbound Endpoints** (within the same consumer group) to read from different partitions concurrently.
+</body>
+</html>

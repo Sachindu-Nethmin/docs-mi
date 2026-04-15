@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>rabbitmq-amqp-1.0-inbound-endpoint-example.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># RabbitMQ (AMQP 1.0) Inbound Endpoint Example
+
+The RabbitMQ (AMQP 1.0) Inbound Endpoint allows you to connect to RabbitMQ Broker and consume messages from specified queues. The messages are then injected into the mediation engine for further processing and mediation.
+
+## What you’ll build
+
+By following this tutorial, you will gain hands-on experience in:
+
+- Configuring the RabbitMQ (AMQP 1.0) Inbound Endpoint in WSO2 Integrator: MI using the Visual Studio Code extension.
+- Consuming and processing messages from a RabbitMQ queue.
+- Running and testing the integration to receive real-time notifications.
+
+The inbound endpoint acts as a message receiver and injects those messages into an integration sequence. In this section, we will demonstrate how to configure the inbound endpoint to establish a connection with the RabbitMQ Broker. In this example, we will simply log the message. However, you can extend the flow to perform complex mediation tasks using [mediators]({{base_path}}/reference/mediators/about-mediators/).
+
+## Prerequisites 
+
+### Set up RabbitMQ Broker
+
+To connect with RabbitMQ Broker using the WSO2 Integrator: MI RabbitMQ (AMQP 1.0) Inbound Endpoint, you need to first set up a running RabbitMQ Broker instance locally or on a server. In this example, we will use an RabbitMQ Broker standalone server. Set up RabbitMQ Broker by following the instructions in [Set up RabbitMQ Broker]({{base_path}}/reference/connectors/rabbitmq-amqp-1.0-connector/rabbitmq-amqp-1.0-connector-setup/).
+
+## Configure Inbound Endpoint
+
+1. Follow the steps in [create Integration Project]({{base_path}}/develop/create-integration-project/) guide to set up your project.
+
+2. Create a sequence (message injecting sequence) to process the message. In this example, the sequence logs the message for simplicity, but in a real-world use case, this can include any message mediation logic. Since the RabbitMQ broker requires acknowledgment from the client that receives the message, you need to configure the `rabbitmq.accept` operation to acknowledge the message after processing. You can configure this operation anywhere in the message injecting sequence based on when you want to acknowledge the message and notify the RabbitMQ broker to remove it from the queue, indicating successful processing. For more information on message acknowledgment, refer to the [RabbitMQ (AMQP 1.0) Connector reference documentation - Message Acknowledgment Operations Section]({{base_path}}/reference/connectors/rabbitmq-amqp-1.0-connector/rabbitmq-amqp-1.0-connector-reference/#message-acknowledgment-operations).
+```xml
+   &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+   &lt;sequence name=&quot;successSeq&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+       &lt;log category=&quot;INFO&quot; logMessageID=&quot;false&quot; logFullPayload=&quot;false&quot;&gt;
+           &lt;message&gt;${payload}&lt;/message&gt;
+       &lt;/log&gt;
+       &lt;rabbitmq.accept&gt;
+           &lt;responseVariable&gt;rabbitmq_accept_1&lt;/responseVariable&gt;
+           &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+       &lt;/rabbitmq.accept&gt;
+   &lt;/sequence&gt; 
+```
+
+3. Create another sequence to handle errors that occur during message processing. Similar to the message injecting sequence, this example logs the message for simplicity, but in a real-world use case, this can include error handling and recovery logic. Since the RabbitMQ broker requires acknowledgment, you need to configure either the `rabbitmq.discard` operation or the `rabbitmq.requeue` operation to negatively acknowledge the message. You can configure this operation anywhere in the error sequence based on when you want to acknowledge the failure and notify the RabbitMQ broker to either discard or requeue the message. For more information on message acknowledgment, refer to the [RabbitMQ (AMQP 1.0) Connector reference documentation - Message Acknowledgment Operations Section]({{base_path}}/reference/connectors/rabbitmq-amqp-1.0-connector/rabbitmq-amqp-1.0-connector-reference/#message-acknowledgment-operations).
+```xml
+   &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+   &lt;sequence name=&quot;errorSeq&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+       &lt;log category=&quot;INFO&quot; logMessageID=&quot;false&quot; logFullPayload=&quot;false&quot;&gt;
+           &lt;message&gt;${payload}&lt;/message&gt;
+       &lt;/log&gt;
+       &lt;rabbitmq.discard&gt;
+           &lt;responseVariable&gt;rabbitmq_discard_1&lt;/responseVariable&gt;
+           &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+       &lt;/rabbitmq.discard&gt;
+   &lt;/sequence&gt;
+```
+4. Then, go to the **Add Artifact** section and select **Event Integration**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/rabbitmq-inbound/AddEventIntegration.png&quot; title=&quot;Add an Event Integration&quot; width=&quot;800&quot; alt=&quot;Add an Event Integration&quot;/&gt;
+
+5. Create an **RabbitMQ (AMQP 1.0) Inbound Endpoint**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/rabbitmq-inbound/AddRabbitMQInbound.png&quot; title=&quot;Create RabbitMQ Inbound Endpoint&quot; width=&quot;800&quot; alt=&quot;Create RabbitMQ Inbound Endpoint&quot;/&gt;
+
+6. Enter the following values in the form and click **Create**.
+
+      * **Inbound Functional:**
+        * **Event Integration Name**: `RabbitMQInboundEP`
+        * **Injecting Sequence Name**: `successSeq`
+        * **Error Sequence Name**: `errorSeq`
+        * **Execute Sequentially**: `true`
+        * **Coordination**: `true`
+      * **Basic :**
+        * **Server Hosts**: `localhost`
+        * **Server Ports**: `5672`
+        * **Queue Name**: `notification-queue`
+        * **Queue Type**: `QUORUM`
+        * **Queue AutoDeclare**: `true`
+        * **Exchange Name**: `notification-exchange`
+        * **Exchange Type**: `DIRECT`
+        * **Exchange Auto Declare**: `true`
+        * **Routing Key**: `notification-routing-key`
+      * **User Authentication:**
+         * **SASL Mechanism**: `PLAIN`
+         * **OAuth2 Enabled**: `false`
+         * **Server UserName**: `guest`
+         * **Server Password**: `guest`
+
+    The source view of the created inbound endpoint is shown below. For detailed descriptions of each parameter, please refer to the [RabbitMQ (AMQP 1.0) Inbound Endpoint reference documentation]({{base_path}}/reference/connectors/rabbitmq-amqp-1.0-connector/rabbitmq-amqp-1.0-inbound-endpoint-reference).
+
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;inboundEndpoint name=&quot;RabbitMQInboundEP&quot; class=&quot;org.wso2.carbon.inbound.rabbitmq.RabbitMQListener&quot; sequence=&quot;successSeq&quot; onError=&quot;errorSeq&quot; suspend=&quot;false&quot;&gt;
+        &lt;parameters xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;parameter name=&quot;inbound.behavior&quot;&gt;eventBased&lt;/parameter&gt;
+            &lt;parameter name=&quot;sequential&quot;&gt;true&lt;/parameter&gt;
+            &lt;parameter name=&quot;coordination&quot;&gt;true&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.server.host.name&quot;&gt;localhost&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.server.port&quot;&gt;5672&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.queue.name&quot;&gt;notification-queue&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.queue.type&quot;&gt;QUORUM&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.queue.auto.declare&quot;&gt;true&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.exchange.name&quot;&gt;notification-exchange&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.exchange.type&quot;&gt;DIRECT&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.exchange.auto.declare&quot;&gt;true&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.routing.key&quot;&gt;notification-routing-key&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.connection.sasl.mechanism&quot;&gt;PLAIN&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.connection.oauth2.enabled&quot;&gt;false&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.server.user.name&quot;&gt;guest&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.server.password&quot;&gt;guest&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.connection.idle.timeout&quot;&gt;60000&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.connection.recovery.policy.type&quot;&gt;FIXED_WITH_INITIAL_DELAY_AND_TIMEOUT&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.classic.dead.letter.strategy&quot;&gt;NON_RETRYABLE_DISCARD&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.queue.exclusive&quot;&gt;false&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.queue.auto.delete&quot;&gt;false&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.exchange.auto.delete&quot;&gt;false&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.stream.filter.match.unfiltered&quot;&gt;false&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.stream.offset.starting.strategy&quot;&gt;NEXT&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.stream.offset.tracker.flush.interval&quot;&gt;10&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.stream.offset.tracker.shutdown.timeout&quot;&gt;5&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.connection.ssl.enabled&quot;&gt;false&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.dead.letter.queue.type&quot;&gt;CLASSIC&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.dead.letter.queue.auto.declare&quot;&gt;false&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.dead.letter.exchange.type&quot;&gt;DIRECT&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.dead.letter.exchange.auto.declare&quot;&gt;false&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.throttle.enabled&quot;&gt;false&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.throttle.mode&quot;&gt;BATCH&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.throttle.timeUnit&quot;&gt;MINUTE&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.queue.overflow.strategy&quot;&gt;DROP_HEAD&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.auto.ack.enabled&quot;&gt;false&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.ack.wait.time&quot;&gt;180000&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.concurrent.consumers.count&quot;&gt;1&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.message.receiver.thread.pool.size&quot;&gt;1&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.consumer.initial.credit&quot;&gt;1&lt;/parameter&gt;
+            &lt;parameter name=&quot;rabbitmq.classic.override.requeue.with.discard&quot;&gt;false&lt;/parameter&gt;
+        &lt;/parameters&gt;
+    &lt;/inboundEndpoint&gt;
+    ```      
+
+## Export integration logic as a CApp
+
+Follow the steps in the [Build and Export the Carbon Application]({{base_path}}/develop/deploy-artifacts/#build-and-export-the-carbon-application) guide to build and export the CApp to a specified location.
+
+## Get the project
+
+You can download the ZIP file and extract the contents to get the project code.
+
+&lt;a href=&quot;{{base_path}}/assets/attachments/connectors/RabbitMQMessageListener.zip&quot;&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+&lt;/a&gt;
+
+## Run the Integration
+
+To deploy and run the project, refer to the [build and run]({{base_path}}/develop/deploy-artifacts/#build-and-run) guide or simply use the **Run** button in the Visual Studio Code extension to run the integration.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/salesforce-inbound/deploy-run.png&quot; title=&quot;Deploy and Run the Integration&quot; width=&quot;500&quot; alt=&quot;Deploy and Run the Integration&quot;/&gt;
+
+You can further refer to the application deployed through the CLI tool. See the instructions on [managing integrations from the CLI]({{base_path}}/observe-and-manage/managing-integrations-with-micli).
+
+
+## Testing the Integration
+
+You can manually publish messages to a RabbitMQ queue via the RabbitMQ management console. Refer to the [official RabbitMQ documentation](https://www.rabbitmq.com/docs/management) for guidance on accessing the management console. You can use the console to publish messages for testing purposes. However, this approach is not recommended for enterprise-level deployments.
+
+Alternatively, you can use the [RabbitMQ (AMQP 1.0) Connector example]({{base_path}}/reference/connectors/rabbitmq-amqp-1.0-connector/rabbitmq-amqp-1.0-connector-example) to insert data programmatically. In this example, we will use the WSO2 MI RabbitMQ (AMQP 1.0) connector to insert data into the RabbitMQ queue.
+
+1. Save the following payload as `data.json`:
+
+       ```json
+       {
+          &quot;queue&quot;: &quot;notification-queue&quot;,
+          &quot;message&quot;: &quot;Hello World!&quot;
+       }
+       ```
+
+2. Invoke the API using the following `curl` command:
+
+   ```
+   curl -X POST -d @data.json http://localhost:8290/publishmessage --header &quot;Content-Type:application/json&quot;
+   ```
+
+#### Expected Output
+
+After inserting a record, you should see a log entry in the WSO2 Integrator: MI console similar to the following:
+
+   ```
+   [2026-02-13 18:32:39,526]  INFO {LogMediator} RabbitMQInboundEP-rabbitmq-inbound-listener-dispatcher-0 - {inboundendpoint:RabbitMQInboundEP} {&quot;text&quot;:&quot;Hello World!&quot;}
+   ```
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>overview.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Messaging Endpoints
+
+An [endpoint]({{base_path}}/learn/enterprise-integration-patterns/messaging-systems/message-endpoint) is used to connect an application to a messaging channel so that the application can send or receive messages.
+
+This section introduces various endpoint patterns and how each can be simulated using the WSO2 Integrator: MI.
+
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/messaging-gateway&quot;&gt;Messaging Gateway&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-gateway.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-gateway.png&quot; alt=&quot;messaging-gateway&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to encapsulate access to the messaging system from the rest of the application.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/messaging-mapper&quot;&gt;Messaging Mapper&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;/td&gt;
+        &lt;td&gt;How to move data between domain objects and the messaging infrastructure, while keeping the two independent of each other.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/transactional-client&quot;&gt;Transactional Client&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/transactional-client.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/transactional-client.png&quot; alt=&quot;transactional-client&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a client controls its transactions with the messaging system.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/polling-consumer&quot;&gt;Polling Consumer&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/polling-consumer.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/polling-consumer.png&quot; alt=&quot;polling-consumer&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How an application consumes a message when the application is ready.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/event-driven-consumer&quot;&gt;Event-Driven Consumer&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/event-driven-consumer.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/event-driven-consumer.png&quot; alt=&quot;event-driven-consumer&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How an application automatically consumes messages as they become available.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/competing-consumers&quot;&gt;Competing Consumers&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/competing-consumers.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/competing-consumers.png&quot; alt=&quot;competing-consumers&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a messaging client processes multiple messages concurrently.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/message-dispatcher&quot;&gt;Message Dispatcher&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-dispatcher.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-dispatcher.png&quot; alt=&quot;message-dispatcher&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How multiple consumers on a single channel coordinate their message processing.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/selective-consumer&quot;&gt;Selective Consumer&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-selector.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-selector.png&quot; alt=&quot;message-selector&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a message consumer selects which messages to receive.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/durable-subscriber&quot;&gt;Durable Subscriber&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/durable-subscription.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/durable-subscription.png&quot; alt=&quot;durable-subscription&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a subscriber avoids missing messages while it is not listening for them.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/service-activator&quot;&gt;Service Activator&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-adapter.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-adapter.png&quot; alt=&quot;messaging-adapter&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How an application designs a service to be invoked via both messaging and non-messaging techniques.&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+</body>
+</html>

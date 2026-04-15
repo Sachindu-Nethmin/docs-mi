@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>routing-based-on-headers.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Route Requests Based on Message Headers
+
+This example scenario uses an inventory of stocks as the back-end service. A proxy service is configured in the WSO2 Integrator: MI to use separate mediation sequences for processing request messages with different **message headers**. 
+
+When a stock quote request is received, the WSO2 Integrator: MI will read the **request header** and then route the message to the relevant mediation sequence for processing. The relevant sequence will forward the message to the backend, receive the response, process it, and return it to the client.
+    
+## Synapse configuration
+    
+Listed below are the synapse configurations for implementing this scenario. See the instructions on how to [build and run](#build-and-run) this example.
+
+=== &quot;Proxy Service&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy name=&quot;HeaderBasedRoutingProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;http https&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;switch source=&quot;${headers.CustomHeader}&quot;&gt;
+                    &lt;case regex=&quot;application/json&quot;&gt;
+                        &lt;log category=&quot;INFO&quot;&gt;
+                            &lt;message&gt;Custom Header = application/json&lt;/message&gt;
+                        &lt;/log&gt;
+                        &lt;sequence key=&quot;sequence1&quot;/&gt;
+                    &lt;/case&gt;
+                    &lt;case regex=&quot;text/xml&quot;&gt;
+                        &lt;log category=&quot;INFO&quot;&gt;
+                            &lt;message&gt;Custom Header = text/xml&lt;/message&gt;
+                        &lt;/log&gt;
+                        &lt;sequence key=&quot;sequence2&quot;/&gt;
+                    &lt;/case&gt;
+                    &lt;default&gt;
+                        &lt;log category=&quot;INFO&quot;&gt;
+                            &lt;message&gt;Accept Header = other&lt;/message&gt;
+                        &lt;/log&gt;
+                        &lt;sequence key=&quot;sequence3&quot;/&gt;
+                    &lt;/default&gt;
+                &lt;/switch&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence/&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;Sequence 1&quot;     
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;sequence name=&quot;sequence1&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;sequence key=&quot;send_seq&quot;/&gt;
+        &lt;property name=&quot;messageType&quot; scope=&quot;axis2&quot; type=&quot;STRING&quot; value=&quot;application/json&quot;/&gt;
+        &lt;respond/&gt;
+    &lt;/sequence&gt;
+    ```
+=== &quot;Sequence 2&quot;    
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;sequence name=&quot;sequence2&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;sequence key=&quot;send_seq&quot;/&gt;
+        &lt;property name=&quot;messageType&quot; scope=&quot;axis2&quot; type=&quot;STRING&quot; value=&quot;text/xml&quot;/&gt;
+        &lt;respond/&gt;
+    &lt;/sequence&gt;
+    ```
+=== &quot;Sequence 3&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;sequence name=&quot;sequence3&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;sequence key=&quot;send_seq&quot;/&gt;
+        &lt;respond/&gt;
+    &lt;/sequence&gt;
+    ```    
+=== &quot;Send Seq&quot;     
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;sequence name=&quot;send_seq&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;header name=&quot;Action&quot; action=&quot;set&quot; scope=&quot;default&quot; value=&quot;urn:getQuote&quot;/&gt;
+        &lt;call&gt;
+            &lt;endpoint key=&quot;stockQuoteEndpoint&quot;/&gt;
+        &lt;/call&gt;
+    &lt;/sequence&gt;
+    ```   
+=== &quot;Endpoint&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;endpoint name=&quot;stockQuoteEndpoint&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;&gt;
+            &lt;suspendOnFailure&gt;
+                &lt;initialDuration&gt;-1&lt;/initialDuration&gt;
+                &lt;progressionFactor&gt;1&lt;/progressionFactor&gt;
+            &lt;/suspendOnFailure&gt;
+            &lt;markForSuspension&gt;
+                &lt;retriesBeforeSuspension&gt;0&lt;/retriesBeforeSuspension&gt;
+            &lt;/markForSuspension&gt;
+        &lt;/address&gt;
+    &lt;/endpoint&gt;
+    ```
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+3. Create the [proxy service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service) and [mediation sequences]({{base_path}}/develop/creating-artifacts/creating-reusable-sequences) with the configurations given above.
+4. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+Set up the back-end service:
+
+1. Download the [back-end service](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/axis2Server.zip).
+2. Extract the downloaded zip file.
+3. Open a terminal, navigate to the `axis2Server/bin/` directory inside the extracted folder.
+4. Execute the following command to start the axis2server with the SimpleStockQuote back-end service:
+
+    === &quot;On MacOS/Linux&quot;            
+        ```bash
+        sh axis2server.sh
+        ```
+    === &quot;On Windows&quot;        
+        ```bash
+        axis2server.bat
+        ```
+
+Invoke the proxy service:
+
+- Send a request with the &#x27;application/json&#x27; header and see that a JSON response is received.
+
+    === &quot;Request (application/json)&quot;
+        ```xml
+        HTTP method: POST 
+        Request URL: http://localhost:8290/services/HeaderBasedRoutingProxy
+        Content-Type: text/xml;charset=UTF-8
+        CustomHeader: application/json
+        Message Body:
+        &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+           &lt;soapenv:Header/&gt;
+           &lt;soapenv:Body&gt;
+           &lt;ser:getQuote xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+                &lt;ser:request&gt;
+                    &lt;xsd:symbol&gt;IBM&lt;/xsd:symbol&gt;
+                &lt;/ser:request&gt;
+            &lt;/ser:getQuote&gt;
+           &lt;/soapenv:Body&gt;
+        &lt;/soapenv:Envelope&gt;
+        ```
+    === &quot;Response&quot;        
+        ```json
+        {
+            &quot;Envelope&quot;: {
+                &quot;Header&quot;: null,
+                &quot;Body&quot;: {
+                    &quot;getQuoteResponse&quot;: {
+                        &quot;return&quot;: {
+                            &quot;@type&quot;: &quot;ax21:GetQuoteResponse&quot;,
+                            &quot;change&quot;: 3.8274925074699615,
+                            &quot;earnings&quot;: 12.497082213279025,
+                            &quot;high&quot;: -161.41346745041102,
+                            &quot;last&quot;: 164.53738820320592,
+                            &quot;lastTradeTimestamp&quot;: &quot;Mon Jul 01 16:12:23 IST 2024&quot;,
+                            &quot;low&quot;: -163.2629771689784,
+                            &quot;marketCap&quot;: -4291974.770736802,
+                            &quot;name&quot;: &quot;IBM Company&quot;,
+                            &quot;open&quot;: 172.25384297431248,
+                            &quot;peRatio&quot;: 25.33375650150598,
+                            &quot;percentageChange&quot;: 2.156561954110794,
+                            &quot;prevClose&quot;: 177.4812219131509,
+                            &quot;symbol&quot;: &quot;IBM&quot;,
+                            &quot;volume&quot;: 19678
+                        }
+                    }
+                }
+            }
+        }
+        ```
+
+- Send a request with the &#x27;text/xml&#x27; header and see that an XML response is received.
+
+    === &quot;Request (text/xml)&quot;
+        ```xml
+        HTTP method: POST 
+        Request URL: http://localhost:8290/services/HeaderBasedRoutingProxy
+        Content-Type: text/xml;charset=UTF-8
+        CustomHeader: text/xml
+        Message Body:
+        &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+           &lt;soapenv:Header/&gt;
+           &lt;soapenv:Body&gt;
+           &lt;ser:getQuote xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+                &lt;ser:request&gt;
+                    &lt;xsd:symbol&gt;IBM&lt;/xsd:symbol&gt;
+                &lt;/ser:request&gt;
+            &lt;/ser:getQuote&gt;
+           &lt;/soapenv:Body&gt;
+        &lt;/soapenv:Envelope&gt;
+        ```
+    === &quot;Response&quot;        
+        ```xml
+        &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+            &lt;soapenv:Header/&gt;
+            &lt;soapenv:Body&gt;
+                &lt;ns:getQuoteResponse xmlns:ns=&quot;http://services.samples&quot;&gt;
+                    &lt;ns:return xmlns:ax21=&quot;http://services.samples/xsd&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:type=&quot;ax21:GetQuoteResponse&quot;&gt;
+                        &lt;ax21:change&gt;4.131871430984311&lt;/ax21:change&gt;
+                        &lt;ax21:earnings&gt;13.582164597035094&lt;/ax21:earnings&gt;
+                        &lt;ax21:high&gt;-160.71069227737433&lt;/ax21:high&gt;
+                        &lt;ax21:last&gt;162.56566544816462&lt;/ax21:last&gt;
+                        &lt;ax21:lastTradeTimestamp&gt;Mon Jul 01 16:19:44 IST 2024&lt;/ax21:lastTradeTimestamp&gt;
+                        &lt;ax21:low&gt;166.6876727232271&lt;/ax21:low&gt;
+                        &lt;ax21:marketCap&gt;3.630109155595136E7&lt;/ax21:marketCap&gt;
+                        &lt;ax21:name&gt;IBM Company&lt;/ax21:name&gt;
+                        &lt;ax21:open&gt;-161.08473734270993&lt;/ax21:open&gt;
+                        &lt;ax21:peRatio&gt;24.51306734205319&lt;/ax21:peRatio&gt;
+                        &lt;ax21:percentageChange&gt;-2.622518084027564&lt;/ax21:percentageChange&gt;
+                        &lt;ax21:prevClose&gt;-157.55359157099647&lt;/ax21:prevClose&gt;
+                        &lt;ax21:symbol&gt;IBM&lt;/ax21:symbol&gt;
+                        &lt;ax21:volume&gt;5552&lt;/ax21:volume&gt;
+                    &lt;/ns:return&gt;
+                &lt;/ns:getQuoteResponse&gt;
+            &lt;/soapenv:Body&gt;
+        &lt;/soapenv:Envelope&gt;
+        ```
+</body>
+</html>

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>expressions.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>---
+search:
+  boost: 0.5
+---
+
+# Legacy Expressions
+
+!!! Note
+    WSO2 Integrator: MI will continue to support existing XPath and JSONPath expressions. However, it is recommended to use the new [Synapse Expressions]({{base_path}}/reference/synapse-properties/synapse-expressions), as they simplify data extraction and provide a rich set of functions.
+
+In WSO2 Integrator: MI, expressions are a way to dynamically compute values within various integration artifacts such as sequences, APIs, endpoints, and proxies. These expressions are used to extract data as it flows through the integration logic.
+
+The most commonly used expression languages in WSO2 MI are [Variables](#variables), [Functions](#functions), [JSONPath (for JSON)]({{base_path}}/reference/synapse-properties/jsonpath-expressions), and [XPath (for XML)]({{base_path}}/reference/synapse-properties/xpath-expressions).
+
+## Variables
+
+There is a set of predefined variables that you can use to extract data from the message. These variables in different [scopes]({{base_path}}/reference/synapse-properties/scopes) are as follows:
+
+### $ctx
+
+The prefix used to get properties set at the [default scope]({{base_path}}/reference/synapse-properties/scopes/#default-scope). For example, to get the value of property with name `ERROR_MESSAGE`, use the expression `$ctx:ERROR_MESSAGE`.
+
+Similarly, you can use the `$ctx` prefix with [Generic Properties]({{base_path}}/reference/mediators/property-reference/generic-properties).
+
+??? note &quot;Example of $ctx usage&quot;
+    
+    This example sends a request to an API, and call to a non-existent endpoint reference key. It causes a
+    mediation fault, which triggers the fault sequence.
+
+    Deploy the following API. For instructions, see [Creating a REST API]({{base_path}}/develop/creating-artifacts/creating-an-api/).
+    
+    The `&lt;property name=&quot;stockprop&quot; expression=&quot;$ctx:ERROR_MESSAGE&quot;/&gt;` property in the fault sequence configuration is used to log the error message that occurs due to a mediation fault.
+    
+    ``` xml
+    &lt;api context=&quot;/stockQuote&quot; name=&quot;stockQuoteAPI&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;resource methods=&quot;GET&quot; uri-template=&quot;/&quot;&gt;
+            &lt;inSequence&gt;
+                &lt;call&gt;
+                    &lt;endpoint key=&quot;ep2&quot;/&gt;
+                &lt;/call&gt;
+                &lt;respond/&gt;   
+            &lt;/inSequence&gt;
+            &lt;faultSequence&gt;
+                &lt;log&gt;
+                    &lt;property name=&quot;stockprop&quot; expression=&quot;$ctx:ERROR_MESSAGE&quot;/&gt;
+                    &lt;property name=&quot;Cause&quot; expression=&quot;get-property(&#x27;ERROR_MESSAGE&#x27;)&quot;/&gt;
+                &lt;/log&gt;
+            &lt;/faultSequence&gt;
+        &lt;/resource&gt;
+    &lt;/api&gt; 
+    ```
+     
+    Note the following message in the log.
+
+    ``` java
+    INFO {LogMediator} - {api:stockQuoteAPI} To: /stockQuote/, MessageID: urn:uuid:f1c35024-4d19-4042-abed-8880a4d98c3d, correlation_id: f1c35024-4d19-4042-abed-8880a4d98c3d, Direction: request, stockprop = Couldn&#x27;t find the endpoint with the key : ep2, Cause = Couldn&#x27;t find the endpoint with the key : ep2
+    ```
+    In this example, the property definition, `&lt;property
+    name=&quot;stockprop&quot; expression=&quot;$ctx:ERROR_MESSAGE&quot;/&gt;` is equivalent
+    to `&lt;property name=&quot;stockprop&quot;
+    expression=&quot;get-property(&#x27;ERROR_MESSAGE&#x27;)&quot;/&gt;`.
+
+### $trp
+
+The prefix used to get the transport headers. For example, to get the transport header named Content-Type of the current message, use the `$trp:Content-Type` expression. HTTP transport headers are not case sensitive. Therefore, `$trp:Content-Type` and `$trp:CONTENT-TYPE` are regarded as the same.
+
+Similarly, you can use `$trp` prefix with [HTTP Transport Properties]({{base_path}}/reference/mediators/property-reference/http-transport-properties).
+
+
+??? note &quot;Example of $trp usage&quot;
+
+    Deploy the following API. For instructions, see [Creating a REST API]({{base_path}}/develop/creating-artifacts/creating-an-api/).
+    
+    Note the property, `&lt;property name=&quot;stockprop&quot; expression=&quot;$trp:Content-Type&quot;/&gt;` in the configuration, which is used to log the `Content-Type` HTTP header of the request message.
+    
+    ``` xml
+    &lt;api context=&quot;/stockQuote&quot; name=&quot;stockQuoteAPI&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;resource methods=&quot;POST&quot; uri-template=&quot;/&quot;&gt;
+            &lt;inSequence&gt;
+                &lt;log&gt;
+                    &lt;property name=&quot;stockprop&quot; expression=&quot;$trp:Content-Type&quot;/&gt;
+                &lt;/log&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence/&gt;
+        &lt;/resource&gt;
+    &lt;/api&gt; 
+    ```
+    
+    Note the following message in the log.
+    
+    ``` java
+    INFO {LogMediator} - {api:stockQuoteAPI} To: /stockQuote/, MessageID: urn:uuid:7095f877-6a7c-4c99-a48b-c506ed9e43e1, correlation_id: 7095f877-6a7c-4c99-a48b-c506ed9e43e1, Direction: request, stockprop = application/json
+    ```
+    
+    In this example, the property definition, `&lt;property name=&quot;stockprop&quot;
+    expression=&quot;$trp:Content-Type&quot;/&gt;` is equivalent to `&lt;property
+    name=&quot;stockprop&quot;
+    expression=&quot;get-property(&#x27;transport&#x27;,&#x27;Content-Type&#x27;)&quot;/&gt;`.
+
+### $body
+
+The prefix used to get the message payload. For example, the `$body//getQuote` expression refers to the first `getQuote` element in a message body.
+
+??? note &quot;Example of $body usage&quot;
+
+    Deploy the following proxy service using instructions in [Creating a Proxy Service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service).
+    
+    Note the property, `&lt;property xmlns:m0=&quot;http://services.samples&quot; name=&quot;stockprop&quot; expression=&quot;$body//m0:getQuote&quot;/&gt;` in the configuration. It is used to log the first `&lt;m0:getQuote&gt;` element of the request message body.
+    
+    ``` xml
+    &lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;StockQuoteProxy&quot; transports=&quot;https,http&quot; statistics=&quot;disable&quot; trace=&quot;disable&quot; startOnLoad=&quot;true&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;log&gt;
+                    &lt;property xmlns:m0=&quot;http://services.samples&quot; name=&quot;stockprop&quot; expression=&quot;$body//m0:getQuote&quot;/&gt;
+                &lt;/log&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt; 
+    ```
+    
+    Note the following message in the log.
+    
+    ``` java
+    INFO - LogMediator To: /services/StockQuoteProxy, WSAction: urn:getQuote, SOAPAction: urn:getQuote, ReplyTo: http://www.w3.org/2005/08/addressing/anonymous, MessageID: urn:uuid:930f68f5-199a-4eff-90d2-ea679c2362ab, Direction: request, stockprop = &lt;m0:getQuotexmlns:m0=&quot;http://services.samples&quot;&gt;&lt;m0:request&gt;&lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;&lt;/m0:request&gt;&lt;/m0:getQuote&gt;
+    ```
+
+### $axis2
+
+The prefix used to get the properties at the [axis2 scope]({{base_path}}/reference/synapse-properties/scopes/#axis2-scope). For example, to get the value of the `axis2` scope property with the `REST_URL_POSTFIX` name, use the `$axis2:REST_URL_POSTFIX` expression.
+
+Similarly, you can use `$axis2` prefix with [HTTP Transport Properties]({{base_path}}/reference/mediators/property-reference/axis2-properties).
+
+??? note &quot;Example of $axis2 usage&quot;
+
+    Deploy the following API. For instructions, see [Creating a REST API]({{base_path}}/develop/creating-artifacts/creating-an-api/).
+    
+    Note the property, `&lt;property name=&quot;stockprop&quot; expression=&quot;$axis2:REST_URL_POSTFIX&quot;/&gt;` in the configuration which is used to log the `REST_URL_POSTFIX`
+    value of the request message.
+    
+    ``` xml
+    &lt;api context=&quot;/stockQuote&quot; name=&quot;stockQuoteAPI&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;resource methods=&quot;POST&quot; uri-template=&quot;/process&quot;&gt;
+            &lt;inSequence&gt;
+                &lt;log&gt;
+                    &lt;property name=&quot;stockprop&quot; expression=&quot;$axis2:REST_URL_POSTFIX&quot;/&gt;
+                &lt;/log&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence/&gt;
+        &lt;/resource&gt;
+    &lt;/api&gt; 
+    ```
+
+    Note the following message in the log.
+    
+    ``` java
+    INFO {LogMediator} - {api:stockQuoteAPI} To: /stockQuote/process, MessageID: urn:uuid:1cba15f7-d3b8-47b5-a0e7-f8275f9a6a99, correlation_id: 1cba15f7-d3b8-47b5-a0e7-f8275f9a6a99, Direction: request, stockprop = /process
+    ```
+    
+    In this example, the property definition,
+    `&lt;property name=&quot;stockprop&quot; expression=&quot;$axis2:REST_URL_POSTFIX&quot;/&gt;`
+    is equivalent to
+    `&lt;property name=&quot;stockprop&quot; expression=&quot;get-property(&#x27;axis2&#x27;,&#x27;REST_URL_POSTFIX&#x27;)&quot;/&gt;`
+
+### $url
+
+The prefix used to get the URI query params of a request URL.
+
+??? note &quot;Example of $url usage&quot;
+
+    Deploy the following API. For instructions, see [Creating a REST API]({{base_path}}/develop/creating-artifacts/creating-an-api/).
+    
+    ``` xml
+    &lt;api xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;URLQueryTest&quot; context=&quot;/query&quot;&gt;
+       &lt;resource methods=&quot;GET&quot; uri-template=&quot;/edit?a={symbol}&amp;b={value}&quot;&gt;
+          &lt;inSequence&gt;
+             &lt;log level=&quot;full&quot;&gt;
+                &lt;property name=&quot;SYMBOL&quot; expression=&quot;$url:a&quot;&gt;&lt;/property&gt;
+                &lt;property name=&quot;VALUE&quot; expression=&quot;$url:b&quot;&gt;&lt;/property&gt;
+             &lt;/log&gt;
+             &lt;respond&gt;&lt;/respond&gt;
+          &lt;/inSequence&gt;
+          &lt;faultSequence/&gt;
+       &lt;/resource&gt;
+    &lt;/api&gt;
+    ```
+
+    Note the following message in the log.
+    ``` xml
+    INFO {LogMediator} - {api:URLQueryTest} To: /query/edit?a=wso2&amp;b=2.4, MessageID: urn:uuid:b89fa7a9-8974-4539-96f6-4e42bd05c6c3, correlation_id: b89fa7a9-8974-4539-96f6-4e42bd05c6c3, Direction: request, SYMBOL = wso2, VALUE = 2.4, Envelope: &lt;?xml version=&#x27;1.0&#x27; encoding=&#x27;utf-8&#x27;?&gt;&lt;soapenv:Envelope xmlns:soapenv=&quot;http://www.w3.org/2003/05/soap-envelope&quot;&gt;&lt;soapenv:Body/&gt;&lt;/soapenv:Envelope&gt;
+    ```
+
+### $func
+
+The prefix used to refer to a particular parameter value passed externally by an invoker such as the [Call Template Mediator]({{base_path}}/reference/mediators/call-template-mediator).
+
+??? note &quot;Example of $func usage&quot;
+
+    Add a sequence template with the following configuration. See [Adding a New Sequence Template]({{base_path}}/develop/creating-artifacts/creating-reusable-sequences) for detailed instructions.
+    
+    ``` xml
+    &lt;template xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;HelloWordLogger&quot;&gt;
+        &lt;sequence&gt;
+            &lt;log level=&quot;full&quot;&gt;
+                &lt;property xmlns:ns2=&quot;http://org.apache.synapse/xsd&quot; xmlns:ns=&quot;http://org.apache.synapse/xsd&quot; name=&quot;message&quot; expression=&quot;$func:message&quot;&gt;&lt;/property&gt;
+            &lt;/log&gt;
+        &lt;/sequence&gt;
+    &lt;/template&gt;
+    ```
+    
+    Deploy the following API. For instructions, see [Creating a REST API]({{base_path}}/develop/creating-artifacts/creating-an-api/).
+    
+    ``` xml
+    &lt;api context=&quot;/stockQuote&quot; name=&quot;stockQuoteAPI&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;resource methods=&quot;POST&quot; uri-template=&quot;/process&quot;&gt;
+            &lt;inSequence&gt;
+                &lt;call-template target=&quot;HelloWorldLogger&quot;&gt;
+                    &lt;with-param name=&quot;message&quot; value=&quot;HelloWorld&quot;/&gt;
+                &lt;/call-template&gt;
+                &lt;log/&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence/&gt;
+        &lt;/resource&gt;
+    &lt;/api&gt; 
+    ```
+
+    Note the following message in the log.
+    
+    ``` xml
+    INFO {LogMediator} - {api:stockQuoteAPI} To: /stockQuote/process, MessageID: urn:uuid:c640f936-52c0-4e2c-94ee-b29e11884272, correlation_id: c640f936-52c0-4e2c-94ee-b29e11884272, Direction: request, message = null, Payload: {
+    &quot;payload&quot;: {}
+    }
+    ```
+
+### $header
+
+The prefix used to get the SOAP 1.1 or 1.2 header element. For example, the expression
+`$header/wsa:To` refers to the addressing `To` header regardless of
+whether this message is SOAP-11 or SOAP-12.
+
+??? note &quot;Example of $header usage&quot;
+
+    Deploy the following proxy service using instructions in [Creating a Proxy Service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service).
+    
+    Note the property, `&lt;property xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot; name=&quot;stockprop&quot; expression=&quot;$header/wsa:To&quot;/&gt;` in the configuration. It is used to log the value of **wsa:To** header of the SOAP request.
+    
+    ``` xml
+    &lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;StockQuoteProxy&quot; transports=&quot;https,http&quot; statistics=&quot;disable&quot; trace=&quot;disable&quot; startOnLoad=&quot;true&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;log&gt;
+                    &lt;property xmlns:wsa=&quot;http://www.w3.org/2005/08/addressing&quot; name=&quot;stockprop&quot; expression=&quot;$header/wsa:To&quot;/&gt;
+                &lt;/log&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt; 
+    ```
+    
+    Note the following message in the log.
+    
+    ``` java
+    INFO - LogMediator To: http://localhost:9000/services/SimpleStockQuoteService, WSAction: urn:getQuote, SOAPAction: urn:getQuote, ReplyTo: http://www.w3.org/2005/08/addressing/anonymous, MessageID: urn:uuid:8a64c9cb-b82f-4d6f-a45d-bef37f8b664a, Direction: request, stockprop = http://localhost:9000/services/SimpleStockQuoteService
+    ```
+
+### $env
+
+The prefix used to get a SOAP 1.1 or 1.2 envelope element. For example, to get the body element from the SOAP envelope, use the expression `$env/*[local-name()=&#x27;Body&#x27;]`. You can do the same using the expression [$body](#body).
+
+Similarly you can use [$header](#header) to get SOAP 1.1 or 1.2 header element instead of using `$env`.
+
+??? note &quot;Example of $env usage&quot;
+
+    1.  Deploy the following API. For instructions, see [Creating a REST API]({{base_path}}/develop/creating-artifacts/creating-an-api/).
+    
+        ``` xml
+        &lt;api context=&quot;/soapEnvelopeTest&quot; name=&quot;SoapEnvelopeTest&quot;&gt;
+                &lt;resource url-mapping=&quot;/*&quot;&gt;
+                    &lt;inSequence&gt;
+                        &lt;property name=&quot;messageType&quot; scope=&quot;axis2&quot; value=&quot;application/xml&quot;/&gt;
+                        &lt;payloadFactory media-type=&quot;xml&quot;&gt;
+                            &lt;format&gt;
+                                &lt;theData xmlns=&quot;http://some.namespace&quot;&gt;
+                                    &lt;item&gt;$1&lt;/item&gt;
+                                &lt;/theData&gt;
+                            &lt;/format&gt;
+                            &lt;args&gt;
+                                &lt;arg evaluator=&quot;xml&quot; expression=&quot;$env/*[local-name()=&#x27;Body&#x27;]/*[local-name()=&#x27;jsonObject&#x27;]/*&quot;/&gt;
+                            &lt;/args&gt;
+                        &lt;/payloadFactory&gt;
+                        &lt;property name=&quot;messageType&quot; scope=&quot;axis2&quot; value=&quot;application/json&quot;/&gt;
+                        &lt;respond/&gt;
+                    &lt;/inSequence&gt;
+                &lt;/resource&gt;
+        &lt;/api&gt;
+        ```
+    
+    2.  Send a post request to the API you created (i.e., `http://localhost:8280/soapEnvelopeTest`),with the following json payload using a rest client.
+    
+        ``` xml
+        {&quot;content&quot;:{ &quot;paramA&quot;: &quot;ValueA&quot;, &quot;paramB&quot;: &quot;valueB&quot; }}
+        ```
+    
+        You will receive the following response:
+    
+        ``` xml
+        {&quot;theData&quot;:{&quot;item&quot;:{&quot;content&quot;:{&quot;paramA&quot;:&quot;ValueA&quot;,&quot;paramB&quot;:&quot;valueB&quot;}}}}
+        ```
+
+
+## Functions
+
+There is a set of predefined functions that you can use to extract data from the message.
+
+#### base64Encode() function
+
+The `base64Encode()` function returns the base64-encoded value of the specified string.
+
+Syntax:
+
+-   `base64Encode(string value)`
+-   `base64Encode(string value, string charset)`
+
+Example:
+
+`&lt;property name=&quot;ENCODED_VALUE&quot; expression=&quot;base64Encode(&#x27;This is a test value&#x27;)&quot;/&gt;`
+
+#### base64Decode() function
+
+The `base64Decode()` function returns the original value of the specified base64-encoded value.
+
+The syntax of the function takes the following format.
+
+-   `base64Decode(string encodedValue)`
+-   `base64Decode(string encodedValue, string charset)`
+
+Example:
+
+`&lt;property name=&quot;DECODED_VALUE&quot; expression=&quot;base64Decode(&#x27;VGhpcyBpcyBhIHRlc3QgdmFsdWU=&#x27;)&quot;/&gt;`
+
+#### get-property() function
+
+The `get-property()` function allows you to retrieve various types of properties from the message context, such as transport headers, custom properties, system properties, or Axis2-specific properties. These properties can be used in the message flows, making the mediation process dynamic.
+
+The syntax of the function takes the following format.
+
+-   `get-property(String propertyName)`
+-   `get-property(String scope, String propertyName)`
+
+The function accepts [scope]({{base_path}}/reference/synapse-properties/scopes) as an optional parameter. It retrieves a
+message property at the given scope. If you provide only the property name without the scope, the default `synapse` scope will be used.
+
+See [scopes]({{base_path}}/reference/synapse-properties/scopes) documentation to see examples for each operation.
+
+#### url-encode() function
+
+The `url-encode()` function returns the URL-encoded value of the specified string.
+
+Syntax:
+
+-   `url-encode(string value)`
+-   `url-encode(string value, string charset)`
+
+Example:
+
+`&lt;property name=&quot;ENCODED_URL&quot; expression=&quot;url-encode(&#x27;http://this is a test url&#x27;)&quot;/&gt;`
+</body>
+</html>

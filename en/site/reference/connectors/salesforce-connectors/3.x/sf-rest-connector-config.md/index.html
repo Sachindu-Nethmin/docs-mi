@@ -1,0 +1,3151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>sf-rest-connector-config.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>---
+search:
+  boost: 2
+---
+
+# Salesforce Connector Reference
+
+The following operations allow you to work with the Salesforce Connector. Click an operation name to see parameter details and sample usage.
+
+&gt; **Note:** The API version is configurable and can be adjusted based on your Salesforce environment or requirements. This version of the Salesforce Connector was tested using Salesforce API version v60.0.
+
+---
+## Initialize the connector
+
+The WSO2 Integrator: MI Salesforce connector offers **two connection types**, each suited to a different API family:
+
+| Connection type            | Typical use-case                                                 | Provide                                                                                                                                     | What the connector does                                                                                                                                                                 |
+| -------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **OAuth 2.0**              | REST &amp; Bulk APIs                                                 | Client Credentials grant**&lt;br/&gt;• `clientId`&lt;br/&gt;• `clientSecret` | *Access-token only:* uses it until it expires, then fails.&lt;br/&gt;&lt;br/&gt;*Client Credentials:* automatically exchanges `clientId` + `clientSecret` for a fresh access token whenever needed. |
+| **BasicAuth (SOAP login)** | SOAP Partner/Enterprise APIs (`query`, `create`, `update`, etc.) | • `username`&lt;br/&gt;• `password`                                                                                                               | Calls the Salesforce SOAP `login` operation, retrieves a session ID, and attaches it to every subsequent SOAP request.                                                                  |
+
+&gt; **Note:** BasicAuth is **only** for SOAP operations. REST and Bulk calls **must** use OAuth 2.0. For more information on how authentication is done in Salesforce, see
+[Understanding Authentication](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_understanding_authentication.htm).
+
+??? note &quot;OAuth 2.0&quot;
+    This connection initializes the connector to interact with the Salesforce REST &amp; Bulk APIs. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/intro_understanding_web_server_oauth_flow.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionName&lt;/td&gt;
+            &lt;td&gt;A logical name to identify this connection.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;SALESFORCE_OAUTH_2&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;scope&lt;/td&gt;
+            &lt;td&gt;Space-separated OAuth scopes.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;full refresh_token&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;clientId&lt;/td&gt;
+            &lt;td&gt;Consumer Key from your connected app.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;XXXXXXXXXXXX&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;clientSecret&lt;/td&gt;
+            &lt;td&gt;Consumer Secret from your connected app.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;XXXXXXXXXXXX&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tokenUrl&lt;/td&gt;
+            &lt;td&gt;OAuth 2.0 token endpoint URL.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;https://login.salesforce.com/services/oauth2/token&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;instanceUrl&lt;/td&gt;
+            &lt;td&gt;Base URL for API requests.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;https://your_instance.salesforce.com&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiVersion&lt;/td&gt;
+            &lt;td&gt;Salesforce API version.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;v60.0&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;timeout&lt;/td&gt;
+            &lt;td&gt;Connection timeout in milliseconds.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;3000&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;blocking&lt;/td&gt;
+            &lt;td&gt;Enable blocking API calls.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;false&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforcerest.init&gt;
+        &lt;connectionName&gt;{${payload.connectionName}}&lt;/connectionName&gt;
+        &lt;grantType&gt;{${payload.grantType}}&lt;/grantType&gt;
+        &lt;scope&gt;{${payload.scope}}&lt;/scope&gt;
+        &lt;clientId&gt;{${payload.clientId}}&lt;/clientId&gt;
+        &lt;clientSecret&gt;{${payload.clientSecret}}&lt;/clientSecret&gt;
+        &lt;tokenUrl&gt;{${payload.tokenUrl}}&lt;/tokenUrl&gt;
+        &lt;instanceUrl&gt;{${payload.instanceUrl}}&lt;/instanceUrl&gt;
+        &lt;apiVersion&gt;{${payload.apiVersion}}&lt;/apiVersion&gt;
+        &lt;timeout&gt;{${payload.timeout}}&lt;/timeout&gt;
+        &lt;blocking&gt;{${payload.blocking}}&lt;/blocking&gt;
+    &lt;/salesforcerest.init&gt;
+    ```
+
+    **Sample request**
+    
+    ```json
+    {
+      &quot;connectionName&quot;: &quot;SALESFORCE_OAUTH_2&quot;,
+      &quot;scope&quot;: &quot;full refresh_token&quot;,
+      &quot;clientId&quot;: &quot;XXXXXXXXXXXX&quot;,
+      &quot;clientSecret&quot;: &quot;XXXXXXXXXXXX&quot;,
+      &quot;tokenUrl&quot;: &quot;https://login.salesforce.com/services/oauth2/token&quot;,
+      &quot;instanceUrl&quot;: &quot;https://your_instance.salesforce.com&quot;,
+      &quot;apiVersion&quot;: &quot;v60.0&quot;,
+      &quot;timeout&quot;: &quot;3000&quot;,
+      &quot;readTimeout&quot;: &quot;3000&quot;,
+      &quot;blocking&quot;: &quot;false&quot;
+    }
+    ```
+
+??? note &quot;BasicAuth&quot;
+This connection also initializes the connector to interact with Salesforce via Basic Authentication using the SOAP login API. See the [SOAP API Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/intro_soap_api.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionName&lt;/td&gt;
+            &lt;td&gt;A logical name to identify this connection.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;BasicAuth&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;username&lt;/td&gt;
+            &lt;td&gt;Salesforce login username.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;user@example.com&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;password&lt;/td&gt;
+            &lt;td&gt;Password followed by your security token.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;MyP@ssw0rdXyZ&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;loginUrl&lt;/td&gt;
+            &lt;td&gt;Salesforce login endpoint URL.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;https://login.salesforce.com/services/Soap/u/60.0&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;forceLogin&lt;/td&gt;
+            &lt;td&gt;Always start a new session if enabled.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;false&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;blocking&lt;/td&gt;
+            &lt;td&gt;Enable blocking API calls to Salesforce.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;false&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforcerest.init&gt;
+        &lt;connectionName&gt;{${payload.connectionName}}&lt;/connectionName&gt;
+        &lt;username&gt;{${payload.username}}&lt;/username&gt;
+        &lt;password&gt;{${payload.password}}&lt;/password&gt;
+        &lt;loginUrl&gt;{${payload.loginUrl}}&lt;/loginUrl&gt;
+        &lt;forceLogin&gt;{${payload.forceLogin}}&lt;/forceLogin&gt;
+        &lt;blocking&gt;{${payload.blocking}}&lt;/blocking&gt;
+    &lt;/salesforcerest.init&gt;
+    ```
+    
+    **Sample request**
+
+    ```json
+    {
+        &quot;connectionName&quot;: &quot;BasicAuth&quot;,
+        &quot;username&quot;: &quot;user@example.com&quot;,
+        &quot;password&quot;: &quot;MyP@ssw0rdXyZ&quot;,
+        &quot;loginUrl&quot;: &quot;https://login.salesforce.com/services/Soap/u/60.0&quot;,
+        &quot;forceLogin&quot;: &quot;false&quot;,
+        &quot;blocking&quot;: &quot;false&quot;
+    }
+    ``` 
+
+### Search
+
+??? note &quot;search&quot;
+    The `salesforce.search` operation allows you to search for records by specifying a search string. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_search.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;searchString&lt;/td&gt;
+            &lt;td&gt;The SOQL query to execute the search.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;sample string&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.search&gt;
+        &lt;searchString&gt;{${payload.searchString}}&lt;/searchString&gt;
+    &lt;/salesforce.search&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;searchString&quot;: &quot;FIND {map*} IN ALL FIELDS RETURNING Account (Id, Name), Contact, Opportunity, Lead&quot;,
+    }
+    ```
+
+### Users
+
+??? note &quot;getUserInformation&quot;
+    The `salesforce.getUserInformation` operation retrieves information about a specific user by specifying the following property. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.198.0.api_rest.meta/api_rest/dome_process_rules.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;userId&lt;/td&gt;
+            &lt;td&gt;The ID of the user whose details you want to retrieve.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;00528000000yl7j&lt;/td&gt;
+        &lt;/tr&gt;
+
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.getUserInformation&gt;
+        &lt;userId&gt;{${payload.userId}}&lt;/userId&gt;
+    &lt;/salesforce.getUserInformation&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;userId&quot;: &quot;00528000000yl7j&quot;
+    }
+    ```
+
+??? note &quot;resetPassword&quot;
+The `salesforce.resetPassword` operation resets a specific user’s password by specifying the following property. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_sobject_user_password.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;userId&lt;/td&gt;
+            &lt;td&gt;The ID of the user whose password you want to reset.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;00528000000yl7j&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.resetPassword&gt;
+        &lt;userId&gt;{${payload.userId}}&lt;/userId&gt;
+    &lt;/salesforce.resetPassword&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;userId&quot;: &quot;00528000000yl7j&quot;,
+    }
+    ```
+
+??? note &quot;setPassword&quot;
+    The `salesforce.setPassword` operation sets a specific user’s password by specifying the following properties. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_sobject_user_password.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;userId&lt;/td&gt;
+            &lt;td&gt;The ID of the user whose password you want to set.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;00528000000yl7j&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fieldAndValue&lt;/td&gt;
+            &lt;td&gt;JSON object containing the new password field and its value — for example: &lt;code&gt;{&quot;NewPassword&quot;:&quot;MyNewP@ssw0rd&quot;}&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;{&quot;NewPassword&quot;:&quot;MyNewP@ssw0rd&quot;}&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.setPassword&gt;
+        &lt;userId&gt;{${payload.userId}}&lt;/userId&gt;
+        &lt;fieldAndValue&gt;{${payload.fieldAndValue}}&lt;/fieldAndValue&gt;
+    &lt;/salesforce.setPassword&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;userId&quot;: &quot;00528000000yl7j&quot;,
+        &quot;fieldAndValue&quot;: &quot;{\&quot;NewPassword\&quot;:\&quot;MyNewP@ssw0rd\&quot;}&quot;
+    }
+    ```
+
+### Query
+
+??? note &quot;query&quot;
+    The `salesforce.query` operation retrieves data from a Salesforce object by specifying the following properties. To include deleted records in the Recycle Bin, use the `salesforce.queryAll` operation in place of `salesforce.query`. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_query.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queryString&lt;/td&gt;
+            &lt;td&gt;The SQL query to use to search for records.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;select id, name from Account&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queryAll&lt;/td&gt;
+            &lt;td&gt;Check if the deleted records should be included in the result&lt;/td&gt;
+            &lt;td&gt;false&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    query:
+
+    ```xml
+    &lt;salesforce.query&gt;
+        &lt;queryString&gt;{${payload.queryString}}&lt;/queryString&gt;
+    &lt;/salesforce.query&gt;
+    ```
+
+    queryAll:
+
+    ```xml
+    &lt;salesforce.queryAll&gt;
+        &lt;queryString&gt;{${payload.queryString}}&lt;/queryString&gt;
+    &lt;/salesforce.queryAll&gt;
+    ```
+    
+    **Sample request**
+
+    ```json
+    {
+        &quot;queryString&quot;: &quot;SELECT ID, NAME FROM ACCOUNT&quot;,
+    }
+    ```
+
+### Records
+
+??? note &quot;create&quot;
+    The `salesforce.create` operation creates a new record by specifying the following properties. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/dome_sobject_create.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObjectName&lt;/td&gt;
+            &lt;td&gt;The type of object for which you will create a record.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fieldAndValue&lt;/td&gt;
+            &lt;td&gt;The .json format property used to create the record. Include all mandatory fields according to the requirements for the specified sObject.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;&lt;pre&gt;{
+            &quot;name&quot;: &quot;wso2&quot;,
+            &quot;description&quot;:&quot;This Account belongs to WSO2&quot;}
+            &lt;/pre&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.create&gt;
+        &lt;sObjectName&gt;{${payload.sObjectName}}&lt;/sObjectName&gt;
+        &lt;fieldAndValue&gt;{${payload.fieldAndValue}}&lt;/fieldAndValue&gt;
+    &lt;/salesforce.create&gt;
+    ```
+
+    **Sample request**
+
+    The following is a sample request that can be handled by the create operation.
+
+    ```json
+    {
+        &quot;sObjectName&quot;:&quot;Account&quot;,,
+        &quot;fieldAndValue&quot;: {
+            &quot;name&quot;: &quot;wso2&quot;,
+            &quot;description&quot;:&quot;This Account belongs to WSO2&quot;
+        }
+    }
+    ```
+
+??? note &quot;createBulk&quot;
+    The `salesforce.createBulk` operation creates multiple records of the same sObject type by specifying the following properties. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.198.0.api_rest.meta/api_rest/dome_composite_sobject_tree_flat.htm#topic-title) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObjectName&lt;/td&gt;
+            &lt;td&gt;The type of object for which you will create a record.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fieldAndValue&lt;/td&gt;
+            &lt;td&gt;The .json format property, which specifies each record as an entry within the records array. Include all mandatory fields according to the requirements for the specified sObject.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;&lt;pre&gt;{
+            &quot;records&quot;: [
+            {
+            &quot;attributes&quot;: {&quot;type&quot;: &quot;Account&quot;, &quot;referenceId&quot;: &quot;ref1&quot;},
+            &quot;name&quot;: &quot;wso2&quot;,
+            &quot;phone&quot;: &quot;1111111&quot;,
+            &quot;website&quot;: &quot;www.salesforce1.com&quot;
+            },
+            {
+            &quot;attributes&quot;: {&quot;type&quot;: &quot;Account&quot;, &quot;referenceId&quot;: &quot;ref2&quot;},
+            &quot;name&quot;: &quot;slwso2&quot;,
+            &quot;phone&quot;: &quot;22222222&quot;,
+            &quot;website&quot;: &quot;www.salesforce2.com&quot;
+            }]
+            }
+            &lt;/pre&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    &gt; **Note**: For example, if you are creating a record for the Account sObject, &quot;name&quot; is a mandatory parameter, and you might want to include the optional description, so the fieldAndValue property would look like this:
+    &gt; ```json
+    &gt; {
+    &gt;   &quot;records&quot;: [
+    &gt;   {
+    &gt;        &quot;attributes&quot;: {&quot;type&quot;: &quot;Account&quot;, &quot;referenceId&quot;: &quot;ref1&quot;},
+    &gt;        &quot;name&quot;: &quot;wso2&quot;,
+    &gt;        &quot;phone&quot;: &quot;1111111&quot;,
+    &gt;        &quot;website&quot;: &quot;www.salesforce1.com&quot;
+    &gt;    },
+    &gt;    {
+    &gt;        &quot;attributes&quot;: {&quot;type&quot;: &quot;Account&quot;, &quot;referenceId&quot;: &quot;ref2&quot;},
+    &gt;        &quot;name&quot;: &quot;slwso2&quot;,
+    &gt;        &quot;phone&quot;: &quot;22222222&quot;,
+    &gt;        &quot;website&quot;: &quot;www.salesforce2.com&quot;
+    &gt;    }]
+    &gt; }
+    &gt; ```
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.createBulk&gt;
+        &lt;sObjectName&gt;{${payload.sObjectName}}&lt;/sObjectName&gt;
+        &lt;fieldAndValue&gt;{${payload.fieldAndValue}}&lt;/fieldAndValue&gt;
+    &lt;/salesforce.createBulk&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;sObjectName&quot;:&quot;Account&quot;,,
+        &quot;fieldAndValue&quot;: {
+            &quot;records&quot;: [
+                {
+                &quot;attributes&quot;: {&quot;type&quot;: &quot;Account&quot;, &quot;referenceId&quot;: &quot;ref1&quot;},
+                &quot;name&quot;: &quot;wso2&quot;,
+                &quot;phone&quot;: &quot;1111111&quot;,
+                &quot;website&quot;: &quot;www.salesforce1.com&quot;
+                },
+                {
+                &quot;attributes&quot;: {&quot;type&quot;: &quot;Account&quot;, &quot;referenceId&quot;: &quot;ref2&quot;},
+                &quot;name&quot;: &quot;slwso2&quot;,
+                &quot;phone&quot;: &quot;22222222&quot;,
+                &quot;website&quot;: &quot;www.salesforce2.com&quot;
+                }]
+            }
+    }
+    ```
+
+??? note &quot;createTree&quot;
+    To create nested records for a specific sObject, use salesforce.createTree and specify the following properties. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.198.0.api_rest.meta/api_rest/dome_composite_sobject_tree_create.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObjectName&lt;/td&gt;
+            &lt;td&gt;The type of object for which you will create a record.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fieldAndValue&lt;/td&gt;
+            &lt;td&gt;The .json format property, which specifies each record as an entry within the records array. Include all mandatory fields according to the requirements for the specified sobject.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;&lt;pre&gt;{
+            &quot;records&quot; :[{
+            &quot;attributes&quot; : {&quot;type&quot; : &quot;Account&quot;, &quot;referenceId&quot; : &quot;ref1&quot;},
+            &quot;name&quot; : &quot;SampleAccount1&quot;,
+            &quot;phone&quot; : &quot;1234567890&quot;,
+            &quot;website&quot; : &quot;www.salesforce.com&quot;,
+            &quot;numberOfEmployees&quot; : &quot;100&quot;,
+            &quot;type&quot; : &quot;Analyst&quot;,
+            &quot;industry&quot; : &quot;Banking&quot;,
+            &quot;Contacts&quot; : {
+            &quot;records&quot; : [{
+            &quot;attributes&quot; : {&quot;type&quot; : &quot;Contact&quot;, &quot;referenceId&quot; : &quot;ref2&quot;},
+            &quot;lastname&quot; : &quot;Smith&quot;,
+            &quot;Title&quot; : &quot;President&quot;,
+            &quot;email&quot; : &quot;sample@salesforce.com&quot;
+            },{
+            &quot;attributes&quot; : {&quot;type&quot; : &quot;Account&quot;, &quot;referenceId&quot; : &quot;ref3&quot;},
+            &quot;lastname&quot; : &quot;Evans&quot;,
+            &quot;title&quot; : &quot;Vice President&quot;,
+            &quot;email&quot; : &quot;sample@salesforce.com&quot;
+            }]
+            }
+            },{
+            &quot;attributes&quot; : {&quot;type&quot; : &quot;Account&quot;, &quot;referenceId&quot; : &quot;ref4&quot;},
+            &quot;name&quot; : &quot;SampleAccount2&quot;,
+            &quot;phone&quot; : &quot;1234567890&quot;,
+            &quot;website&quot; : &quot;www.salesforce.com&quot;,
+            &quot;numberOfEmployees&quot; : &quot;52000&quot;,
+            &quot;type&quot; : &quot;Analyst&quot;,
+            &quot;industry&quot; : &quot;Banking&quot;,
+            &quot;childAccounts&quot; : {
+            &quot;records&quot; : [{
+            &quot;attributes&quot; : {&quot;type&quot; : &quot;Account&quot;, &quot;referenceId&quot; : &quot;ref5&quot;},
+            &quot;name&quot; : &quot;SampleChildAccount1&quot;,
+            &quot;phone&quot; : &quot;1234567890&quot;,
+            &quot;website&quot; : &quot;www.salesforce.com&quot;,
+            &quot;numberOfEmployees&quot; : &quot;100&quot;,
+            &quot;type&quot; : &quot;Analyst&quot;,
+            &quot;industry&quot; : &quot;Banking&quot;
+            }]
+            },
+            &quot;Contacts&quot; : {
+            &quot;records&quot; : [{
+            &quot;attributes&quot; : {&quot;type&quot; : &quot;Contact&quot;, &quot;referenceId&quot; : &quot;ref6&quot;},
+            &quot;lastname&quot; : &quot;Jones&quot;,
+            &quot;title&quot; : &quot;President&quot;,
+            &quot;email&quot; : &quot;sample@salesforce.com&quot;
+            }]
+            }
+            }]
+            }
+            &lt;/pre&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    &gt; **Note**: If you are creating records for the Account sObject, &quot;name&quot; is a mandatory parameter, and you might want to include additional optional values for each record, so the fieldAndValue property might look like this:
+    &gt; ```json
+    &gt; {
+    &gt;   &quot;records&quot; :[{
+    &gt;   &quot;attributes&quot; : {&quot;type&quot; : &quot;Account&quot;, &quot;referenceId&quot; : &quot;ref1&quot;},
+    &gt;   &quot;name&quot; : &quot;SampleAccount1&quot;,
+    &gt;   &quot;phone&quot; : &quot;1234567890&quot;,
+    &gt;   &quot;website&quot; : &quot;www.salesforce.com&quot;,
+    &gt;   &quot;numberOfEmployees&quot; : &quot;100&quot;,
+    &gt;   &quot;type&quot; : &quot;Analyst&quot;,
+    &gt;   &quot;industry&quot; : &quot;Banking&quot;,
+    &gt;   &quot;Contacts&quot; : {
+    &gt;     &quot;records&quot; : [{
+    &gt;       &quot;attributes&quot; : {&quot;type&quot; : &quot;Contact&quot;, &quot;referenceId&quot; : &quot;ref2&quot;},
+    &gt;       &quot;lastname&quot; : &quot;Smith&quot;,
+    &gt;       &quot;Title&quot; : &quot;President&quot;,
+    &gt;       &quot;email&quot; : &quot;sample@salesforce.com&quot;
+    &gt;     },{
+    &gt;       &quot;attributes&quot; : {&quot;type&quot; : &quot;Contact&quot;, &quot;referenceId&quot; : &quot;ref3&quot;},
+    &gt;       &quot;lastname&quot; : &quot;Evans&quot;,
+    &gt;       &quot;title&quot; : &quot;Vice President&quot;,
+    &gt;       &quot;email&quot; : &quot;sample@salesforce.com&quot;
+    &gt;     }]
+    &gt;   }
+    &gt;   },{
+    &gt;   &quot;attributes&quot; : {&quot;type&quot; : &quot;Account&quot;, &quot;referenceId&quot; : &quot;ref4&quot;},
+    &gt;   &quot;name&quot; : &quot;SampleAccount2&quot;,
+    &gt;   &quot;phone&quot; : &quot;1234567890&quot;,
+    &gt;   &quot;website&quot; : &quot;www.salesforce.com&quot;,
+    &gt;   &quot;numberOfEmployees&quot; : &quot;52000&quot;,
+    &gt;   &quot;type&quot; : &quot;Analyst&quot;,
+    &gt;   &quot;industry&quot; : &quot;Banking&quot;,
+    &gt;   &quot;childAccounts&quot; : {
+    &gt;     &quot;records&quot; : [{
+    &gt;       &quot;attributes&quot; : {&quot;type&quot; : &quot;Account&quot;, &quot;referenceId&quot; : &quot;ref5&quot;},
+    &gt;       &quot;name&quot; : &quot;SampleChildAccount1&quot;,
+    &gt;       &quot;phone&quot; : &quot;1234567890&quot;,
+    &gt;       &quot;website&quot; : &quot;www.salesforce.com&quot;,
+    &gt;       &quot;numberOfEmployees&quot; : &quot;100&quot;,
+    &gt;       &quot;type&quot; : &quot;Analyst&quot;,
+    &gt;       &quot;industry&quot; : &quot;Banking&quot;
+    &gt;     }]
+    &gt;   },
+    &gt;   &quot;Contacts&quot; : {
+    &gt;     &quot;records&quot; : [{
+    &gt;       &quot;attributes&quot; : {&quot;type&quot; : &quot;Contact&quot;, &quot;referenceId&quot; : &quot;ref6&quot;},
+    &gt;       &quot;lastname&quot; : &quot;Jones&quot;,
+    &gt;       &quot;title&quot; : &quot;President&quot;,
+    &gt;       &quot;email&quot; : &quot;sample@salesforce.com&quot;
+    &gt;     }]
+    &gt;   }
+    &gt;   }]
+    &gt; }
+    &gt; ```
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.createTree&gt;
+        &lt;sObjectName&gt;{${payload.sObjectName}}&lt;/sobject&gt;
+        &lt;fieldAndValue&gt;{${payload.fieldAndValue}}&lt;/fieldAndValue&gt;
+    &lt;/salesforce.createTree&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;sObjectName&quot;: &quot;Account&quot;,
+        &quot;fieldAndValue&quot;: {
+            &quot;records&quot;: [
+                {
+                    &quot;attributes&quot;: {
+                        &quot;type&quot;: &quot;Account&quot;,
+                        &quot;referenceId&quot;: &quot;ref1&quot;
+                    },
+                    &quot;name&quot;: &quot;SampleAccount1&quot;,
+                    &quot;phone&quot;: &quot;1234567890&quot;,
+                    &quot;website&quot;: &quot;www.salesforce.com&quot;,
+                    &quot;numberOfEmployees&quot;: &quot;100&quot;,
+                    &quot;type&quot;: &quot;Analyst&quot;,
+                    &quot;industry&quot;: &quot;Banking&quot;,
+                    &quot;Contacts&quot;: {
+                        &quot;records&quot;: [
+                            {
+                                &quot;attributes&quot;: {
+                                    &quot;type&quot;: &quot;Contact&quot;,
+                                    &quot;referenceId&quot;: &quot;ref2&quot;
+                                },
+                                &quot;LastName&quot;: &quot;Smith&quot;,
+                                &quot;Title&quot;: &quot;President&quot;,
+                                &quot;Email&quot;: &quot;sample@salesforce.com&quot;
+                            },
+                            {
+                                &quot;attributes&quot;: {
+                                    &quot;type&quot;: &quot;Contact&quot;,
+                                    &quot;referenceId&quot;: &quot;ref3&quot;
+                                }, // fixed
+                                &quot;LastName&quot;: &quot;Evans&quot;, // fixed
+                                &quot;Title&quot;: &quot;Vice President&quot;, // fixed
+                                &quot;Email&quot;: &quot;sample@salesforce.com&quot; // fixed
+                            }
+                        ]
+                    }
+                },
+                {
+                    &quot;attributes&quot;: {
+                        &quot;type&quot;: &quot;Account&quot;,
+                        &quot;referenceId&quot;: &quot;ref4&quot;
+                    },
+                    &quot;name&quot;: &quot;SampleAccount2&quot;,
+                    &quot;phone&quot;: &quot;1234567890&quot;,
+                    &quot;website&quot;: &quot;www.salesforce.com&quot;,
+                    &quot;numberOfEmployees&quot;: &quot;52000&quot;,
+                    &quot;type&quot;: &quot;Analyst&quot;,
+                    &quot;industry&quot;: &quot;Banking&quot;,
+                    &quot;childAccounts&quot;: {
+                        &quot;records&quot;: [
+                            {
+                                &quot;attributes&quot;: {
+                                    &quot;type&quot;: &quot;Account&quot;,
+                                    &quot;referenceId&quot;: &quot;ref5&quot;
+                                },
+                                &quot;name&quot;: &quot;SampleChildAccount1&quot;,
+                                &quot;phone&quot;: &quot;1234567890&quot;,
+                                &quot;website&quot;: &quot;www.salesforce.com&quot;,
+                                &quot;numberOfEmployees&quot;: &quot;100&quot;,
+                                &quot;type&quot;: &quot;Analyst&quot;,
+                                &quot;industry&quot;: &quot;Banking&quot;
+                            }
+                        ]
+                    },
+                    &quot;Contacts&quot;: {
+                        &quot;records&quot;: [
+                            {
+                                &quot;attributes&quot;: {
+                                    &quot;type&quot;: &quot;Contact&quot;,
+                                    &quot;referenceId&quot;: &quot;ref6&quot;
+                                },
+                                &quot;LastName&quot;: &quot;Jones&quot;,
+                                &quot;Title&quot;: &quot;President&quot;,
+                                &quot;Email&quot;: &quot;sample@salesforce.com&quot;
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+    ```
+
+??? note &quot;update&quot;
+    The `salesforce.update` operation updates an existing record by specifying the following properties. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/dome_update_fields.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObjectName&lt;/td&gt;
+            &lt;td&gt;The type of object for which you will create a record.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fieldAndValue&lt;/td&gt;
+            &lt;td&gt;The json format property with the new definition for the record.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;&lt;pre&gt;{
+            &quot;name&quot;: &quot;wso2&quot;,
+            &quot;description&quot;:&quot;This Account belongs to WSO2&quot;
+            }
+            &lt;/pre&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Id&lt;/td&gt;
+            &lt;td&gt;The ID of the record you are updating.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;00128000002OOhD&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.update&gt;
+        &lt;sObjectName&gt;{${payload.sObjectName}}&lt;/sObjectName&gt;
+        &lt;fieldAndValue&gt;{${payload.fieldAndValue}}&lt;/fieldAndValue&gt;
+        &lt;Id&gt;{${payload.Id}}&lt;/Id&gt;
+    &lt;/salesforce.update&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;sObjectName&quot;:&quot;Account&quot;,
+        &quot;Id&quot;:&quot;00128000002OOhD&quot;,,
+        &quot;fieldAndValue&quot;: {
+            &quot;name&quot;: &quot;wso2&quot;,
+            &quot;description&quot;:&quot;This Account belongs to WSO2&quot;
+        }
+    }
+    ```
+
+??? note &quot;delete&quot;
+    The `salesforce.delete` operation deletes a record and requires the following properties. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/dome_delete_record.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObjectName&lt;/td&gt;
+            &lt;td&gt;The object type of the record.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Id&lt;/td&gt;
+            &lt;td&gt;The ID of the record you are deleting.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;00128000002OOhD&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.update&gt;
+        &lt;sObjectName&gt;{${payload.sObjectName}}&lt;/sObjectName&gt;
+        &lt;fieldAndValue&gt;{${payload.fieldAndValue}}&lt;/fieldAndValue&gt;
+        &lt;Id&gt;{$ctx:Id}&lt;/Id&gt;
+    &lt;/salesforce.update&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;sObjectName&quot;:&quot;Account&quot;,
+        &quot;idToDelete&quot;:&quot;00128000002OOhD&quot;,
+    }
+    ```
+
+
+??? note &quot;upsert&quot;
+    The `salesforce.upsert` operation creates or updates a record using an external ID by specifying the following properties. This method is used to create records or update existing records based on the value of a specified external ID field. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/dome_upsert.htm) for more information.
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Sample Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;sObjectName&lt;/td&gt;
+        &lt;td&gt;The object type whose value you want to upsert.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;Account&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;externalIDField&lt;/td&gt;
+        &lt;td&gt;The external Id Field of the subject.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;sample__c&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Id&lt;/td&gt;
+        &lt;td&gt;The value of the customExtIdField.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;15222&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;fieldAndValue&lt;/td&gt;
+        &lt;td&gt;The json format property/payload used to create the record.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;{
+        &quot;Name&quot;:&quot;john&quot;
+        }
+        &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.upsert&gt;
+        &lt;sObjectName&gt;{${payload.sObjectName}}&lt;/sObjectName&gt;
+        &lt;externalIDField&gt;{${payload.externalIDField}}&lt;/externalIDField&gt;
+        &lt;Id&gt;{${payload.Id}}&lt;/Id&gt;
+        &lt;fieldAndValue&gt;{${payload.fieldAndValue}}&lt;/fieldAndValue&gt;
+    &lt;/salesforce.upsert&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;sObjectName&quot;:&quot;Account&quot;,,
+        &quot;intervalTime&quot; : &quot;2400000&quot;,
+        &quot;externalIDField&quot;:&quot;sample__c&quot;,
+        &quot;Id&quot;:&quot;15222&quot;,
+        &quot;fieldAndValue&quot;:
+        {
+            &quot;Name&quot;:&quot;john&quot;
+        }
+    }
+    ```
+
+??? note &quot;getDeleted&quot;
+    The `salesforce.getDeleted` operation retrieves a list of records deleted within a specified timespan for the given object. Provide the start and end date-time values in ISO 8601 format: `YYYY-MM-DDThh:mm:ss+hh:mm`. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_getdeleted.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObjectName&lt;/td&gt;
+            &lt;td&gt;The object where you want to look for deleted records&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;startTime&lt;/td&gt;
+            &lt;td&gt;Starting date/time (Coordinated Universal Time (UTC)—not local—timezone) of the timespan for which to retrieve the data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;2015-10-05T12:30:30+05:30&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;endTime&lt;/td&gt;
+            &lt;td&gt;Ending date/time (Coordinated Universal Time (UTC)—not local—timezone) of the timespan for which to retrieve the data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;2015-10-10T20:30:30+05:30&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.getDeleted&gt;
+        &lt;sObjectName&gt;{${payload.sObjectName}}&lt;/sObjectName&gt;
+        &lt;startTime&gt;{${payload.startTime}}&lt;/startTime&gt;
+        &lt;endTime&gt;{${payload.endTime}}&lt;/endTime&gt;
+    &lt;/salesforce.getDeleted&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+      &quot;sObjectName&quot;:&quot;Account&quot;,
+      &quot;startTime&quot;:&quot;2015-10-05T12:30:30+05:30&quot;,
+      &quot;endTime&quot;:&quot;2015-10-10T20:30:30+05:30&quot;
+    }
+    ```
+
+??? note &quot;getUpdated&quot;
+    The `salesforce.getUpdated` operation retrieves a list of records updated within a specified timespan for the given object. Provide the start and end date-time values in ISO 8601 format: `YYYY-MM-DDThh:mm:ss+hh:mm`. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_getupdated.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObjectName&lt;/td&gt;
+            &lt;td&gt;The object where you want to look for updated records&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;startTime&lt;/td&gt;
+            &lt;td&gt;Starting date/time (Coordinated Universal Time (UTC)—not local—timezone) of the timespan for which to retrieve the data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;2015-10-05T12:30:30+05:30&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;endTime&lt;/td&gt;
+            &lt;td&gt;Ending date/time (Coordinated Universal Time (UTC)—not local—timezone) of the timespan for which to retrieve the data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;2015-10-10T20:30:30+05:30&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.getUpdated&gt;
+        &lt;sObjectName&gt;{${payload.sObjectName}}&lt;/sObjectName&gt;
+        &lt;startTime&gt;{${payload.startTime}}&lt;/startTime&gt;
+        &lt;endTime&gt;{${payload.endTime}}&lt;/endTime&gt;
+    &lt;/salesforce.getUpdated&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;sObjectName&quot;:&quot;Account&quot;,
+        &quot;startTime&quot;:&quot;2015-10-05T12:30:30+05:30&quot;,
+        &quot;endTime&quot;:&quot;2015-10-10T20:30:30+05:30&quot;
+    }
+    ```
+
+
+### sObjects
+
+??? note &quot;describeGlobal&quot;
+    The `salesforce.describeGlobal` operation retrieves a list of all objects available in the system. You can then obtain metadata for one or more objects as described in the following sections. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_describeGlobal.htm) for more information.
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.describeGlobal/&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {}
+    ```
+
+??? note &quot;describeSObject&quot;
+    The `salesforce.describeSObject` operation retrieves metadata (such as name, label, and fields—including field properties) for a specific object type by specifying the following properties. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_sobject_describe.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObjectName&lt;/td&gt;
+            &lt;td&gt;The object type whose metadata you want to retrieve.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.describeSObject&gt;
+        &lt;sObjectName&gt;{${payload.sObjectName}}&lt;/sObjectName&gt;
+    &lt;/salesforce.describeSObject&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;sObjectName&quot;:&quot;Account&quot;,
+    }
+    ```
+
+??? note &quot;retrieveSObject&quot;
+    The `salesforce.retrieveSObject` operation retrieves details of a specific record. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_sobject_retrieve.htm) for more information.
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Sample Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;sObjectName&lt;/td&gt;
+        &lt;td&gt;The object type of the record.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;Account&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;rowId&lt;/td&gt;
+        &lt;td&gt;The ID of the record whose details you want to retrieve.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;00128000005YjDnAAK&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.retrieveSObject&gt;
+        &lt;sObjectName&gt;{${payload.sObjectName}}&lt;/sObjectName&gt;
+        &lt;rowId&gt;{${payload.rowId}}&lt;/rowId&gt;
+    &lt;/salesforce.retrieveSObject&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;sObjectName&quot;:&quot;Account&quot;,
+        &quot;rowId&quot;:&quot;00128000005YjDnAAK&quot;,
+    }
+    ```
+
+### Composite
+
+??? note &quot;compositeBatch&quot;
+    The `salesforce.compositeBatch` operation executes up to 25 sub-requests in a single call to Salesforce’s Composite Batch REST resource. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_composite_batch.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Field and Value&lt;/td&gt;
+            &lt;td&gt;JSON string that defines the array of sub-requests (each sub-request includes &lt;code&gt;method&lt;/code&gt;, &lt;code&gt;url&lt;/code&gt;, optional &lt;code&gt;body&lt;/code&gt;, and a &lt;code&gt;referenceId&lt;/code&gt;).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;[{&quot;method&quot;:&quot;GET&quot;,&quot;url&quot;:&quot;/services/data/v60.0/sobjects/Account/001...&quot;}]&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.compositeBatch&gt;
+        &lt;fieldAndValue&gt;{${payload.fieldAndValue}}&lt;/fieldAndValue&gt;
+    &lt;/salesforce.compositeBatch&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;fieldAndValue&quot;: {
+            &quot;batchRequests&quot;: [
+                {
+                    &quot;method&quot;: &quot;PATCH&quot;,
+                    &quot;url&quot;: &quot;v64.0/sobjects/account/001D000000K0fXOIAZ&quot;,
+                    &quot;richInput&quot;: {
+                        &quot;Name&quot;: &quot;NewName&quot;
+                    }
+                },
+                {
+                    &quot;method&quot;: &quot;GET&quot;,
+                    &quot;url&quot;: &quot;v64.0/sobjects/account/001D000000K0fXOIAZ?fields=Name,BillingPostalCode&quot;
+                }
+            ]
+        }
+    }
+    ```
+
+??? note &quot;compositeGraph&quot;
+    The `salesforce.compositeGraph` operation submits one or more composite graph operations to Salesforce’s Composite Graph REST resource. Each graph can contain multiple sub-requests that are executed in the order you define. See the [Composite Graph API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_composite_graph.htm) for full details.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Field and Value&lt;/td&gt;
+            &lt;td&gt;
+                A JSON object that defines one or more graphs.&lt;br/&gt;
+                Each graph contains a &lt;code&gt;graphId&lt;/code&gt; and a &lt;code&gt;compositeRequest&lt;/code&gt; array.&lt;br/&gt;
+                Every sub-request in &lt;code&gt;compositeRequest&lt;/code&gt; specifies &lt;code&gt;method&lt;/code&gt;, &lt;code&gt;url&lt;/code&gt;, an optional &lt;code&gt;body&lt;/code&gt;, and a &lt;code&gt;referenceId&lt;/code&gt;.
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;{ &quot;graphs&quot;: [ { &quot;graphId&quot;: &quot;Graph1&quot;, &quot;compositeRequest&quot;: [ … ] } ] }&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.compositeGraph&gt;
+        &lt;fieldAndValue&gt;{${payload.fieldAndValue}}&lt;/fieldAndValue&gt;
+    &lt;/salesforce.compositeGraph&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;fieldAndValue&quot;: {
+            &quot;graphs&quot;: [
+                {
+                    &quot;graphId&quot;: &quot;Graph1&quot;,
+                    &quot;compositeRequest&quot;: [
+                        {
+                            &quot;method&quot;: &quot;GET&quot;,
+                            &quot;url&quot;: &quot;/services/data/v60.0/sobjects/Account/0018g00000XXXXXAAA&quot;,
+                            &quot;referenceId&quot;: &quot;RefAccount&quot;
+                        },
+                        {
+                            &quot;method&quot;: &quot;PATCH&quot;,
+                            &quot;url&quot;: &quot;/services/data/v60.0/sobjects/Account/@{RefAccount.Id}&quot;,
+                            &quot;body&quot;: {
+                                &quot;Industry&quot;: &quot;Manufacturing&quot;
+                            },
+                            &quot;referenceId&quot;: &quot;UpdateAccount&quot;
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+    ```
+
+??? note &quot;compositeRequest&quot;
+    The `salesforce.compositeRequest` operation executes a series of REST API sub-requests in a single call to Salesforce’s Composite REST resource, preserving the order and allowing inter-request references. See the [Composite API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_composite.htm) for full details.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Field And Value&lt;/td&gt;
+            &lt;td&gt;
+                A JSON object that defines the composite request.&lt;br/&gt;
+                Must include an &lt;code&gt;allOrNone&lt;/code&gt; flag and a &lt;code&gt;compositeRequest&lt;/code&gt; array.&lt;br/&gt;
+                Each item in &lt;code&gt;compositeRequest&lt;/code&gt; specifies &lt;code&gt;method&lt;/code&gt;, &lt;code&gt;url&lt;/code&gt;, an optional &lt;code&gt;body&lt;/code&gt;, and a &lt;code&gt;referenceId&lt;/code&gt;.
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;{ &quot;allOrNone&quot;: true, &quot;compositeRequest&quot;: [ … ] }&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.compositeRequest&gt;
+        &lt;fieldAndValue&gt;{${payload.fieldAndValue}}&lt;/fieldAndValue&gt;
+    &lt;/salesforce.compositeRequest&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;fieldAndValue&quot;: {
+            &quot;allOrNone&quot;: true,
+            &quot;compositeRequest&quot;: [
+                {
+                    &quot;method&quot;: &quot;GET&quot;,
+                    &quot;url&quot;: &quot;/services/data/v60.0/sobjects/Account/0018g00000XXXXXAAA&quot;,
+                    &quot;referenceId&quot;: &quot;RefAccount&quot;
+                },
+                {
+                    &quot;method&quot;: &quot;PATCH&quot;,
+                    &quot;url&quot;: &quot;/services/data/v60.0/sobjects/Account/@{RefAccount.id}&quot;,
+                    &quot;body&quot;: {
+                        &quot;Industry&quot;: &quot;Manufacturing&quot;
+                    },
+                    &quot;referenceId&quot;: &quot;UpdateAccount&quot;
+                },
+                {
+                    &quot;method&quot;: &quot;POST&quot;,
+                    &quot;url&quot;: &quot;/services/data/v60.0/sobjects/Contact&quot;,
+                    &quot;body&quot;: {
+                        &quot;LastName&quot;: &quot;Smith&quot;,
+                        &quot;AccountId&quot;: &quot;@{RefAccount.id}&quot;
+                    },
+                    &quot;referenceId&quot;: &quot;CreateContact&quot;
+                }
+            ]
+        }
+    }
+    ```
+
+### Bulk V2
+
+??? note &quot;abortJob&quot;
+    The `salesforce.abortJob` operation aborts a bulk ingest job in Salesforce using Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/close_job.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Job ID&lt;/td&gt;
+            &lt;td&gt;The bulk job ID.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;7503i000000XXXXXAAI&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.abortJob&gt;
+        &lt;jobId&gt;{${payload.jobId}}&lt;/jobId&gt;
+    &lt;/salesforce.abortJob&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;jobId&quot;: &quot;7503i000000XXXXXAAI&quot;
+    }
+    ```
+
+??? note &quot;createJob&quot;
+    The `salesforce.createJob` operation creates a bulk ingest job in Salesforce using Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/create_job.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Operation&lt;/td&gt;
+            &lt;td&gt;The bulk operation to perform on the data (for example, &lt;code&gt;insert&lt;/code&gt;, &lt;code&gt;update&lt;/code&gt;, &lt;code&gt;upsert&lt;/code&gt;, or &lt;code&gt;delete&lt;/code&gt;).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;insert&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Object&lt;/td&gt;
+            &lt;td&gt;The object type for the data being processed. Use only a single object type per job.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Column Delimeter&lt;/td&gt;
+            &lt;td&gt;The column delimiter used for CSV job data. Default is &lt;code&gt;COMMA&lt;/code&gt;. Valid values: &lt;code&gt;BACKQUOTE&lt;/code&gt;, &lt;code&gt;CARET&lt;/code&gt;, &lt;code&gt;COMMA&lt;/code&gt;, &lt;code&gt;PIPE&lt;/code&gt;, &lt;code&gt;SEMICOLON&lt;/code&gt;, &lt;code&gt;TAB&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;COMMA&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Line Ending&lt;/td&gt;
+            &lt;td&gt;The line ending used for CSV job data, marking the end of a data row. Valid values: &lt;code&gt;LF&lt;/code&gt;, &lt;code&gt;CRLF&lt;/code&gt;. Default is &lt;code&gt;LF&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;LF&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Assignment Rule ID&lt;/td&gt;
+            &lt;td&gt;The ID of an assignment rule to run for a Case or a Lead. The rule can be active or inactive.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;01Q3j000000XXXXAAA&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;External ID Field Name&lt;/td&gt;
+            &lt;td&gt;The external-ID field in the object being updated. Required only for &lt;code&gt;upsert&lt;/code&gt; operations.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;External_Id__c&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.createJob&gt;
+        &lt;operation&gt;{${payload.operation}}&lt;/operation&gt;
+        &lt;object&gt;{${payload.object}}&lt;/object&gt;
+        &lt;columnDelimiter&gt;{${payload.columnDelimiter}}&lt;/columnDelimiter&gt;
+        &lt;lineEnding&gt;{${payload.lineEnding}}&lt;/lineEnding&gt;
+        &lt;assignmentRuleId&gt;{${payload.assignmentRuleId}}&lt;/assignmentRuleId&gt;
+        &lt;externalIdFieldName&gt;{${payload.externalIdFieldName}}&lt;/externalIdFieldName&gt;
+    &lt;/salesforce.createJob&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;operation&quot;: &quot;insert&quot;,
+        &quot;object&quot;: &quot;Account&quot;,
+        &quot;columnDelimiter&quot;: &quot;COMMA&quot;,
+        &quot;lineEnding&quot;: &quot;LF&quot;,
+        &quot;assignmentRuleId&quot;: &quot;01Q3j000000XXXXAAA&quot;,
+        &quot;externalIdFieldName&quot;: &quot;External_Id__c&quot;
+    }
+    ```
+
+??? note &quot;closeJob&quot;
+    The `salesforce.closeJob` operation closes a bulk ingest job in Salesforce using Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/close_job.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Job ID&lt;/td&gt;
+            &lt;td&gt;The bulk job ID.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;7503i000000XXXXXAAI&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.closeJob&gt;
+        &lt;jobId&gt;{${payload.jobId}}&lt;/jobId&gt;
+    &lt;/salesforce.closeJob&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;jobId&quot;: &quot;7503i000000XXXXXAAI&quot;
+    }
+    ```
+
+??? note &quot;deleteJob&quot;
+    The `salesforce.deleteJob` operation deletes a bulk ingest job in Salesforce using Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/delete_job.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Job ID&lt;/td&gt;
+            &lt;td&gt;The bulk job ID.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;7503i000000XXXXXAAI&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.deleteJob&gt;
+        &lt;jobId&gt;{${payload.jobId}}&lt;/jobId&gt;
+    &lt;/salesforce.deleteJob&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;jobId&quot;: &quot;7503i000000XXXXXAAI&quot;
+    }
+    ```
+
+??? note &quot;getAllJobInfo&quot;
+    The `salesforce.getJobInfo` operation retrieve all the bulk ingest job information from Salesforce using Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/get_all_jobs.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;IsPKChunkingEnabled&lt;/td&gt;
+            &lt;td&gt;If set to &lt;code&gt;true&lt;/code&gt;, returns information only about jobs where PK Chunking is enabled (Bulk API 1.0 only).&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;true&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Job Type&lt;/td&gt;
+            &lt;td&gt;Returns jobs that match the specified type.&lt;br/&gt;
+                Valid values: &lt;code&gt;Classic&lt;/code&gt;, &lt;code&gt;BigObjectIngest&lt;/code&gt;, &lt;code&gt;V2Ingest&lt;/code&gt;, &lt;code&gt;All&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;V2Ingest&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Query Locator&lt;/td&gt;
+            &lt;td&gt;Returns jobs starting at the specified locator value.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;0Sf3i0000004oBAEAY&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.getAllJobInfo&gt;
+        &lt;isPKChunkingEnabled&gt;{${payload.isPKChunkingEnabled}}&lt;/isPKChunkingEnabled&gt;
+        &lt;jobType&gt;{${payload.jobType}}&lt;/jobType&gt;
+        &lt;queryLocator&gt;{${payload.queryLocator}}&lt;/queryLocator&gt;
+    &lt;/salesforce.getAllJobInfo&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;isPKChunkingEnabled&quot;: true,
+        &quot;jobType&quot;: &quot;V2Ingest&quot;,
+        &quot;queryLocator&quot;: &quot;0Sf3i0000004oBAEAY&quot;
+    }
+    ```
+
+??? note &quot;getFailedResults&quot;
+    The `salesforce.getFailedResults` operation retrieves failed records of a specific bulk job from Salesforce using the Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/get_job_failed_results.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Job ID&lt;/td&gt;
+            &lt;td&gt;The bulk job ID.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;7503i000000XXXXXAAI&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Output Type&lt;/td&gt;
+            &lt;td&gt;The response content type.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;CSV&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Add Results To&lt;/td&gt;
+            &lt;td&gt;Where to store the results (&lt;code&gt;FILE&lt;/code&gt; or &lt;code&gt;BODY&lt;/code&gt;).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;FILE&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;File Path&lt;/td&gt;
+            &lt;td&gt;The file path to store results (required only when &lt;code&gt;Add Results To&lt;/code&gt; is &lt;code&gt;FILE&lt;/code&gt;).&lt;/td&gt;
+            &lt;td&gt;If &lt;code&gt;FILE&lt;/code&gt; selected&lt;/td&gt;
+            &lt;td&gt;/tmp/failed_results.csv&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.getFailedResults&gt;
+        &lt;jobId&gt;{${payload.jobId}}&lt;/jobId&gt;
+        &lt;outputType&gt;{${payload.outputType}}&lt;/outputType&gt;
+        &lt;addResultsTo&gt;{${payload.addResultsTo}}&lt;/addResultsTo&gt;
+        &lt;filePath&gt;{${payload.filePath}}&lt;/filePath&gt;
+    &lt;/salesforce.getFailedResults&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;jobId&quot;: &quot;7503i000000XXXXXAAI&quot;,
+        &quot;outputType&quot;: &quot;CSV&quot;,
+        &quot;addResultsTo&quot;: &quot;FILE&quot;,
+        &quot;filePath&quot;: &quot;/tmp/failed_results.csv&quot;
+    }
+    ```
+
+??? note &quot;getJobInfo&quot;
+    The `salesforce.getJobInfo` operation retrieve bulk ingest job information from Salesforce using Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/get_job_info.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Job ID&lt;/td&gt;
+            &lt;td&gt;The bulk job ID.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;7503i000000XXXXXAAI&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.getJobInfo&gt;
+        &lt;jobId&gt;{${payload.jobId}}&lt;/jobId&gt;
+    &lt;/salesforce.getJobInfo&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;jobId&quot;: &quot;7503i000000XXXXXAAI&quot;
+    }
+    ```
+
+??? note &quot;getSuccessfulResults&quot;
+    The `salesforce.getSuccessfulResults` operation retrieves successful records of a specific bulk job from Salesforce using the Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/get_job_successful_results.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Job ID&lt;/td&gt;
+            &lt;td&gt;The bulk job ID.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;7503i000000XXXXXAAI&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Output Type&lt;/td&gt;
+            &lt;td&gt;The response content type.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;CSV&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Add Results To&lt;/td&gt;
+            &lt;td&gt;Where to store the results (&lt;code&gt;FILE&lt;/code&gt; or &lt;code&gt;BODY&lt;/code&gt;).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;FILE&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;File Path&lt;/td&gt;
+            &lt;td&gt;The file path to store results (required only when &lt;code&gt;Add Results To&lt;/code&gt; is &lt;code&gt;FILE&lt;/code&gt;).&lt;/td&gt;
+            &lt;td&gt;If &lt;code&gt;FILE&lt;/code&gt; selected&lt;/td&gt;
+            &lt;td&gt;/tmp/success_results.csv&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.getSuccessfulResults&gt;
+        &lt;jobId&gt;{${payload.jobId}}&lt;/jobId&gt;
+        &lt;outputType&gt;{${payload.outputType}}&lt;/outputType&gt;
+        &lt;addResultsTo&gt;{${payload.addResultsTo}}&lt;/addResultsTo&gt;
+        &lt;filePath&gt;{${payload.filePath}}&lt;/filePath&gt;
+    &lt;/salesforce.getSuccessfulResults&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;jobId&quot;: &quot;7503i000000XXXXXAAI&quot;,
+        &quot;outputType&quot;: &quot;CSV&quot;,
+        &quot;addResultsTo&quot;: &quot;FILE&quot;,
+        &quot;filePath&quot;: &quot;/tmp/success_results.csv&quot;
+    }
+    ```
+
+??? note &quot;getUnprocessedResults&quot;
+    The `salesforce.getUnprocessedResults` operation retrieves unprocessed records of a specific bulk job from Salesforce using the Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/get_job_unprocessed_results.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Job ID&lt;/td&gt;
+            &lt;td&gt;The bulk job ID.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;7503i000000XXXXXAAI&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Output Type&lt;/td&gt;
+            &lt;td&gt;The response content type.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;CSV&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Add Results To&lt;/td&gt;
+            &lt;td&gt;Where to store the results (&lt;code&gt;FILE&lt;/code&gt; or &lt;code&gt;BODY&lt;/code&gt;).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;FILE&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;File Path&lt;/td&gt;
+            &lt;td&gt;The file path to store results (required only when &lt;code&gt;Add Results To&lt;/code&gt; is &lt;code&gt;FILE&lt;/code&gt;).&lt;/td&gt;
+            &lt;td&gt;If &lt;code&gt;FILE&lt;/code&gt; selected&lt;/td&gt;
+            &lt;td&gt;/tmp/unprocessed_results.csv&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.getUnprocessedResults&gt;
+        &lt;jobId&gt;{${payload.jobId}}&lt;/jobId&gt;
+        &lt;outputType&gt;{${payload.outputType}}&lt;/outputType&gt;
+        &lt;addResultsTo&gt;{${payload.addResultsTo}}&lt;/addResultsTo&gt;
+        &lt;filePath&gt;{${payload.filePath}}&lt;/filePath&gt;
+    &lt;/salesforce.getUnprocessedResults&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;jobId&quot;: &quot;7503i000000XXXXXAAI&quot;,
+        &quot;outputType&quot;: &quot;CSV&quot;,
+        &quot;addResultsTo&quot;: &quot;FILE&quot;,
+        &quot;filePath&quot;: &quot;/tmp/unprocessed_results.csv&quot;
+    }
+    ```
+
+??? note &quot;uploadJobData&quot;
+    The `salesforce.uploadJobData` operation upload the csv records to a bulk job in Salesforce using the Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/upload_job_data.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Job ID&lt;/td&gt;
+            &lt;td&gt;The bulk job ID.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;7503i000000XXXXXAAI&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Input Data&lt;/td&gt;
+            &lt;td&gt;The CSV content to upload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;Name,Industry&amp;#10;Acme,Manufacturing&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.uploadJobData&gt;
+        &lt;jobId&gt;{${payload.jobId}}&lt;/jobId&gt;
+        &lt;inputData&gt;{${payload.inputData}}&lt;/inputData&gt;
+    &lt;/salesforce.uploadJobData&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;jobId&quot;: &quot;7503i000000XXXXXAAI&quot;,
+        &quot;inputData&quot;: &quot;Name,Industry\nAcme,Manufacturing&quot;
+    }
+    ```
+
+??? note &quot;createQueryJob&quot;
+    The `salesforce.createQueryJob` operation creates a bulk query job in Salesforce using Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/query_create_job.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Operation&lt;/td&gt;
+            &lt;td&gt;The type of query.&lt;br/&gt;Valid values: &lt;code&gt;QUERY&lt;/code&gt;, &lt;code&gt;QUERY_ALL&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;QUERY&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Column Delimiter&lt;/td&gt;
+            &lt;td&gt;The column delimiter used for CSV job data.&lt;br/&gt;Default is &lt;code&gt;COMMA&lt;/code&gt;.&lt;br/&gt;Valid values: &lt;code&gt;BACKQUOTE&lt;/code&gt;, &lt;code&gt;CARET&lt;/code&gt;, &lt;code&gt;COMMA&lt;/code&gt;, &lt;code&gt;PIPE&lt;/code&gt;, &lt;code&gt;SEMICOLON&lt;/code&gt;, &lt;code&gt;TAB&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;COMMA&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Line Ending&lt;/td&gt;
+            &lt;td&gt;The line ending used for CSV job data, marking the end of a data row.&lt;br/&gt;Valid values: &lt;code&gt;LF&lt;/code&gt;, &lt;code&gt;CRLF&lt;/code&gt;.&lt;br/&gt;Default is &lt;code&gt;LF&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;LF&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.createQueryJob&gt;
+        &lt;operation&gt;{${payload.operation}}&lt;/operation&gt;
+        &lt;columnDelimiter&gt;{${payload.columnDelimiter}}&lt;/columnDelimiter&gt;
+        &lt;lineEnding&gt;{${payload.lineEnding}}&lt;/lineEnding&gt;
+    &lt;/salesforce.createQueryJob&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;operation&quot;: &quot;QUERY&quot;,
+        &quot;columnDelimiter&quot;: &quot;COMMA&quot;,
+        &quot;lineEnding&quot;: &quot;LF&quot;
+    }
+    ```
+
+??? note &quot;abortQueryJob&quot;
+    The `salesforce.abortQueryJob` operation aborts a bulk query job in Salesforce using Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/query_abort_job.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Query Job ID&lt;/td&gt;
+            &lt;td&gt;The bulk query job ID.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;7508i000000YYYYAAA&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.abortQueryJob&gt;
+        &lt;queryJobId&gt;{${payload.queryJobId}}&lt;/queryJobId&gt;
+    &lt;/salesforce.abortQueryJob&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;queryJobId&quot;: &quot;7508i000000YYYYAAA&quot;
+    }
+    ```
+
+??? note &quot;deleteQueryJob&quot;
+    The `salesforce.deleteQueryJob` operation deletes a bulk query job in Salesforce using Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/query_delete_job.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Query Job ID&lt;/td&gt;
+            &lt;td&gt;The bulk query job ID.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;7508i000000YYYYAAA&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.deleteQueryJob&gt;
+        &lt;queryJobId&gt;{${payload.queryJobId}}&lt;/queryJobId&gt;
+    &lt;/salesforce.deleteQueryJob&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;queryJobId&quot;: &quot;7508i000000YYYYAAA&quot;
+    }
+    ```
+
+??? note &quot;getQueryJobInfo&quot;
+    The `salesforce.getQueryJobInfo` operation retrieve bulk query job information from Salesforce using Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/query_get_one_job.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Job ID&lt;/td&gt;
+            &lt;td&gt;The bulk query job ID.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;7508i000000YYYYAAA&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.getQueryJobInfo&gt;
+        &lt;jobId&gt;{${payload.jobId}}&lt;/jobId&gt;
+    &lt;/salesforce.getQueryJobInfo&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;jobId&quot;: &quot;7508i000000YYYYAAA&quot;
+    }
+    ```
+
+??? note &quot;getAllQueryJobInfo&quot;
+    The `salesforce.getAllQueryJobInfo` operation retrieve all the bulk query job information from Salesforce using Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/query_get_all_jobs.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;IsPKChunkingEnabled&lt;/td&gt;
+            &lt;td&gt;If set to &lt;code&gt;true&lt;/code&gt;, returns information only about jobs where PK Chunking is enabled (Bulk API 1.0 only).&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;true&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Job Type&lt;/td&gt;
+            &lt;td&gt;Returns jobs that match the specified type.&lt;br/&gt;
+                Valid values: &lt;code&gt;Classic&lt;/code&gt;, &lt;code&gt;V2Query&lt;/code&gt;, &lt;code&gt;V2Ingest&lt;/code&gt;, &lt;code&gt;All&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;V2Query&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Query Locator&lt;/td&gt;
+            &lt;td&gt;Returns jobs starting at the specified locator value.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;0Sf3i0000004oBAEAY&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.getAllQueryJobInfo&gt;
+        &lt;isPKChunkingEnabled&gt;{${payload.isPKChunkingEnabled}}&lt;/isPKChunkingEnabled&gt;
+        &lt;jobType&gt;{${payload.jobType}}&lt;/jobType&gt;
+        &lt;queryLocator&gt;{${payload.queryLocator}}&lt;/queryLocator&gt;
+    &lt;/salesforce.getAllQueryJobInfo&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;isPKChunkingEnabled&quot;: true,
+        &quot;jobType&quot;: &quot;V2Query&quot;,
+        &quot;queryLocator&quot;: &quot;0Sf3i0000004oBAEAY&quot;
+    }
+    ```
+
+??? note &quot;getQueryJobResults&quot;
+    The `salesforce.getQueryJobResults` operation retrieves the results of a specified bulk query job from Salesforce using the Salesforce Bulk API v2. See the [related API documentation](https://developer.salesforce.com/docs/atlas.en-us.api_asynch.meta/api_asynch/query_get_job_results.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Salesforce configuration&lt;/td&gt;
+            &lt;td&gt;The Salesforce configuration that stores OAuth-related data.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;salesforceConfig&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Job ID&lt;/td&gt;
+            &lt;td&gt;The ID of the bulk query job.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;7508i000000YYYYAAA&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Locator&lt;/td&gt;
+            &lt;td&gt;A string that identifies a specific set of query results. Providing a value returns only that set of results.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;02X8i000004abcdEAA&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Records&lt;/td&gt;
+            &lt;td&gt;The maximum number of records to retrieve per result set.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+            &lt;td&gt;500&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Output Type&lt;/td&gt;
+            &lt;td&gt;The response content type.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;CSV&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Add Results To&lt;/td&gt;
+            &lt;td&gt;Where to store the results (&lt;code&gt;FILE&lt;/code&gt; or &lt;code&gt;BODY&lt;/code&gt;).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;FILE&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;File Path&lt;/td&gt;
+            &lt;td&gt;The file path to store results (required only when &lt;code&gt;Add Results To&lt;/code&gt; is &lt;code&gt;FILE&lt;/code&gt;).&lt;/td&gt;
+            &lt;td&gt;If &lt;code&gt;FILE&lt;/code&gt; selected&lt;/td&gt;
+            &lt;td&gt;/tmp/query_results.csv&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.getQueryJobResults&gt;
+        &lt;jobId&gt;{${payload.jobId}}&lt;/jobId&gt;
+        &lt;locator&gt;{${payload.locator}}&lt;/locator&gt;
+        &lt;maxRecords&gt;{${payload.maxRecords}}&lt;/maxRecords&gt;
+        &lt;outputType&gt;{${payload.outputType}}&lt;/outputType&gt;
+        &lt;addResultsTo&gt;{${payload.addResultsTo}}&lt;/addResultsTo&gt;
+        &lt;filePath&gt;{${payload.filePath}}&lt;/filePath&gt;
+    &lt;/salesforce.getQueryJobResults&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;jobId&quot;: &quot;7508i000000YYYYAAA&quot;,
+        &quot;locator&quot;: &quot;02X8i000004abcdEAA&quot;,
+        &quot;maxRecords&quot;: 500,
+        &quot;outputType&quot;: &quot;CSV&quot;,
+        &quot;addResultsTo&quot;: &quot;FILE&quot;,
+        &quot;filePath&quot;: &quot;/tmp/query_results.csv&quot;
+    }
+    ```
+
+### SOAP
+
+??? note &quot;soapConvertLead&quot;  
+    The `salesforce.soapConvertLead` operation converts one or more Lead records into Account, Contact, and (optionally) Opportunity records. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_convertlead.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Lead Convert Requests&lt;/td&gt;
+            &lt;td&gt;The convert lead requests&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;[{...}]&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapConvertLead&gt;
+        &lt;leadconvertrequests&gt;{${payload.leadconvertrequests}}&lt;/leadconvertrequests&gt;
+    &lt;/salesforce.soapConvertLead&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;leadconvertrequests&quot;: &quot;[{...}]&quot;
+    }
+    ```
+
+??? note &quot;soapCreate&quot;  
+    The `salesforce.soapCreate` operation adds one or more new records to Salesforce. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_create.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;All or None&lt;/td&gt;
+            &lt;td&gt;Whether to rollback changes if an object fails(Default value is 0).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;1&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Allow Field Truncate&lt;/td&gt;
+            &lt;td&gt;Whether to truncates strings that exceed the field length(Default value is 0).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;1&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObjects&lt;/td&gt;
+            &lt;td&gt;The sobject type&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapCreate&gt;
+        &lt;allOrNone&gt;{${payload.allOrNone}}&lt;/allOrNone&gt;
+        &lt;allowFieldTruncate&gt;{${payload.allowFieldTruncate}}&lt;/allowFieldTruncate&gt;
+        &lt;sobjects&gt;{${payload.sobjects}}&lt;/sobjects&gt;
+    &lt;/salesforce.soapCreate&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;allOrNone&quot;: &quot;1&quot;,
+      &quot;allowFieldTruncate&quot;: &quot;1&quot;,
+      &quot;sobjects&quot;: &quot;Account&quot;
+    }
+    ```
+
+??? note &quot;soapDelete&quot;  
+    The `salesforce.soapDelete` operation deletes one or more records from Salesforce. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_delete.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;All or None&lt;/td&gt;
+            &lt;td&gt;Whether to rollback changes if an object fails(Default value is 0).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;1&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObjects&lt;/td&gt;
+            &lt;td&gt;The sobject type&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapDelete&gt;
+        &lt;allOrNone&gt;{${payload.allOrNone}}&lt;/allOrNone&gt;
+        &lt;sobjects&gt;{${payload.sobjects}}&lt;/sobjects&gt;
+    &lt;/salesforce.soapDelete&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;allOrNone&quot;: &quot;1&quot;,
+      &quot;sobjects&quot;: &quot;Account&quot;
+    }
+    ```
+
+
+??? note &quot;soapDescribeGlobal&quot;  
+    The `salesforce.soapDescribeGlobal` operation retrieves a list of all objects available in your organization&#x27;s data. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_describeglobal.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;&lt;td colspan=&quot;4&quot;&gt;No parameters&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapDescribeGlobal&gt;
+    &lt;/salesforce.soapDescribeGlobal&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {}
+    ```
+
+??? note &quot;soapDescribeSObject&quot;  
+    The `salesforce.soapDescribeSObject` operation describes metadata (fields and properties) for the specified object. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_describesobject.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObject&lt;/td&gt;
+            &lt;td&gt;The sobject type&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapDescribeSObject&gt;
+        &lt;sobject&gt;{${payload.sobject}}&lt;/sobject&gt;
+    &lt;/salesforce.soapDescribeSObject&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;sobject&quot;: &quot;Account&quot;
+    }
+    ```
+
+??? note &quot;soapDescribeSObjects&quot;  
+    The `salesforce.soapDescribeSObjects` operation describes metadata (fields and properties) for one or more specified objects. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_describesobjects.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObjects&lt;/td&gt;
+            &lt;td&gt;The sobject types&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapDescribeSObjects&gt;
+        &lt;sobjects&gt;{${payload.sobjects}}&lt;/sobjects&gt;
+    &lt;/salesforce.soapDescribeSObjects&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;sobjects&quot;: &quot;Account&quot;
+    }
+    ```
+
+??? note &quot;soapEmptyRecycleBin&quot;  
+    The `salesforce.soapEmptyRecycleBin` operation permanently deletes records from the Recycle Bin. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_emptyrecyclebin.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;All or None&lt;/td&gt;
+            &lt;td&gt;Whether to rollback changes if an object fails(Default value is 0).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;1&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObjects&lt;/td&gt;
+            &lt;td&gt;The sobject type&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapEmptyRecycleBin&gt;
+        &lt;allOrNone&gt;{${payload.allOrNone}}&lt;/allOrNone&gt;
+        &lt;sobjects&gt;{${payload.sobjects}}&lt;/sobjects&gt;
+    &lt;/salesforce.soapEmptyRecycleBin&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;allOrNone&quot;: &quot;1&quot;,
+      &quot;sobjects&quot;: &quot;Account&quot;
+    }
+    ```
+
+??? note &quot;soapFindDuplicates&quot;  
+    The `salesforce.soapFindDuplicates` operation searches for duplicate records based on defined matching rules. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_findduplicates.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObjects&lt;/td&gt;
+            &lt;td&gt;The sobject type&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapFindDuplicates&gt;
+        &lt;sobjects&gt;{${payload.sobjects}}&lt;/sobjects&gt;
+    &lt;/salesforce.soapFindDuplicates&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;sobjects&quot;: &quot;Account&quot;
+    }
+    ```
+
+??? note &quot;soapFindDuplicatesByIds&quot;  
+    The `salesforce.soapFindDuplicatesByIds` operation searches for duplicate records for the provided record IDs. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_findduplicatesbyids.htm) for more information. The input is an array of IDs.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;IDs&lt;/td&gt;
+            &lt;td&gt;Record ids&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;[&quot;0018g00000XXXXXAAA&quot;]&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapFindDuplicatesByIds&gt;
+        &lt;ids&gt;{${payload.ids}}&lt;/ids&gt;
+    &lt;/salesforce.soapFindDuplicatesByIds&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;ids&quot;: &quot;[\&quot;0018g00000XXXXXAAA\&quot;]&quot;
+    }
+    ```
+
+??? note &quot;soapGetDeleted&quot;  
+    The `salesforce.soapGetDeleted` operation retrieves IDs of records deleted during a specified time window. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_getdeleted.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObject Type&lt;/td&gt;
+            &lt;td&gt;The sobject type&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Start Date&lt;/td&gt;
+            &lt;td&gt;The start date for deleted records lookup&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;2025-06-01T00:00:00Z&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;End Date&lt;/td&gt;
+            &lt;td&gt;The end date for deleted records lookup&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;2025-06-16T00:00:00Z&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapGetDeleted&gt;
+        &lt;sObjectType&gt;{${payload.sObjectType}}&lt;/sObjectType&gt;
+        &lt;startDate&gt;{${payload.startDate}}&lt;/startDate&gt;
+        &lt;endDate&gt;{${payload.endDate}}&lt;/endDate&gt;
+    &lt;/salesforce.soapGetDeleted&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;sObjectType&quot;: &quot;Account&quot;,
+      &quot;startDate&quot;: &quot;2025-06-01T00:00:00Z&quot;,
+      &quot;endDate&quot;: &quot;2025-06-16T00:00:00Z&quot;
+    }
+    ```
+
+
+
+??? note &quot;soapGetServerTimestamp&quot;  
+    The `salesforce.soapGetServerTimestamp` operation retrieves the current server timestamp (UTC). See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_getservertimestamp.htm) for more information..
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;&lt;td colspan=&quot;4&quot;&gt;No parameters&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapGetServerTimestamp&gt;
+    &lt;/salesforce.soapGetServerTimestamp&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {}
+    ```
+
+??? note &quot;soapGetUpdated&quot;  
+    The `salesforce.soapGetUpdated` operation retrieves IDs of records updated during a specified time window. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_getupdated.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObject Type&lt;/td&gt;
+            &lt;td&gt;The sobject type&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Start Date&lt;/td&gt;
+            &lt;td&gt;The start date for deleted records lookup&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;2024-01-01T00:00:00Z&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;End Date&lt;/td&gt;
+            &lt;td&gt;The end date for deleted records lookup&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;2024-01-02T00:00:00Z&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapGetUpdated&gt;
+        &lt;sObjectType&gt;{${payload.sObjectType}}&lt;/sObjectType&gt;
+        &lt;startDate&gt;{${payload.startDate}}&lt;/startDate&gt;
+        &lt;endDate&gt;{${payload.endDate}}&lt;/endDate&gt;
+    &lt;/salesforce.soapGetUpdated&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;sObjectType&quot;: &quot;Account&quot;,
+      &quot;startDate&quot;: &quot;2024-01-01T00:00:00Z&quot;,
+      &quot;endDate&quot;: &quot;2024-01-02T00:00:00Z&quot;
+    }
+    ```
+
+??? note &quot;soapGetUserInfo&quot;  
+    The `salesforce.soapGetUserInfo` operation retrieves personal information for the user of the current session. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_getuserinfo.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;&lt;td colspan=&quot;4&quot;&gt;No parameters&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapGetUserInfo&gt;
+    &lt;/salesforce.soapGetUserInfo&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {}
+    ```
+
+??? note &quot;soapLogout&quot;  
+    The `salesforce.soapLogout` operation terminates the current session. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_logout.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;&lt;td colspan=&quot;4&quot;&gt;No parameters&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapLogout&gt;
+    &lt;/salesforce.soapLogout&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {}
+    ```
+
+??? note &quot;soapMerge&quot;  
+    The `salesforce.soapMerge` operation merges up to three records of the same object type into a single record. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_merge.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Merge Requests&lt;/td&gt;
+            &lt;td&gt;WThe merge requests.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;[&amp;lt;MergeRequest/&amp;gt;]&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapMerge&gt;
+        &lt;mergerequests&gt;{${payload.mergerequests}}&lt;/mergerequests&gt;
+    &lt;/salesforce.soapMerge&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;mergerequests&quot;: &quot;[&lt;MergeRequest/&gt;]&quot;
+    }
+    ```
+
+??? note &quot;soapQuery&quot;  
+    The `salesforce.soapQuery` operation runs a SOQL query and returns matching records. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_query.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Batch Size&lt;/td&gt;
+            &lt;td&gt;The number of records to return.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;200&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Query String&lt;/td&gt;
+            &lt;td&gt;The queryString to get the results from API.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;SELECT Id, Name FROM Account&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapQuery&gt;
+        &lt;batchSize&gt;{${payload.batchSize}}&lt;/batchSize&gt;
+        &lt;queryString&gt;{${payload.queryString}}&lt;/queryString&gt;
+    &lt;/salesforce.soapQuery&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;batchSize&quot;: 200,
+      &quot;queryString&quot;: &quot;SELECT Id, Name FROM Account&quot;
+    }
+    ```
+
+??? note &quot;soapQueryAll&quot;  
+    The `salesforce.soapQueryAll` operation runs a SOQL query that returns both active and archived/deleted records. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_queryall.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Batch Size&lt;/td&gt;
+            &lt;td&gt;The number of records to return.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;200&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Query String&lt;/td&gt;
+            &lt;td&gt;The queryString to get the results from API.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;SELECT Id, Name FROM Account&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapQueryAll&gt;
+        &lt;batchSize&gt;{${payload.batchSize}}&lt;/batchSize&gt;
+        &lt;queryString&gt;{${payload.queryString}}&lt;/queryString&gt;
+    &lt;/salesforce.soapQueryAll&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;batchSize&quot;: 200,
+      &quot;queryString&quot;: &quot;SELECT Id, Name FROM Account&quot;
+    }
+    ```
+
+??? note &quot;soapQueryMore&quot;  
+    The `salesforce.soapQueryMore` operation retrieves the next batch of query results. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_querymore.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Batch Size&lt;/td&gt;
+            &lt;td&gt;The number of records to return.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;200&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapQueryMore&gt;
+        &lt;batchSize&gt;{${payload.batchSize}}&lt;/batchSize&gt;
+    &lt;/salesforce.soapQueryMore&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;batchSize&quot;: 200
+    }
+    ```
+
+??? note &quot;soapResetPassword&quot;  
+    The `salesforce.soapResetPassword` operation resets a user&#x27;s password and emails them the new password. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_resetpassword.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;User ID&lt;/td&gt;
+            &lt;td&gt;The user&amp;#x27;s Salesforce ID.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;0058g00000XXXXXAAA&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapResetPassword&gt;
+        &lt;userId&gt;{${payload.userId}}&lt;/userId&gt;
+    &lt;/salesforce.soapResetPassword&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;userId&quot;: &quot;0058g00000XXXXXAAA&quot;
+    }
+    ```
+
+??? note &quot;soapRetrieve&quot;  
+    The `salesforce.soapRetrieve` operation retrieves field values for one or more records of a specified object. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_retrieve.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Object Type&lt;/td&gt;
+            &lt;td&gt;The object type of the records.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Object IDs&lt;/td&gt;
+            &lt;td&gt;XML representation of the records to retrieve, as shown in the following example.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;&amp;lt;ids&amp;gt;001...&amp;lt;/ids&amp;gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Field List&lt;/td&gt;
+            &lt;td&gt;A comma-separated list of the fields you want to retrieve from the records.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;SampleValue&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+    
+    ```xml
+    &lt;salesforce.soapRetrieve&gt;
+        &lt;objectType&gt;{${payload.objectType}}&lt;/objectType&gt;
+        &lt;objectIDS&gt;{${payload.objectIDS}}&lt;/objectIDS&gt;
+        &lt;fieldList&gt;{${payload.fieldList}}&lt;/fieldList&gt;
+    &lt;/salesforce.soapRetrieve&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+      &quot;objectType&quot;: &quot;Account&quot;,
+      &quot;objectIDS&quot;: &quot;&lt;ids&gt;001...&lt;/ids&gt;&quot;,
+      &quot;fieldList&quot;: &quot;SampleValue&quot;
+    }
+    ```
+
+??? note &quot;soapSearch&quot;  
+    The `salesforce.soapSearch` operation executes a SOSL text search against your organization&#x27;s data. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_search.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;search String&lt;/td&gt;
+            &lt;td&gt;The searchString to get the Result.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;*John*&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforce.soapSearch&gt;
+        &lt;searchString&gt;{${payload.searchString}}&lt;/searchString&gt;
+    &lt;/salesforce.soapSearch&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;searchString&quot;: &quot;*John*&quot;
+    }
+    ```
+
+??? note &quot;soapSendEmail&quot;
+    The `salesforce.soapSendEmail` operation sends a single or mass email immediately. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_sendemail.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Send Email&lt;/td&gt;
+            &lt;td&gt;XML representation of the email, as shown in the example.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;{}&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+        &lt;salesforce.soapSendEmail&gt;
+            &lt;sendEmail&gt;{${payload.sendEmail}}&lt;/sendEmail&gt;
+        &lt;/salesforce.soapSendEmail&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+        {
+          &quot;sendEmail&quot;: &quot;&lt;SingleEmailMessage&gt;...&lt;/SingleEmailMessage&gt;&quot;
+        }
+    ```
+
+??? note &quot;soapSendEmailMessage&quot;
+    The `salesforce.soapSendEmailMessage` operation sends up to 10 draft EmailMessage records. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_sendemailmessage.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Send Email Message&lt;/td&gt;
+            &lt;td&gt;XML representation of the email IDs to send, as shown in the example.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;{}&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+        &lt;salesforce.soapSendEmailMessage&gt;
+            &lt;sendEmailMessage&gt;{${payload.sendEmailMessage}}&lt;/sendEmailMessage&gt;
+        &lt;/salesforce.soapSendEmailMessage&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+        {
+          &quot;sendEmailMessage&quot;: &quot;&lt;EmailMessage&gt;...&lt;/EmailMessage&gt;&quot;
+        }
+    ```
+
+??? note &quot;soapSetPassword&quot;
+    The `salesforce.soapSetPassword` operation sets a user&#x27;s password to a specified value. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_setpassword.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;User ID&lt;/td&gt;
+            &lt;td&gt;The user&amp;#x27;s Salesforce ID.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;0058g00000XXXXXAAA&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Password&lt;/td&gt;
+            &lt;td&gt;If using setPassword, the new password to assign to the user.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;P@ssw0rd123&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+        &lt;salesforce.soapSetPassword&gt;
+            &lt;userId&gt;{${payload.userId}}&lt;/userId&gt;
+            &lt;password&gt;{${payload.password}}&lt;/password&gt;
+        &lt;/salesforce.soapSetPassword&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+        {
+          &quot;userId&quot;: &quot;0058g00000XXXXXAAA&quot;,
+          &quot;password&quot;: &quot;P@ssw0rd123&quot;
+        }
+    ```
+
+??? note &quot;soapUndelete&quot;
+    The `salesforce.soapUndelete` operation restores deleted records from the Recycle Bin. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_undelete.htm) for more information.
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Sample Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;All or None&lt;/td&gt;
+        &lt;td&gt;Whether to rollback changes if an object fails(Default value is 0).&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;1&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;sObjects&lt;/td&gt;
+        &lt;td&gt;The sobject type&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;Account&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+        &lt;salesforce.soapUndelete&gt;
+            &lt;allOrNone&gt;{${payload.allOrNone}}&lt;/allOrNone&gt;
+            &lt;sobjects&gt;{${payload.sobjects}}&lt;/sobjects&gt;
+        &lt;/salesforce.soapUndelete&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+        {
+          &quot;allOrNone&quot;: &quot;1&quot;,
+          &quot;sobjects&quot;: &quot;Account&quot;
+        }
+    ```
+
+??? note &quot;soapUpdate&quot;
+    The `salesforce.soapUpdate` operation updates one or more existing records. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_update.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;All or None&lt;/td&gt;
+            &lt;td&gt;Whether to rollback changes if an object fails(Default value is 0).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;1&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Allow Field Truncate&lt;/td&gt;
+            &lt;td&gt;Whether to truncates strings that exceed the field length(Default value is 0).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;1&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObjects&lt;/td&gt;
+            &lt;td&gt;The sobject type&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+        &lt;salesforce.soapUpdate&gt;
+            &lt;allOrNone&gt;{${payload.allOrNone}}&lt;/allOrNone&gt;
+            &lt;allowFieldTruncate&gt;{${payload.allowFieldTruncate}}&lt;/allowFieldTruncate&gt;
+            &lt;sobjects&gt;{${payload.sobjects}}&lt;/sobjects&gt;
+        &lt;/salesforce.soapUpdate&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+        {
+          &quot;allOrNone&quot;: &quot;1&quot;,
+          &quot;allowFieldTruncate&quot;: &quot;1&quot;,
+          &quot;sobjects&quot;: &quot;Account&quot;
+        }
+    ```
+
+??? note &quot;soapUpsert&quot;
+    The `salesforce.soapUpsert` operation creates new records or updates existing records based on an external ID field. See the [SOAP API documentation](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_calls_upsert.htm) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+            &lt;th&gt;Sample Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;All or None&lt;/td&gt;
+            &lt;td&gt;Whether to rollback changes if an object fails(Default value is 0).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;1&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Allow Field Truncate&lt;/td&gt;
+            &lt;td&gt;Whether to truncates strings that exceed the field length(Default value is 0).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;1&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sObjects&lt;/td&gt;
+            &lt;td&gt;The sobject type&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;Account&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;External ID&lt;/td&gt;
+            &lt;td&gt;The field containing the record ID&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+            &lt;td&gt;External_Id__c&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+        &lt;salesforce.soapUpsert&gt;
+            &lt;allOrNone&gt;{${payload.allOrNone}}&lt;/allOrNone&gt;
+            &lt;allowFieldTruncate&gt;{${payload.allowFieldTruncate}}&lt;/allowFieldTruncate&gt;
+            &lt;sobjects&gt;{${payload.sobjects}}&lt;/sobjects&gt;
+            &lt;externalId&gt;{${payload.externalId}}&lt;/externalId&gt;
+        &lt;/salesforce.soapUpsert&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+        {
+          &quot;allOrNone&quot;: &quot;1&quot;,
+          &quot;allowFieldTruncate&quot;: &quot;1&quot;,
+          &quot;sobjects&quot;: &quot;Account&quot;,
+          &quot;externalId&quot;: &quot;External_Id__c&quot;
+        }
+    ```
+</body>
+</html>

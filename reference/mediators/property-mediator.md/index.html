@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>property-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Property mediator
+
+The Property mediator is used to define configuration settings that control how an integration behaves. These properties manage transport settings, security configurations, or mediator-specific parameters that influence message processing. The Property mediator allows you to set or remove these properties, ensuring they are available within the mediation flow.
+
+!!! Note
+    With the introduction of the [**Variable mediator**]({{base_path}}/reference/mediators/variable-mediator/) in WSO2 MI 4.4.0 onwards, it is now recommended to use the **Property mediator** only for managing configuration-related properties within a mediation flow. To store data for future use, the [**Variable mediator**]({{base_path}}/reference/mediators/variable-mediator/) should be used instead.
+
+## Syntax
+
+```xml
+&lt;property name=&quot;string&quot; [action=&quot;set&quot;|&quot;remove&quot;] [type=&quot;STRING&quot;|&quot;INTEGER&quot;|&quot;BOOLEAN&quot;|&quot;DOUBLE&quot;|&quot;FLOAT&quot;|&quot;LONG&quot;|&quot;SHORT&quot;|&quot;OM&quot;|&quot;JSON&quot;] 
+        (value=&quot;string&quot; | expression=&quot;expression&quot;) [scope=&quot;default&quot;|&quot;transport&quot;|&quot;axis2&quot;|&quot;axis2-client&quot;|&quot;operation&quot;|&quot;registry&quot;|&quot;system&quot;|&quot;env&quot;|&quot;file&quot;] 
+        [pattern=&quot;regex&quot; [group=&quot;integer&quot;]]&gt;&lt;/property&gt;
+```
+
+## Configuration
+
+The parameters available to configure the property mediator are as follows:
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Property Name&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;A name for the property.&lt;/p&gt;
+&lt;p&gt;You can provide a static value or a dynamic value for the property name. A dynamic property name can be retrieved by using an &lt;a href=&quot;{{base_path}}/reference/synapse-properties/expressions&quot;&gt;expression&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Note that the &lt;a href=&quot;{{base_path}}/reference/synapse-properties/expressions&quot;&gt;expression&lt;/a&gt; should be contained within curly brackets (&lt;code&gt;{}&lt;/code&gt;) as well as double quotations (&lt;code&gt;&quot;&quot;&lt;/code&gt;). See the examples given below.&lt;/p&gt;
+  &lt;ul&gt;
+    &lt;li&gt;
+      &lt;code&gt;property name=&quot;{get-property(&#x27;propertyName&#x27;)}&quot;&lt;/code&gt;
+    &lt;/li&gt;
+    &lt;li&gt;
+      &lt;code&gt;property name=&quot;{$ctx:propertyName}&quot;&lt;/code&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;p&gt;For names of the generic properties that come by default, see &lt;a href=&quot;{{base_path}}/reference/mediators/property-reference/generic-properties&quot;&gt;Generic Properties&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Property Action&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;The action to be performed for the property.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Set&lt;/strong&gt;: If this is selected, the property will be set in the message.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Remove&lt;/strong&gt;: If this is selected, the property will be removed from the message.&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Property Data Type&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;The data type for the property. Property mediator will handle the property as a property of selected type. Available values are as follows:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;STRING&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;INTEGER&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;BOOLEAN&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DOUBLE&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;FLOAT&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;LONG&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SHORT&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;OM&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;JSON&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&quot;admonition note&quot;&gt;
+        &lt;p class=&quot;admonition-title&quot;&gt;Note&lt;/p&gt;
+&lt;p&gt;&lt;li&gt;&lt;code&gt;STRING&lt;/code&gt; is the default type.&lt;/li&gt;&lt;/p&gt;
+&lt;p&gt;&lt;li&gt;The &lt;code&gt;OM&lt;/code&gt; type is used to set XML property values on the message context. This is useful when the expression associated with the property mediator evaluates to an XML node during mediation. When the &lt;code&gt;OM&lt;/code&gt; type is used, the XML is converted to an AXIOM OMElement before it is assigned to a property.&lt;/li&gt;&lt;/p&gt;
+&lt;p&gt;&lt;li&gt;The &lt;code&gt;JSON&lt;/code&gt; type is used to set JSON values on the message context. It is recommended to use the JSON
+ data type (rather than the STRING data type) for JSON payloads.&lt;/li&gt;&lt;/p&gt;
+&lt;p&gt;
+  &lt;li&gt;Note that when the JSON is just a string, you need to add quotes around them. This is due to the restrictions in 
+  &lt;a href=&quot;https://tools.ietf.org/html/rfc7159&quot;&gt;RFC&lt;/a&gt;.
+&lt;/li&gt;&lt;/p&gt;
+&lt;p&gt;
+  Example 1: Creating a property with a JSON string by giving the value.&lt;/br&gt;
+
+  &lt;code&gt;&amp;lt;property name=&quot;Greeting&quot; value=&quot;&amp;quot;Hello World&amp;quot;&quot; type=&quot;JSON&quot;/&amp;gt;&lt;/code&gt;&lt;/br&gt;&lt;/br&gt;
+
+  Example 2 : Creating a property with a JSON object via expression evaluation.&lt;/br&gt;
+
+  &lt;code&gt;&amp;lt;property name=&quot;studentObject&quot; expression=&quot;$.student&quot; type=&quot;JSON&quot;/&amp;gt;&lt;/code&gt;
+
+&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Property Value&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;You can give either value or an expression. 
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Value&lt;/strong&gt;: the property value is entered as a constant in this parameter.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Expression&lt;/strong&gt;: the &lt;a href=&quot;{{base_path}}/reference/synapse-properties/expressions&quot;&gt;expression&lt;/a&gt; which determines the property value should be entered in this parameter.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Pattern&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;This parameter is used to enter a regular expression that will be evaluated against the value of the property or the result of the &lt;a href=&quot;{{base_path}}/reference/synapse-properties/expressions&quot;&gt;expression&lt;/a&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Group&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;The number (index) of the matching item is evaluated using the regular expression entered in the &lt;strong&gt;Pattern&lt;/strong&gt; parameter.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Scope&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;The &lt;a href=&quot;{{base_path}}/reference/synapse-properties/scopes&quot;&gt;scope&lt;/a&gt; at which the property will be set to or removed from. Possible values are as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Synapse&lt;/strong&gt;: This is the default scope. The properties set in this scope last as long as the transaction (request-response) exists.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Transport&lt;/strong&gt;: The properties set in this scope will be considered transport headers. For example, if it is required to send an HTTP header named &#x27;CustomHeader&#x27; with an outgoing request, you can use the property mediator configuration with this scope.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Axis2&lt;/strong&gt;: Properties set in this scope are available only either throughout the request flow or the response flow for which the property is defined.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Registry&lt;/strong&gt;: This scope is used to retrieve properties within the registry.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;System&lt;/strong&gt;: This scope is used to retrieve Java system properties.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Environment&lt;/strong&gt;: This scope is used to retrieve environment variables.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;File&lt;/strong&gt;: This scope is used to retrieve properties defined in the `file.properties` configuration file.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Operation&lt;/strong&gt;: This scope is used to retrieve a property in the operation context level.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;axis2-client&lt;/strong&gt;: This is similar to the &lt;strong&gt;Synapse&lt;/strong&gt; scope. The difference between the two scopes is that the &lt;strong&gt;axis2-client&lt;/strong&gt; scope can be accessed inside the &lt;b&gt;mediate()&lt;/b&gt; method of a mediator via a custom mediator created using the &lt;a href=&quot;{{base_path}}/reference/mediators/class-mediator&quot;&gt;Class mediator&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For a detailed explanation of each scope, see &lt;a href=&quot;{{base_path}}/reference/synapse-properties/scopes&quot;&gt;scopes&lt;/a&gt; documentation.&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+## Examples
+
+### Send a fault message based on the Accept http header
+
+In this configuration, a response is sent to the client based on the `Accept` header. The [Payload mediator]({{base_path}}/reference/mediators/payloadfactory-mediator) transforms the message contents. Then a [Property mediator]({{base_path}}/reference/mediators/property-mediator) sets the message type
+based on the `Accept` header using the `$ctx:accept` expression. The message is then sent back to the client via the [Respond mediator]({{base_path}}/reference/mediators/respond-mediator).
+
+``` xml
+&lt;payloadFactory media-type=&quot;xml&quot;&gt;
+    &lt;format&gt;
+        &lt;m:getQuote xmlns:m=&quot;http://services.samples&quot;&gt;
+            &lt;m:request&gt;
+                &lt;m:symbol&gt;Error&lt;/m:symbol&gt;
+            &lt;/m:request&gt;
+        &lt;/m:getQuote&gt;
+    &lt;/format&gt;
+&lt;/payloadFactory&gt;
+&lt;property name=&quot;messageType&quot; expression=&quot;$ctx:accept&quot; scope=&quot;axis2&quot;/&gt;
+&lt;respond/&gt;
+```
+
+### Set the HTTP status code
+
+The Property mediator can be used to set the HTTP status code for responses. In the example below, the status code is set to `500`.
+
+```xml
+&lt;property name=&quot;HTTP_SC&quot; value=&quot;500&quot; scope=&quot;axis2&quot;/&gt;
+```
+</body>
+</html>

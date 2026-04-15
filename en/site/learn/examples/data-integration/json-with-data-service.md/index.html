@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>json-with-data-service.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Expose Data in JSON Format
+
+You can send and receive JSON messages by default via WSO2 Integrator: MI. See the topics given below to
+understand how data can be exposed in the JSON format, and how data can be changed by sending JSON payloads. In this example, you will use a data service that exposes RDBMS data.
+
+A data service can expose data in one of the following formats: XML,
+RDF, or JSON. You can select the required format by specifying
+the output type for the data service query. To expose data in JSON, you
+need to select JSON as the output type, and map the output to a JSON
+template.
+
+## Prerequisites
+
+Let&#x27;s create a MySQL database with the required data.
+
+1.  Install the MySQL server.
+2.  Create a database named `Employees`.
+
+    ```bash
+    CREATE DATABASE Employees;
+    ```
+
+3.  Create the Employee table inside the Employees database:
+
+    ```bash
+    USE Employees;
+
+    CREATE TABLE Employees (EmployeeNumber int(11) NOT NULL, FirstName varchar(255) NOT NULL, LastName varchar(255) DEFAULT NULL, Email varchar(255) DEFAULT NULL, Salary varchar(255));
+    ```
+
+## Synapse configuration
+
+Given below is the data service configuration you need to build. See the instructions on how to [build and run](#build-and-run) this example.
+
+```xml
+&lt;data name=&quot;RDBMSDataService&quot; serviceStatus=&quot;active&quot; transports=&quot;http https local&quot;&gt;
+   &lt;config enableOData=&quot;false&quot; id=&quot;Datasource&quot;&gt;
+      &lt;property name=&quot;driverClassName&quot;&gt;com.mysql.jdbc.Driver&lt;/property&gt;
+      &lt;property name=&quot;url&quot;&gt;jdbc:mysql://localhost:3306/Employees&lt;/property&gt;
+      &lt;property name=&quot;username&quot;&gt;root&lt;/property&gt;
+      &lt;property name=&quot;password&quot;&gt;password&lt;/property&gt;
+   &lt;/config&gt;
+   &lt;query id=&quot;GetEmployeeDetails&quot; useConfig=&quot;Datasource&quot;&gt;
+      &lt;sql&gt;select EmployeeNumber, FirstName, LastName, Email, Salary from Employees where EmployeeNumber=:EmployeeNumber&lt;/sql&gt;
+      &lt;result outputType=&quot;json&quot;&gt;{
+   &quot;Employees&quot;:{
+      &quot;Employee&quot;:[
+         {
+            &quot;EmployeeNumber&quot;:&quot;$EmployeeNumber&quot;,
+            &quot;FirstName&quot;:&quot;$FirstName&quot;,
+            &quot;LastName&quot;:&quot;$LastName&quot;,
+            &quot;Email&quot;:&quot;$Email&quot;,
+            &quot;Salary&quot;:&quot;$Salary&quot;
+         }
+      ]
+   }
+}&lt;/result&gt;
+      &lt;param name=&quot;EmployeeNumber&quot; sqlType=&quot;STRING&quot;/&gt;
+   &lt;/query&gt;
+   &lt;query id=&quot;AddEmployeeDetails&quot; useConfig=&quot;Datasource&quot;&gt;
+      &lt;sql&gt;insert into Employees (EmployeeNumber, FirstName, LastName, Email, Salary) values(:EmployeeNumber,:FirstName,:LastName,:Email,:Salary)&lt;/sql&gt;
+      &lt;param name=&quot;EmployeeNumber&quot; sqlType=&quot;STRING&quot;/&gt;
+      &lt;param name=&quot;FirstName&quot; sqlType=&quot;STRING&quot;/&gt;
+      &lt;param name=&quot;LastName&quot; sqlType=&quot;STRING&quot;/&gt;
+      &lt;param name=&quot;Email&quot; sqlType=&quot;STRING&quot;/&gt;
+      &lt;param name=&quot;Salary&quot; sqlType=&quot;STRING&quot;/&gt;
+   &lt;/query&gt;
+   &lt;query id=&quot;UpdateEmployeeDetails&quot; useConfig=&quot;Datasource&quot;&gt;
+      &lt;sql&gt;update Employees set LastName=:LastName, FirstName=:FirstName, Email=:Email, Salary=:Salary where EmployeeNumber=:EmployeeNumber&lt;/sql&gt;
+      &lt;param name=&quot;LastName&quot; sqlType=&quot;STRING&quot;/&gt;
+      &lt;param name=&quot;FirstName&quot; sqlType=&quot;STRING&quot;/&gt;
+      &lt;param name=&quot;Email&quot; sqlType=&quot;STRING&quot;/&gt;
+      &lt;param name=&quot;Salary&quot; sqlType=&quot;STRING&quot;/&gt;
+      &lt;param name=&quot;EmployeeNumber&quot; sqlType=&quot;STRING&quot;/&gt;
+   &lt;/query&gt;
+   &lt;operation name=&quot;GetEmployeeOp&quot;&gt;
+      &lt;call-query href=&quot;GetEmployeeDetails&quot;&gt;
+         &lt;with-param name=&quot;EmployeeNumber&quot; query-param=&quot;EmployeeNumber&quot;/&gt;
+      &lt;/call-query&gt;
+   &lt;/operation&gt;
+   &lt;operation name=&quot;AddEmployeeOp&quot;&gt;
+      &lt;call-query href=&quot;AddEmployeeDetails&quot;&gt;
+         &lt;with-param name=&quot;EmployeeNumber&quot; query-param=&quot;EmployeeNumber&quot;/&gt;
+         &lt;with-param name=&quot;FirstName&quot; query-param=&quot;FirstName&quot;/&gt;
+         &lt;with-param name=&quot;LastName&quot; query-param=&quot;LastName&quot;/&gt;
+         &lt;with-param name=&quot;Email&quot; query-param=&quot;Email&quot;/&gt;
+         &lt;with-param name=&quot;Salary&quot; query-param=&quot;Salary&quot;/&gt;
+      &lt;/call-query&gt;
+   &lt;/operation&gt;
+   &lt;operation name=&quot;UpdateEmployeeOp&quot;&gt;
+      &lt;call-query href=&quot;UpdateEmployeeDetails&quot;&gt;
+         &lt;with-param name=&quot;LastName&quot; query-param=&quot;LastName&quot;/&gt;
+         &lt;with-param name=&quot;FirstName&quot; query-param=&quot;FirstName&quot;/&gt;
+         &lt;with-param name=&quot;Email&quot; query-param=&quot;Email&quot;/&gt;
+         &lt;with-param name=&quot;Salary&quot; query-param=&quot;Salary&quot;/&gt;
+         &lt;with-param name=&quot;EmployeeNumber&quot; query-param=&quot;EmployeeNumber&quot;/&gt;
+      &lt;/call-query&gt;
+   &lt;/operation&gt;
+   &lt;resource method=&quot;GET&quot; path=&quot;Employee/{EmployeeNumber}&quot;&gt;
+      &lt;call-query href=&quot;GetEmployeeDetails&quot;&gt;
+         &lt;with-param name=&quot;EmployeeNumber&quot; query-param=&quot;EmployeeNumber&quot;/&gt;
+      &lt;/call-query&gt;
+   &lt;/resource&gt;
+   &lt;resource method=&quot;POST&quot; path=&quot;Employee&quot;&gt;
+      &lt;call-query href=&quot;AddEmployeeDetails&quot;&gt;
+         &lt;with-param name=&quot;EmployeeNumber&quot; query-param=&quot;EmployeeNumber&quot;/&gt;
+         &lt;with-param name=&quot;FirstName&quot; query-param=&quot;FirstName&quot;/&gt;
+         &lt;with-param name=&quot;LastName&quot; query-param=&quot;LastName&quot;/&gt;
+         &lt;with-param name=&quot;Email&quot; query-param=&quot;Email&quot;/&gt;
+         &lt;with-param name=&quot;Salary&quot; query-param=&quot;Salary&quot;/&gt;
+      &lt;/call-query&gt;
+   &lt;/resource&gt;
+   &lt;resource method=&quot;PUT&quot; path=&quot;Employee&quot;&gt;
+      &lt;call-query href=&quot;UpdateEmployeeDetails&quot;&gt;
+         &lt;with-param name=&quot;LastName&quot; query-param=&quot;LastName&quot;/&gt;
+         &lt;with-param name=&quot;FirstName&quot; query-param=&quot;FirstName&quot;/&gt;
+         &lt;with-param name=&quot;Email&quot; query-param=&quot;Email&quot;/&gt;
+         &lt;with-param name=&quot;Salary&quot; query-param=&quot;Salary&quot;/&gt;
+         &lt;with-param name=&quot;EmployeeNumber&quot; query-param=&quot;EmployeeNumber&quot;/&gt;
+      &lt;/call-query&gt;
+   &lt;/resource&gt;
+&lt;/data&gt;
+```
+
+Alternatively, you can use one of the following JSON templates for the response mapping:
+
+-   Simple JSON template
+
+    ```json
+    { &quot;Employees&quot;:
+          {&quot;Employee&quot;:[
+            {&quot;EmployeeNumber&quot;:&quot;$EmployeeNumber&quot;,                       
+             &quot;Details&quot;: {
+              &quot;FirstName&quot;:&quot;$FirstName&quot;,
+              &quot;LastName&quot;:&quot;$LastName&quot;,
+              &quot;Email&quot;:&quot;$Email&quot;,
+              &quot;Salary&quot;:&quot;$Salary&quot;
+             }
+            }                 
+          ]
+        }           
+    }
+    ```
+
+-   Define data types
+
+    In a basic JSON output mapping, we specify the field values that we expect in the query result. You can give additional properties to this field mapping such as data type of the field, the possible content filtering user roles etc. These extended properties for the fields are given in parentheses, with a list of string tokens providing the additional properties, separated by a semicolon (&quot;;&quot;). See the sample below.
+
+    ```json
+    &lt;result outputType=&quot;json&quot;&gt;
+    { &quot;Employees&quot;:
+          {&quot;Employee&quot;:[
+            {&quot;EmployeeNumber&quot;:&quot;$EmployeeNumber(type:integer)&quot;,                       
+             &quot;Details&quot;: {
+              &quot;FirstName&quot;:&quot;$FirstName&quot;,
+              &quot;LastName&quot;:&quot;$LastName&quot;,
+              &quot;Email&quot;:&quot;$Email&quot;,
+              &quot;Salary&quot;:&quot;$Salary(requiredRoles:hr,admin)&quot;
+             }
+            }                 
+          ]
+        }           
+    }
+    &lt;/result&gt;
+    ```
+!!! Info
+    As shown in the sample given above, the column name values that are expected in the query result should be referred to by the column name with the `$` prefix. E.g. `$EmployeeNumber`.
+    
+    Also, the structure of the JSON template should follow some guidelines in order to be compatible with the result. These guidelines are: 
+
+    -   The top most item should be a JSON object. It cannot be a JSON array.
+    -   For handling multiple records from the result set, the immediate child of the top most object can be a JSON array, and the array should contain only a single object.
+    -   If only a single result is returned, the immediate child of the top most object can be a single JSON object.
+    -   After the immediate child of the top most object, there cannot be other JSON arrays in the mapping.
+
+    All JSON responses are returned as an array.
+    
+-   If you want to write a nested query using JSON, see the example on [nested queries]({{base_path}}/learn/examples/data-integration/nested-queries-in-data-service).
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+
+3. [Create the data service]({{base_path}}/develop/creating-artifacts/data-services/creating-data-services) with the configurations given above.
+
+4. Download the JDBC driver for MySQL from [here](http://dev.mysql.com/downloads/connector/j/).
+
+5. Switch to the **EXPLORER** view in VS Code and copy the downloaded driver to the `&lt;PROJECT_NAME&gt;/deployment/lib/` directory in the project structure.
+
+    !!! Note
+        If the driver class does not exist in the relevant folders when you create the datasource, you will get an exception such as `Unable to load class: com.mysql.jdbc.Driver`.
+
+6. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+### GET data in JSON
+
+The RDBMSDataService that you are using contains the following
+resource:
+
+-   **Resource Path**: `Employee/{EmployeeNumber}  `
+-   **Resource Method**: `GET`
+-   **Query ID**: `GetEmployeeDetails`
+
+You can now RESTfully invoke the above resource. To send a JSON message
+to a RESTful resource, you can simply add the “
+`         Accept        ` : `         Application/json        ` ” to the
+request header when you send the request. The service can be invoked in
+REST-style via [curl](http://curl.haxx.se/).  
+Shown below is the curl command to invoke the GET resource:
+
+```bash
+curl -X GET -H &quot;Accept: application/json&quot; http://localhost:8290/services/RDBMSDataService/Employee/{EmployeeNumber}
+```
+
+Example:
+
+```bash
+curl -X GET -H &quot;Accept: application/json&quot; http://localhost:8290/services/RDBMSDataService/Employee/1
+```
+
+As a result, you receive the response in JSON format as shown below.
+
+```bash
+{&quot;Employees&quot;:{&quot;Employee&quot;:[{&quot;EmployeeNumber&quot;:&quot;1&quot;,&quot;FirstName&quot;:&quot;John&quot;,&quot;LastName&quot;:&quot;Doe&quot;,&quot;Email&quot;:&quot;JohnDoe@gmail.com&quot;,&quot;Salary&quot;:&quot;10000&quot;},{&quot;EmployeeNumber&quot;:&quot;1&quot;,&quot;FirstName&quot;:&quot;John&quot;,&quot;LastName&quot;:&quot;Doe&quot;,&quot;Email&quot;:&quot;JohnDoe@gmail.com&quot;,&quot;Salary&quot;:&quot;20000&quot;}]}
+```
+
+### POST/UPDATE data using JSON
+
+When a client sends a request to change data (POST/PUT/DELETE) in the
+datasource, the HTTP header `Accept` should be set to
+`application/json`. Also, if the data is sent as a
+JSON payload, the HTTP header `Content-Type` should be
+set to `application/json`.
+
+The RDBMSDataService that you are using contains the following
+resources for adding and updating data.
+
+- Resource for adding employee information:
+    
+    - **Resource Path**: `Employee`
+    - **Resource Method**: `POST `
+    - **Query ID**: `AddEmployeeDetails`
+
+- Resource for updating employee information:
+
+    - **Resource Path**: `Employee`
+    - **Resource Method**: `PUT`
+    - **Query ID**: `UpdateEmployeeDetails`
+
+You can RESTfully invoke the above resource by sending HTTP requests as
+explained below.
+
+#### Post data
+
+To post new employee information, you need to invoke the resource with
+the POST method.
+
+1.  First, create a file named
+    `           employee-payload.json          ` , and define the JSON
+    payload for posting new data as shown below.
+
+    ```json
+    {
+      &quot;user_defined_value&quot;: {
+        &quot;EmployeeNumber&quot; : &quot;14001&quot;,
+        &quot;LastName&quot;: &quot;Smith&quot;,
+        &quot;FirstName&quot;: &quot;Will&quot;,
+        &quot;Email&quot;: &quot;will@google.com&quot;,
+        &quot;Salary&quot;: &quot;15500.0&quot;
+      }
+    }
+    ```
+
+2.  On the terminal, navigate to the location where the
+    **`            employee-payload.json           `** file is stored,
+    and execute the following HTTP request:
+
+    ```bash
+    curl -X POST -H &#x27;Accept: application/json&#x27;  -H &#x27;Content-Type: application/json&#x27; --data &quot;@employee-payload.json&quot; -k -v http://localhost:8290/services/RDBMSDataService/Employee
+    ```
+
+#### Post data in batches
+
+You are able to post JSON data in batches using the
+`         RDBMSDataService        ` that you created or uploaded.
+
+!!! Info
+    Verify that batch requesting is enabled for the data service.
+
+1.  First, create a file named
+    **`            employee-batch-payload.json           `** , and
+    define the JSON payload for posting multiple employee records
+    (batch) as shown below.
+
+    ```bash
+    {
+        &quot;user_defined_value&quot;: {
+            &quot;user_defined_value&quot;: [
+                {
+                    &quot;EmployeeNumber&quot;: &quot;5012&quot;,
+                    &quot;FirstName&quot;: &quot;Will&quot;,
+                    &quot;LastName&quot;: &quot;Smith&quot;,
+                    &quot;Email&quot;: &quot;will@smith.com&quot;,
+                    &quot;Salary&quot;: &quot;13500.0&quot;
+                },
+                {
+                    &quot;EmployeeNumber&quot;: &quot;5013&quot;,
+                    &quot;FirstName&quot;: &quot;Parker&quot;,
+                    &quot;LastName&quot;: &quot;Peter&quot;,
+                    &quot;Email&quot;: &quot;peter@parker.com&quot;,
+                    &quot;Salary&quot;: &quot;15500.0&quot;
+                }
+            ]
+        }
+    }
+    ```
+
+2.  On the terminal, navigate to the location where the
+    **`            employee-batch-payload.json           `** file is
+    stored, and execute the following HTTP request:
+
+    ```bash
+    curl -X POST -H &#x27;Accept: application/json&#x27;  -H &#x27;Content-Type: application/json&#x27; --data &quot;@employee-batch-payload.json&quot; -k -v http://localhost:8290/services/RDBMSDataService/Employee_batch_req
+    ```
+
+#### Update data
+
+To update the existing employee records, you need to invoke the resource
+with the PUT method.
+
+1.  First, create a file named
+    **`            employee-upload-update.json           `** , and
+    define the JSON payload for updating an existing employee record as
+    shown below.  
+    For example, change the salary amount. Make sure that the employee
+    number already exists in the database.
+
+    ```bash
+    {
+      &quot;user_defined_value&quot;: {
+        &quot;EmployeeNumber&quot; : &quot;1&quot;,
+        &quot;FirstName&quot;: &quot;Will&quot;,
+        &quot;LastName&quot;: &quot;Smith&quot;,
+        &quot;Email&quot;: &quot;will@smith.com&quot;,
+        &quot;Salary&quot;: &quot;78500.0&quot;
+      }
+    }
+    ```
+
+2.  On the terminal, navigate to the location where the
+    **`            employee-upload-update.json           `** file is
+    stored, and execute the following HTTP request:
+
+    ```bash
+    curl -X PUT -H &#x27;Accept: application/json&#x27;  -H &#x27;Content-Type: application/json&#x27; --data &quot;@employee-upload-update.json&quot; -k -v http://localhost:8290/services/RDBMSDataService/Employee
+    ```
+
+#### Post data using Request Box
+
+When the Request Box feature is enabled, you can invoke multiple
+operations (consecutively) using one single operation. The process of
+posting a JSON payload through a request box transaction is explained
+below.
+
+!!! Info
+    Verify that batch requesting is enabled for the data service.
+
+1.  First, create a file named
+    **`            employee-request-box-payload           `**
+    **`            .json           `** , and define the JSON payload for
+    posting multiple employee records (batch) as shown below.
+
+    !!! Tip
+        The following payload works for this use case. When you create
+        payloads for different use cases, be mindful of the tips [given
+        here](#UsingJSONwithDataServices-JSON_payloads) .
+    
+
+    ```json
+    {
+     &quot;request_box&quot;  : { 
+          &quot;_postemployee&quot; : {
+                    &quot;EmployeeNumber&quot;  : &quot;14005&quot;, 
+                    &quot;LastName&quot; :  &quot;Smith&quot; ,
+                    &quot;FirstName&quot; :  &quot;Will&quot; , 
+                    &quot;Email&quot; :  &quot;will@google.com&quot; ,
+                    &quot;Salary&quot; : &quot;15500.0&quot;
+                            },
+          &quot;_getemployee_employeenumber&quot;:{
+                    &quot;EmployeeNumber&quot;  : &quot;14005&quot;
+               }
+        }
+    }
+    ```
+
+2.  On the terminal, navigate to the location where the
+    **`            employee-request-box-payload.json           `** file
+    is stored, and execute the following HTTP request:
+
+    ```bash
+    curl -X POST -H &#x27;Accept: application/json&#x27;  -H &#x27;Content-Type: application/json&#x27; --data &quot;@employee-request-box-payload.json&quot; http://localhost:8290/services/RDBMSDataService/request_box
+    ```
+
+!!! Tip
+    **Creating JSON payloads for Request Box transactions**
+
+    Note the following when you define a JSON payload for a request box
+    transaction: The object name specified in the payload must be in the
+    following format: &quot; `         _&lt;HTTP_METHOD&gt;&lt;RESOURCE_PATH&gt;        `
+    &quot; where `         RESOURCE_PATH        ` represents the path value
+    specified in the data service resource. For example, if the
+    `         RESOURCE_PATH        ` is &quot;employee&quot;, the payload object name
+    should be as follows:
+
+    -   For HTTP POST requests: `          _postemployee         `
+    -   For HTTP PUT requests: `          _putemployee         `
+
+    The child name/values of the child fields in the payload should be the
+    names and values of the input parameters in the target query.
+
+    **Handling a resource path with the &quot;/&quot; symbol**
+
+    If the `         RESOURCE_PATH        ` specified in the data service
+    contains the &quot;/&quot; symbol, be sure to replace the &quot;/&quot; symbol with the
+    underscore symbol (&quot;\&quot;) in the payload object name.
+
+    **Important!** In this scenario, the `         RESOURCE_PATH        ` value should only contain simple letters. For example, the value can be &quot; `         /employee/add&quot;        ` but not &quot; `/Employee/Add&quot;`.
+
+    For example, if the `         RESOURCE_PATH        ` is
+    `         /employee/add        ` , the payload object name should be as
+    follows:
+
+    -   For HTTP POST requests: `          _post_employee_add         `
+    -   For HTTP PUT requests: `          _put_employee_add         `
+
+</body>
+</html>

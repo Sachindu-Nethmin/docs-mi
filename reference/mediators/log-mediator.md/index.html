@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>log-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Log Mediator
+
+The **Log mediator** enables the logging of messages as they flow through mediation sequences. It helps in debugging and tracking messages by printing message content, variables, properties, and other relevant information to the console or a log file. It can be added at any point in the flow.
+
+For more information on logging, see [Monitoring Logs]({{base_path}}/observe-and-manage/classic-observability-logs/monitoring-logs/).
+
+## Syntax
+
+```xml
+&lt;log [category=&quot;INFO|TRACE|DEBUG|WARN|ERROR|FATAL&quot;] [separator=&quot;string&quot;] logMessageID=(true | false) logFullPayload=(true | false)&gt;
+   &lt;message&gt;&lt;/message&gt;
+   &lt;property name=&quot;string&quot; (value=&quot;string&quot; | expression=&quot;expression&quot;)/&gt;+
+&lt;/log&gt;
+```
+
+## Configuration
+
+The parameters available to configure the Log mediator are as
+follows.
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Log Category&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;This parameter is used to specify the log category. The following log levels correspond to the WSO2 Integrator: MI service level logs.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;INFO&lt;/strong&gt; - provides informational messages that highlight the progress of the application at a coarse-grained level.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TRACE&lt;/strong&gt; - provides fine-grained informational events than the DEBUG level.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DEBUG&lt;/strong&gt; - provides fine-grained informational events that are most useful to debug an application.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;WARN&lt;/strong&gt; - provides informational messages on potentially harmful situations.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ERROR&lt;/strong&gt; - provides error events that might still allow the application to continue running.&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;FATAL&lt;/strong&gt; - provides very severe error events that will presumably lead the application to abort.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Append Message ID&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;
+Determines whether the Message ID is included in the log along with other selected details.
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;True&lt;/strong&gt;: Includes the Message ID in the log.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;False&lt;/strong&gt;: Excludes the Message ID from the log. (Default)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Append Payload&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;
+Determines whether the full message payload is included in the log along with other selected details.
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;True&lt;/strong&gt;: Includes the full message payload in the log.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;False&lt;/strong&gt;: Excludes the message payload from the log. (Default)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Message&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p&gt;This parameter is used to define a log message. You can embed &lt;a href=&quot;{{base_path}}/reference/synapse-properties/synapse-expressions&quot;&gt;Synapse Expressions&lt;/a&gt; in the template to generate the log message.&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+You can use the &lt;strong&gt;Additional Parameters&lt;/strong&gt; section to log additional information. The configurations available under &lt;strong&gt;Additional Parameters&lt;/strong&gt; section of the Log mediator are as follows.
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Parameters&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;This is used to specify the key value pairs to be logged. You can use the &lt;code&gt;Add Parameter&lt;/code&gt; option to add a new parameter.
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Name&lt;/strong&gt; - The name of the parameter to be logged.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Value&lt;/strong&gt; - Based on the use case you can either have a static value or an &lt;a href=&quot;{{base_path}}/reference/synapse-properties/synapse-expressions&quot;&gt;expression&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Parameter Separator&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;
+&lt;p&gt;This parameter specifies the value used to separate parameters in the log. By default, the separator is a comma (&lt;code&gt;,&lt;/code&gt;).&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+## Examples
+
+### Using a message template
+
+In this example, we define a message template using [Synapse Expressions]({{base_path}}/reference/synapse-properties/synapse-expressions).
+
+```xml
+&lt;log category=&quot;INFO&quot;&gt;
+   &lt;message&gt;Processing user details : ${payload.user} with Purchase data : ${var.purchaseDetails}&lt;/message&gt;
+&lt;/log&gt;
+```
+
+A sample log output:
+```xml
+[2024-09-09 15:23:03,998]  INFO {LogMediator} - {api:StockQuoteAPI} Processing user details : {&quot;firstName&quot;:&quot;Johne&quot;, &quot;lastName&quot;: &quot;Doe&quot;} with Purchase data : {&quot;itemCode&quot;: 8987, &quot;price&quot;: 45}
+```
+
+### Logging message ID
+
+In this example, we enable logging of the message ID by setting `logMessageID=&quot;true&quot;` in the log configuration. Additionally, we define a message template using [Synapse Expressions]({{base_path}}/reference/synapse-properties/synapse-expressions).
+
+```xml
+&lt;log category=&quot;INFO&quot; logMessageID=&quot;true&quot;&gt;
+   &lt;message&gt;Test message ${payload}&lt;/message&gt;
+&lt;/log&gt;
+```
+
+A sample log output:
+```xml
+[2025-02-27 21:18:38,015]  INFO {LogMediator} - {api:TestApi POST /testapi/} MessageID: urn:uuid:7137bda5-065d-41b9-85c9-1b23b8c3fd8e, correlation_id: 7137bda5-065d-41b9-85c9-1b23b8c3fd8e, Test message {&quot;payload&quot;:&quot;Hello World&quot;}
+```
+
+### Using parameters in addition to message template
+
+In this example, we define parameters in addition to the message.
+
+```xml 
+&lt;log category=&quot;INFO&quot;&gt;
+   &lt;message&gt;Processing user details : ${payload.user} with Purchase data : ${var.purchaseDetails}&lt;/message&gt;
+   &lt;property name=&quot;endpoint&quot; expression=&quot;${var.endpointName}&quot;/&gt;
+&lt;/log&gt;
+```
+A sample log output:
+```xml
+[2024-09-09 15:23:03,998]  INFO {LogMediator} - {api:StockQuoteAPI} Processing user details : {&quot;firstName&quot;:&quot;Johne&quot;, &quot;lastName&quot;: &quot;Doe&quot;} with Purchase data : {&quot;itemCode&quot;: 8987, &quot;price&quot;: 45}, endpoint = PurchaseEP
+```
+</body>
+</html>

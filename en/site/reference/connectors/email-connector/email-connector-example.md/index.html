@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>email-connector-example.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>---
+search:
+  boost: 2
+---
+
+# Email Connector Example
+
+Email Connector can be used to perform operations using protocols SMTP, IMAP, and POP3. 
+
+## What you&#x27;ll build
+
+This example explains how to use Email Connector to send an email and retrieve the same email from Gmail. The user sends a payload with the recipients and content of the email. Then, by invoking another API resource, the content of the inbox email will be retrieved. 
+
+The example consists of two API resources `send` and `retrieve`. 
+
+* `/send `: The user sends the request payload which includes the recipients, content, and attachments of the email. This request is sent to the integration runtime by invoking the EmailConnector API. It will send the email to the relevant recipients. 
+
+    &lt;p&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-14.png&quot; title=&quot;Send function&quot; width=&quot;900&quot; alt=&quot;Send function&quot; /&gt;&lt;/p&gt;
+
+* `/retrieve `: The user sends the request payload, containing the filter to search the received email. This request is sent to the integration runtime where the EmailConnector API resides. Once the API is invoked, it returns the filtered emails.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-15.png&quot; title=&quot;Retrieve function&quot; width=&quot;900&quot; alt=&quot;Retrieve function&quot;/&gt;
+
+If you do not want to configure this yourself, you can simply [get the project](#get-the-project) and run it.
+
+## Set up the integration project
+
+Follow the steps in the [create integration project]({{base_path}}/develop/create-integration-project/) guide to set up the **Integration Project**. 
+
+## Create the integration logic for sending email
+
+1. Under the **Create an integration** section, select **API** to create a new REST API.
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-api.png&quot; title=&quot;Adding a Rest API&quot; width=&quot;900&quot; alt=&quot;Adding a Rest API&quot;/&gt;
+
+    Provide the API name as `send` and the API context as `/send`.
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-resource-1.png&quot; title=&quot;Adding the API resource step 1.&quot; width=&quot;900&quot; alt=&quot;Adding the API resource step 1.&quot;/&gt;
+    &lt;br/&gt;
+    Select the newly created `send` API and Click the `edit` icon to change the API method. 
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-resource-2.png&quot; title=&quot;Adding the API resource step 1.&quot; width=&quot;900&quot; alt=&quot;Adding the API resource step 1.&quot;/&gt;
+    &lt;br/&gt;
+    Then select the `POST` method and click `OK`.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-resource-3.png&quot; title=&quot;Adding the API resource step 1.&quot; width=&quot;900&quot; alt=&quot;Adding the API resource step 1.&quot;/&gt;
+    &lt;br/&gt;
+    This will create a new API resource with the context `/send` and the method `POST`.
+
+2. First, Let&#x27;s create a sample payload request to send API. Click on the `Start` node and select the `Add Request` option. This will create a new example payload request.
+    &lt;/br/&gt;
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-request.png&quot; title=&quot;Adding the sample API request.&quot; width=&quot;400&quot; alt=&quot;Adding the API request.&quot;/&gt;
+    
+    In this operation, we are going to receive the following inputs from the user. 
+
+    - **from** - Sender of the email.
+    - **to** - Recipient of the email. 
+    - **subject** - Subject of the email.
+    - **content** - Content to be included in the email.
+    - **contentType** - Content Type of the email
+
+    Therefore, provide the following JSON payload to the request.
+    ```json
+    {
+        &quot;from&quot;: &quot;&lt;your-email&gt;@gmail.com&quot;,
+        &quot;to&quot;: &quot;&lt;your-email&gt;@gmail.com&quot;,
+        &quot;subject&quot;: &quot;Sample email&quot;,
+        &quot;content&quot;: &quot;This is the body of the sample email&quot;,
+        &quot;contentType&quot;:&quot;text/plain&quot;
+    }
+    ```
+
+3. Now we will add the `send` operation of the Email Connector to send the email.
+    &lt;br/&gt;
+    To do this, we need to add the Email Connector to the integration project. Now, Click on the `Add` icon and search for the email connector. Select the email connector and click on the `Download` button.
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-send-operation-1.png&quot; title=&quot;Adding the send operation.&quot; width=&quot;900&quot; alt=&quot;Adding the send operation.&quot;/&gt;
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-send-operation-2.png&quot; title=&quot;Adding the send operation.&quot; width=&quot;900&quot; alt=&quot;Adding the send operation.&quot;/&gt;
+
+    Add a `send` operation to the integration logic by clicking on the `Add` icon and selecting the `send` operation from the list of operations.
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-send-operation-3.png&quot; title=&quot;Adding the send operation.&quot; width=&quot;900&quot; alt=&quot;Adding the send operation.&quot;/&gt;
+
+4. Create a connection by clicking on the &#x27;Add new connection&#x27; in the pop-up window as shown below. It will appear a new pop-up window.
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-conn.png&quot; title=&quot;Adding the connection.&quot; width=&quot;900&quot; alt=&quot;Adding the connection.&quot;/&gt;
+
+    In the pop-up window, the following parameters must be provided. &lt;br/&gt;
+    
+    - **Connection Name** - A unique name to identify the connection by.
+    - **Host** - Host name of the mail server.
+    - **Port** - The port number of the mail server.
+    - **Username** - Username used to connect with the mail server.
+    - **Password** - Password to connect with the mail server.
+
+    Additionally, for SMTP Secure Connection, the following parameter is also required.
+    
+    - Require TLS  
+
+    The following values can be provided to connect to Gmail. &lt;br/&gt;
+    
+    - **Connection Name** - `GmailConnection`
+    - **Host** - `smtp.gmail.com`
+    - **Port** - `465` 
+    - **Username** - &amp;lt;your_email_address&amp;gt;
+    - **Password** - &amp;lt;your_email_password&amp;gt; 
+    &gt; **NOTE**: If you have enabled 2-factor authentication, an app password should be obtained as instructed [here](https://support.google.com/accounts/answer/185833?hl=en).
+    - Require TLS - `false`
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-smtps-conn.png&quot; title=&quot;Connection parameters.&quot; width=&quot;400&quot; alt=&quot;Connection parameters.&quot;/&gt;
+    
+5. After the connection is successfully created, select the created connection as `Connection` from the drop-down in appeared window after going into the `email` connector and select the `send` operation. &lt;br/&gt;
+    Then we need to provide the necessary parameters to the `send` operation. Since we defined an example request payload, we can use the same parameters to send the email. &lt;br/&gt;
+    To do this, click on the `Expression` icon in the From field and select the `Payload` option.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-send-parameters-1.png&quot; title=&quot;Adding the send parameters.&quot; width=&quot;400&quot; alt=&quot;Adding the send parameters.&quot;/&gt;
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-send-parameters-2.png&quot; title=&quot;Adding the send parameters.&quot; width=&quot;900&quot; alt=&quot;Adding the send parameters.&quot;/&gt;
+
+    This will open a new pop-up window where you can select the `payload.from` parameter from the request payload. &lt;br/&gt;
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-send-parameters-3.png&quot; title=&quot;Adding the send parameters.&quot; width=&quot;900&quot; alt=&quot;Adding the send parameters.&quot;/&gt;
+
+    Next, do the same for the `To`, `Subject`, `Content`, and `ContentType` fields. &lt;br/&gt;
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-send-parameters-4.png&quot; title=&quot;Adding the send parameters.&quot; width=&quot;400&quot; alt=&quot;Adding the send parameters.&quot;/&gt;
+
+    Tick the `Overwrite body` checkbox in the `Output` field to overwrite the body of the email with the content provided in the request payload. &lt;br/&gt;
+ 
+6. Add the [Respond Mediator]({{base_path}}/reference/mediators/respond-mediator/) to respond to the response from sending the email as shown below.
+
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-respond.png&quot; title=&quot;Adding the respond mediator.&quot; width=&quot;900&quot; alt=&quot;Adding the respond mediator.&quot;/&gt;
+
+## Create the integration logic for retrieving email
+
+1. Create the next API resource, which is `/retrieve` by following the same steps previously. This API resource will retrieve filters from the incoming HTTP post request from which to filter the email messages such as the subject, retrieve the emails, retrieve the email body, and respond.
+   This will be used to retrieve the email we just sent. This will also be a `POST` request.
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-retrieve.png&quot; title=&quot;Adding new resource.&quot; width=&quot;900&quot; alt=&quot;Adding new resource.&quot;/&gt;
+
+2. Add the `list` operation of the Email Connector similar to step 3.
+
+3. Next, we will create an IMAP connection to list emails similar to step 4. Following are the values to be provided when creating the connection.
+
+    - **Connection Name** - `imapsconnection`
+    - **Connection Type** - `IMAPS`
+    - **Host** - `imap.gmail.com`
+    - **Port** - `993`
+    - **Username** - &amp;lt;your_email_address&amp;gt;
+    - **Password** - &amp;lt;your_email_password&amp;gt;
+
+4. In this operation we are going to receive the following inputs from the user. 
+    - **subjectRegex** - Subject Regex to filter the email from. &lt;br/&gt;
+    
+    Therefore, provide the expressions below to the following `Subject Regex` property in the `list` operation window.&lt;br/&gt;
+    
+    - **Subject Regex** : `payload.subjectRegex` &lt;br/&gt;
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-list-parameters.png&quot; title=&quot;Adding the list parameters.&quot; width=&quot;400&quot; alt=&quot;Adding the send parameters.&quot;/&gt;
+    
+5. We will next iterate the response received and obtain the email content of each email using the `getEmailBody` operation. To do this, add the [Foreach Mediator]({{base_path}}/reference/mediators/foreach-mediator/) as shown below entering `payload.emails` as the Foreach Expression.
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-foreach.png&quot; title=&quot;Adding foreach mediator.&quot; width=&quot;900&quot; alt=&quot;Adding foreach mediator.&quot;/&gt;
+
+
+6. Inside the [Foreach Mediator]({{base_path}}/reference/mediators/foreach-mediator/), add the `getEmailBody` operation as shown below providing the `payload.emails` expression as the Email Index.&lt;br/&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-get-email-body.png&quot; title=&quot;Adding getEmailBody mediator.&quot; width=&quot;400&quot; alt=&quot;Adding foreach mediator.&quot;/&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-foreach.png&quot; title=&quot;Overall component diagram&quot; width=&quot;400&quot; alt=&quot;Overall component diagram&quot;/&gt;
+
+    &gt; **NOTE**: Further, you can use the `getAttachment` operation to retrieve attachment content if there is any. Refer to the [Reference Documentation]({{base_path}}/reference/connectors/email-connector/email-connector-config/) to learn more.
+
+16. Next, we will use a [Payload Mediator]({{base_path}}/reference/mediators/payloadfactory-mediator/), to add the email content to the same response we received from the `list` operation and configure the Payload mediator as shown below.
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-payload.png&quot; title=&quot;Adding payload factory mediator.&quot; width=&quot;400&quot; alt=&quot;Adding payload facotry mediator.&quot;/&gt;
+
+    Entered payload:
+    ```json
+    {&quot;To&quot;:&quot;${payload.email.to}&quot;,&quot;From&quot;:&quot;${payload.email.from}&quot;,&quot;Subject&quot;:&quot;${payload.email.subject}&quot;,&quot;Content&quot;:&quot;${payload.email.textContent}&quot;}
+    ```
+
+8. Finally, add a [Respond Mediator]({{base_path}}/reference/mediators/respond-mediator/) after the &#x27;foreach&#x27; mediator to respond to the response of retrieved emails.
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn-add-respond-2.png&quot; title=&quot;Adding respond mediator 2.&quot; width=&quot;900&quot; alt=&quot;Adding respond mediator 2.&quot;/&gt;
+
+## Export integration logic as a carbon application
+To export the project, refer to the [build and export the carbon application]({{base_path}}/develop/deploy-artifacts/#build-and-export-the-carbon-application) guide. 
+
+## Get the project
+
+You can download the ZIP file and extract the contents to get the project code.
+
+&lt;a href=&quot;{{base_path}}/assets/attachments/connectors/emailconnectorv2.zip&quot;&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+&lt;/a&gt;
+
+## Deployment
+
+To deploy and run the project, refer to the [build and run]({{base_path}}/develop/deploy-artifacts/#build-and-run) guide.
+
+You can further refer to the application deployed through the CLI tool. See the instructions on [managing integrations from the CLI]({{base_path}}/observe-and-manage/managing-integrations-with-apictl).
+
+## Test
+
+### Email send operation
+
+1. Create a file called `data.json` with the following payload. We will send the email to ourselves so that we can retrieve it later.
+    ```
+    {
+        &quot;from&quot;: &quot;&lt;your-email&gt;@gmail.com&quot;,
+        &quot;to&quot;: &quot;&lt;your-email&gt;@gmail.com&quot;,
+        &quot;subject&quot;: &quot;Sample email&quot;,
+        &quot;content&quot;: &quot;This is the body of the sample email&quot;,
+        &quot;contentType&quot;:&quot;text/plain&quot;
+    }
+    ```
+2. Invoke the API as shown below using the curl command. Curl Application can be downloaded from [here](https://curl.haxx.se/download.html).
+    ```
+    curl -H &quot;Content-Type: application/json&quot; --request POST --data @data.json http://localhost:8290/send
+    ```
+**Expected Response**: 
+You should get a &#x27;success&#x27; response as below and you will receive the email.
+    ```
+    {
+    &quot;success&quot;: true
+    }
+    ``` 
+
+### Email list operation
+
+1. Create a file called `data.json` with the following payload. 
+    ```
+    {
+        &quot;subjectRegex&quot;:&quot;Sample email&quot;
+    }
+    ```
+2. Invoke the API as shown below using the curl command.
+    ```
+    curl -H &quot;Content-Type: application/json&quot; --request POST --data @data.json http://localhost:8290/retrieve
+    ```
+**Expected Response**: 
+You should get a response like below.
+    ```
+    {
+        &quot;emails&quot;: {
+            &quot;email&quot;: [
+                {
+                    &quot;emailID&quot;: &quot;&lt;9402597.1.1720439415817@10.100.1.245&gt;&quot;,
+                    &quot;to&quot;: &quot;&lt;your-email&gt;@gmail.com&quot;,
+                    &quot;from&quot;: &quot;&lt;your-email&gt;@gmail.com&quot;,
+                    &quot;subject&quot;: &quot;Sample email&quot;,
+                    &quot;textContent&quot;: &quot;This is the body of the sample email&quot;
+                }
+            ]
+        }
+    }
+    ``` 
+
+## What&#x27;s next
+
+* To customize this example for your own scenario, see [Email Connector Configuration]({{base_path}}/reference/connectors/email-connector/email-connector-config/) documentation for all operation details of the connector.
+</body>
+</html>

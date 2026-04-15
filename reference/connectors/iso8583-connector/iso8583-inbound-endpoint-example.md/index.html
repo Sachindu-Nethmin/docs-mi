@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>iso8583-inbound-endpoint-example.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># ISO8583 Inbound Endpoint Example
+
+In the real world, financial scenarios are happening among thousands of banking systems and networks. In this situation, one system needs to act as a message publisher, and another system needs to be capable of receiving messages. Once the message is received, further processing actions are performed based on the logic that is implemented in the internal system.
+
+The ISO8583 inbound endpoint of WSO2 acts as a message consumer. The ISO8583 inbound endpoint is a listening inbound endpoint that can consume ISO8583 standard messages. It then converts the messages to XML format and injects messages to a sequence in the integration runtime.
+
+## What you&#x27;ll build
+
+This scenario demonstrates how the ISO8583 inbound endpoint works as an ISO8583 message consumer. In this scenario, to generate ISO8583 messages we use a sample Java client program.
+
+The ISO8583 inbound endpoint listens on port `5001` and acts as a ISO8583 standard message consumer. When a sample Java client connects on port `5001`, the ISO8583 inbound endpoint consumes ISO8583 standard messages, converts the messages to XML format, and then injects messages to a sequence in the integration runtime.
+
+See [ISO8583 connector configuration]({{base_path}}/reference/connectors/iso8583-connector/iso8583-connector-configuration/) for more information. However, for simplicity of this example, we will just log the message. You can extend the sample as required using WSO2 [mediators]({{base_path}}/reference/mediators/about-mediators). 
+
+The following diagram illustrates all the required functionality of the ISO8583 inbound operations that you are going to build. 
+
+For example, while transferring bank and financial sector information using the ISO85883 message format among the banking networks, the message receiving can be done by using inbound endpoints. The ISO8583 inbound endpoint of WSO2 acts as an ISO8583 message receiver. You can inject that message into the mediation flow for getting the required output.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/iso8583-inbound-operations.png&quot; title=&quot;ISO8583 inbound operations&quot; width=&quot;800&quot; alt=&quot;ISO8583 inbound operations&quot;/&gt;
+
+## Set up the integration project
+
+1. Follow the steps in [Creating an Integration Project]({{base_path}}/develop/create-integration-project/) to set up the integration project.
+
+2. Add a new **ISO8583 Inbound Endpoint** by clicking the **+** icon in **Inbound Endpoints** and select **ISO8583 WSO2 Listener Connector**.
+   
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/iso8583-inbound.png&quot; title=&quot;Creating inbound endpoint Listener selector&quot; width=&quot;800&quot; alt=&quot;Creating inbound endpoint&quot;/&gt;
+   
+3. Provide values for **Inbound Endpoint Name** and **Port** as shown below and click **Create**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/iso-inbound-form.png&quot; title=&quot;Creating ISO8583 inbound endpoint form&quot; width=&quot;800&quot; alt=&quot;Creating ISO8583 inbound endpoint form&quot;/&gt;
+
+    The source view of the created inbound endpoint is shown below. 
+
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;inboundEndpoint name=&quot;ISOInboundEndpoint&quot; class=&quot;org.wso2.carbon.inbound.iso8583.listening.ISO8583MessageConsumer&quot; sequence=&quot;ISOInboundEndpoint-inboundSequence&quot; onError=&quot;ISOInboundEndpoint-inboundErrorSequence&quot; suspend=&quot;false&quot;&gt;
+        &lt;parameters xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;parameter name=&quot;inbound.behavior&quot;&gt;listening&lt;/parameter&gt;
+            &lt;parameter name=&quot;port&quot;&gt;5001&lt;/parameter&gt;
+            &lt;parameter name=&quot;sequential&quot;&gt;true&lt;/parameter&gt;
+            &lt;parameter name=&quot;coordination&quot;&gt;true&lt;/parameter&gt;
+            &lt;parameter name=&quot;headerLength&quot;&gt;0&lt;/parameter&gt;
+            &lt;parameter name=&quot;coreThreads&quot;&gt;1&lt;/parameter&gt;
+            &lt;parameter name=&quot;maxThreads&quot;&gt;3&lt;/parameter&gt;
+            &lt;parameter name=&quot;keepAlive&quot;&gt;1&lt;/parameter&gt;
+            &lt;parameter name=&quot;queueLength&quot;&gt;1&lt;/parameter&gt;
+        &lt;/parameters&gt;
+    &lt;/inboundEndpoint&gt;
+    ```
+   
+    !!! Note
+        When creating the ISO8583 inbound endpoint you have two options in defining the injecting sequence and error sequence.
+        &lt;br/&gt;- **Automatic**: Click the checkbox *Automatically generate sequence*
+        &lt;br/&gt;- **Manual**: You can select already defined sequences as injecting and error sequences.&lt;br/&gt;
+    
+    !!! Info
+        In this example, we are using the **Automatic** option and that will create an injecting sequence named `ISOInboundEndpoint-inboundSequence` and an error sequence named `ISOInboundEndpoint-inboundErrorSequence`.&lt;br/&gt;
+       
+4. Implement the injecting sequence which processes the message - `ISOInboundEndpoint-inboundSequence`.
+
+    For simplicity, in this example you will just log the message. However, in a real-world use case, this could involve any type of message mediation.
+    
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;sequence name=&quot;ISOInboundEndpoint-inboundSequence&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+       &lt;log category=&quot;INFO&quot; level=&quot;full&quot; description=&quot;Received ISO Message&quot;&gt;
+           &lt;property name=&quot;Log_Message&quot; value=&quot;Message received through ISO8583 Inbound Endpoint&quot;/&gt;
+       &lt;/log&gt;
+    &lt;/sequence&gt;
+    ```
+
+## Export integration logic as a CApp
+In order to export the project, refer to the [build and export the carbon application]({{base_path}}/develop/deploy-artifacts/#build-and-export-the-carbon-application) guide. 
+
+## Deployment
+
+1. Download [jpos-1.9.4.jar](http://mvnrepository.com/artifact/org.jpos/jpos/1.9.4), [jdom-1.1.3.jar](http://mvnrepository.com/artifact/org.jdom/jdom/1.1.3), and [commons-cli-1.3.1.jar](http://mvnrepository.com/artifact/commons-cli/commons-cli/1.3.1) and add it to `&lt;Project_Home&gt;/deployment/libs` folder.
+2. In order to deploy and run the project, refer the [build and run]({{base_path}}/develop/deploy-artifacts/#build-and-run) guide.
+
+
+## Test
+
+1. Download the JAR file of Test Client program from [here]({{base_path}}/assets/attachments/jar/ISO8583TestClient-1.0.jar).
+2. Open a terminal, navigate to downloaded JAR file location.
+3. Execute the following command to start the Test Client program:
+
+    ```bash
+    java -jar ISO8583TestClient-1.0.jar
+    ```
+   
+4. Provide a ISO8583 standard message as input for ISO8583 Data:
+
+    ```
+    0200B220000100100000000000000002000020134500000050000001115221801234890610000914XYRTUI5269TYUI021ABCDEFGHIJ 1234567890 
+    ```
+   
+   **Expected response**
+   
+   ```
+   [2024-12-11 16:02:08,302]  INFO {LogMediator} - To: , MessageID: urn:uuid:7B55A5B8E9634F8DC81733922128267, Direction: request, Log_Message = Message received through ISO8583 Inbound Endpoint, Envelope: 
+   &lt;?xml version=&#x27;1.0&#x27; encoding=&#x27;utf-8&#x27;?&gt;&lt;soapenv:Envelope xmlns:soapenv=&quot;http://www.w3.org/2003/05/soap-envelope&quot;&gt;
+      &lt;soapenv:Body&gt;
+         &lt;ISOMessage&gt;
+            &lt;data&gt;
+              &lt;field id=&quot;0&quot;&gt;0200&lt;/field&gt;
+              &lt;field id=&quot;3&quot;&gt;201345&lt;/field&gt;
+              &lt;field id=&quot;4&quot;&gt;000000500000&lt;/field&gt;
+              &lt;field id=&quot;7&quot;&gt;0111522180&lt;/field&gt;
+              &lt;field id=&quot;11&quot;&gt;123489&lt;/field&gt;
+              &lt;field id=&quot;32&quot;&gt;100009&lt;/field&gt;
+              &lt;field id=&quot;44&quot;&gt;XYRTUI5269TYUI&lt;/field&gt;
+              &lt;field id=&quot;111&quot;&gt;ABCDEFGHIJ 1234567890&lt;/field&gt;
+           &lt;/data&gt;
+        &lt;/ISOMessage&gt;
+      &lt;/soapenv:Body&gt;
+   &lt;/soapenv:Envelope&gt;
+   ```   
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>scatter-gather-integration-pattern.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Scatter Gather Integration Pattern Sample
+
+This sample demonstrates how to implement the Scatter-Gather enterprise integration pattern with WSO2 Integrator: MI.
+
+The sample includes a REST API called MissionServiceAPI and three endpoints: MissionEP1, MissionEP2 and MissionEP3.
+
+When a client invokes the API, it clones the request payload and sends it to the three different endpoints. The responses from these endpoints are then aggregated and built into a single payload, which is sent back to the client.
+
+## Deploying the sample
+
+1.  Open the sample by clicking on the **Scatter Gather Integration Pattern** card.
+2.  Give a folder location to save the sample.
+3.  [Build and run]({{base_path}}/develop/deploy-artifacts#build-and-run) the sample in your WSO2 Integrator: MI.
+
+## Running the sample
+
+1.  Open a terminal and run the following commands to invoke the Service.
+
+    ```bash
+    curl --location &#x27;http://localhost:8290/missionservice&#x27; \
+    --header &#x27;Content-Type: text/xml&#x27; \
+    --data &#x27;&lt;tem:Mission xmlns:tem=&quot;http://tempuri.org&quot;/&gt;&#x27; 
+    ```
+
+    You will receive a response like following.
+
+    ```
+    &lt;?xml version=&#x27;1.0&#x27; encoding=&#x27;UTF-8&#x27;?&gt;
+    &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:s=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:SOAP-ENV=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&gt;
+        &lt;soapenv:Body&gt;
+            &lt;MissionResult xmlns=&quot;http://tempuri.org&quot;&gt;Resellers of cloud-based Web 3.0 application development gaming for emerging markets.&lt;/MissionResult&gt;
+            &lt;MissionResult xmlns=&quot;http://tempuri.org&quot;&gt;Spearheading the next generation of compliant broad-band instrumentation models for high-worth individuals.&lt;/MissionResult&gt;
+            &lt;MissionResult xmlns=&quot;http://tempuri.org&quot;&gt;The industry leader in personal quantum XML marketing services for industry and government.&lt;/MissionResult&gt;
+        &lt;/soapenv:Body&gt;
+    &lt;/soapenv:Envelope&gt;
+    ```
+
+2.  You can also [run the unit test case]({{base_path}}/develop/creating-unit-test-suite/#run-unit-test-suite) defined for this sample.
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>proxy-service-properties.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Proxy Service Properties
+## Introduction
+
+Proxy services are virtual services that receive messages and optionally process them before forwarding them to a service at a given endpoint. This approach allows you to perform necessary transformations and introduce additional functionality without changing your existing service. 
+
+Just as [REST APIs]({{base_path}}/reference/synapse-properties/rest-api-properties) and [Inbound Endpoints]({{base_path}}/reference/synapse-properties/inbound-endpoints/about-inbound-endpoints), the proxy service uses [mediators]({{base_path}}/reference/mediators/about-mediators) and [sequences]({{base_path}}/reference/mediation-sequences) to define the mediation logic for processing messages. You can also enable WS-Security to a proxy service so that it serves as a security gateway to your actual services. 
+
+Any available transport can be used to receive and send messages from the proxy services. A proxy service is externally visible and can be accessed using a URL similar to a normal web service address.
+
+## Properties
+
+See the topics given below for the list of properties that can be configured when [creating a proxy service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service/).
+
+### General properties
+
+Listed below are the main properties that are required when [creating a proxy service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service/) of any type.
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Property&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Proxy Service Name&lt;/td&gt;
+    &lt;td&gt;A unique name for the proxy service.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Transports&lt;/td&gt;
+    &lt;td&gt;
+      The transport protocols that are used to receive messages. Once you have selected the required transports, you can later add &lt;a href=&quot;#service-parameters&quot;&gt;service parameters&lt;/a&gt; relevant to each transport type.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Target Endpoint&lt;/td&gt;
+    &lt;td&gt;
+      The proxy service uses an &lt;b&gt;Endpoint&lt;/b&gt; artifact inline to define the location to which messages should be routed. You can choose one of the following options to specify the endpoint.
+      &lt;ul&gt;
+        &lt;li&gt;If you have a &lt;a href=&quot;{{base_path}}/develop/creating-artifacts/creating-endpoints&quot;&gt;predefined &lt;b&gt;Endpoint&lt;/b&gt;&lt;/a&gt; artifact in WSO2 Integrator: MI (WSO2 MI), provide the name of the artifact.&lt;/li&gt;
+        &lt;li&gt;If you have a predefined &lt;b&gt;Endpoint&lt;/b&gt; artifact that is saved in the &lt;a href=&quot;{{base_path}}/get-started/key-concepts/#registry&quot;&gt;registry&lt;/a&gt;, provide the link to the artifact.&lt;/li&gt;
+      &lt;/ul&gt;
+      See &lt;a href=&quot;{{base_path}}/reference/synapse-properties/endpoint-properties&quot;&gt;Endpoint Properties&lt;/a&gt; for the complete list of properties you can define for the Endpoint artifact.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+### Service parameters
+
+- See the list of transport parameters you can configure at the service level for a proxy service:
+
+    - [JMS properties]({{base_path}}/reference/synapse-properties/transport-parameters/jms-transport-parameters)
+    - [MailTo properties]({{base_path}}/reference/synapse-properties/transport-parameters/mailto-transport-parameters)
+    - [MQTT properties]({{base_path}}/reference/synapse-properties/transport-parameters/mqtt-transport-parameters)
+    - [RabbitMQ properties]({{base_path}}/reference/synapse-properties/transport-parameters/rabbitmq-transport-parameters)
+    - [VFS properties]({{base_path}}/reference/synapse-properties/transport-parameters/vfs-transport-parameters)
+    - [Fix properties]({{base_path}}/reference/synapse-properties/transport-parameters/fix-transport-parameters)
+    - [HL7 properties]({{base_path}}/reference/synapse-properties/transport-parameters/hl7-transport-parameters)
+
+- You can also configure the following service-level property to expose an [Inbound Endpoint]({{base_path}}/reference/synapse-properties/inbound-endpoints/about-inbound-endpoints) through a proxy service:
+  &lt;table&gt;
+     &lt;tr&gt;
+        &lt;th&gt;Service Parameter&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+     &lt;/tr&gt;
+     &lt;tr&gt;
+        &lt;td&gt;inbound.only&lt;/td&gt;
+        &lt;td&gt;
+              Whether the proxy service needs to be exposed only via inbound endpoints. If set to &lt;code&gt;true&lt;/code&gt; all requests that the proxy service receives via normal transport will be rejected. The proxy service will process only the requests that are received via inbound endpoints.&lt;/br&gt;&lt;/br&gt; The default setting is &lt;code&gt;false&lt;/code&gt;.
+        &lt;/td&gt;
+     &lt;/tr&gt;
+  &lt;/table&gt;
+
+- To publish a custom WSDL for a proxy service, select one of the WSDL types.
+    &lt;table&gt;
+    &lt;thead&gt;
+    &lt;tr class=&quot;header&quot;&gt;
+    &lt;th&gt;WSDL Type&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+    &lt;tr class=&quot;odd&quot;&gt;
+    &lt;td&gt;INLINE&lt;/td&gt;
+    &lt;td&gt;Enter the WSDL definition in the &lt;strong&gt;WSDL XML&lt;/strong&gt; field.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr class=&quot;even&quot;&gt;
+    &lt;td&gt;SOURCE_URL&lt;/td&gt;
+    &lt;td&gt;&lt;p&gt;Enter the URI of the WSDL in the text box, and then click &lt;strong&gt;Test URI&lt;/strong&gt; to ensure it is available. A URI consists of a URL and URN. The URL defines the host address of the network resource (can be omitted if resources are not network-homed), and the URN defines the resource name in local &quot;namespaces.&quot;&lt;/p&gt;
+    &lt;p&gt;For example URI = &lt;code&gt;ftp://ftp.dlink.ru/pub/ADSL, w&lt;/code&gt; here URL = &lt;code&gt;ftp://ftp.dlink.ru&lt;/code&gt; and URN = &lt;code&gt;pub/ADSL&lt;/code&gt;&lt;/p&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr class=&quot;odd&quot;&gt;
+    &lt;td&gt;REGISTRY_KEY&lt;/td&gt;
+    &lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+    &lt;p&gt;If the WSDL is saved as a registry entry, select this option and choose the reference key of that registry entry from the governance Registry or configuration Registry.&lt;/p&gt;
+    &lt;/div&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr class=&quot;even&quot;&gt;
+    &lt;td&gt;ENDPOINT&lt;/td&gt;
+    &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/tbody&gt;
+    &lt;/table&gt;
+
+    Following are additional service parameters you can use to configure the service WSDL.
+    &lt;table&gt;
+    &lt;thead&gt;
+    &lt;tr class=&quot;header&quot;&gt;
+    &lt;th&gt;&lt;p&gt;Parameter&lt;/p&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;p&gt;Description&lt;/p&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+    &lt;tr class=&quot;odd&quot;&gt;
+    &lt;td&gt;&lt;p&gt;useOriginalwsdl&lt;/p&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+    &lt;p&gt;If this parameter is set to &lt;code&gt;true&lt;/code&gt;, the original WSDL published via the &lt;code&gt;publishWSDL&lt;/code&gt; parameter is used instead of the custom WSDL.&lt;/p&gt;
+    &lt;/div&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr class=&quot;even&quot;&gt;
+    &lt;td&gt;&lt;p&gt;modifyUserWSDLPortAddress&lt;/p&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;p&gt;If true (default), the port addresses will be modified to the current host. Effective only with &lt;code&gt;useOriginalwsdl=true&lt;/code&gt; .&lt;/p&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr class=&quot;odd&quot;&gt;
+    &lt;td&gt;ApplicationXMLBuilder.allowDTD&lt;/td&gt;
+    &lt;td&gt;If this parameter is set to true, it enables data type definition processing for the proxy service.&lt;br /&gt;
+    Data type definition processing is disabled in the Axis2 engine due to security vulnerability. This parameter enables it for individual proxy services.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr class=&quot;even&quot;&gt;
+    &lt;td&gt;&lt;p&gt;enablePublishWSDLSafeMode&lt;/p&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+    &lt;p&gt;If this parameter is set to &lt;code&gt;true&lt;/code&gt; when deploying a proxy service, even though the WSDL is not available, you can prevent the proxy service from being faulty. However, the deployed proxy service will be inaccessible since the WSDL is not available.&lt;/p&gt;
+        &lt;p&gt;&lt;b&gt;Note&lt;/b&gt; that this is only applicable when you publish the WSDL (i.e., via the &lt;code&gt;publishWSDL&lt;/code&gt; property) either as a URI or as an endpoint.&lt;/p&gt;
+
+    &lt;/div&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr class=&quot;odd&quot;&gt;
+    &lt;td&gt;showAbsoluteSchemaURL&lt;/td&gt;
+    &lt;td&gt;If this parameter is set to &lt;code&gt;true&lt;/code&gt;, the absolute path of the referred schemas of the WSDL is shown instead of the relative paths.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr class=&quot;even&quot;&gt;
+    &lt;td&gt;showProxySchemaURL&lt;/td&gt;
+    &lt;td&gt;If this parameter is set to &lt;code&gt;true&lt;/code&gt;, the full proxy URL will be set as the prefix to the schema location of the imports in proxy WSDL.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/tbody&gt;
+    &lt;/table&gt;
+
+    If your WSDL has dependencies with other resources (schemas or other WSDL documents), you can link them using the **Wsdl Resources** property. You can enter the registry key and the location of the dependent resource: The location is available in the WSDL. When you have the location, you can find the registry key corresponding to the location from the registry.
+
+    In the following example, the WSDL imports a metadata schema from the metadata.xsd file. Therefore, the location is `metadata.xsd`.
+
+    ```xml
+    &lt;xsd:import namespace=http://www.wso2.org/test/10 schemaLocation=&quot;metadata.xsd&quot; /&gt;
+    ```
+
+    In the following example, the WSDL is retrieved from the registry using the key `my.wsdl`. This WSDL imports another WSDL from `http://www.standards.org/standard.wsdl`. This dependent WSDL is retrieved from the registry using the `standard.wsdl` registry key.
+
+    ```xml 
+    &lt;publishWSDL key=&quot;my.wsdl&quot;&gt;
+        &lt;resource location=&quot;http://www.standards.org/standard.wsdl&quot; key=&quot;standard.wsdl&quot;/&gt;
+    &lt;/publishWSDL&gt;
+    ```
+</body>
+</html>

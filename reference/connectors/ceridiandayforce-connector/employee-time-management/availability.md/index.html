@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>availability.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Working with Employee Availability
+
+### Overview 
+
+The following operations allow you to retrieve the availability of an employee
+
+| Operation | Description |
+| ------------- |-------------|
+|[GET Availability](#retrieving-employee-availability)| Availability represents the periods an employee is available to be scheduled for work. This request allows you to retrieve a single employee&#x27;s daily availability between two dates. In order to use it, an employee XRefCodes is needed. Employee XRefCodes can be retrieved with GET Employees. |
+
+### Operation details
+
+This section provides more details on each of the operations.
+
+#### Retrieving Employee Availability
+We can use GET Availability operation with required parameters to search and find availability of required employees.
+
+**GET Availability**
+```xml
+&lt;ceridiandayforce.getAvailability&gt;
+    &lt;xRefCode&gt;{$ctx:xRefCode}&lt;/xRefCode&gt;
+    &lt;filterAvailabilityStartDate&gt;{$ctx:filterAvailabilityStartDate}&lt;/filterAvailabilityStartDate&gt;
+    &lt;filterAvailabilityEndDate&gt;{$ctx:filterAvailabilityEndDate}&lt;/filterAvailabilityEndDate&gt;
+&lt;/ceridiandayforce.getAvailability&gt;
+```
+
+**Properties**
+
+* xRefCode (Mandatory): The unique identifier (external reference code) of the employee whose data will be retrieved. The value provided must be the exact match for an employee; otherwise, a bad request (400) error will be returned.
+* filterAvailabilityStartDate (Mandatory): Inclusive period start date to determine which employee availability data to retrieve . Example: 2017-01-01T00:00:00
+* filterAvailabilityEndDate (Mandatory): Inclusive period end date to determine which employee availability data to retrieve . Example: 2017-01-01T00:00:00
+
+**Sample request**
+
+Following is a sample request that can be handled by this operation.
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;xRefCode&quot;: &quot;42199&quot;,
+  &quot;filterAvailabilityStartDate&quot;: &quot;2018-02-04T00:00:00&quot;,
+  &quot;filterAvailabilityEndDate&quot;: &quot;2018-02-18T00:00:00&quot;
+}
+```
+
+**Sample response**
+
+Given below is a sample response for this operation.
+
+```json
+{
+    &quot;Data&quot;: [
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-04T00:00:00&quot;,
+            &quot;UnAvailable&quot;: true,
+            &quot;IsDefault&quot;: true
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-05T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-06T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;07:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;09:00:00&quot;,
+            &quot;StartTime2&quot;: &quot;14:00:00&quot;,
+            &quot;EndTime2&quot;: &quot;20:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-07T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-08T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-09T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-10T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-11T00:00:00&quot;,
+            &quot;UnAvailable&quot;: true,
+            &quot;IsDefault&quot;: true
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-12T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-13T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;07:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;09:00:00&quot;,
+            &quot;StartTime2&quot;: &quot;14:00:00&quot;,
+            &quot;EndTime2&quot;: &quot;20:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-14T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-15T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-16T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-17T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-18T00:00:00&quot;,
+            &quot;UnAvailable&quot;: true,
+            &quot;IsDefault&quot;: true
+        }
+    ]
+}
+```
+
+**Related Dayforce documentation**
+
+[https://developers.dayforce.com/Build/API-Explorer/Time-Management/Employee-Availability.aspx](https://developers.dayforce.com/Build/API-Explorer/Time-Management/Employee-Availability.aspx)
+
+### Sample configuration
+
+Following example illustrates how to connect to Dayforce with the init operation and query operation.
+
+1.Create a sample proxy as below :
+```xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
+       name=&quot;query&quot;
+       startOnLoad=&quot;true&quot;
+       statistics=&quot;disable&quot;
+       trace=&quot;disable&quot;
+       transports=&quot;http,https&quot;&gt;
+   &lt;target&gt;
+      &lt;inSequence&gt;
+         &lt;log level=&quot;full&quot; separator=&quot;,&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.username)&quot; name=&quot;username&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.password)&quot; name=&quot;password&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.clientNamespace)&quot; name=&quot;clientNamespace&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.apiVersion)&quot; name=&quot;apiVersion&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.xRefCode)&quot; name=&quot;xRefCode&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.filterAvailabilityStartDate)&quot; name=&quot;filterAvailabilityStartDate&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.filterAvailabilityEndDate)&quot; name=&quot;filterAvailabilityEndDate&quot;/&gt;
+         &lt;ceridiandayforce.init&gt;
+            &lt;username&gt;{$ctx:username}&lt;/username&gt;
+            &lt;password&gt;{$ctx:password}&lt;/password&gt;
+            &lt;clientNamespace&gt;{$ctx:clientNamespace}&lt;/clientNamespace&gt;
+            &lt;apiVersion&gt;{$ctx:apiVersion}&lt;/apiVersion&gt;
+         &lt;/ceridiandayforce.init&gt;
+         &lt;ceridiandayforce.getAvailability&gt;
+            &lt;xRefCode&gt;{$ctx:xRefCode}&lt;/xRefCode&gt;
+            &lt;filterAvailabilityStartDate&gt;{$ctx:filterAvailabilityStartDate}&lt;/filterAvailabilityStartDate&gt;
+            &lt;filterAvailabilityEndDate&gt;{$ctx:filterAvailabilityEndDate}&lt;/filterAvailabilityEndDate&gt;
+         &lt;/ceridiandayforce.getAvailability&gt;
+         &lt;send/&gt;
+      &lt;/inSequence&gt;
+   &lt;/target&gt;
+   &lt;description/&gt;
+&lt;/proxy&gt;
+                                
+```
+
+2.Create a json file named query.json and copy the configurations given below to it:
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;xRefCode&quot;: &quot;42199&quot;,
+  &quot;filterAvailabilityStartDate&quot;: &quot;2018-02-04T00:00:00&quot;,
+  &quot;filterAvailabilityEndDate&quot;: &quot;2018-02-18T00:00:00&quot;
+}
+```
+3.Replace the credentials with your values.
+
+4.Execute the following curl command:
+
+```bash
+curl http://localhost:8280/services/query -H &quot;Content-Type: application/json&quot; -d @query.json
+```
+5.Dayforce returns HTTP Code 200 with the following body
+
+```json
+{
+    &quot;Data&quot;: [
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-04T00:00:00&quot;,
+            &quot;UnAvailable&quot;: true,
+            &quot;IsDefault&quot;: true
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-05T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-06T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;07:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;09:00:00&quot;,
+            &quot;StartTime2&quot;: &quot;14:00:00&quot;,
+            &quot;EndTime2&quot;: &quot;20:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-07T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-08T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-09T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-10T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-11T00:00:00&quot;,
+            &quot;UnAvailable&quot;: true,
+            &quot;IsDefault&quot;: true
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-12T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-13T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;07:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;09:00:00&quot;,
+            &quot;StartTime2&quot;: &quot;14:00:00&quot;,
+            &quot;EndTime2&quot;: &quot;20:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-14T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-15T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-16T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-17T00:00:00&quot;,
+            &quot;IsDefault&quot;: true,
+            &quot;StartTime1&quot;: &quot;00:00:00&quot;,
+            &quot;EndTime1&quot;: &quot;1.00:00:00&quot;
+        },
+        {
+            &quot;DateOfRequest&quot;: &quot;2018-02-18T00:00:00&quot;,
+            &quot;UnAvailable&quot;: true,
+            &quot;IsDefault&quot;: true
+        }
+    ]
+}
+```
+</body>
+</html>

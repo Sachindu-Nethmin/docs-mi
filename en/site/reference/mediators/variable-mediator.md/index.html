@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>variable-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Variable mediator
+
+The Variable mediator is used to manage variables within a mediation flow. The Variable mediator allows you to set variables, which can then be used later in the mediation flow.
+
+## Syntax
+
+```xml
+&lt;variable name=&quot;string&quot; [type=&quot;STRING&quot;|&quot;BOOLEAN&quot;|&quot;INTEGER&quot;|&quot;DOUBLE&quot;|&quot;LONG&quot;|&quot;XML&quot;|&quot;JSON&quot;] (value=&quot;string&quot; | expression=&quot;expression&quot;) /&gt;
+```
+
+## Configuration
+
+The parameters available to configure the Variable mediator are as follows:
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Name&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;The name of the variable. This name uniquely identifies the variable in the mediation flow.&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Data Type&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;The data type of the variable. Available types are as follows:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;STRING&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;BOOLEAN&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;INTEGER&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DOUBLE&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;LONG&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;XML&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;JSON&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Value&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;You can give either a static value or a &lt;a href=&quot;{{base_path}}/reference/synapse-properties/synapse-expressions&quot;&gt;Synapse expression&lt;/a&gt;.
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+## Examples
+
+### Set a variable with a static value
+
+This example demonstrates setting a variable with a static value.
+
+```xml
+&lt;variable name=&quot;username&quot; value=&quot;JohnDoe&quot; type=&quot;STRING&quot;/&gt;
+```
+
+### Set a variable with an expression
+
+This example demonstrates dynamically setting a variable using an expression.
+
+```xml
+&lt;variable name=&quot;userDataObject&quot; expression=&quot;${payload.user.data}&quot; type=&quot;JSON&quot;/&gt;
+&lt;variable name=&quot;userId&quot; expression=&quot;${payload.user.id}&quot; type=&quot;INTEGER&quot;/&gt;
+```
+</body>
+</html>

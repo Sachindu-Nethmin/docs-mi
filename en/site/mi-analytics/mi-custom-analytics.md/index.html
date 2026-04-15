@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>mi-custom-analytics.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Publish Custom Analytics Events Data
+
+## Introduction
+
+WSO2 Integrator: MI provides the capability to publish custom analytics data with the existing event schema. This guide explains the steps required to achieve this.
+
+This section outlines the process of creating a sample and configuring it with WSO2 Integrator: MI.
+
+## Create a sample
+
+To begin, create a new Java/Maven project.
+
+!!! note    
+    Alternatively, you can use an existing [sample](https://github.com/wso2/product-micro-integrator/tree/master/samples/AnalyticsSampleDataProvider). If you choose to use the provided sample instead of developing one from scratch, you can skip the steps for creating the sample and proceed directly to [Configuring the Sample](#configuring-the-sample).
+
+This section covers how to configure the `pom.xml` file, implement the required classes, and build the sample project.
+
+### Configure the pom.xml
+
+Add the WSO2 Nexus repository to the `pom.xml` file:
+
+```xml
+    &lt;repository&gt;
+        &lt;id&gt;wso2-nexus&lt;/id&gt;
+        &lt;name&gt;WSO2 internal Repository&lt;/name&gt;
+        &lt;url&gt;https://maven.wso2.org/nexus/content/groups/wso2-public/&lt;/url&gt;
+        &lt;releases&gt;
+            &lt;enabled&gt;true&lt;/enabled&gt;
+            &lt;updatePolicy&gt;daily&lt;/updatePolicy&gt;
+            &lt;checksumPolicy&gt;ignore&lt;/checksumPolicy&gt;
+        &lt;/releases&gt;
+    &lt;/repository&gt;
+```
+
+Add the following dependencies.
+
+```xml
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.wso2.ei&lt;/groupId&gt;
+            &lt;artifactId&gt;org.wso2.micro.integrator.analytics.messageflow.data.publisher&lt;/artifactId&gt;
+            &lt;version&gt;${wso2.mi.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.apache.synapse&lt;/groupId&gt;
+            &lt;artifactId&gt;synapse-extensions&lt;/artifactId&gt;
+            &lt;version&gt;${synapse.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.apache.synapse&lt;/groupId&gt;
+            &lt;artifactId&gt;synapse-core&lt;/artifactId&gt;
+            &lt;version&gt;${synapse.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+```
+
+!!! info
+    The versions for `${wso2.mi.version}` and `${synapse.version}` can be found in the JAR versions available in the current WSO2 Integrator: MI package.
+
+### Implement required class
+
+To add custom analytics data to the existing event schema, implement a class from the `org.wso2.micro.integrator.analytics.messageflow.data.publisher.producer.AnalyticsCustomDataProvider` interface. Override the `getCustomProperties` method to push custom analytics data.
+
+An example implementation of this class is shown below:
+
+``` java
+    public class SampleCustomDataProvider implements AnalyticsCustomDataProvider {
+        @Override
+        public Map&lt;String, Object&gt; getCustomProperties(MessageContext messageContext) {
+            Map&lt;String, Object&gt; properties = new HashMap&lt;&gt;();
+            Object contentType = ((Axis2MessageContext) messageContext).getAxis2MessageContext().getProperty(&quot;ContentType&quot;);
+            if (contentType != null) {
+                properties.put(&quot;contentType&quot;, contentType);
+            }
+            return properties;
+        }
+    }
+```
+
+### Build the project
+
+To build the project, run the following command:
+
+```
+    mvn clean install
+```
+
+## Configure the sample
+
+This section outlines the steps required to configure WSO2 Integrator: MI for the sample created above.
+
+After building the project, copy the created `.jar` file into the `&lt;MI_HOME&gt;/lib` directory.
+
+Edit the `analytics` configuration in the `deployment.toml` file, located inside the `&lt;MI_HOME&gt;/conf` directory, and add the following configuration:
+
+``` toml
+    [analytics]
+    enabled=true
+    custom_data_provider_class=&quot;org.wso2.ei.SampleCustomDataProvider&quot;
+```
+
+This configuration ensures that the custom data provider class is engaged.
+
+Enable statistics for WSO2 Integrator: MI following the instructions [here]({{base_path}}/mi-analytics/mi-elk-installation-guide/#enabling-statistics-for-artifacts).
+
+Create a log appender following the instructions [here]({{base_path}}/mi-analytics/mi-elk-installation-guide/#creating-log-appender).
+
+Now, trigger an event and check the `&lt;MI_HOME&gt;/repository/logs/synapse-analytics.log` to verify the event data being published by WSO2 Integrator: MI.
+</body>
+</html>

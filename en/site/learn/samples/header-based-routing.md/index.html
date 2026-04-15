@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>header-based-routing.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Header Based Routing Sample
+
+This sample demonstrates the routing capability of WSO2 Integrator: MI (WSO2 MI). In this scenario, routing occurs based on a header in the message. The integration involves a service that performs arithmetic operations. Depending on the value of the `operation` header in the message, it needs to be routed to the relevant service.
+
+The routing decision is made based on the content of the HTTP header called `Operation`. Specifically, the Switch mediator extracts the value of the element using an XPath expression. Subsequently, the Payload mediator constructs the message payload required by the backend service.
+
+## Deploying the sample
+
+1.  Open the sample by clicking on the **Header Based Routing** card.
+2.  Give a folder location to save the sample.
+3.  [Build and run]({{base_path}}/develop/deploy-artifacts#build-and-run) the sample in your WSO2 Integrator: MI.
+
+## Running the sample
+
+1. Open a terminal and run the following commands to invoke the API.
+
+    ```bash
+    curl --location &#x27;http://localhost:8290/calculate&#x27; \
+    --header &#x27;Operation: Add&#x27; \
+    --header &#x27;Content-Type: text/xml&#x27; \
+    --data &#x27;&lt;ArithmaticOperation&gt;
+        &lt;Arg1&gt;10&lt;/Arg1&gt;
+        &lt;Arg2&gt;25&lt;/Arg2&gt;
+    &lt;/ArithmaticOperation&gt;&#x27;
+    ```
+
+    ```bash
+    curl --location &#x27;http://localhost:8290/calculate&#x27; \
+    --header &#x27;Operation: Divide&#x27; \
+    --header &#x27;Content-Type: text/xml&#x27; \
+    --data &#x27;&lt;ArithmaticOperation&gt;
+        &lt;Arg1&gt;10&lt;/Arg1&gt;
+        &lt;Arg2&gt;25&lt;/Arg2&gt;
+    &lt;/ArithmaticOperation&gt;&#x27;
+    ```
+
+    You will receive the following responses.
+
+    ```
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+    &lt;SOAP-ENV:Envelope xmlns:SOAP-ENV=&#x27;http://schemas.xmlsoap.org/soap/envelope/&#x27; xmlns:xsi=&#x27;http://www.w3.org/2001/XMLSchema-instance&#x27; xmlns:s=&#x27;http://www.w3.org/2001/XMLSchema&#x27;&gt;
+        &lt;SOAP-ENV:Body&gt;
+            &lt;AddIntegerResponse xmlns=&quot;http://tempuri.org&quot;&gt;
+                &lt;AddIntegerResult&gt;35&lt;/AddIntegerResult&gt;
+            &lt;/AddIntegerResponse&gt;
+        &lt;/SOAP-ENV:Body&gt;
+    &lt;/SOAP-ENV:Envelope&gt;
+    ```
+
+    ```
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+    &lt;SOAP-ENV:Envelope xmlns:SOAP-ENV=&#x27;http://schemas.xmlsoap.org/soap/envelope/&#x27; xmlns:xsi=&#x27;http://www.w3.org/2001/XMLSchema-instance&#x27; xmlns:s=&#x27;http://www.w3.org/2001/XMLSchema&#x27;&gt;
+        &lt;SOAP-ENV:Body&gt;
+            &lt;DivideIntegerResponse xmlns=&quot;http://tempuri.org&quot;&gt;
+                &lt;DivideIntegerResult&gt;.4&lt;/DivideIntegerResult&gt;
+            &lt;/DivideIntegerResponse&gt;
+        &lt;/SOAP-ENV:Body&gt;
+    &lt;/SOAP-ENV:Envelope&gt;
+    ```
+
+2. You can also [run the unit test case]({{base_path}}/develop/creating-unit-test-suite/#run-unit-test-suite) defined for this sample.
+</body>
+</html>

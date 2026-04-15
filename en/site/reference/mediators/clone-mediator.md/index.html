@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>clone-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Clone Mediator
+
+!!! Note  
+      From WSO2 MI 4.4.0 onwards, if your use case requires processing and merging multiple message flows, you don&#x27;t need to use the **Clone Mediator** along with the **Aggregate Mediator**. Instead, you can use the [**Scatter Gather mediator**]({{base_path}}/reference/mediators/scatter-gather-mediator/) as a single-step solution, simplifying the integration flow. It is recommended to use the [**Scatter Gather mediator**]({{base_path}}/reference/mediators/scatter-gather-mediator/) for new implementations.
+
+The **Clone Mediator** can be used to clone a message into several messages. It resembles the [Scatter-Gather enterprise integration pattern]({{base_path}}/learn/enterprise-integration-patterns/message-routing/scatter-gather/). The Clone mediator is similar to the [Iterate mediator]({{base_path}}/reference/mediators/iterate-mediator). The difference between the two mediators is that the Iterate mediator splits a message into different parts, whereas the Clone mediator makes multiple identical copies of the message.
+
+!!! Info
+    To get the asynchronous behavior you have to have the sequence to inject the message context to that sequence asynchronously. You can not achieve that by adding the endpoint itself to the target without adding the sequence.
+
+## Syntax
+
+``` java
+&lt;clone [continueParent=(true | false)] [sequential=(true | false)] [iterations=&quot;number&quot;] &gt;
+   &lt;target [to=&quot;uri&quot;] [soapAction=&quot;qname&quot;] [sequence=&quot;sequence_ref&quot;] [endpoint=&quot;endpoint_ref&quot;]&gt;
+     &lt;sequence&gt;
+       (mediator)+
+     &lt;/sequence&gt;?
+     &lt;endpoint&gt;
+       endpoint
+     &lt;/endpoint&gt;?
+   &lt;/target&gt;+
+&lt;/clone&gt;
+```
+
+## Configuration
+
+The parameters available to configure the Clone mediator is as follows.
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Clone ID&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Identification of messages created by the clone mediator. This is particularly useful when aggregating responses of messages that are created using nested Clone mediators.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Sequential Mediation&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;This parameter is used to specify whether the cloned messages should be processed sequentially or not. The processing is carried based on the information relating to the sequence and endpoint specified in the &lt;a href=&quot;#target-configuration&quot;&gt;target configuration&lt;/a&gt;. The possible values are as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Yes&lt;/strong&gt;: If this is selected, the cloned messages will be processed sequentially. Note that selecting &lt;strong&gt;True&lt;/strong&gt; might cause delays due to high resource consumption.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;No&lt;/strong&gt;: If this is selected, the cloned messages will not be processed sequentially. This is the default value and it results in better performance.&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Continue Parent&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;This parameter is used to specify whether the original message should be preserved or not. Possible values are as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Yes&lt;/strong&gt;: If this is selected, the original message will be preserved.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;No&lt;/strong&gt;: If this is selected, the original message will be discarded. This is the default value.&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;strong&gt;Number of Clones&lt;/strong&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;The parameter indicates the number of targets which currently exist for the Clone mediator. Click &lt;strong&gt;Add Clone Target&lt;/strong&gt; to add a new target. Each time you add a target, it will be added as a child of the Clone mediator in the mediator tree as shown below.&lt;/p&gt;
+&lt;p&gt;Click &lt;strong&gt;Target&lt;/strong&gt; to add the target configuration as described below.&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+### Target configuration
+
+The parameters available to configure the target are as follows.
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;SOAP Action&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;The SOAP action of the message.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;To Address&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;The target endpoint address.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Sequence&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;This parameter is used to specify whether cloned messages should be mediated via a &lt;b&gt;sequence&lt;/b&gt; or not, and to specify the sequence if they are to be further mediated. Possible options are as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;None&lt;/strong&gt;: If this is selected, no further mediation will be performed for the cloned messages.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Anonymous&lt;/strong&gt;: If this is selected, you can define an anonymous &lt;b&gt;sequence&lt;/b&gt; for the cloned messages by adding the required mediators as children to &lt;strong&gt;Target&lt;/strong&gt; in the mediator tree.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Pick From Registry&lt;/strong&gt;: If this is selected, you can refer to a predefined &lt;b&gt;sequence&lt;/b&gt; that is currently saved as a resource in the registry. Click either &lt;strong&gt;Configuration Registry&lt;/strong&gt; or &lt;strong&gt;Governance Registry&lt;/strong&gt; as relevant to select the required &lt;b&gt;sequence&lt;/b&gt; from the resource tree.&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Endpoint&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;The &lt;b&gt;endpoint&lt;/b&gt; to which the cloned messages should be sent. Possible options are as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;None&lt;/strong&gt; : If this is selected, the cloned messages are not sent to an &lt;b&gt;endpoint&lt;/b&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Anonymous&lt;/strong&gt; : If this is selected, you can define an anonymous endpoint within the iterate target configuration to which the cloned messages should be sent. Click the &lt;strong&gt;Add&lt;/strong&gt; link which appears after selecting this option to add the anonymous endpoint. &lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Pick from Registry&lt;/strong&gt; : If this is selected, you can refer to a predefined endpoint that is currently saved as a resource in the registry. Click either &lt;strong&gt;Configuration Registry&lt;/strong&gt; or &lt;strong&gt;Governance Registry&lt;/strong&gt; as relevant to select the required endpoint from the resource tree.&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+## Example
+
+In this example, the Clone Mediator clones messages and redirects them to a **Default** endpoint and an existing sequence.
+
+``` java
+&lt;clone xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+   &lt;target&gt;
+      &lt;endpoint name=&quot;endpoint_urn_uuid_73A47733EB1E6F30812921609540392-849227072&quot;&gt;
+         &lt;default /&gt;
+      &lt;/endpoint&gt;
+   &lt;/target&gt;
+   &lt;target sequence=&quot;test1&quot; /&gt;
+&lt;/clone&gt;
+```
+</body>
+</html>

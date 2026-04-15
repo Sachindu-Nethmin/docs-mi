@@ -1,0 +1,3607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>amazons3-connector-reference.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Amazon S3 Connector Reference
+
+The following operations allow you to work with the Amazon S3 Connector. Click an operation name to see parameter details and samples on how to use it.
+
+---
+
+## Initialize the connector
+
+To use the Amazon S3 connector, add the &lt;amazons3.init&gt; element in your configuration before carrying out any Amazon S3 operations. This Amazon S3 configuration authenticates with Amazon S3 by specifying the AWS access key ID and secret access key ID, which are used for every operation.
+
+??? note &quot;init&quot;
+    The init operation is used to initialize the connection to Amazon S3.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;awsAccessKeyId&lt;/td&gt;
+            &lt;td&gt;AWS access key ID.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;awsSecretAccessKey&lt;/td&gt;
+            &lt;td&gt;AWS secret access key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;name&lt;/td&gt;
+            &lt;td&gt;Unique name to identify the connection by.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;region&lt;/td&gt;
+            &lt;td&gt;Region which is used select a regional endpoint to make requests, e.g.: us-east-1.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;host&lt;/td&gt;
+            &lt;td&gt;The AWS API endpoint hostname to which you need to connect.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    &gt; **Note**: You can either pass credentials within init configuration or set the AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY as environment variables. The AWS SDK uses provider chains to look for AWS credentials in system/user environment variables.
+
+    To set these environment variables on Linux, macOS, or Unix, use export :
+    export AWS_ACCESS_KEY_ID=AKIXXXXXXXXXXA
+    export AWS_SECRET_ACCESS_KEY=qHZXXXXXXQc4oMQMnAOj+340XXxO2s
+
+    To set these environment variables on Windows, use set :
+    set AWS_ACCESS_KEY_ID=AKIXXXXXXXXXXA
+    set AWS_SECRET_ACCESS_KEY=qHZXXXXXXQc4oMQMnAOj+340XXxO2s
+
+    &gt; **Note**: If the application is running in an EC2 instance and credentials are not defined in the init configuration, the credentials will be obtained from the [IAM role](https://docs.amazonaws.cn/en_us/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html) assigned for the Amazon EC2 instance. This option is available only with Amazon S3 connector v2.0.2 and above.
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.init&gt;
+        &lt;awsAccessKeyId&gt;{$ctx:awsAccessKeyId}&lt;/awsAccessKeyId&gt;
+        &lt;awsSecretAccessKey&gt;{$ctx:awsSecretAccessKey}&lt;/awsSecretAccessKey&gt;
+        &lt;name&gt;{$ctx:connectionName}&lt;/name&gt;
+        &lt;region&gt;{$ctx:region}&lt;/region&gt;
+    &lt;/amazons3.init&gt;
+    ```
+
+---
+
+### Buckets
+
+??? note &quot;listBuckets&quot;
+    The listBuckets implementation returns a list of all buckets owned by the authenticated sender of the request. To authenticate a request, use a valid AWS Access Key ID that is registered with Amazon S3. Anonymous requests cannot list buckets, and a user cannot list buckets that were not created by that particular user.
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.listBuckets/&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;listBuckets/&gt;
+    ```
+
+
+??? note &quot;createBucket&quot;
+    The createBucket operation creates a new bucket. To create a bucket, the user should be registered with Amazon S3 and have a valid AWS Access Key ID to authenticate requests. Anonymous requests are never allowed to create buckets. By creating the bucket, the user becomes the owner of the bucket. Not every string is an acceptable bucket name. For information on bucket naming restrictions, see [Working with Amazon S3 Buckets](http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingBucket.html). By default, the bucket is created in the US Standard region. The user can optionally specify a region in the request body. For example, if the user resides in Europe, the user will probably find it advantageous to create buckets in the EU (Ireland) region. For more information, see [How to Select a Region for Your Buckets](http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingBucket.html#access-bucket-intro). See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/CreateBucketRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketRegion&lt;/td&gt;
+            &lt;td&gt;Region for the created bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;acl&lt;/td&gt;
+            &lt;td&gt;The canned ACL to apply to the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantRead&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to list the objects in the bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantWrite&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to create, overwrite, and delete any object in the bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantReadACP&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to read the bucket ACL.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantWriteACP&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to write the ACL for the applicable bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantFullControl&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees the READ, WRITE, READ_ACP, and WRITE_ACP permissions on the bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectLockEnabledForBucket&lt;/td&gt;
+            &lt;td&gt;The object lock mode that you want to apply to the copied object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.createBucket&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;bucketRegion&gt;{$ctx:bucketRegion}&lt;/bucketRegion&gt;
+        &lt;acl&gt;{$ctx:acl}&lt;/acl&gt;
+        &lt;grantFullControl&gt;{$ctx:grantFullControl}&lt;/grantFullControl&gt;
+        &lt;grantRead&gt;{$ctx:grantRead}&lt;/grantRead&gt;
+        &lt;grantReadACP&gt;{$ctx:grantReadACP}&lt;/grantReadACP&gt;
+        &lt;grantWrite&gt;{$ctx:grantWrite}&lt;/grantWrite&gt;
+        &lt;grantWriteACP&gt;{$ctx:grantWriteACP}&lt;/grantWriteACP&gt;
+        &lt;objectLockEnabledForBucket&gt;{$ctx:objectLockEnabledForBucket}&lt;/objectLockEnabledForBucket&gt;
+    &lt;/amazons3.createBucket&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;createBucket&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;bucketRegion&gt;us-east-2&lt;/bucketRegion&gt;
+        &lt;objectLockEnabledForBucket&gt;false&lt;/objectLockEnabledForBucket&gt;
+    &lt;/createBucket&gt;
+    ```
+
+
+??? note &quot;putBucketWebsite&quot;
+    Sets the configuration of the website that is specified in the website subresource.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;websiteConfig&lt;/td&gt;
+            &lt;td&gt;Website configuration information. For information on the elements you use in the request to specify the website configuration, see [here](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/PutBucketWebsiteRequest.html).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.putBucketWebsite&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;websiteConfig&gt;{$ctx:websiteConfig}&lt;/websiteConfig&gt;
+    &lt;/amazons3.putBucketWebsite&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;putBucketWebsite&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;WebsiteConfiguration&gt;
+            &lt;IndexDocument&gt;
+                &lt;Suffix&gt;index2.html&lt;/Suffix&gt;
+            &lt;/IndexDocument&gt;
+            &lt;ErrorDocument&gt;
+                &lt;Key&gt;Error2.html&lt;/Key&gt;
+            &lt;/ErrorDocument&gt;
+            &lt;RoutingRules&gt;
+                &lt;RoutingRule&gt;
+                    &lt;Condition&gt;
+                        &lt;KeyPrefixEquals&gt;docs/&lt;/KeyPrefixEquals&gt;
+                    &lt;/Condition&gt;
+                    &lt;Redirect&gt;
+                        &lt;ReplaceKeyPrefixWith&gt;documents/&lt;/ReplaceKeyPrefixWith&gt;
+                    &lt;/Redirect&gt;
+                &lt;/RoutingRule&gt;
+                &lt;RoutingRule&gt;
+                    &lt;Condition&gt;
+                        &lt;KeyPrefixEquals&gt;images/&lt;/KeyPrefixEquals&gt;
+                    &lt;/Condition&gt;
+                    &lt;Redirect&gt;
+                        &lt;ReplaceKeyPrefixWith&gt;documents/&lt;/ReplaceKeyPrefixWith&gt;
+                    &lt;/Redirect&gt;
+                &lt;/RoutingRule&gt;
+            &lt;/RoutingRules&gt;
+        &lt;/WebsiteConfiguration&gt;
+    &lt;/putBucketWebsite&gt;
+    ```
+
+??? note &quot;putBucketPolicy&quot;
+    The putBucketPolicy operation adds or replaces a policy on a bucket. If the bucket already has a policy, the one in this request completely replaces it. To perform this operation, you must be the bucket owner.
+
+    If you are not the bucket owner but have PutBucketPolicy permissions on the bucket, Amazon S3 returns a 405 Method Not Allowed. In all other cases, for a PUT bucket policy request that is not from the bucket owner, Amazon S3 returns 403 Access Denied. There are restrictions about who can create bucket policies and which objects in a bucket they can apply to.
+
+    See the [PutBucketPolicy documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/PutBucketPolicyRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketPolicy&lt;/td&gt;
+            &lt;td&gt;Policy of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;confirmRemoveSelfBucketAccess&lt;/td&gt;
+            &lt;td&gt;Use this to change this bucket policy in the future.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.putBucketPolicy&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;bucketPolicy&gt;{$ctx:bucketPolicy}&lt;/bucketPolicy&gt;
+        &lt;confirmRemoveSelfBucketAccess&gt;{$ctx:confirmRemoveSelfBucketAccess}&lt;/confirmRemoveSelfBucketAccess&gt;
+    &lt;/amazons3.putBucketPolicy&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;awsAccessKeyId&quot;: &quot;AWS access key id here&quot;,
+        &quot;awsSecretAccessKey&quot;: &quot;AWS secret access key here&quot;,
+        &quot;region&quot;:&quot;us-east-2&quot;,
+        &quot;connectionName&quot;: &quot;amazonS3&quot;,
+        &quot;bucketName&quot;: &quot;signv4test&quot;,
+        &quot;bucketPolicy&quot;: {
+                    &quot;Version&quot;:&quot;2012-10-17&quot;,
+                    &quot;Statement&quot;:[{
+                        &quot;Sid&quot;:&quot;AddPerm&quot;,
+                        &quot;Effect&quot;:&quot;Allow&quot;,
+                        &quot;Principal&quot;: {
+                                &quot;AWS&quot;: [&quot;*&quot;]
+                            },
+                        &quot;Action&quot;:[&quot;s3:*&quot;],
+                        &quot;Resource&quot;:[&quot;arn:aws:s3:::signv4test/*&quot;]
+                        }]
+                    },
+        &quot;confirmRemoveSelfBucketAccess&quot;:&quot;&quot;
+    }
+    ```
+
+??? note &quot;putBucketACL&quot;
+    The putBucketACL operation uses the ACL sub-resource to set the permissions on an existing bucket using access control lists (ACL). See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/PutBucketAclRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;accessControlList&lt;/td&gt;
+            &lt;td&gt;Container for ACL information, which includes the following:
+                &lt;ul&gt;
+                    &lt;li&gt;Grant: Container for the grantee and permissions.
+                        &lt;ul&gt;
+                            &lt;li&gt;Grantee: The subject whose permissions are being set.
+                                &lt;ul&gt;
+                                    &lt;li&gt;ID: ID of the grantee.&lt;/li&gt;
+                                    &lt;li&gt;DisplayName: Screen name of the grantee.&lt;/li&gt;
+                                &lt;/ul&gt;
+                            &lt;/li&gt;
+                            &lt;li&gt;Permission: Specifies the permission to give to the grantee.&lt;/li&gt;
+                        &lt;/ul&gt;
+                    &lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.putBucketACL&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;accessControlList&gt;{$ctx:accessControlList}&lt;/accessControlList&gt;
+    &lt;/amazons3.putBucketACL&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;putBucketACL&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;accessControlList&gt;
+            &lt;Grants&gt;
+                &lt;Grant&gt;
+                    &lt;Grantee xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:type=&quot;CanonicalUser&quot;&gt;
+                        &lt;ID&gt;9a48e6b16816cc75df306d35bb5d0bd0778b61fbf49b8ef4892143197c84a867&lt;/ID&gt;
+                        &lt;DisplayName&gt;admin+aws+connectors+secondary&lt;/DisplayName&gt;
+                    &lt;/Grantee&gt;
+                    &lt;Permission&gt;FULL_CONTROL&lt;/Permission&gt;
+                &lt;/Grant&gt;
+                &lt;Grant&gt;
+                    &lt;Grantee xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:type=&quot;Group&quot;&gt;
+                        &lt;URI xmlns=&quot;&quot;&gt;http://acs.amazonaws.com/groups/global/AllUsers&lt;/URI&gt;
+                    &lt;/Grantee&gt;
+                    &lt;Permission xmlns=&quot;&quot;&gt;READ&lt;/Permission&gt;
+                &lt;/Grant&gt;
+            &lt;/Grants&gt;
+        &lt;/accessControlList&gt;
+    &lt;/putBucketACL&gt;
+    ```
+
+??? note &quot;putBucketLifecycleConfiguration&quot;
+    The putBucketLifecycleConfiguration operation uses the acl subresource to set the permissions on an existing bucket using access control lists (ACL). See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/PutBucketLifecycleConfigurationRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;lifecycleConfiguration&lt;/td&gt;
+            &lt;td&gt;Container for lifecycle rules, which includes the following:
+                &lt;ul&gt;
+                    &lt;li&gt;Rule: Container for a lifecycle rule.
+                        &lt;ul&gt;
+                            &lt;li&gt;ID: Unique identifier for the rule. The value cannot be longer than 255 characters.&lt;/li&gt;
+                            &lt;li&gt;Prefix: Object key prefix identifying one or more objects to which the rule applies.&lt;/li&gt;
+                            &lt;li&gt;Status: If Enabled, Amazon S3 executes the rule as scheduled. If Disabled, Amazon S3 ignores the rule.&lt;/li&gt;
+                            &lt;li&gt;Transition: This action specifies a period in the objects&#x27; lifetime when Amazon S3 should transition them to the STANDARD_IA or the GLACIER storage class.
+                                &lt;ul&gt;
+                                    &lt;li&gt;Days: Specifies the number of days after object creation when the specific rule action takes effect.&lt;/li&gt;
+                                    &lt;li&gt;StorageClass: Specifies the Amazon S3 storage class to which you want the object to transition.&lt;/li&gt;
+                                &lt;/ul&gt;
+                            &lt;/li&gt;
+                            &lt;li&gt;Expiration: This action specifies a period in an object&#x27;s lifetime when Amazon S3 should take the appropriate expiration action.
+                                &lt;ul&gt;
+                                    &lt;li&gt;Days: Specifies the number of days after object creation when the specific rule action takes effect.&lt;/li&gt;
+                                &lt;/ul&gt;
+                            &lt;/li&gt;
+                        &lt;/ul&gt;
+                    &lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.putBucketLifecycleConfiguration&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;lifecycleConfiguration&gt;{$ctx:lifecycleConfiguration}&lt;/lifecycleConfiguration&gt;
+    &lt;/amazons3.putBucketLifecycleConfiguration&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;putBucketLifecycleConfiguration&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;lifecycleConfiguration&gt;
+            &lt;Rule&gt;
+                &lt;ID&gt;id1&lt;/ID&gt;
+                &lt;Prefix&gt;documents/&lt;/Prefix&gt;
+                &lt;Status&gt;Enabled&lt;/Status&gt;
+                &lt;Transition&gt;
+                    &lt;Days&gt;30&lt;/Days&gt;
+                    &lt;StorageClass&gt;GLACIER&lt;/StorageClass&gt;
+                &lt;/Transition&gt;
+            &lt;/Rule&gt;
+            &lt;Rule&gt;
+                &lt;ID&gt;id2&lt;/ID&gt;
+                &lt;Prefix&gt;logs/&lt;/Prefix&gt;
+                &lt;Status&gt;Enabled&lt;/Status&gt;
+                &lt;Expiration&gt;
+                    &lt;Days&gt;365&lt;/Days&gt;
+                &lt;/Expiration&gt;
+            &lt;/Rule&gt;
+        &lt;/lifecycleConfiguration&gt;
+    &lt;/putBucketLifecycleConfiguration&gt;
+    ```
+
+??? note &quot;putBucketReplication&quot;
+    The putBucketReplication operation uses the acl subresource to set the permissions on an existing bucket using access control lists (ACL). See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/PutBucketReplicationRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;replicationConfiguration&lt;/td&gt;
+            &lt;td&gt;Container for replication configuration (Amazon Resource Name (ARN) of an IAM role and set of replication rules):
+                &lt;ul&gt;
+                    &lt;li&gt;Rule: Container for information about a particular replication rule.
+                        &lt;ul&gt;
+                            &lt;li&gt;ID: Unique identifier for the rule. The value cannot be longer than 255 characters.&lt;/li&gt;
+                            &lt;li&gt;Prefix: Object key prefix identifying one or more objects to which the rule applies.&lt;/li&gt;
+                            &lt;li&gt;Status: The rule is ignored if status is not Enabled..&lt;/li&gt;
+                            &lt;li&gt;Destination: Container for destination information.
+                                &lt;ul&gt;
+                                    &lt;li&gt;Bucket:Amazon resource name (ARN) of the bucket where you want Amazon S3 to store replicas of the object identified by the rule.&lt;/li&gt;
+                                &lt;/ul&gt;
+                            &lt;/li&gt;
+                        &lt;/ul&gt;
+                    &lt;/li&gt;
+                    &lt;li&gt;Role: Amazon Resource Name (ARN) of an IAM role for Amazon S3 to assume when replicating the objects.&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.putBucketReplication&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;replicationConfiguration&gt;{$ctx:replicationConfiguration}&lt;/replicationConfiguration&gt;
+    &lt;/amazons3.putBucketReplication&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;putBucketReplication&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;ReplicationConfiguration&gt;
+            &lt;Rule&gt;
+                &lt;ID&gt;id1&lt;/ID&gt;
+                &lt;Prefix&gt;documents/&lt;/Prefix&gt;
+                &lt;Status&gt;Enabled&lt;/Status&gt;
+                &lt;Destination&gt;
+                    &lt;Bucket&gt;arn:aws:s3:::signv4testq23aa1&lt;/Bucket&gt;
+                &lt;/Destination&gt;
+            &lt;/Rule&gt;
+        &lt;/ReplicationConfiguration&gt;
+    &lt;/putBucketReplication&gt;
+    ```
+
+??? note &quot;putBucketTagging&quot;
+    The putBucketTagging operation uses the tagging subresource to add a set of tags to an existing bucket. Use tags to organize your AWS bill to reflect your own cost structure. To do this, sign up to get your AWS account bill with tag key values included. Then, to see the cost of combined resources, organize your billing information according to resources with the same tag key values. For example, you can tag several resources with a specific application name, and then organize your billing information to see the total cost of that application across several services. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/PutBucketTaggingRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tagSet&lt;/td&gt;
+            &lt;td&gt;Container for a set of tags, which includes the following:
+                &lt;ul&gt;
+                    &lt;li&gt;Tag: Container for tag information.
+                        &lt;ul&gt;
+                            &lt;li&gt;Key: Name of the tag.&lt;/li&gt;
+                            &lt;li&gt;Value: Value of the tag.&lt;/li&gt;
+                        &lt;/ul&gt;
+                    &lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.putBucketTagging&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;tagSet&gt;{$ctx:tagSet}&lt;/tagSet&gt;
+    &lt;/amazons3.putBucketTagging&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;putBucketTagging&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;TagSet&gt;
+            &lt;Tag&gt;
+                &lt;Key&gt;Project&lt;/Key&gt;
+                &lt;Value&gt;Project One&lt;/Value&gt;
+            &lt;/Tag&gt;
+            &lt;Tag&gt;
+                &lt;Key&gt;User&lt;/Key&gt;
+                &lt;Value&gt;jsmith&lt;/Value&gt;
+            &lt;/Tag&gt;
+        &lt;/TagSet&gt;
+    &lt;/putBucketTagging&gt;
+    ```
+
+??? note &quot;putBucketRequestPayment&quot;
+    The putBucketRequestPayment operation uses the requestPayment subresource to set the request payment configuration of a bucket. By default, the bucket owner pays for downloads from the bucket. This configuration parameter enables the bucket owner (only) to specify that the person requesting the download will be charged for the download. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/PutBucketRequestPaymentRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;payer&lt;/td&gt;
+            &lt;td&gt;Specifies who pays for the download and request fees.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.putBucketRequestPayment&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;payer&gt;{$ctx:payer}&lt;/payer&gt;
+    &lt;/amazons3.putBucketRequestPayment&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;putBucketRequestPayment&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;payer&gt;Requester&lt;/payer&gt;
+    &lt;/putBucketRequestPayment&gt;
+    ```
+
+??? note &quot;putBucketVersioning&quot;
+    The putBucketVersioning operation uses the requestPayment subresource to set the request payment configuration of a bucket. By default, the bucket owner pays for downloads from the bucket. This configuration parameter enables the bucket owner (only) to specify that the person requesting the download will be charged for the download. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/PutBucketVersioningRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;status&lt;/td&gt;
+            &lt;td&gt;Sets the versioning state of the bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;mfa&lt;/td&gt;
+            &lt;td&gt;The concatenation of the authentication device&#x27;s serial number, a space, and the value that is displayed on your authentication device.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;mfaDelete&lt;/td&gt;
+            &lt;td&gt;Specifies whether MFA Delete is enabled in the bucket versioning configuration.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.putBucketVersioning&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;status&gt;{$ctx:status}&lt;/status&gt;
+        &lt;mfaDelete&gt;{$ctx:mfaDelete}&lt;/mfaDelete&gt;
+    &lt;/amazons3.putBucketVersioning&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;putBucketVersioning&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;status&gt;Enabled&lt;/status&gt;
+    &lt;/putBucketVersioning&gt;
+    ```
+
+??? note &quot;deleteBucket&quot;
+    The deleteBucket operation deletes the bucket named in the URI. All objects (including all object versions and Delete Markers) in the bucket must be deleted before the bucket itself can be deleted. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/DeleteBucketRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.deleteBucket&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.deleteBucket&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;deleteBucket&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/deleteBucket&gt;
+    ```
+
+??? note &quot;deleteBucketPolicy&quot;
+    The deleteBucketPolicy operation deletes the policy on a specified bucket. To use the operation, you must have DeletePolicy permissions on the specified bucket and be the bucket owner. If there are no DeletePolicy permissions, Amazon S3 returns a 403 Access Denied error. If there is the correct permission, but you are not the bucket owner, Amazon S3 returns a 405 Method Not Allowed error. If the bucket does not have a policy, Amazon S3 returns a 204 No Content error. There are restrictions about who can create bucket policies and which objects in a bucket they can apply to. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/DeleteBucketPolicyRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.deleteBucketPolicy&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.deleteBucketPolicy&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;deleteBucketPolicy&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/deleteBucketPolicy&gt;
+    ```
+
+??? note &quot;deleteBucketCORS&quot;
+    The deleteBucketCORS operation deletes the CORS configuration information set for the bucket. To use this operation, you must have permission to perform the s3:PutCORSConfiguration action. The bucket owner has this permission by default and can grant this permission to others. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/DeleteBucketCorsRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.deleteBucketCORS&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.deleteBucketCORS&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;deleteBucketCORS&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/deleteBucketCORS&gt;
+    ```
+
+??? note &quot;deleteBucketLifecycle&quot;
+    The deleteBucketLifecycle operation deletes the lifecycle configuration from the specified bucket. Amazon S3 removes all the lifecycle configuration rules in the lifecycle subresource associated with the bucket. Your objects never expire, and Amazon S3 no longer automatically deletes any objects on the basis of rules contained in the deleted lifecycle configuration. To use this operation, you must have permission to perform the s3:PutLifecycleConfiguration action. By default, the bucket owner has this permission and the bucket owner can grant this permission to others. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/DeleteBucketLifecycleRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.deleteBucketLifecycle&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.deleteBucketLifecycle&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;deleteBucketLifecycle&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/deleteBucketLifecycle&gt;
+    ```
+
+??? note &quot;deleteBucketReplication&quot;
+    The deleteBucketReplication operation deletes the replication sub-resource associated with the specified bucket. This operation requires permission for the s3:DeleteReplicationConfiguration action. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/DeleteBucketReplicationRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.deleteBucketReplication&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.deleteBucketReplication&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;deleteBucketReplication&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/deleteBucketReplication&gt;
+    ```
+
+??? note &quot;deleteBucketTagging&quot;
+    The deleteBucketTagging operation uses the tagging sub-resource to remove a tag set from the specified bucket. To use this operation, you must have permission to perform the s3:PutBucketTagging action. By default, the bucket owner has this permission and can grant this permission to others. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/DeleteBucketTaggingRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.deleteBucketTagging&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.deleteBucketTagging&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;deleteBucketTagging&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/deleteBucketTagging&gt;
+    ```
+
+??? note &quot;deleteBucketWebsiteConfiguration&quot;
+    The deleteBucketWebsiteConfiguration operation removes the website configuration for a bucket. Amazon S3 returns a 207 OK response upon successfully deleting a website configuration on the specified bucket. It will give a 200 response if the website configuration you are trying to delete does not exist on the bucket, and a 404 response if the bucket itself does not exist. This operation requires the S3: DeleteBucketWebsite permission. By default, only the bucket owner can delete the website configuration attached to a bucket. However, bucket owners can grant other users permission to delete the website configuration by writing a bucket policy granting them the S3: DeleteBucketWebsite permission. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/DeleteBucketWebsiteRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.deleteBucketWebsiteConfiguration&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.deleteBucketWebsiteConfiguration&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;deleteBucketWebsiteConfiguration&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/deleteBucketWebsiteConfiguration&gt;
+    ```
+
+??? note &quot;listObjects&quot;
+    The listObjects operation returns some or all (up to 1000) of the objects in a bucket. The request parameters act as selection criteria to return a subset of the objects in a bucket. To use this implementation of the operation, the user must have READ access to the bucket. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/ListObjectsRequest.html)) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;delimiter&lt;/td&gt;
+            &lt;td&gt;A delimiter is a character used to group keys. All keys that contain the same string between the prefix, if specified, and the first occurrence of the delimiter after the prefixes are grouped under a single result element CommonPrefixes. If the prefix parameter is not specified, the substring starts at the beginning of the key. The keys that are grouped under the CommonPrefixesresult element are not returned elsewhere in the response.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;encodingType&lt;/td&gt;
+            &lt;td&gt;Requests Amazon S3 to encode the response and specifies the encoding method to use. An object key can contain any Unicode character. However, XML 1.0 parser cannot parse some characters such as characters with an ASCII value from 0 to 10. For characters that are not supported in XML 1.0, this parameter can be added to request Amazon S3 to encode the keys in the response.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;marker&lt;/td&gt;
+            &lt;td&gt;Specifies the key to start with when listing objects in a bucket. Amazon S3 lists objects in alphabetical order.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxKeys&lt;/td&gt;
+            &lt;td&gt;Sets the maximum number of keys returned in the response body. The response might contain fewer keys but will never contain more.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;prefix&lt;/td&gt;
+            &lt;td&gt;Limits the response to keys that begin with the specified prefix.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.listObjects&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;delimiter&gt;{$ctx:delimiter}&lt;/delimiter&gt;
+        &lt;encodingType&gt;{$ctx:encodingType}&lt;/encodingType&gt;
+        &lt;marker&gt;{$ctx:marker}&lt;/marker&gt;
+        &lt;maxKeys&gt;{$ctx:maxKeys}&lt;/maxKeys&gt;
+        &lt;prefix&gt;{$ctx:prefix}&lt;/prefix&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+    &lt;/amazons3.listObjects&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;listObjects&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;maxKeys&gt;3&lt;/maxKeys&gt;
+        &lt;encodingType&gt;The name of the bucket.&lt;/encodingType&gt;
+        &lt;delimiter&gt;images&lt;/delimiter&gt;
+    &lt;/listObjects&gt;
+    ```
+
+??? note &quot;getBucketLifecycleConfiguration&quot;
+    The getBucketLifecycleConfiguration operation returns the lifecycle configuration information set on the bucket. To use this operation, permissions should be given to perform the s3:GetLifecycleConfiguration action. The bucket owner has this permission by default and can grant this permission to others. There is usually some time lag before lifecycle configuration deletion is fully propagated to all the Amazon S3 systems. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetBucketLifecycleConfigurationRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getBucketLifecycleConfiguration&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.getBucketLifecycleConfiguration&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getBucketLifecycleConfiguration&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/getBucketLifecycleConfiguration&gt;
+    ```
+
+??? note &quot;putBucketCORS&quot;
+    The putBucketCORS operation returns the CORS configuration information set for the bucket. To use this operation, you must have permission to perform the s3:putBucketCORS action. By default, the bucket owner has this permission and can grant it to others. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/PutBucketCorsRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;corsConfiguration&lt;/td&gt;
+            &lt;td&gt;Container for up to 100 CORSRules elements.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.putBucketCORS&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;corsConfiguration&gt;{$ctx:corsConfiguration}&lt;/corsConfiguration&gt;
+    &lt;/amazons3.putBucketCORS&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;putBucketCORS&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;CORSConfiguration&gt;
+            &lt;CORSRule&gt;
+                &lt;AllowedOrigin&gt;*&lt;/AllowedOrigin&gt;
+                &lt;AllowedMethod&gt;GET&lt;/AllowedMethod&gt;
+                &lt;AllowedHeader&gt;*&lt;/AllowedHeader&gt;
+                &lt;MaxAgeSeconds&gt;3000&lt;/MaxAgeSeconds&gt;
+            &lt;/CORSRule&gt;
+        &lt;/CORSConfiguration&gt;
+    &lt;/putBucketCORS&gt;
+    ```
+
+??? note &quot;getBucketCORS&quot;
+    The getBucketCORS operation returns the CORS configuration information set for the bucket. To use this operation, you must have permission to perform the s3:getBucketCORS action. By default, the bucket owner has this permission and can grant it to others. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetBucketCorsRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getBucketCORS&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.getBucketCORS&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getBucketCORS&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/getBucketCORS&gt;
+    ```
+
+??? note &quot;getBucketLocation&quot;
+    The getBucketLocation operation returns the lifecycle configuration information set on the bucket. To use this operation, you must be the bucket owner. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetBucketLocationRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getBucketLocation&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.getBucketLocation&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getBucketLocation&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/getBucketLocation&gt;
+    ```
+
+??? note &quot;getBucketLogging&quot;
+    The getBucketLogging operation returns the logging status of a bucket and the permissions users have to view and modify that status. To use this operation, you must be the bucket owner. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetBucketLoggingRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getBucketLogging&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.getBucketLogging&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getBucketLogging&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/getBucketLogging&gt;
+    ```
+
+??? note &quot;getBucketNotificationConfiguration&quot;
+    The getBucketNotificationConfiguration operation returns the lifecycle configuration information set on the bucket. To use this operation, you must be the bucket owner to read the notification configuration of a bucket. However, the bucket owner can use a bucket policy to grant permission to other users to read this configuration with the s3:getBucketNotificationConfiguration permission. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetBucketNotificationConfigurationRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getBucketNotificationConfiguration&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.getBucketNotificationConfiguration&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getBucketNotificationConfiguration&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/getBucketNotificationConfiguration&gt;
+    ```
+
+??? note &quot;getBucketTagging&quot;
+    The getBucketTagging operation returns the lifecycle configuration information set on the bucket. To use this operation, you must have permission to perform the s3:GetBucketTagging action. By default, the bucket owner has this permission and can grant this permission to others. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetBucketTaggingRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getBucketTagging&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.getBucketTagging&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getBucketTagging&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/getBucketTagging&gt;
+    ```
+
+??? note &quot;getBucketReplication&quot;
+    The getBucketReplication operation returns the lifecycle configuration information set on the bucket. To use this operation, you must have permission to perform the s3:GetReplicationConfiguration action. For more information about permissions, go to Using Bucket Policies and User Policies in the Amazon Simple Storage Service Developer Guide. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetBucketReplicationRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getBucketReplication&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.getBucketReplication&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getBucketReplication&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/getBucketReplication&gt;
+    ```
+
+??? note &quot;getBucketPolicy&quot;
+    The getBucketPolicy operation returns the policy of a specified bucket. To use this operation, the user must have GetPolicy permissions on the specified bucket, and the user must be the bucket owner. If the user does not have GetPolicy permissions, Amazon S3 returns a 403 Access Denied error. If the user has correct permissions, but the user is not the bucket owner, Amazon S3 returns a 405 Method Not Allowed error. If the bucket does not have a policy, Amazon S3 returns a 404 Policy Not found error. There are restrictions about who can create bucket policies and which objects in a bucket they can apply to. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetBucketPolicyRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getBucketPolicy&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.getBucketPolicy&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getBucketPolicy&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/getBucketPolicy&gt;
+    ```
+
+??? note &quot;listObjectVersions&quot;
+    The listObjectVersions operation lists metadata about all of the versions of objects in a bucket. Request parameters can be used as selection criteria to return metadata about a subset of all the object versions. To use this operation, the user must have READ access to the bucket. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/ListObjectVersionsRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;delimiter&lt;/td&gt;
+            &lt;td&gt;A delimiter is a character used to group keys.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;encodingType&lt;/td&gt;
+            &lt;td&gt;Requests Amazon S3 to encode the response and specifies the encoding method to use.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;keyMarker&lt;/td&gt;
+            &lt;td&gt;Specifies the key in the bucket that you want to start listing from. See also versionIdMarker below.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxKeys&lt;/td&gt;
+            &lt;td&gt;Sets the maximum number of keys returned in the response body.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;prefix&lt;/td&gt;
+            &lt;td&gt;Limits the response to keys that begin with the specified prefix.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;versionIdMarker&lt;/td&gt;
+            &lt;td&gt;Specifies the object version you want to start listing from.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.listObjectVersions&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;delimiter&gt;{$ctx:delimiter}&lt;/delimiter&gt;
+        &lt;encodingType&gt;{$ctx:encodingType}&lt;/encodingType&gt;
+        &lt;keyMarker&gt;{$ctx:keyMarker}&lt;/keyMarker&gt;
+        &lt;maxKeys&gt;{$ctx:maxKeys}&lt;/maxKeys&gt;
+        &lt;prefix&gt;{$ctx:prefix}&lt;/prefix&gt;
+        &lt;versionIdMarker&gt;{$ctx:versionIdMarker}&lt;/versionIdMarker&gt;
+    &lt;/amazons3.listObjectVersions&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;listObjectVersions&gt;
+        &lt;bucketName&gt;testkeerthu1234&lt;/bucketName&gt;
+        &lt;delimiter&gt;/&lt;/delimiter&gt;
+        &lt;maxKeys&gt;3&lt;/maxKeys&gt;
+        &lt;prefix&gt;images&lt;/prefix&gt;
+    &lt;/listObjectVersions&gt;
+    ```
+
+??? note &quot;getBucketRequestPayment&quot;
+    The getBucketRequestPayment operation returns the request payment configuration of a bucket. To use this operation, the user must be the bucket owner. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetBucketRequestPaymentRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getBucketRequestPayment&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.getBucketRequestPayment&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getBucketRequestPayment&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/getBucketRequestPayment&gt;
+    ```
+
+??? note &quot;getBucketVersioning&quot;
+    The getBucketVersioning operation returns the versioning state of a bucket. To retrieve the versioning state of a bucket, the user must be the bucket owner. This implementation also returns the MFA Delete status of the versioning state. If the MFA Delete status is enabled, the bucket owner must use an authentication device to change the versioning state of the bucket. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetBucketVersioningRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getBucketVersioning&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.getBucketVersioning&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getBucketVersioning&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/getBucketVersioning&gt;
+    ```
+
+??? note &quot;getBucketWebsite&quot;
+    The getBucketWebsite operation returns the website configuration associated with a bucket. To host the website on Amazon S3, a bucket can be configured as a website by adding a website configuration. This operation requires the S3:GetBucketWebsite permission. By default, only the bucket owner can read the bucket website configuration. However, bucket owners can allow other users to read the website configuration by writing a bucket policy granting them the S3:GetBucketWebsite permission. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetBucketWebsiteRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getBucketWebsite&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.getBucketWebsite&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getBucketWebsite&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/getBucketWebsite&gt;
+    ```
+
+??? note &quot;getBucketACL&quot;
+    The getBucketACL operation returns the access control list (ACL) of a bucket. To return the ACL of the bucket, the user must have READ_ACP access to the bucket. If READ_ACP permission is granted to the anonymous user, you can return the ACL of the bucket without the authorization. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetBucketAclRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getBucketACL&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.getBucketACL&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getBucketACL&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/getBucketACL&gt;
+    ```
+??? note &quot;headBucket&quot;
+    The headBucket operation is useful to determine if a bucket exists and you have permission to access it. The operation returns a 200 OK if the bucket exists and you have permission to access it. Otherwise, the operation might return responses such as 404 Not Found and 403 Forbidden. See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/HeadBucketRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.headBucket&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+    &lt;/amazons3.headBucket&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;headBucket&gt;
+        &lt;bucketName&gt;1513162931643testconbkt2&lt;/bucketName&gt;
+    &lt;/headBucket&gt;
+    ```
+
+??? note &quot;listMultipartUploads&quot;
+    The listMultipartUploads operation lists in-progress multipart uploads. A multipart upload is in progress when it has been initiated using the Initiate Multipart Upload request but has not yet been completed or aborted. It returns a default value of 1000 multipart uploads in the response. The number of uploads can be further limited in a response by specifying the maxUploads property. If additional multipart uploads satisfy the list criteria, the response will contain an &quot;IsTruncated&quot; element with the value &quot;true&quot;. To list the additional multipart uploads, use the keyMarker and uploadIdMarker request parameters.
+
+    In the response, the uploads are sorted by key. If the application has initiated more than one multipart upload using the same object key, uploads in the response are first sorted by key. Additionally, uploads are sorted in ascending order within each key by the upload initiation time.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/glacier/model/ListMultipartUploadsRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;delimiter&lt;/td&gt;
+            &lt;td&gt;A delimiter is a character you use to group keys. All keys that contain the same string between the prefix, if specified, and the first occurrence of the delimiter after the prefix are grouped under a single result element CommonPrefixes. If you do not specify the prefix parameter, the substring starts at the beginning of the key. The keys that are grouped under the CommonPrefixesresult element are not returned elsewhere in the response.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;encodingType&lt;/td&gt;
+            &lt;td&gt;Requests Amazon S3 to encode the response and specifies the encoding method to use. An object key can contain any Unicode character. However, XML 1.0 parser cannot parse some characters such as characters with an ASCII value from 0 to 10. For characters that are not supported in XML 1.0, you can add this parameter to request Amazon S3 to encode the keys in the response.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxUploads&lt;/td&gt;
+            &lt;td&gt;Sets the maximum number of multipart uploads, from 1 to 1,000, to return in the response body. 1,000 is the maximum number of uploads that can be returned in a response.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;keyMarker&lt;/td&gt;
+            &lt;td&gt;Specifies the key to start with when listing objects in a bucket. Amazon S3 lists objects in alphabetical order.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;prefix&lt;/td&gt;
+            &lt;td&gt;Limits the response to keys that begin with the specified prefix.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;uploadIdMarker&lt;/td&gt;
+            &lt;td&gt;Specifies the multipart upload after which listing should begin.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.listMultipartUploads&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;delimiter&gt;{$ctx:delimiter}&lt;/delimiter&gt;
+        &lt;encodingType&gt;{$ctx:encodingType}&lt;/encodingType&gt;
+        &lt;maxUploads&gt;{$ctx:maxUploads}&lt;/maxUploads&gt;
+        &lt;keyMarker&gt;{$ctx:keyMarker}&lt;/keyMarker&gt;
+        &lt;prefix&gt;{$ctx:prefix}&lt;/prefix&gt;
+        &lt;uploadIdMarker&gt;{$ctx:uploadIdMarker}&lt;/uploadIdMarker&gt;
+    &lt;/amazons3.listMultipartUploads&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;listMultipartUploads&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+    &lt;/listMultipartUploads&gt;
+    ```
+
+### Objects
+
+??? note &quot;deleteObject&quot;
+    The deleteObject operation removes the null version (if there is one) of an object and inserts a delete marker, which becomes the latest version of the object. If there is no null version, Amazon S3 does not remove any objects.
+
+    If the object you want to delete is in a bucket where the bucket versioning configuration is MFA Delete enabled, you must include the mfa in the request. For more information about MFA Delete, see Using MFA Delete .
+
+    Following is the proxy configuration for init and deleteObject. The init section has connection parameters.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/clouddirectory/model/DeleteObjectRequest.html) for more information.
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;The name of the object to be deleted.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;versionId&lt;/td&gt;
+            &lt;td&gt;Version Id of an object to remove a specific object version.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bypassGovernanceRetention&lt;/td&gt;
+            &lt;td&gt;Indicates whether S3 Object Lock should bypass Governance-mode restrictions to process this operation.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;mfa&lt;/td&gt;
+            &lt;td&gt;Required to permanently delete a versioned object if versioning is configured with MFA Delete enabled. The value is the concatenation of the authentication device&#x27;s serial number, a space, and the value displayed on your authentication device.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    &gt; **Note**: To remove a specific version, the user must be the bucket owner and must use the versionId sub-resource, which permanently deletes the version.
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.init&gt;
+        &lt;awsAccessKeyId&gt;{$ctx:awsAccessKeyId}&lt;/awsAccessKeyId&gt;
+        &lt;awsSecretAccessKey&gt;{$ctx:awsSecretAccessKey}&lt;/awsSecretAccessKey&gt;
+        &lt;name&gt;{$ctx:connectionName}&lt;/name&gt;
+        &lt;region&gt;{$ctx:region}&lt;/region&gt;
+    &lt;/amazons3.init&gt;
+
+    &lt;amazons3.deleteObject&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;objectKey&gt;{$ctx:objectKey}&lt;/objectKey&gt;
+        &lt;versionId&gt;{$ctx:versionId}&lt;/versionId&gt;
+        &lt;bypassGovernanceRetention&gt;{$ctx:bypassGovernanceRetention}&lt;/bypassGovernanceRetention&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+    &lt;/amazons3.deleteObject&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;deleteObject&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;objectKey&gt;testObject1&lt;/objectKey&gt;
+        &lt;versionId&gt;FHbrL3xf2TK54hLNWWArYI79woSElvHf&lt;/versionId&gt;
+    &lt;/deleteObject&gt;
+    ```
+
+??? note &quot;deleteObjects&quot;
+    The deleteObjects operation deletes multiple objects from a bucket using a single HTTP request. If object keys that need to be deleted are known, this operation provides a suitable alternative to sending individual delete requests (deleteObject). The deleteObjects request contains a list of up to 1000 keys that the user wants to delete. In the XML, you provide the object key names, and optionally provide version IDs if you want to delete a specific version of the object from a versioning-enabled bucket. For each key, Amazon S3 performs a delete operation and returns the result of that deletion, success or failure, in the response. Note that if the object specified in the request is not found, Amazon S3 returns the result as deleted.
+
+    The deleteObjects operation supports two modes for the response: verbose and quiet. By default, the operation uses the verbose mode in which the response includes the result of deletion of each key in your request. In the quiet mode, the response includes only keys where the delete operation encountered an error. For a successful deletion, the operation does not return any information about the deletion in the response body.
+
+    When using the deleteObjects operation that attempts to delete a versioned object on an MFA Delete enabled bucket, you must include an MFA token. If you do not provide one, even if there are non-versioned objects you are attempting to delete. Additionally, f you provide an invalid token, the entire request will fail, regardless of whether there are versioned keys in the request. For more information about MFA Delete, see MFA Delete.
+
+    Following is the proxy configuration for init and deleteObjects. The init section has connection parameters.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/DeleteObjectsRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;Name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bypassGovernanceRetention&lt;/td&gt;
+            &lt;td&gt;Indicates whether S3 Object Lock should bypass Governance-mode restrictions to process this operation.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;mfa&lt;/td&gt;
+            &lt;td&gt;Required to permanently delete a versioned object if versioning is configured with MFA Delete enabled. The value is the concatenation of the authentication device&#x27;s serial number, a space, and the value displayed on your authentication device.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;deleteConfig&lt;/td&gt;
+            &lt;td&gt;The configuration for deleting the objects. It contains the following properties:
+                &lt;ul&gt;
+                    &lt;li&gt;Delete: Container for the request.&lt;/li&gt;
+                        &lt;ul&gt;
+                            &lt;li&gt;Quiet: Enable quiet mode for the request. When you add this element, you must set its value to true. Default is false.&lt;/li&gt;
+                            &lt;li&gt;Object: Container element that describes the delete request for each object.&lt;/li&gt;
+                                &lt;ul&gt;
+                                    &lt;li&gt;Key: Key name of the object to delete.&lt;/li&gt;
+                                    &lt;li&gt;VersionId: Version ID for the specific version of the object to delete.&lt;/li&gt;
+                                &lt;/ul&gt;
+                        &lt;/ul&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.init&gt;
+        &lt;awsAccessKeyId&gt;{$ctx:awsAccessKeyId}&lt;/awsAccessKeyId&gt;
+        &lt;awsSecretAccessKey&gt;{$ctx:awsSecretAccessKey}&lt;/awsSecretAccessKey&gt;
+        &lt;name&gt;{$ctx:connectionName}&lt;/name&gt;
+        &lt;region&gt;{$ctx:region}&lt;/region&gt;
+    &lt;/amazons3.init&gt;
+
+    &lt;amazons3.deleteObjects&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;bypassGovernanceRetention&gt;{$ctx:bypassGovernanceRetention}&lt;/bypassGovernanceRetention&gt;
+        &lt;deleteConfig&gt;{$ctx:deleteConfig}&lt;/deleteConfig&gt;
+        &lt;mfa&gt;{$ctx:mfa}&lt;/mfa&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+    &lt;/amazons3.deleteObjects&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;deleteObjects&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;Delete&gt;
+            &lt;Objects&gt;
+                &lt;Object&gt;
+                    &lt;Key&gt;testobject33&lt;/Key&gt;
+                    &lt;VersionId&gt;M46OVgxl4lHBNCeZwBpEZvGhj0k5vvjK&lt;/VersionId&gt;
+                &lt;/Object&gt;
+                &lt;Object&gt;
+                    &lt;Key&gt;testObject1&lt;/Key&gt;
+                    &lt;VersionId&gt;PwbvPU.yn3YcHOCF8bntKeTdzfKQC6jN&lt;/VersionId&gt;
+                &lt;/Object&gt;
+            &lt;/Objects&gt;
+        &lt;/Delete&gt;
+    &lt;/deleteObjects&gt;
+    ```
+
+??? note &quot;getObject&quot;
+    The getObject operation retrieves objects from Amazon S3. To use this operation, the user must have READ access to the object. If the user grants READ access to the anonymous user, the object can be returned without the authorization. By default, this operation returns the latest version of the object.
+
+    An Amazon S3 bucket has no directory hierarchy such as in a typical computer file system. However, a logical hierarchy can be created by using object key names that imply a folder structure. For example, instead of naming an object sample.jpg, it could be named photos/2006/February/sample.jpg. To retrieve an object from such a logical hierarchy, the full key name for the object should be specified.
+
+    For a virtual hosted-style request example, if you have the object photos/2006/February/sample.jpg, specify the resource as /photos/2006/February/sample.jpg. For a path-style request example, if you have the object photos/2006/February/sample.jpg in the bucket named examplebucket, specify the resource as /examplebucket/photos/2006/February/sample.jpg. If the object to be retrieved is a GLACIER storage class object, the object is archived in Amazon Glacier, and you must first restore a copy before retrieving the object. Otherwise, this operation returns the &quot;InvalidObjectStateError&quot; error.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/mediastoredata/model/GetObjectRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;The name of the object to retrieve details for.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;responseContentType&lt;/td&gt;
+            &lt;td&gt;Content-Type property of the response.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;responseContentLanguage&lt;/td&gt;
+            &lt;td&gt;Content-Language property of the response.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;responseExpires&lt;/td&gt;
+            &lt;td&gt;Expires property of the response.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;responseCacheControl&lt;/td&gt;
+            &lt;td&gt;Cache-Control property of the response.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;responseContentDisposition&lt;/td&gt;
+            &lt;td&gt;Content-Disposition property of the response.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;responseContentEncoding&lt;/td&gt;
+            &lt;td&gt;Content-Encoding property of the response.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;range&lt;/td&gt;
+            &lt;td&gt;HTTP range property.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ifModifiedSince&lt;/td&gt;
+            &lt;td&gt;Return the object only if it has been modified.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ifUnmodifiedSince&lt;/td&gt;
+            &lt;td&gt;Return the object only if it has not been modified.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ifMatch&lt;/td&gt;
+            &lt;td&gt;Return the object only if its ETag is the same.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ifNoneMatch&lt;/td&gt;
+            &lt;td&gt;Return the object only if its ETag is not the same as the one specified.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;versionId&lt;/td&gt;
+            &lt;td&gt;VersionId used to reference a specific version of the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerAlgorithm&lt;/td&gt;
+            &lt;td&gt;Specifies the algorithm to use to when encrypting the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerKey&lt;/td&gt;
+            &lt;td&gt;Specifies the customer-provided encryption key for Amazon S3 to use in encrypting data.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerKeyMD5&lt;/td&gt;
+            &lt;td&gt;Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;partNumber&lt;/td&gt;
+            &lt;td&gt;Part number of the object being read.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;destinationFilePath&lt;/td&gt;
+            &lt;td&gt;Specifies the path to the local file where the contents of the response needs to be written. If the destination file already exists or if the file is not writable by the current user, an exception will be thrown.
+            &lt;br&gt;
+            **Note**: This parameter is available only with Amazon S3 connector v2.0.1 and above.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;getContentAsBase64&lt;/td&gt;
+            &lt;td&gt;Get the file content as Base64 encoded.
+            &lt;br&gt;
+            **Note**: This parameter is available only with Amazon S3 connector v2.0.6 and above.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;escapeXmlCharacters&lt;/td&gt;
+            &lt;td&gt;Escape XML characters.
+            &lt;br&gt;
+            **Note**: This parameter is available only with Amazon S3 connector v2.0.11 and above in the 2.x.x series.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getObject&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;objectKey&gt;{$ctx:objectKey}&lt;/objectKey&gt;
+        &lt;responseContentType&gt;{$ctx:responseContentType}&lt;/responseContentType&gt;
+        &lt;responseContentLanguage&gt;{$ctx:responseContentLanguage}&lt;/responseContentLanguage&gt;
+        &lt;responseExpires&gt;{$ctx:responseExpires}&lt;/responseExpires&gt;
+        &lt;responseCacheControl&gt;{$ctx:responseCacheControl}&lt;/responseCacheControl&gt;
+        &lt;responseContentDisposition&gt;{$ctx:responseContentDisposition}&lt;/responseContentDisposition&gt;
+        &lt;responseContentEncoding&gt;{$ctx:responseContentEncoding}&lt;/responseContentEncoding&gt;
+        &lt;range&gt;{$ctx:range}&lt;/range&gt;
+        &lt;ifModifiedSince&gt;{$ctx:ifModifiedSince}&lt;/ifModifiedSince&gt;
+        &lt;ifUnmodifiedSince&gt;{$ctx:ifUnmodifiedSince}&lt;/ifUnmodifiedSince&gt;
+        &lt;ifMatch&gt;{$ctx:ifMatch}&lt;/ifMatch&gt;
+        &lt;ifNoneMatch&gt;{$ctx:ifNoneMatch}&lt;/ifNoneMatch&gt;
+        &lt;versionId&gt;{$ctx:versionId}&lt;/versionId&gt;
+        &lt;sseCustomerAlgorithm&gt;{$ctx:sseCustomerAlgorithm}&lt;/sseCustomerAlgorithm&gt;
+        &lt;sseCustomerKey&gt;{$ctx:sseCustomerKey}&lt;/sseCustomerKey&gt;
+        &lt;sseCustomerKeyMD5&gt;{$ctx:sseCustomerKeyMD5}&lt;/sseCustomerKeyMD5&gt;
+        &lt;partNumber&gt;{$ctx:partNumber}&lt;/partNumber&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+    &lt;/amazons3.getObject&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getObject&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;objectKey&gt;Tree2.png&lt;/objectKey&gt;
+        &lt;partNumber&gt;1&lt;/partNumber&gt;
+    &lt;/getObject&gt;
+    ```
+
+??? note &quot;putObject&quot;
+    The putObject operation adds an object to a bucket. You must have WRITE permissions on a bucket to add an object to it. Amazon S3 does not add partial objects, so if a success response is received, the entire object is added to the bucket. Because Amazon S3 is a distributed system, if it receives multiple write requests for the same object simultaneously, it overwrites all but the last object written.
+
+    To ensure that data is not corrupted traversing the network, use the Content-MD5 parameter. When it is used, Amazon S3 checks the object against the provided MD5 value and, if they do not match, it returns an error. Additionally, you can calculate the MD5 value while putting an object to Amazon S3 and compare the returned ETag with the calculated MD5 value.
+
+    When uploading an object, you can specify the accounts or groups that should be granted specific permissions on the object. There are two ways to grant the appropriate permissions using the request parameters: either specify a canned (predefined) ACL using the &quot;acl&quot;, or specify access permissions explicitly using the &quot;grantRead&quot;, &quot;grantReadACP&quot;, &quot;grantWriteACP&quot;, and &quot;grantFullControl&quot; parameters. These parameters map to the set of permissions that Amazon S3 supports in an ACL. Use only one approach, not both.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/clouddirectory/model/putObjectRequest.html) for more information.
+
+    !!! note
+        The `fileContent` parameter is available only with Amazon S3 connector v2.0.2 and above. Either the `filePath` or `fileContent` parameter is mandatory.
+        The `isContentBase64Encoded` parameter is available only with Amazon S3 connector v2.0.7 and above.
+        The `enableStreaming`, `streamingThreshold`, and `streamingPartSize` parameters are available only with Amazon S3 connector v2.0.12 and above.
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;The name of the object to retrieve details for.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;filePath&lt;/td&gt;
+            &lt;td&gt;The path of the source file to be uploaded.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fileContent&lt;/td&gt;
+            &lt;td&gt;Content of the file.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;isContentBase64Encoded&lt;/td&gt;
+            &lt;td&gt;Indicates whether the &lt;code&gt;fileContent&lt;/code&gt; should be treated as Base64-encoded. By default, this is set to &lt;code&gt;false&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;            
+        &lt;tr&gt;
+            &lt;td&gt;acl&lt;/td&gt;
+            &lt;td&gt;The canned ACL to apply to the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;cacheControl&lt;/td&gt;
+            &lt;td&gt;This can be used to specify caching behavior along the request or reply chain.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentDisposition&lt;/td&gt;
+            &lt;td&gt;This specifies presentational information for the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentEncoding&lt;/td&gt;
+            &lt;td&gt;The language the content is in.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentLanguage&lt;/td&gt;
+            &lt;td&gt;This specifies what content encodings have been applied to the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentType&lt;/td&gt;
+            &lt;td&gt;A standard MIME type describing the format of the object data.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentMD5&lt;/td&gt;
+            &lt;td&gt;The base64-encoded 128-bit MD5 digest of the message according to RFC 1864.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;expires&lt;/td&gt;
+            &lt;td&gt;This specifies the date and time at which the object is no longer cacheable.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantRead&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to list the objects in the bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantReadACP&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to read the bucket ACL.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantWriteACP&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to write the ACL for the applicable bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantFullControl&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees the READ, WRITE, READ_ACP, and WRITE_ACP permissions on the bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;metadata&lt;/td&gt;
+            &lt;td&gt;The metadata. Comma separated key value pair. The key and value are separated by &#x27;:&#x27;t.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;serverSideEncryption&lt;/td&gt;
+            &lt;td&gt;Specifies the server-side encryption algorithm to use when Amazon S3 creates the target object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;storageClass&lt;/td&gt;
+            &lt;td&gt;RRS enables customers to reduce their costs by storing non-critical, reproducible data at lower levels of redundancy than Amazon S3&#x27;s standard storage.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;websiteRedirectLocation&lt;/td&gt;
+            &lt;td&gt;If the bucket is configured as a website, redirects requests for this object to another object in the same bucket or to an external URL. Amazon S3 stores the value of this parameter in the object metadata.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerAlgorithm&lt;/td&gt;
+            &lt;td&gt;Specifies the algorithm to use to when encrypting the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerKey&lt;/td&gt;
+            &lt;td&gt;Specifies the customer-provided encryption key for Amazon S3 to use in encrypting data.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerKeyMD5&lt;/td&gt;
+            &lt;td&gt;Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ssekmsKeyId&lt;/td&gt;
+            &lt;td&gt;Specifies the ID of the symmetric customer managed AWS KMS CMK to use for object encryption.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ssekmsEncryptionContext&lt;/td&gt;
+            &lt;td&gt;Specifies the AWS KMS Encryption Context to use for object encryption.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tagging&lt;/td&gt;
+            &lt;td&gt;The tag-set for the object. The tag-set must be encoded as URL Query parameters. (For example, &quot;Key1=Value1&quot;). This must be used in conjunction with the TaggingDirective.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectLockMode&lt;/td&gt;
+            &lt;td&gt;The object lock mode that you want to apply to the uploaded object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectLockRetainUntilDate&lt;/td&gt;
+            &lt;td&gt;Specifies the date and time when you want the Object Lock to expire.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectLockLegalHoldStatus&lt;/td&gt;
+            &lt;td&gt;Specifies whether you want to apply a Legal Hold to the uploaded object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;enableStreaming&lt;/td&gt;
+            &lt;td&gt;When set to &lt;code&gt;true&lt;/code&gt;, reads upload content directly from the binary payload in the message body as a streaming &lt;code&gt;InputStream&lt;/code&gt;, avoiding full in-memory buffering. When enabled, &lt;code&gt;filePath&lt;/code&gt; and &lt;code&gt;fileContent&lt;/code&gt; must be empty. If the content length is unknown or exceeds &lt;code&gt;streamingThreshold&lt;/code&gt;, a multipart upload is used automatically.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;streamingThreshold&lt;/td&gt;
+            &lt;td&gt;The threshold in bytes at which the connector switches from a single-part upload to a multipart upload when streaming is enabled. Defaults to &lt;code&gt;104857600&lt;/code&gt; (100 MB). Requires &lt;code&gt;enableStreaming&lt;/code&gt; to be &lt;code&gt;true&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;streamingPartSize&lt;/td&gt;
+            &lt;td&gt;The part size in bytes for each chunk during a multipart upload. Must be between &lt;code&gt;5242880&lt;/code&gt; (5 MB) and &lt;code&gt;2147483647&lt;/code&gt; (~2 GB). Defaults to &lt;code&gt;104857600&lt;/code&gt; (100 MB). Requires &lt;code&gt;enableStreaming&lt;/code&gt; to be &lt;code&gt;true&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.putObject&gt;
+        &lt;bucketName&gt;{$url:bucketName}&lt;/bucketName&gt;
+        &lt;objectKey&gt;{$url:objectKey}&lt;/objectKey&gt;
+        &lt;filePath&gt;{$url:filePath}&lt;/filePath&gt;
+        &lt;acl&gt;{$ctx:acl}&lt;/acl&gt;
+        &lt;cacheControl&gt;{$ctx:cacheControl}&lt;/cacheControl&gt;
+        &lt;contentDisposition&gt;{$ctx:contentDisposition}&lt;/contentDisposition&gt;
+        &lt;contentEncoding&gt;{$ctx:contentEncoding}&lt;/contentEncoding&gt;
+        &lt;contentLanguage&gt;{$ctx:contentLanguage}&lt;/contentLanguage&gt;
+        &lt;contentType&gt;{$ctx:contentType}&lt;/contentType&gt;
+        &lt;expires&gt;{$ctx:expires}&lt;/expires&gt;
+        &lt;grantRead&gt;{$ctx:grantRead}&lt;/grantRead&gt;
+        &lt;grantReadACP&gt;{$ctx:grantReadACP}&lt;/grantReadACP&gt;
+        &lt;grantWriteACP&gt;{$ctx:grantWriteACP}&lt;/grantWriteACP&gt;
+        &lt;grantFullControl&gt;{$ctx:grantFullControl}&lt;/grantFullControl&gt;
+        &lt;metadata&gt;{$ctx:metadata}&lt;/metadata&gt;
+        &lt;serverSideEncryption&gt;{$ctx:serverSideEncryption}&lt;/serverSideEncryption&gt;
+        &lt;storageClass&gt;{$ctx:storageClass}&lt;/storageClass&gt;
+        &lt;websiteRedirectLocation&gt;{$ctx:websiteRedirectLocation}&lt;/websiteRedirectLocation&gt;
+        &lt;sseCustomerAlgorithm&gt;{$ctx:sseCustomerAlgorithm}&lt;/sseCustomerAlgorithm&gt;
+        &lt;sseCustomerKey&gt;{$ctx:sseCustomerKey}&lt;/sseCustomerKey&gt;
+        &lt;sseCustomerKeyMD5&gt;{$ctx:sseCustomerKeyMD5}&lt;/sseCustomerKeyMD5&gt;
+        &lt;ssekmsKeyId&gt;{$ctx:ssekmsKeyId}&lt;/ssekmsKeyId&gt;
+        &lt;ssekmsEncryptionContext&gt;{$ctx:ssekmsEncryptionContext}&lt;/ssekmsEncryptionContext&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+        &lt;tagging&gt;{$ctx:tagging}&lt;/tagging&gt;
+        &lt;objectLockMode&gt;{$ctx:objectLockMode}&lt;/objectLockMode&gt;
+        &lt;objectLockRetainUntilDate&gt;{$ctx:objectLockRetainUntilDate}&lt;/objectLockRetainUntilDate&gt;
+        &lt;objectLockLegalHoldStatus&gt;{$ctx:objectLockLegalHoldStatus}&lt;/objectLockLegalHoldStatus&gt;
+        &lt;enableStreaming&gt;{$ctx:enableStreaming}&lt;/enableStreaming&gt;
+        &lt;streamingThreshold&gt;{$ctx:streamingThreshold}&lt;/streamingThreshold&gt;
+        &lt;streamingPartSize&gt;{$ctx:streamingPartSize}&lt;/streamingPartSize&gt;
+    &lt;/amazons3.putObject&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;putObject&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;objectKey&gt;s3_image.jpg&lt;/objectKey&gt;
+        &lt;filePath&gt;/Users/mine/Desktop/S3_img.jpg&lt;/filePath&gt;
+    &lt;/putObject&gt;
+    ```
+
+??? note &quot;putObjectAcl&quot;
+    The putObjectAcl operation sets the access control list (ACL) permissions for an object that already exists in a bucket. You can specify the ACL in the request body or specify permissions using request, depending on the application needs. For example, if there is an existing application that updates an object ACL using the request body, you can continue to use that approach.
+
+    The ACL of an object is set at the object version level. By default, putObjectAcl sets the ACL of the latest version of an object. To set the ACL of a different version, use the versionId property.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/PutObjectAclRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;Name of the object whose acl needs to be set.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;accessControlList&lt;/td&gt;
+            &lt;td&gt;Container for ACL information, which includes the following:
+                    &lt;ul&gt;
+                        &lt;li&gt;Grant: Container for the grantee and permissions.&lt;/li&gt;
+                            &lt;ul&gt;
+                                &lt;li&gt;Grantee: The subject whose permissions are being set.&lt;/li&gt;
+                                    &lt;ul&gt;
+                                        &lt;li&gt;ID: ID of the grantee.&lt;/li&gt;
+                                        &lt;li&gt;DisplayName: Screen name of the grantee.&lt;/li&gt;
+                                    &lt;/ul&gt;
+                                &lt;li&gt;Permission: Specifies the permission to give to the grantee.&lt;/li&gt;
+                            &lt;/ul&gt;
+                    &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;versionId&lt;/td&gt;
+            &lt;td&gt;Version Id of an object to remove a specific object version.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;acl&lt;/td&gt;
+            &lt;td&gt;The canned ACL to apply to the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantRead&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to list the objects in the bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantWrite&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to create, overwrite, and delete any object in the bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantReadACP&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to read the bucket ACL.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantWriteACP&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to write the ACL for the applicable bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantFullControl&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees the READ, WRITE, READ_ACP, and WRITE_ACP permissions on the bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.putObjectAcl&gt;
+        &lt;objectKey&gt;{$ctx:objectKey}&lt;/objectKey&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;accessControlList&gt;{$ctx:accessControlList}&lt;/accessControlList&gt;
+        &lt;versionId&gt;{$ctx:versionId}&lt;/versionId&gt;
+        &lt;acl&gt;{$ctx:acl}&lt;/acl&gt;
+        &lt;grantRead&gt;{$ctx:grantRead}&lt;/grantRead&gt;
+        &lt;grantReadACP&gt;{$ctx:grantReadACP}&lt;/grantReadACP&gt;
+        &lt;grantWrite&gt;{$ctx:grantWrite}&lt;/grantWrite&gt;
+        &lt;grantWriteACP&gt;{$ctx:grantWriteACP}&lt;/grantWriteACP&gt;
+        &lt;grantFullControl&gt;{$ctx:grantFullControl}&lt;/grantFullControl&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+    &lt;/amazons3.putObjectAcl&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;putObjectAcl&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;objectKey&gt;testObject2&lt;/objectKey&gt;
+        &lt;versionId&gt;FHbrL3xf2TK54hLNWWArYI79woSElvHf&lt;/versionId&gt;
+        &lt;acl&gt;authenticated-read&lt;/acl&gt;
+        &lt;AccessControlPolicy&gt;
+            &lt;Owner&gt;
+                &lt;ID&gt;c6567b8c9274b78d6af4a3080c5e43e700f560f3517b7d9acc87251412044c35&lt;/ID&gt;
+            &lt;/Owner&gt;
+            &lt;Grant&gt;
+                &lt;Grantee xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:type=&quot;CanonicalUser&quot;&gt;
+                    &lt;ID&gt;c6567b8c9274b78d6af4a3080c5e43e700f560f3517b7d9acc87251412044c35&lt;/ID&gt;
+                    &lt;DisplayName&gt;pe.chanaka.ck@gmail.com&lt;/DisplayName&gt;
+                &lt;/Grantee&gt;
+                &lt;Permission&gt;WRITE_ACP&lt;/Permission&gt;
+            &lt;/Grant&gt;
+            &lt;Grant&gt;
+                &lt;Grantee xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:type=&quot;CanonicalUser&quot;&gt;
+                    &lt;ID&gt;c6567b8c9274b78d6af4a3080c5e43e700f560f3517b7d9acc87251412044c35&lt;/ID&gt;
+                    &lt;DisplayName&gt;pe.chanaka.ck@gmail.com&lt;/DisplayName&gt;
+                &lt;/Grantee&gt;
+                &lt;Permission&gt;READ&lt;/Permission&gt;
+            &lt;/Grant&gt;
+        &lt;/AccessControlPolicy&gt;
+    &lt;/putObjectAcl&gt;
+    ```
+
+??? note &quot;copyBucketObject&quot;
+    The copyBucketObject operation creates a copy of an object that is already stored in Amazon S3. This operation is the same as performing a GET and then a PUT. Adding the &quot;copySource&quot; enables to copy the source object into the destination bucket.
+
+    When copying an object, most of the metadata (default) can be preserved, or new metadata can be specified. However, the ACL is not preserved and is set to &quot;private&quot; for the user making the request. All copy requests must be authenticated and cannot contain a message body. Additionally, the user must have the READ access to the source object and WRITE access to the destination bucket. To copy an object only under certain conditions, such as whether the ETag matches or whether the object was modified before or after a specified date with the parameters such as &quot;copySourceIfMatch&quot;, &quot;copySourceIfNoneMatch&quot;, &quot;copySourceIfUnmodifiedSince&quot;, or &quot;copySourceIfModifiedSince&quot; must be used.
+
+    There are two instances when the copy request could return an error. One is when Amazon S3 receives the copy request, and the other can occur while Amazon S3 is copying the files. If the error occurs before the copy operation starts, you receive a standard Amazon S3 error. If the error occurs during the copy operation, the error response is embedded in the 200 OK response. This means that a 200 OK response can contain either a success or an error. If the request is an HTTP 1.1 request, the response is chunk encoded. Otherwise, it will not contain the content-length, and you will need to read the entire body.
+
+    When copying an object, the accounts or groups that should be granted specific permissions on the object can be specified. There are two ways to grant the appropriate permissions using the request: one is to specify a canned (predefined) ACL using the &quot;acl&quot; parameter, and the other is to specify access permissions explicitly using the &quot;grantRead&quot;, &quot;grantReadACP&quot;, &quot;grantWriteACP&quot;, and &quot;grantFullControl&quot; parameters. These parameters map to the set of permissions that Amazon S3 supports in an ACL. Use only one approach, not both.
+
+    Following is the proxy configuration for init and copyBucketObject. The init section has connection parameters.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/CopyObjectRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;acl&lt;/td&gt;
+            &lt;td&gt;The canned ACL to apply to the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;cacheControl&lt;/td&gt;
+            &lt;td&gt;This can be used to specify caching behavior along the request or reply chain.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentDisposition&lt;/td&gt;
+            &lt;td&gt;This specifies presentational information for the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentEncoding&lt;/td&gt;
+            &lt;td&gt;The language the content is in.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentLanguage&lt;/td&gt;
+            &lt;td&gt;This specifies what content encodings have been applied to the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentType&lt;/td&gt;
+            &lt;td&gt;A standard MIME type describing the format of the object data.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantRead&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to list the objects in the bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantReadACP&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to read the bucket ACL.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantWriteACP&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to write the ACL for the applicable bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantFullControl&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees the READ, WRITE, READ_ACP, and WRITE_ACP permissions on the bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;copySource&lt;/td&gt;
+            &lt;td&gt;The name of the source bucket and key name of the source object, separated by a slash (/).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;metadataDirective&lt;/td&gt;
+            &lt;td&gt;Specifies whether the metadata is copied from the source object or replaced with metadata provided in the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;metadata&lt;/td&gt;
+            &lt;td&gt;New metadata to replace. Comma separated key value pair. The key and value are separated by &#x27;:&#x27;.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;taggingDirective&lt;/td&gt;
+            &lt;td&gt;Specifies whether the object tag-set are copied from the source object or replaced with tag-set provided in the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;copySourceIfMatch&lt;/td&gt;
+            &lt;td&gt;Copies the object if its entity tag (ETag) matches the specified tag. Otherwise, the request returns a 412 HTTP status code error (failed precondition).&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;copySourceIfNoneMatch&lt;/td&gt;
+            &lt;td&gt;Copies the object if its entity tag (ETag) is different from the specified ETag. Otherwise, the request returns a 412 HTTP status code error (failed precondition).&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;copySourceIfUnmodifiedSince&lt;/td&gt;
+            &lt;td&gt;Copies the object if it has not been modified since the specified time. Oherwise, the request returns a 412 HTTP status code error (failed precondition).&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;copySourceIfModifiedSince&lt;/td&gt;
+            &lt;td&gt;Copies the object if it has been modified since the specified time. Otherwise, the request returns a 412 HTTP status code error (failed condition).&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;expires&lt;/td&gt;
+            &lt;td&gt;The date and time at which the object is no longer cacheable.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;serverSideEncryption&lt;/td&gt;
+            &lt;td&gt;Specifies the server-side encryption algorithm to use when Amazon S3 creates the target object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;storageClass&lt;/td&gt;
+            &lt;td&gt;RRS enables customers to reduce their costs by storing non-critical, reproducible data at lower levels of redundancy than Amazon S3&#x27;s standard storage.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;websiteRedirectLocation&lt;/td&gt;
+            &lt;td&gt;If the bucket is configured as a website, redirects requests for this object to another object in the same bucket or to an external URL. Amazon S3 stores the value of this parameter in the object metadata.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerAlgorithm&lt;/td&gt;
+            &lt;td&gt;Specifies the algorithm to use to when encrypting the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerKey&lt;/td&gt;
+            &lt;td&gt;Specifies the customer-provided encryption key for Amazon S3 to use in encrypting data.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerKeyMD5&lt;/td&gt;
+            &lt;td&gt;Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ssekmsKeyId&lt;/td&gt;
+            &lt;td&gt;Specifies the ID of the symmetric customer managed AWS KMS CMK to use for object encryption.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ssekmsEncryptionContext&lt;/td&gt;
+            &lt;td&gt;Specifies the AWS KMS Encryption Context to use for object encryption.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;copySourceSSECustomerAlgorithm&lt;/td&gt;
+            &lt;td&gt;Specifies the algorithm to use when decrypting the source object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;copySourceSSECustomerKey&lt;/td&gt;
+            &lt;td&gt;Specifies the customer-provided encryption key for Amazon S3 to use to decrypt the source object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;copySourceSSECustomerKeyMD5&lt;/td&gt;
+            &lt;td&gt;Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tagging&lt;/td&gt;
+            &lt;td&gt;The tag-set for the object. The tag-set must be encoded as URL Query parameters. (For example, &quot;Key1=Value1&quot;). This must be used in conjunction with the TaggingDirective.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectLockMode&lt;/td&gt;
+            &lt;td&gt;The object lock mode that you want to apply to the uploaded object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectLockRetainUntilDate&lt;/td&gt;
+            &lt;td&gt;Specifies the date and time when you want the Object Lock to expire.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectLockLegalHoldStatus&lt;/td&gt;
+            &lt;td&gt;Specifies whether you want to apply a Legal Hold to the uploaded object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;destinationBucket&lt;/td&gt;
+            &lt;td&gt;Name of the destination bucket to copy the object.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;destinationKey&lt;/td&gt;
+            &lt;td&gt;The destination where the source will be copied.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.init&gt;
+        &lt;awsAccessKeyId&gt;{$ctx:awsAccessKeyId}&lt;/awsAccessKeyId&gt;
+        &lt;awsSecretAccessKey&gt;{$ctx:awsSecretAccessKey}&lt;/awsSecretAccessKey&gt;
+        &lt;name&gt;{$ctx:connectionName}&lt;/name&gt;
+        &lt;region&gt;{$ctx:region}&lt;/region&gt;
+    &lt;/amazons3.init&gt;
+
+    &lt;amazons3.copyBucketObject&gt;
+        &lt;copySource&gt;{$ctx:copySource}&lt;/copySource&gt;
+        &lt;acl&gt;{$ctx:acl}&lt;/acl&gt;
+        &lt;cacheControl&gt;{$ctx:cacheControl}&lt;/cacheControl&gt;
+        &lt;contentDisposition&gt;{$ctx:contentDisposition}&lt;/contentDisposition&gt;
+        &lt;contentEncoding&gt;{$ctx:contentEncoding}&lt;/contentEncoding&gt;
+        &lt;contentLanguage&gt;{$ctx:contentLanguage}&lt;/contentLanguage&gt;
+        &lt;contentType&gt;{$ctx:contentType}&lt;/contentType&gt;
+        &lt;copySourceIfMatch&gt;{$ctx:copySourceIfMatch}&lt;/copySourceIfMatch&gt;
+        &lt;copySourceIfModifiedSince&gt;{$ctx:copySourceIfModifiedSince}&lt;/copySourceIfModifiedSince&gt;
+        &lt;copySourceIfNoneMatch&gt;{$ctx:copySourceIfNoneMatch}&lt;/copySourceIfNoneMatch&gt;
+        &lt;copySourceIfUnmodifiedSince&gt;{$ctx:copySourceIfUnmodifiedSince}&lt;/copySourceIfUnmodifiedSince&gt;
+        &lt;expires&gt;{$ctx:expires}&lt;/expires&gt;
+        &lt;grantRead&gt;{$ctx:grantRead}&lt;/grantRead&gt;
+        &lt;grantReadACP&gt;{$ctx:grantReadACP}&lt;/grantReadACP&gt;
+        &lt;grantWriteACP&gt;{$ctx:grantWriteACP}&lt;/grantWriteACP&gt;
+        &lt;grantFullControl&gt;{$ctx:grantFullControl}&lt;/grantFullControl&gt;
+        &lt;metadataDirective&gt;{$ctx:metadataDirective}&lt;/metadataDirective&gt;
+        &lt;metadata&gt;{$ctx:metadata}&lt;/metadata&gt;
+        &lt;taggingDirective&gt;{$ctx:taggingDirective}&lt;/taggingDirective&gt;
+        &lt;tagging&gt;{$ctx:tagging}&lt;/tagging&gt;
+        &lt;serverSideEncryption&gt;{$ctx:serverSideEncryption}&lt;/serverSideEncryption&gt;
+        &lt;storageClass&gt;{$ctx:storageClass}&lt;/storageClass&gt;
+        &lt;websiteRedirectLocation&gt;{$ctx:websiteRedirectLocation}&lt;/websiteRedirectLocation&gt;
+        &lt;sseCustomerAlgorithm&gt;{$ctx:sseCustomerAlgorithm}&lt;/sseCustomerAlgorithm&gt;
+        &lt;sseCustomerKey&gt;{$ctx:sseCustomerKey}&lt;/sseCustomerKey&gt;
+        &lt;sseCustomerKeyMD5&gt;{$ctx:sseCustomerKeyMD5}&lt;/sseCustomerKeyMD5&gt;
+        &lt;ssekmsKeyId&gt;{$ctx:ssekmsKeyId}&lt;/ssekmsKeyId&gt;
+        &lt;ssekmsEncryptionContext&gt;{$ctx:ssekmsEncryptionContext}&lt;/ssekmsEncryptionContext&gt;
+        &lt;copySourceSSECustomerAlgorithm&gt;{$ctx:copySourceSSECustomerAlgorithm}&lt;/copySourceSSECustomerAlgorithm&gt;
+        &lt;copySourceSSECustomerKey&gt;{$ctx:copySourceSSECustomerKey}&lt;/copySourceSSECustomerKey&gt;
+        &lt;copySourceSSECustomerKeyMD5&gt;{$ctx:copySourceSSECustomerKeyMD5}&lt;/copySourceSSECustomerKeyMD5&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+        &lt;objectLockMode&gt;{$ctx:objectLockMode}&lt;/objectLockMode&gt;
+        &lt;objectLockRetainUntilDate&gt;{$ctx:objectLockRetainUntilDate}&lt;/objectLockRetainUntilDate&gt;
+        &lt;objectLockLegalHoldStatus&gt;{$ctx:objectLockLegalHoldStatus}&lt;/objectLockLegalHoldStatus&gt;
+        &lt;destinationBucket&gt;{$ctx:destinationBucket}&lt;/destinationBucket&gt;
+        &lt;destinationKey&gt;{$ctx:destinationKey}&lt;/destinationKey&gt;
+    &lt;/amazons3.copyBucketObject&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;copyBucketObject&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;copySource&gt;/imagesBucket5/testObject37&lt;/copySource&gt;
+        &lt;destinationObject&gt;testObject5&lt;/destinationObject&gt;
+    &lt;/copyBucketObject&gt;
+    ```
+
+??? note &quot;uploadPart&quot;
+    The uploadPart operation uploads a part in a multipart upload. In this operation, you provide part data in your request. However, you have an option to specify your existing Amazon S3 object as the data source for the part being uploaded. You must initiate a multipart upload (see createMultipartUpload) before you can upload any part. In response to your initiate request, Amazon S3 returns an upload ID, which is the unique identifier that must be included in the upload part request.
+
+    Part numbers can be any number from 1 to 10,000 (inclusive). A part number uniquely identifies a part and also defines its position within the object being created. If a new part is uploaded using the same part number that was used with a previous part, the previously uploaded part is overwritten. Each part must be at least 5 MB in size, except the last part. There is no size limit on the last part of your multipart upload.
+
+    To ensure that data is not corrupted when traversing the network, specify the Content-MD5 parameter in the upload part request. Amazon S3 checks the part data against the provided MD5 value. If they do not match, Amazon S3 returns an error. After the multipart upload is initiated and one or more parts are uploaded, you must either complete or abort multipart upload in order to stop getting charged for storage of the uploaded parts. Only after you either complete or abort multipart upload will Amazon S3 free up the parts storage and stop charging you for the parts storage.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/UploadPartRequest.html) for more information.
+
+    !!! note
+        The `fileContent` parameter is available only with Amazon S3 connector v2.0.2 and above. Either the `filePath` or `fileContent` parameter is mandatory.
+        The `isContentBase64Encoded` parameter is available only with Amazon S3 connector v2.0.7 and above.
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;The name to give for the newly created object.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;uploadId&lt;/td&gt;
+            &lt;td&gt;This specifies the ID of the initiated multipart upload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;partNumber&lt;/td&gt;
+            &lt;td&gt;Part number that identifies the part.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;filePath&lt;/td&gt;
+            &lt;td&gt;The path of the source file to be uploaded.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fileContent&lt;/td&gt;
+            &lt;td&gt;Content of the file.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;isContentBase64Encoded&lt;/td&gt;
+            &lt;td&gt;Indicates whether the &lt;code&gt;fileContent&lt;/code&gt; should be treated as Base64-encoded. By default, this is set to &lt;code&gt;false&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerAlgorithm&lt;/td&gt;
+            &lt;td&gt;Specifies the algorithm to use to when encrypting the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerKey&lt;/td&gt;
+            &lt;td&gt;Specifies the customer-provided encryption key for Amazon S3 to use in encrypting data.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerKeyMD5&lt;/td&gt;
+            &lt;td&gt;Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.uploadPart&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;objectKey&gt;{$ctx:objectKey}&lt;/objectKey&gt;
+        &lt;uploadId&gt;{$ctx:uploadId}&lt;/uploadId&gt;
+        &lt;partNumber&gt;{$ctx:partNumber}&lt;/partNumber&gt;
+        &lt;filePath&gt;{$url:filePath}&lt;/filePath&gt;
+        &lt;sseCustomerAlgorithm&gt;{$ctx:sseCustomerAlgorithm}&lt;/sseCustomerAlgorithm&gt;
+        &lt;sseCustomerKey&gt;{$ctx:sseCustomerKey}&lt;/sseCustomerKey&gt;
+        &lt;sseCustomerKeyMD5&gt;{$ctx:sseCustomerKeyMD5}&lt;/sseCustomerKeyMD5&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+    &lt;/amazons3.uploadPart&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;amazons3.uploadPart&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;objectKey&gt;testObj.jpg&lt;/objectKey&gt;
+        &lt;uploadId&gt;cI0BzCZ7cx69YP.dhqpwEZAhgH7IzLVuOYjZVZdrmR9LSYAnxPqyYXlzHWGG3hgyH_MuJkTO8cltkaOK.TeG_7zBjFrjJduFCuFLDwah.ZXK7pvlTTDPQAaTRLW_o4FR&lt;/uploadId&gt;
+        &lt;partNumber&gt;1&lt;/partNumber&gt;
+        &lt;filePath&gt;/Users/mine/Desktop/S3_img.jpg&lt;/filePath&gt;
+    &lt;/amazons3.uploadPart&gt;
+    ```
+
+??? note &quot;completeMultipartUpload&quot;
+    The completeMultipartUpload operation completes a multipart upload by assembling previously uploaded parts. You should first initiate the multipart upload using createMultipartUpload, and then upload all parts using uploadParts. After you successfully upload all relevant parts of an upload, call completeMultipartUpload to complete the upload. When you call completeMultipartUpload, Amazon S3 concatenates all the parts in ascending order by part number to create a new object. In the completeMultipartUpload request, you must provide the complete parts list (see listParts). For each part in the list, the part number and the ETag value must be provided. When the part is uploaded the part number and the ETag value should be returned.
+
+    Processing of a completeMultipartUpload request can take several minutes. After Amazon S3 begins processing the request, it sends an HTTP response header that specifies a 200 OK response. While processing is in progress, Amazon S3 periodically sends whitespace characters to keep the connection from timing out. Because a request could fail after the initial 200 OK response has been sent, it is important that you check the response body to determine whether the request succeeded. If completeMultipartUpload fails, applications should be prepared to retry the failed requests.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/glacier/model/CompleteMultipartUploadRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;completedPartDetails&lt;/td&gt;
+            &lt;td&gt;The container that holds the completed part details. The part details are as follows:
+                    &lt;ul&gt;
+                        &lt;li&gt;part: The container for elements related to a previously uploaded part.&lt;/li&gt;
+                            &lt;ul&gt;
+                                &lt;li&gt;PartNumber: The part number that identifies the part.&lt;/li&gt;
+                                &lt;li&gt;ETag: The entity tag returned when the part is uploaded.&lt;/li&gt;
+                            &lt;/ul&gt;
+                    &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;The name to give the newly created object.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;uploadId&lt;/td&gt;
+            &lt;td&gt;This specifies the ID of the current multipart upload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.completeMultipartUpload&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;objectKey&gt;{$ctx:objectKey}&lt;/objectKey&gt;
+        &lt;uploadId&gt;{$ctx:uploadId}&lt;/uploadId&gt;
+        &lt;completedPartDetails&gt;{$ctx:completedPartDetails}&lt;/completedPartDetails&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+    &lt;/amazons3.completeMultipartUpload&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;completeMultipartUpload&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;objectKey&gt;myimage.png&lt;/objectKey&gt;
+        &lt;uploadId&gt;VONszTPldyDo80ARdEMI2kVxEBLQYY1tncD7PpB54WDtLTACJIn.jWRIGo7iL_EkJYn9Z2BT3MM.kEqju9CgLyUveDtl6MgXzRYqjb8R4L.ZVpUhv25d56P2Tk1XnD0C&lt;/uploadId&gt;
+        &lt;CompletedPartDetails&gt;
+            &lt;CompletedPart&gt;
+                &lt;PartNumber&gt;1&lt;/PartNumber&gt;
+                &lt;ETag&gt;LKJLINTLNM9879NL7jNLk&lt;/ETag&gt;
+            &lt;/CompletedPart&gt;
+        &lt;/CompletedPartDetails&gt;
+    &lt;/completeMultipartUpload&gt;
+    ```
+
+??? note &quot;abortMultipartUpload&quot;
+    The abortMultipartUpload operation aborts a multipart upload. After a multipart upload is aborted, no additional parts can be uploaded using that upload ID. The storage consumed by any previously uploaded parts will be freed. However, if any part uploads are currently in progress, those part uploads might or might not succeed. As a result, it might be necessary to abort a given multipart upload multiple times in order to completely free all storage consumed by all parts. To verify that all parts have been removed so that you do not get charged for the part storage, call the listParts operation and ensure the parts list is empty.
+
+    Following is the proxy configuration for init and abortMultipartUpload. The init section has connection parameters.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/glacier/model/AbortMultipartUploadRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;The name of the object.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;uploadId&lt;/td&gt;
+            &lt;td&gt;This specifies the ID of the current multipart upload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.init&gt;
+        &lt;awsAccessKeyId&gt;{$ctx:awsAccessKeyId}&lt;/awsAccessKeyId&gt;
+        &lt;awsSecretAccessKey&gt;{$ctx:awsSecretAccessKey}&lt;/awsSecretAccessKey&gt;
+        &lt;name&gt;{$ctx:connectionName}&lt;/name&gt;
+        &lt;region&gt;{$ctx:region}&lt;/region&gt;
+    &lt;/amazons3.init&gt;
+
+    &lt;amazons3.abortMultipartUpload&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;objectKey&gt;{$ctx:objectKey}&lt;/objectKey&gt;
+        &lt;uploadId&gt;{$ctx:uploadId}&lt;/uploadId&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+    &lt;/amazons3.abortMultipartUpload&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;abortMultipartUpload&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;objectKey&gt;myimage.png&lt;/objectKey&gt;
+        &lt;uploadId&gt;VONszTPldyDo80ARdEMI2kVxEBLQYY1tncD7PpB54WDtLTACJIn.jWRIGo7iL_EkJYn9Z2BT3MM.kEqju9CgLyUveDtl6MgXzRYqjb8R4L.ZVpUhv25d56P2Tk1XnD0C&lt;/uploadId&gt;
+    &lt;/abortMultipartUpload&gt;
+    ```
+
+??? note &quot;listParts&quot;
+    The listParts operation lists the parts that have been uploaded for a specific multipart upload.
+
+    This operation must include the upload ID, which can be obtained using the createMultipartUpload operation. The listParts operation returns a maximum of 1,000 uploaded parts. The default number of parts returned is 1,000 parts, but you can restrict the number of parts using the maxParts property. If the multipart upload consists of more than 1,000 parts, the response returns an IsTruncated field with the value of true and a NextPartNumberMarker element. In subsequent listParts requests, you can include the partNumberMarker query string parameter and set its value to the NextPartNumberMarker field value from the previous response.
+
+    Following is the proxy configuration for init and listParts. The init section has connection parameters.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/glacier/model/ListPartsRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;The name of the object.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;uploadId&lt;/td&gt;
+            &lt;td&gt;The ID of the upload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxParts&lt;/td&gt;
+            &lt;td&gt;Maximum number of parts allowed in the response.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;partNumberMarker&lt;/td&gt;
+            &lt;td&gt;Specifies the part after which listing should begin. Only parts with higher part numbers will be listed.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.init&gt;
+        &lt;awsAccessKeyId&gt;{$ctx:awsAccessKeyId}&lt;/awsAccessKeyId&gt;
+        &lt;awsSecretAccessKey&gt;{$ctx:awsSecretAccessKey}&lt;/awsSecretAccessKey&gt;
+        &lt;name&gt;{$ctx:connectionName}&lt;/name&gt;
+        &lt;region&gt;{$ctx:region}&lt;/region&gt;
+    &lt;/amazons3.init&gt;
+
+    &lt;amazons3.listParts&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;objectKey&gt;{$ctx:objectKey}&lt;/objectKey&gt;
+        &lt;uploadId&gt;{$ctx:uploadId}&lt;/uploadId&gt;
+        &lt;maxParts&gt;{$ctx:maxParts}&lt;/maxParts&gt;
+        &lt;partNumberMarker&gt;{$ctx:partNumberMarker}&lt;/partNumberMarker&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+    &lt;/amazons3.listParts&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;listParts&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;objectKey&gt;myimage.png&lt;/objectKey&gt;
+        &lt;uploadId&gt;KyxZ7yjpSSZM9f0bdRectMF5dPg2h08BqTsmWf.8OEIq2Z4YvYg01LmJL0kVDqVcz2utci2CDE2Cn7k647j_84GhExGAN9uer65jljH_oapI758RA_AmcyW4N2usGHH0&lt;/uploadId&gt;
+        &lt;maxParts&gt;100&lt;/maxParts&gt;
+        &lt;partNumberMarker&gt;8&lt;/partNumberMarker&gt;
+    &lt;/listParts&gt;
+    ```
+
+??? note &quot;createMultipartUpload&quot;
+    The createMultipartUpload operation initiates a multipart upload and returns an upload ID. This upload ID is used to associate all the parts in the specific multipart upload. You specify this upload ID in each of your subsequent uploadPart requests. You also include this upload ID in the final request to either complete or abort the multipart upload request.
+
+    For request signing, multipart upload is just a series of regular requests: you initiate multipart upload, send one or more requests to upload parts (uploadPart), and finally complete multipart upload (completeMultipartUpload). You sign each request individually. After you initiate multipart upload and upload one or more parts, you must either complete or abort multipart upload in order to stop getting charged for storage of the uploaded parts. Only after you either complete or abort multipart upload will Amazon S3 free up the parts storage and stop charging you for the parts storage.
+
+    Following is the proxy configuration for init and createMultipartUpload. The init section has connection parameters.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/CreateMultipartUploadRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;The name of the object.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;acl&lt;/td&gt;
+            &lt;td&gt;The canned ACL to apply to the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantRead&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to list the objects in the bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantReadACP&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to read the bucket ACL.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantWriteACP&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees to write the ACL for the applicable bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;grantFullControl&lt;/td&gt;
+            &lt;td&gt;Allows the specified grantee or grantees the READ, WRITE, READ_ACP, and WRITE_ACP permissions on the bucket.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;metadata&lt;/td&gt;
+            &lt;td&gt;Specifies whether the metadata is copied from the source object or replaced with metadata provided in the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;serverSideEncryption&lt;/td&gt;
+            &lt;td&gt;Specifies the server-side encryption algorithm to use when Amazon S3 creates the target object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;storageClass&lt;/td&gt;
+            &lt;td&gt;RRS enables customers to reduce their costs by storing non-critical, reproducible data at lower levels of redundancy than Amazon S3&#x27;s standard storage.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;websiteRedirectLocation&lt;/td&gt;
+            &lt;td&gt;If the bucket is configured as a website, redirects requests for this object to another object in the same bucket or to an external URL. Amazon S3 stores the value of this parameter in the object metadata.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerAlgorithm&lt;/td&gt;
+            &lt;td&gt;Specifies the algorithm to use to when encrypting the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerKey&lt;/td&gt;
+            &lt;td&gt;Specifies the customer-provided encryption key for Amazon S3 to use in encrypting data.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerKeyMD5&lt;/td&gt;
+            &lt;td&gt;Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ssekmsKeyId&lt;/td&gt;
+            &lt;td&gt;Specifies the ID of the symmetric customer managed AWS KMS CMK to use for object encryption.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ssekmsEncryptionContext&lt;/td&gt;
+            &lt;td&gt;Specifies the AWS KMS Encryption Context to use for object encryption.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;cacheControl&lt;/td&gt;
+            &lt;td&gt;This can be used to specify caching behavior along the request or reply chain.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentDisposition&lt;/td&gt;
+            &lt;td&gt;This specifies presentational information for the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentEncoding&lt;/td&gt;
+            &lt;td&gt;This specifies what content encodings have been applied to the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentLanguage&lt;/td&gt;
+            &lt;td&gt;This specifies what content encodings have been applied to the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentType&lt;/td&gt;
+            &lt;td&gt;A standard MIME type describing the format of the object data.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;expires&lt;/td&gt;
+            &lt;td&gt;The date and time at which the object is no longer cacheable.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tagging&lt;/td&gt;
+            &lt;td&gt;The tag-set for the object. The tag-set must be encoded as URL Query parameters. (For example, &quot;Key1=Value1&quot;). This must be used in conjunction with the TaggingDirective.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectLockMode&lt;/td&gt;
+            &lt;td&gt;The object lock mode that you want to apply to the uploaded object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectLockRetainUntilDate&lt;/td&gt;
+            &lt;td&gt;Specifies the date and time when you want the Object Lock to expire.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectLockLegalHoldStatus&lt;/td&gt;
+            &lt;td&gt;Specifies whether you want to apply a Legal Hold to the uploaded object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.init&gt;
+        &lt;awsAccessKeyId&gt;{$ctx:awsAccessKeyId}&lt;/awsAccessKeyId&gt;
+        &lt;awsSecretAccessKey&gt;{$ctx:awsSecretAccessKey}&lt;/awsSecretAccessKey&gt;
+        &lt;name&gt;{$ctx:connectionName}&lt;/name&gt;
+        &lt;region&gt;{$ctx:region}&lt;/region&gt;
+    &lt;/amazons3.init&gt;
+
+    &lt;amazons3.createMultipartUpload&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;objectKey&gt;{$ctx:objectKey}&lt;/objectKey&gt;
+        &lt;acl&gt;{$ctx:acl}&lt;/acl&gt;
+        &lt;cacheControl&gt;{$ctx:cacheControl}&lt;/cacheControl&gt;
+        &lt;contentDisposition&gt;{$ctx:contentDisposition}&lt;/contentDisposition&gt;
+        &lt;contentEncoding&gt;{$ctx:contentEncoding}&lt;/contentEncoding&gt;
+        &lt;contentLanguage&gt;{$ctx:contentLanguage}&lt;/contentLanguage&gt;
+        &lt;contentType&gt;{$ctx:contentType}&lt;/contentType&gt;
+        &lt;expires&gt;{$ctx:expires}&lt;/expires&gt;
+        &lt;grantRead&gt;{$ctx:grantRead}&lt;/grantRead&gt;
+        &lt;grantReadACP&gt;{$ctx:grantReadACP}&lt;/grantReadACP&gt;
+        &lt;grantWriteACP&gt;{$ctx:grantWriteACP}&lt;/grantWriteACP&gt;
+        &lt;grantFullControl&gt;{$ctx:grantFullControl}&lt;/grantFullControl&gt;
+        &lt;metadata&gt;{$ctx:metadata}&lt;/metadata&gt;
+        &lt;serverSideEncryption&gt;{$ctx:serverSideEncryption}&lt;/serverSideEncryption&gt;
+        &lt;storageClass&gt;{$ctx:storageClass}&lt;/storageClass&gt;
+        &lt;websiteRedirectLocation&gt;{$ctx:websiteRedirectLocation}&lt;/websiteRedirectLocation&gt;
+        &lt;sseCustomerAlgorithm&gt;{$ctx:sseCustomerAlgorithm}&lt;/sseCustomerAlgorithm&gt;
+        &lt;sseCustomerKey&gt;{$ctx:sseCustomerKey}&lt;/sseCustomerKey&gt;
+        &lt;sseCustomerKeyMD5&gt;{$ctx:sseCustomerKeyMD5}&lt;/sseCustomerKeyMD5&gt;
+        &lt;ssekmsKeyId&gt;{$ctx:ssekmsKeyId}&lt;/ssekmsKeyId&gt;
+        &lt;ssekmsEncryptionContext&gt;{$ctx:ssekmsEncryptionContext}&lt;/ssekmsEncryptionContext&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+        &lt;tagging&gt;{$ctx:tagging}&lt;/tagging&gt;
+        &lt;objectLockMode&gt;{$ctx:objectLockMode}&lt;/objectLockMode&gt;
+        &lt;objectLockRetainUntilDate&gt;{$ctx:objectLockRetainUntilDate}&lt;/objectLockRetainUntilDate&gt;
+        &lt;objectLockLegalHoldStatus&gt;{$ctx:objectLockLegalHoldStatus}&lt;/objectLockLegalHoldStatus&gt;
+    &lt;/amazons3.createMultipartUpload&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;createMultipartUpload&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;objectKey&gt;upload.png&lt;/objectKey&gt;
+        &lt;metadata&gt;Content-Language:enus&lt;/metadata&gt;
+        &lt;serverSideEncryption&gt;AES256&lt;/serverSideEncryption&gt;
+        &lt;storageClass&gt;STANDARD&lt;/storageClass&gt;
+    &lt;/createMultipartUpload&gt;
+    ```
+
+??? note &quot;multipartUpload&quot;
+    The multipartUpload operation initializes and completes a multipart upload by uploading parts to that specific multipart upload.
+
+    Following is the proxy configuration for init and multipartUpload. The init section has connection parameters.
+
+    !!! note
+        The `fileContent` parameter is available only with Amazon S3 connector v2.0.2 and above. Either the `filePath` or `fileContent` parameter is mandatory.
+        The `isContentBase64Encoded` parameter is available only with Amazon S3 connector v2.0.7 and above.
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;The name of the object.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;partDetails&lt;/td&gt;
+            &lt;td&gt;This contains all the parts with the part numbers.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;filePath&lt;/td&gt;
+            &lt;td&gt;The path of the source file to be uploaded.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fileContent&lt;/td&gt;
+            &lt;td&gt;Content of the file.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;isContentBase64Encoded&lt;/td&gt;
+            &lt;td&gt;Indicates whether the &lt;code&gt;fileContent&lt;/code&gt; should be treated as Base64-encoded. By default, this is set to &lt;code&gt;false&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.init&gt;
+        &lt;awsAccessKeyId&gt;{$ctx:awsAccessKeyId}&lt;/awsAccessKeyId&gt;
+        &lt;awsSecretAccessKey&gt;{$ctx:awsSecretAccessKey}&lt;/awsSecretAccessKey&gt;
+        &lt;name&gt;{$ctx:connectionName}&lt;/name&gt;
+        &lt;region&gt;{$ctx:region}&lt;/region&gt;
+    &lt;/amazons3.init&gt;
+
+    &lt;amazons3.multipartUpload&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;objectKey&gt;{$ctx:objectKey}&lt;/objectKey&gt;
+        &lt;partDetails&gt;{$ctx:partDetails}&lt;/partDetails&gt;
+        &lt;filePath&gt;{$ctx:filePath}&lt;/filePath&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+    &lt;/amazons3.multipartUpload&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;multipartUpload&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;objectKey&gt;myimage.png&lt;/objectKey&gt;
+        &lt;filePath&gt;/Users/mine/Desktop/10MB.mp4&lt;/filePath&gt;
+        &lt;PartDetails&gt;
+            &lt;Part&gt;
+                &lt;PartNumber&gt;1&lt;/PartNumber&gt;
+            &lt;/Part&gt;
+            &lt;Part&gt;
+                &lt;PartNumber&gt;2&lt;/PartNumber&gt;
+            &lt;/Part&gt;
+        &lt;/PartDetails&gt;
+    &lt;/multipartUpload&gt;
+    ```
+
+??? note &quot;getObjectACL&quot;
+    The getObjectACL operation uses the ACL subresource to return the access control list (ACL) of an object. To use this operation, you must have READ_ACP access to the object.
+
+    Following is the proxy configuration for getObjectACL.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetObjectAclRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;The name of the object.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;versionId&lt;/td&gt;
+            &lt;td&gt;VersionId used to reference a specific version of the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getObjectACL&gt;
+        &lt;objectKey&gt;{$ctx:objectKey}&lt;/objectKey&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;versionId&gt;{$ctx:versionId}&lt;/versionId&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+    &lt;/amazons3.getObjectACL&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getObjectACL&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;objectKey&gt;testFile.txt&lt;/objectKey&gt;
+    &lt;/getObjectACL&gt;
+    ```
+
+??? note &quot;getObjectTagging&quot;
+    The getObjectTagging operation returns the tag-set of an object. You send the request against the tagging subresource associated with the object.
+
+    By default, this operation returns information about current version of an object. To retrieve tags of any other version, use the versionId parameter.
+
+    To use this operation, you must have permission to perform the s3:GetObjectTagging action. To retrieve tags of a version, you need permission for the s3:GetObjectVersionTagging action.
+
+    Following is the proxy configuration for getObjectTagging.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetObjectTaggingRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;The name of the object.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;versionId&lt;/td&gt;
+            &lt;td&gt;The version id of the object to retrieve tags of it.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getObjectTagging&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;objectKey&gt;{$ctx:objectKey}&lt;/objectKey&gt;
+        &lt;versionId&gt;{$ctx:versionId}&lt;/versionId&gt;
+    &lt;/amazons3.getObjectTagging&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getObjectTagging&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;objectKey&gt;testFile.txt&lt;/objectKey&gt;
+    &lt;/getObjectTagging&gt;
+    ```
+
+??? note &quot;getObjectTorrent&quot;
+    The getObjectTorrent operation uses the torrent subresource to return torrent files from a bucket. BitTorrent can save you bandwidth when you&#x27;re distributing large files.
+
+    You can get torrent only for objects that are less than 5 GB in size and that are not encrypted using server-side encryption with customer-provided encryption key.
+
+    To use this operation, you must have READ access to the object.
+
+    Following is the proxy configuration for getObjectTorrent.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/GetObjectTorrentRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;The name of the object.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;torrentFilePath&lt;/td&gt;
+            &lt;td&gt;The path of the torrent file to be created.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.getObjectTorrent&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;objectKey&gt;{$ctx:objectKey}&lt;/objectKey&gt;
+        &lt;torrentFilePath&gt;{$ctx:torrentFilePath}&lt;/torrentFilePath&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+    &lt;/amazons3.getObjectTorrent&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;getObjectTorrent&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;objectKey&gt;testFile.txt&lt;/objectKey&gt;
+        &lt;torrentFilePath&gt;/Users/mine/Desktop/testFile.torrent&lt;/torrentFilePath&gt;
+    &lt;/getObjectTorrent&gt;
+    ```
+
+??? note &quot;restoreObject&quot;
+    The restoreObject operation restores a temporary copy of an archived object. You can optionally provide version ID to restore specific object version. If version ID is not provided, it will restore the current version. The number of days that you want the restored copy will be determined by numberOfDays. After the specified period, Amazon S3 deletes the temporary copy. Note that the object remains archived; Amazon S3 deletes only the restored copy.
+
+    An object in the Glacier storage class is an archived object. To access the object, you must first initiate a restore request, which restores a copy of the archived object. Restore jobs typically complete in three to five hours.
+
+    Following is the proxy configuration for restoreObject.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/RestoreObjectRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;The name of the object.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;versionId&lt;/td&gt;
+            &lt;td&gt;Version Id of an object to restore a specific object version.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;restoreRequest&lt;/td&gt;
+            &lt;td&gt;Container for the RestoreRequest parameters (Days, Description, GlacierJobParameters, OutputLocation, SelectParameters, Tier and Type).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.restoreObject&gt;
+        &lt;objectKey&gt;{$ctx:objectKey}&lt;/objectKey&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;versionId&gt;{$ctx:versionId}&lt;/versionId&gt;
+        &lt;restoreRequest&gt;{$ctx:restoreRequest}&lt;/restoreRequest&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+    &lt;/amazons3.restoreObject&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;restoreObject&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;objectKey&gt;testFile.txt&lt;/objectKey&gt;
+        &lt;RestoreRequest&gt;
+            &lt;Days&gt;2&lt;/Days&gt;
+            &lt;GlacierJobParameters&gt;
+                &lt;Tier&gt;Expedited&lt;/Tier&gt;
+            &lt;/GlacierJobParameters&gt;
+        &lt;/RestoreRequest&gt;
+    &lt;/restoreObject&gt;
+    ```
+
+??? note &quot;uploadPartCopy&quot;
+    The uploadPartCopy operation uploads a part by copying data from an existing object as data source. You specify the data source by adding the copySource in your request and a byte range by adding the copySourceRange in your request. The minimum allowable part size for a multipart upload is 5 MB.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/UploadPartCopyRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;The name to give the newly created object.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;uploadId&lt;/td&gt;
+            &lt;td&gt;This specify the ID of the initiated multipart upload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;partNumber&lt;/td&gt;
+            &lt;td&gt;This specify the number or the index of the uploaded part.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;copySource&lt;/td&gt;
+            &lt;td&gt;The name of the source bucket and key name of the source object, separated by a slash (/).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;copySourceRange&lt;/td&gt;
+            &lt;td&gt;Copy the specified range bytes of an object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ifModifiedSince&lt;/td&gt;
+            &lt;td&gt;Return the object only if it has been modified.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ifUnmodifiedSince&lt;/td&gt;
+            &lt;td&gt;Return the object only if it has not been modified.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ifMatch&lt;/td&gt;
+            &lt;td&gt;Return the object only if its ETag is the same.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ifNoneMatch&lt;/td&gt;
+            &lt;td&gt;Returns the object only if its ETag is not the same as the one specified.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;copySourceSSECustomerAlgorithm&lt;/td&gt;
+            &lt;td&gt;Specifies the algorithm to use when decrypting the source object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;copySourceSSECustomerKey&lt;/td&gt;
+            &lt;td&gt;Specifies the customer-provided encryption key for Amazon S3 to use to decrypt the source object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;copySourceSSECustomerKeyMD5&lt;/td&gt;
+            &lt;td&gt;Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerAlgorithm&lt;/td&gt;
+            &lt;td&gt;Specifies the algorithm to use to when encrypting the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerKey&lt;/td&gt;
+            &lt;td&gt;Specifies the customer-provided encryption key for Amazon S3 to use in encrypting data.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerKeyMD5&lt;/td&gt;
+            &lt;td&gt;Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.uploadPartCopy&gt;
+        &lt;objectKey&gt;{$ctx:objectKey}&lt;/objectKey&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;uploadId&gt;{$ctx:uploadId}&lt;/uploadId&gt;
+        &lt;partNumber&gt;{$ctx:partNumber}&lt;/partNumber&gt;
+        &lt;copySource&gt;/imagesBucket5/testObject37&lt;/copySource&gt;
+        &lt;copySourceRange&gt;{$ctx:copySourceRange}&lt;/copySourceRange&gt;
+        &lt;ifModifiedSince&gt;{$ctx:ifModifiedSince}&lt;/ifModifiedSince&gt;
+        &lt;ifUnmodifiedSince&gt;{$ctx:ifUnmodifiedSince}&lt;/ifUnmodifiedSince&gt;
+        &lt;ifMatch&gt;{$ctx:ifMatch}&lt;/ifMatch&gt;
+        &lt;ifNoneMatch&gt;{$ctx:ifNoneMatch}&lt;/ifNoneMatch&gt;
+        &lt;copySourceSSECustomerAlgorithm&gt;{$ctx:copySourceSSECustomerAlgorithm}&lt;/copySourceSSECustomerAlgorithm&gt;
+        &lt;copySourceSSECustomerKey&gt;{$ctx:copySourceSSECustomerKey}&lt;/copySourceSSECustomerKey&gt;
+        &lt;copySourceSSECustomerKeyMD5&gt;{$ctx:copySourceSSECustomerKeyMD5}&lt;/copySourceSSECustomerKeyMD5&gt;
+        &lt;sseCustomerAlgorithm&gt;{$ctx:sseCustomerAlgorithm}&lt;/sseCustomerAlgorithm&gt;
+        &lt;sseCustomerKey&gt;{$ctx:sseCustomerKey}&lt;/sseCustomerKey&gt;
+        &lt;sseCustomerKeyMD5&gt;{$ctx:sseCustomerKeyMD5}&lt;/sseCustomerKeyMD5&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+    &lt;/amazons3.uploadPartCopy&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;uploadPartCopy&gt;
+        &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+        &lt;objectKey&gt;testFile1.txt&lt;/objectKey&gt;
+        &lt;uploadId&gt;SsNUDqUklMaoV_IfePCpGAZHjaxJx.cGXEcX6TVW4I6WzOQFnAKomYevz5qi5LtkfTvlpwjY9M6QDGsIIvdGEQzBURo3MMU2Yh.ZEQDsk_lsnx3Z8m9jsglW6FIfKGQ_&lt;/uploadId&gt;
+        &lt;partNumber&gt;2&lt;/partNumber&gt;
+        &lt;copySource&gt;/testBucket1/testFile.jpg&lt;/copySource&gt;
+        &lt;range&gt;bytes=0-9&lt;/range&gt;
+    &lt;/uploadPartCopy&gt;
+    ```
+
+??? note &quot;headObject&quot;
+    The headObject operation retrieves metadata from an object without returning the object itself. This operation is useful if you are interested only in an object&#x27;s metadata. To use this operation, you must have READ access to that object. A HEAD request has the same options as a GET operation on an object. The response is identical to the GET response except that there is no response body.
+
+    See the [related API documentation](https://sdk.amazonaws.com/java/api/latest/software/amazon/awssdk/services/s3/model/HeadObjectRequest.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bucketName&lt;/td&gt;
+            &lt;td&gt;The name of the bucket.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;objectKey&lt;/td&gt;
+            &lt;td&gt;The name to give the newly created object.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;range&lt;/td&gt;
+            &lt;td&gt;The specified range bytes of an object to download.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ifModifiedSince&lt;/td&gt;
+            &lt;td&gt;Return the object only if it has been modified since the specified time.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ifUnmodifiedSince&lt;/td&gt;
+            &lt;td&gt;Return the object only if it has not been modified since the specified time.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ifMatch&lt;/td&gt;
+            &lt;td&gt;Return the object only if its entity tag (ETag) is the same as the one specified.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ifNoneMatch&lt;/td&gt;
+            &lt;td&gt;Return the object only if its entity tag (ETag) is different from the one specified.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;versionId&lt;/td&gt;
+            &lt;td&gt;VersionId used to reference a specific version of the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerAlgorithm&lt;/td&gt;
+            &lt;td&gt;Specifies the algorithm to use to when encrypting the object.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerKey&lt;/td&gt;
+            &lt;td&gt;Specifies the customer-provided encryption key for Amazon S3 to use in encrypting data.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sseCustomerKeyMD5&lt;/td&gt;
+            &lt;td&gt;Specifies the 128-bit MD5 digest of the encryption key according to RFC 1321.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;partNumber&lt;/td&gt;
+            &lt;td&gt;Part number of the object being read.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestPayer&lt;/td&gt;
+            &lt;td&gt;Confirms that the requester knows that they will be charged for the request.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazons3.headObject&gt;
+        &lt;bucketName&gt;{$ctx:bucketName}&lt;/bucketName&gt;
+        &lt;objectKey&gt;{$ctx:objectKey}&lt;/objectKey&gt;
+        &lt;range&gt;{$ctx:range}&lt;/range&gt;
+        &lt;ifModifiedSince&gt;{$ctx:ifModifiedSince}&lt;/ifModifiedSince&gt;
+        &lt;ifUnmodifiedSince&gt;{$ctx:ifUnmodifiedSince}&lt;/ifUnmodifiedSince&gt;
+        &lt;ifMatch&gt;{$ctx:ifMatch}&lt;/ifMatch&gt;
+        &lt;ifNoneMatch&gt;{$ctx:ifNoneMatch}&lt;/ifNoneMatch&gt;
+        &lt;versionId&gt;{$ctx:versionId}&lt;/versionId&gt;
+        &lt;sseCustomerAlgorithm&gt;{$ctx:sseCustomerAlgorithm}&lt;/sseCustomerAlgorithm&gt;
+        &lt;sseCustomerKey&gt;{$ctx:sseCustomerKey}&lt;/sseCustomerKey&gt;
+        &lt;sseCustomerKeyMD5&gt;{$ctx:sseCustomerKeyMD5}&lt;/sseCustomerKeyMD5&gt;
+        &lt;partNumber&gt;{$ctx:partNumber}&lt;/partNumber&gt;
+        &lt;requestPayer&gt;{$ctx:requestPayer}&lt;/requestPayer&gt;
+    &lt;/amazons3.headObject&gt;
+    ```
+
+    **Sample request**
+
+    ```xml
+    &lt;headObject&gt;
+      &lt;bucketName&gt;signv4test&lt;/bucketName&gt;
+      &lt;objectKey&gt;testObject2&lt;/objectKey&gt;
+    &lt;/headObject&gt;
+    ``` 
+    
+</body>
+</html>

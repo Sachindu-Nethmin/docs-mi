@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>fault-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Fault Mediator
+
+The **Fault Mediator** (also called the **Makefault Mediator**) transforms the current message into a fault message. However, this mediator does not send the converted message. The [Send Mediator]({{base_path}}/reference/mediators/send-mediator) needs to be invoked to send a fault message created via the Fault mediator. The fault message&#x27;s `To` header is set to the `Fault-To` of the original message (if such a header exists in the original message). You can create the fault message as a SOAP 1.1, SOAP 1.2, or plain-old XML (POX) fault.
+
+For more information on faults and errors, see [Error Handling]({{base_path}}/reference/troubleshooting/error-handling-mi).
+
+## Syntax
+
+```xml
+&lt;makefault [description=&quot;string&quot;] [version=&quot;soap11|soap12|pox&quot;]&gt;
+    &lt;code (value=&quot;literal&quot; | expression=&quot;xpath&quot;)/&gt;
+    &lt;reason (value=&quot;literal&quot; | expression=&quot;xpath&quot;)/&gt;
+    &lt;node&gt;?
+    &lt;role&gt;?
+    &lt;detail&gt;?
+&lt;/makefault&gt;
+```
+
+## Configuration
+
+The parameters available to configure the Fault mediator to create a SOAP 1.1 fault are as follows.
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Code&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;This parameter is used to select the fault code for which the fault string should be defined. Possible values are as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;versionMismatch&lt;/strong&gt;: Select this to specify the fault string for a SOAP version mismatch.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;mustUnderstand&lt;/strong&gt;: Select this to specify the fault string for the &lt;code&gt;mustUnderstand&lt;/code&gt; error in SOAP.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Client&lt;/strong&gt;: Select this to specify the fault string for client-side errors.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Server&lt;/strong&gt;: Select this to specify the fault string for server-side errors.&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Reason&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;The detailed fault string of the fault code. The following options are available.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;value&lt;/strong&gt;: If this option is selected, the fault string is specified as a string value.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;expression&lt;/strong&gt;: If this option is selected, the fault string is specified as an expression.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;b&gt;Tip&lt;/b&gt;:
+&lt;p&gt;You can click &lt;strong&gt;NameSpaces&lt;/strong&gt; to add namespaces if you are providing an expression. Then the &lt;strong&gt;Namespace Editor&lt;/strong&gt; panel would appear where you can provide any number of namespace prefixes and URLs used in the XPath expression.&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Role&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;The element of the SOAP fault message which is used to capture the party that the fault.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Detail&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;This parameter is used to enter a custom description of the error. The following options are available.
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;value&lt;/strong&gt;: If this option is selected, the reason is specified as a string value.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;expression&lt;/strong&gt;: If this option is selected, the reason is specified as an expression.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+The parameters available to configure the Fault mediator to create a SOAP 1.2 fault are as follows.
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Code&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;This parameter is used to select the fault code for which the reason should be defined. Possible values are as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;versionMismatch&lt;/strong&gt;: Select this to specify the reason for a SOAP version mismatch.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;mustUnderstand&lt;/strong&gt;: Select this to specify the reason for the &lt;code&gt;mustUnderstand&lt;/code&gt; error in SOAP.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;dataEncodingUnknown&lt;/strong&gt;: Select this to specify the reason for a SOAP encoding error.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Sender&lt;/strong&gt;: Select this to specify the reason for a sender-side error.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Receiver&lt;/strong&gt;: Select this to specify the reason for a receiver-side error.&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Reason&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+This parameter is used to specify the reason for the error code selected in the &lt;strong&gt;Code&lt;/strong&gt; parameter. The following options are available.
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;value&lt;/strong&gt;: If this option is selected, the reason is specified as a string value.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;expression&lt;/strong&gt;: If this option is selected, the reason is specified as an expression.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;b&gt;Tip&lt;/b&gt;:
+&lt;p&gt;You can click &lt;strong&gt;NameSpaces&lt;/strong&gt; to add namespaces if you are providing an expression. Then the &lt;strong&gt;Namespace Editor&lt;/strong&gt; panel would appear where you can provide any number of namespace prefixes and URLs used in the XPath expression.&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Role&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;The SOAP 1.2 role name.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Node&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;The SOAP 1.2 node name.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Detail&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;This parameter is used to enter a custom description of the error. The following options are available.
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;value&lt;/strong&gt;: If this option is selected, the reason is specified as a string value.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;expression&lt;/strong&gt;: If this option is selected, the reason is specified as an expression.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+The parameters available to configure the Fault mediator to create a plain-old XML (POX) fault are as follows.
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Reason&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;This parameter is used to enter a custom fault message. The following options are available.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;value&lt;/strong&gt;: If this option is selected, the fault message is specified as a string value.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;expression&lt;/strong&gt;: If this option is selected, the fault message is specified as an expression.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;b&gt;Tip&lt;/b&gt;:
+&lt;p&gt;You can click &lt;strong&gt;NameSpaces&lt;/strong&gt; to add namespaces if you are providing an expression. Then the &lt;strong&gt;Namespace Editor&lt;/strong&gt; panel would appear where you can provide any number of namespace prefixes and URLs used in the XPath expression.&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Detail&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;This parameter is used to enter details for the fault message. The following options are available.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;value&lt;/strong&gt;: If this option is selected, the detail is specified as a string value.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;expression&lt;/strong&gt;: If this option is selected, the detail is specified as an expression.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;b&gt;Tip&lt;/b&gt;:
+&lt;p&gt;You can click &lt;strong&gt;NameSpaces&lt;/strong&gt; to add namespaces if you are providing an expression. Then the &lt;strong&gt;Namespace Editor&lt;/strong&gt; panel would appear where you can provide any number of namespace prefixes and URLs used in the XPath expression.&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+## Examples
+
+Following are examples of different usages of the Fault Mediator.
+
+### Example 1
+
+In the following example, the `test message` string value is given as the reason for the SOAP error `versionMismatch`.
+
+```xml
+&lt;makefault version=&quot;soap11&quot;&gt;
+    &lt;code value=&quot;soap11Env:VersionMismatch&quot; xmlns:soap11Env=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;/&gt;
+    &lt;reason value=&quot;test message&quot;/&gt;
+&lt;/makefault&gt;
+```
+
+### Example 2
+
+The following sample proxy validates the content type using the If Else Mediator based on the `Content-Type` header property. If the result is true, it sends an exception back to the client using the Fault Mediator. Otherwise, if the result is false, it continues the flow.
+
+``` xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;proxy name=&quot;CheckContentType&quot; startOnLoad=&quot;true&quot; transports=&quot;http https&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+	&lt;target&gt;
+		&lt;inSequence&gt;
+			&lt;filter regex=&quot;application/json&quot; source=&quot;get-property(&#x27;transport&#x27;,&#x27;Content-Type&#x27;)&quot;&gt;
+				&lt;then&gt;
+					&lt;log category=&quot;INFO&quot; level=&quot;simple&quot;&gt;
+						&lt;property name=&quot;CONTENT-TYPE&quot; expression=&quot;get-property(&#x27;transport&#x27;,&#x27;Content-Type&#x27;)&quot;/&gt;
+						&lt;property name=&quot;DECISION&quot; value=&quot;Exception, due to unexpected Content-Type.&quot;/&gt;
+					&lt;/log&gt;
+					&lt;makefault description=&quot;&quot; version=&quot;soap11&quot;&gt;
+						&lt;code value=&quot;soap11Env:Client&quot; xmlns:soap11Env=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;/&gt;
+						&lt;reason value=&quot;Content-Type Error&quot;/&gt;
+						&lt;detail&gt;Content-Type: application/json is not a valid content type.&lt;/detail&gt;
+					&lt;/makefault&gt;
+				&lt;/then&gt;
+				&lt;else&gt;
+					&lt;log category=&quot;INFO&quot; level=&quot;simple&quot;&gt;
+						&lt;property name=&quot;CONTENT-TYPE&quot; expression=&quot;get-property(&#x27;transport&#x27;,&#x27;Content-Type&#x27;)&quot;/&gt;
+						&lt;property name=&quot;DECISION&quot; value=&quot;Continue the mediation flow...&quot;/&gt;
+					&lt;/log&gt;
+				&lt;/else&gt;
+			&lt;/filter&gt;
+			&lt;respond/&gt;
+		&lt;/inSequence&gt;
+		&lt;faultSequence/&gt;
+	&lt;/target&gt;
+&lt;/proxy&gt;
+```
+</body>
+</html>

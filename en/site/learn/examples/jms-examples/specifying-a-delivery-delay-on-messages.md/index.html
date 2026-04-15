@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>specifying-a-delivery-delay-on-messages.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Specify Delivery Delay on Messages
+
+In a normal message flow, JMS messages that are sent by the JMS producer to the JMS broker are forwarded to the respective JMS consumer without any delay.
+
+With the delivery delay messaging feature introduced with JMS 2.0, you can specify a delivery delay time value in each JMS message so that the JMS broker will not deliver the message until after the specified delivery delay has elapsed. Specifying a delivery delay is useful if there is a scenario where you do not want a message consumer to receive a message that is sent until a specified time duration has elapsed. To implement this, you need to add a delivery delay to the JMS producer so
+that the publisher does not deliver a message until the specified delivery delay time interval has elapsed.
+
+The following diagram illustrates how you can use the WSO2 Integrator: MI as a JMS producer and specify a delivery delay on messages when you do not want the message consumer to receive a message until a specified time duration has elapsed.
+
+
+## Synapse configuration
+
+Given below are the synapse configurations that are required for mediating the above use case.
+
+See the instructions on how to [build and run](#build-and-run) this example.
+
+=== &quot;Proxy Service 1&quot;
+    ```xml
+    &lt;proxy name=&quot;JMSDelivery&quot; startOnLoad=&quot;true&quot; trace=&quot;disable&quot; transports=&quot;https http&quot;&gt;
+                &lt;target&gt;
+                    &lt;inSequence&gt;
+                        &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+                        &lt;property name=&quot;FORCE_SC_ACCEPTED&quot; scope=&quot;axis2&quot; value=&quot;true&quot;/&gt;
+                        &lt;property action=&quot;remove&quot; name=&quot;Content-Length&quot; scope=&quot;transport&quot;/&gt;
+                        &lt;property action=&quot;remove&quot; name=&quot;MIME-Version&quot; scope=&quot;transport&quot;/&gt;
+                        &lt;property action=&quot;remove&quot; name=&quot;Transfer-Encoding&quot; scope=&quot;transport&quot;/&gt;
+                        &lt;property action=&quot;remove&quot; name=&quot;User-Agent&quot; scope=&quot;transport&quot;/&gt;
+                        &lt;property action=&quot;remove&quot; name=&quot;Accept-Encoding&quot; scope=&quot;transport&quot;/&gt;
+                        &lt;property name=&quot;messageType&quot; scope=&quot;axis2&quot; value=&quot;application/xml&quot;/&gt;
+                        &lt;property action=&quot;remove&quot; name=&quot;Content-Type&quot; scope=&quot;transport&quot;/&gt;
+                        &lt;log level=&quot;full&quot;/&gt;
+                        &lt;call&gt;
+                            &lt;endpoint&gt;
+                                &lt;address uri=&quot;jms:transport.jms.ConnectionFactory=myQueueConnectionFactory&quot;/&gt;
+                            &lt;/endpoint&gt;
+                        &lt;/call&gt;
+                        &lt;respond/&gt;
+                    &lt;/inSequence&gt;
+                &lt;/target&gt;
+                &lt;publishWSDL uri=&quot;file:repository/samples/resources/proxy/sample_proxy_1.wsdl&quot; preservePolicy=&quot;true&quot;/&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;Proxy Service 2&quot;
+    ```xml
+    &lt;proxy name=&quot;JMSDeliveryDelayed&quot; startOnLoad=&quot;true&quot; trace=&quot;disable&quot; transports=&quot;https http&quot;&gt;
+                &lt;target&gt;
+                    &lt;inSequence&gt;
+                        &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+                        &lt;property name=&quot;FORCE_SC_ACCEPTED&quot; scope=&quot;axis2&quot; value=&quot;true&quot;/&gt;
+                        &lt;property action=&quot;remove&quot; name=&quot;Content-Length&quot; scope=&quot;transport&quot;/&gt;
+                        &lt;property action=&quot;remove&quot; name=&quot;MIME-Version&quot; scope=&quot;transport&quot;/&gt;
+                        &lt;property action=&quot;remove&quot; name=&quot;Transfer-Encoding&quot; scope=&quot;transport&quot;/&gt;
+                        &lt;property action=&quot;remove&quot; name=&quot;User-Agent&quot; scope=&quot;transport&quot;/&gt;
+                        &lt;property action=&quot;remove&quot; name=&quot;Accept-Encoding&quot; scope=&quot;transport&quot;/&gt;
+                        &lt;property name=&quot;messageType&quot; scope=&quot;axis2&quot; value=&quot;application/xml&quot;/&gt;
+                        &lt;property action=&quot;remove&quot; name=&quot;Content-Type&quot; scope=&quot;transport&quot;/&gt;
+                        &lt;property name=&quot;JMS_MESSAGE_DELAY&quot; scope=&quot;axis2&quot; value=&quot;10000&quot;/&gt;
+                        &lt;log level=&quot;full&quot;/&gt;
+                        &lt;call&gt;
+                            &lt;endpoint&gt;
+                                &lt;address uri=&quot;jms:/transport.jms.ConnectionFactory=myQueueConnectionFactory&quot;/&gt;
+                            &lt;/endpoint&gt;
+                        &lt;/call&gt;
+                        &lt;respond/&gt;
+                    &lt;/inSequence&gt;
+                &lt;/target&gt;
+                &lt;publishWSDL uri=&quot;file:repository/samples/resources/proxy/sample_proxy_1.wsdl&quot; preservePolicy=&quot;true&quot;/&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;Main Sequence&quot;
+    ```xml
+    &lt;sequence name=&quot;main&quot;&gt;
+        &lt;in&gt;
+            &lt;!-- Log all messages passing through --&gt;
+           &lt;log level=&quot;full&quot;/&gt;
+            &lt;!-- ensure that the default configuration only sends if it is one of samples --&gt;
+            &lt;!-- Otherwise Synapse would be an open proxy by default (BAD!)               --&gt;
+            &lt;filter regex=&quot;http://localhost:9000.*&quot; source=&quot;get-property(&#x27;To&#x27;)&quot;&gt;
+            &lt;!-- Send the messages where they have been sent (i.e. implicit &quot;To&quot; EPR) --&gt;
+            &lt;send/&gt;
+            &lt;/filter&gt;
+       &lt;/in&gt;
+       &lt;out&gt;
+            &lt;send/&gt;
+       &lt;/out&gt;
+       &lt;description&gt;The main sequence for the message mediation&lt;/description&gt;
+    &lt;/sequence&gt;
+    ```
+=== &quot;Fault Sequence&quot;
+    ```xml
+    &lt;sequence name=&quot;fault&quot;&gt;
+        &lt;!-- Log the message at the full log level with the ERROR_MESSAGE and the ERROR_CODE--&gt;
+        &lt;log level=&quot;full&quot;&gt;
+            &lt;property name=&quot;MESSAGE&quot; value=&quot;Executing default &#x27;fault&#x27; sequence&quot;/&gt;
+            &lt;property expression=&quot;get-property(&#x27;ERROR_CODE&#x27;)&quot; name=&quot;ERROR_CODE&quot;/&gt;
+            &lt;property expression=&quot;get-property(&#x27;ERROR_MESSAGE&#x27;)&quot; name=&quot;ERROR_MESSAGE&quot;/&gt;
+         &lt;/log&gt;
+         &lt;!-- Drops the messages by default if there is a fault --&gt;
+        &lt;drop/&gt;
+    &lt;/sequence&gt;
+    ```
+=== &quot;Registry Artifact&quot;
+    ```xml
+    &lt;registry provider=&quot;org.wso2.micro.integrator.registry.MicroIntegratorRegistry&quot;&gt;
+       &lt;parameter name=&quot;cachableDuration&quot;&gt;15000&lt;/parameter&gt;
+    &lt;/registry&gt;
+    ```
+=== &quot;Task Manager&quot;
+    ```xml 
+    &lt;taskManager provider=&quot;org.wso2.micro.integrator.mediation.ntask.NTaskTaskManager&quot;/&gt;
+    ```
+
+See the descriptions of the above configurations:
+
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Artifact&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Proxy Service 1&lt;/td&gt;
+        &lt;td&gt;
+            The &lt;code&gt;JMSDeliveryDelayed&lt;/code&gt; proxy service sets a delivery delay of 10 seconds on the message that it forwards
+        &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Proxy Service 2&lt;/td&gt;
+        &lt;td&gt;The &lt;code&gt;JMSDelivery&lt;/code&gt; proxy service does not set a delivery delay on the message.&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+3. Create the [proxy services]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service), [registry artifact]({{base_path}}/develop/creating-artifacts/creating-registry-resources), [Scheduled trigger]({{base_path}}/develop/creating-artifacts/creating-scheduled-task), and [sequences]({{base_path}}/develop/creating-artifacts/creating-reusable-sequences) with the configurations given above.
+4. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+Set up the broker:
+
+1.  [Configure a broker]({{base_path}}/install-and-setup/setup/transport-configurations/configuring-transports/#configuring-the-jms-transport) with your WSO2 Integrator: MI instance. Let&#x27;s use HornetQ for this example.
+    
+    -   On **Windows**: HORNETQ_HOME\bin\run.bat --run
+    -   On **MacOS/Linux/Solaris**: sh HORNETQ_HOME/bin/run.sh
+
+2.  Start the broker.
+3.  Start the WSO2 Integrator: MI.
+
+Follow the steps given below to run the example:
+
+1. Run the following java file (**QueueConsumer.java**), which acts as the JMS consumer that consumes messages from the queue:
+
+    ```java
+    package DeliveryDelay;
+        
+    import java.sql.Timestamp;
+    import java.util.Date;
+    import java.util.Properties;
+        
+    import javax.jms.Connection;
+    import javax.jms.ConnectionFactory;
+    import javax.jms.MessageConsumer;
+    import javax.jms.Session;
+    import javax.jms.TextMessage;
+    import javax.jms.Queue;
+    import javax.naming.Context;
+    import javax.naming.InitialContext;
+        
+            /**
+             * Sample consumer to demonstrate JMS 2.0 feature :
+             * Message Delivery Delay
+             * Classic API is used
+             */
+        
+            public class QueueConsumer {
+            private static final String DEFAULT_CONNECTION_FACTORY = &quot;QueueConnectionFactory&quot;;
+            private static final String DEFAULT_DESTINATION = &quot;queue/mySampleQueue&quot;;
+            private static final String INITIAL_CONTEXT_FACTORY = &quot;org.jnp.interfaces.NamingContextFactory&quot;;
+            private static final String PROVIDER_URL = &quot;jnp://localhost:1099&quot;;
+        
+            public static void main(final String[] args) {
+            try {
+                        runExample();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+        
+            public static void runExample() throws Exception {
+            Connection connection = null;
+            Context initialContext = null;
+            try {
+        
+            // Step 1. Create an initial context to perform the JNDI lookup.
+            final Properties env = new Properties();
+                        env.put(Context.INITIAL_CONTEXT_FACTORY, INITIAL_CONTEXT_FACTORY);
+                        env.put(Context.PROVIDER_URL, System.getProperty(Context.PROVIDER_URL, PROVIDER_URL));
+                        initialContext = new InitialContext(env);
+        
+        
+            // Step 2. perform a lookup on the Queue
+            Queue queue = (Queue) initialContext.lookup(DEFAULT_DESTINATION);
+        
+        
+            // Step 3. perform a lookup on the Connection Factory
+            ConnectionFactory cf = (ConnectionFactory) initialContext.lookup(DEFAULT_CONNECTION_FACTORY);
+        
+        
+            // Step 4. Create a JMS Connection
+                        connection = cf.createConnection();
+        
+        
+            // Step 5. Create a JMS Session
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        
+            // Step 6. Create a JMS Message Consumer
+            MessageConsumer messageConsumer = session.createConsumer(queue);
+        
+            // Step 7. Start the Connection
+                        connection.start();
+            System.out.println(&quot;JMS consumer stated on the queue &quot; + DEFAULT_DESTINATION +
+            &quot;\n&quot;);
+        
+            //Clear the queue, if there is any previous messages in the queue
+            TextMessage tempMessage;
+            do{
+                            tempMessage = (TextMessage) messageConsumer.receive(1); 
+                        } while(tempMessage != null);
+        
+            // Step 8.1. Receive the message one
+            TextMessage firstMessage = (TextMessage) messageConsumer.receive(); 
+            long first = System.currentTimeMillis();
+            System.out.println(&quot;Consumer received message: [ &quot;+new Timestamp(new Date(first).getTime())+&quot; ] &quot; + firstMessage.getText() + &quot;\n&quot;);
+        
+            // Step 8.2. Receive delayed
+            TextMessage secondMessage = (TextMessage) messageConsumer.receive();    
+            long second = System.currentTimeMillis();
+            System.out.println(&quot;Consumer received dealyed message: [ &quot;+new Timestamp(new Date(second).getTime())+&quot; ] &quot; + secondMessage.getText() + &quot;\n&quot;);
+            System.out.println(&quot;Time difference between two messages : &quot;+(second-first)/1000+&quot;s&quot;);
+                    } finally {
+        
+            // Step 9. Close JMS resources
+            if (connection != null) {
+                            connection.close();
+                        }
+        
+            // Also the initialContext
+            if (initialContext != null) {
+                            initialContext.close();
+                        }
+                    }
+                }
+            }
+    ```
+
+2. Invoke the two proxy services (`http://localhost:8290/services/JMSDelivery`, `http://localhost:8290/services/JMSDeliveryDelayed`) with the following payload:
+
+    ```xml
+    &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+       &lt;soapenv:Header/&gt;
+       &lt;soapenv:Body&gt;
+          &lt;ser:getQuote&gt;
+             &lt;ser:request&gt;
+                &lt;xsd:symbol&gt;IBM&lt;/xsd:symbol&gt;
+             &lt;/ser:request&gt;
+          &lt;/ser:getQuote&gt;
+       &lt;/soapenv:Body&gt;
+    &lt;/soapenv:Envelope&gt;
+    ```
+
+You will see that two messages are received by the Java consumer with a time difference of more than 10 seconds.
+
+This is because the `JMSDeliveryDelayed` proxy service sets a delivery delay of 10 seconds on the message that it forwards, whereas the `JMSDelivery` proxy service does not set a delivery delay on the message.</body>
+</html>

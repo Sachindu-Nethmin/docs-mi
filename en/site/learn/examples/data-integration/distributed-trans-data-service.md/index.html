@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>distributed-trans-data-service.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Use Distributed Transactions in Data Services
+
+The data integration feature in WSO2 Integrator: MI supports data
+federation, which means that a single data service can expose data from
+multiple datasources. However, if you have multiple RDBMSs connected to
+your data service, and if you need to perform IN-ONLY operations
+(operations that can insert data and modify data in the datasource) in a
+coordinated manner, the RDBMSs need to be defined as XA datasources.
+
+Let&#x27;s consider a scenario where you have two MySQL databases. You can
+define a single data service for these databases and insert data into
+both as explained below.
+
+## Prerequisites
+
+Let&#x27;s create a MySQL database with the required data.
+
+1.  Install the MySQL server.
+2.  Set up a database for storing information of offices:
+    1.  Create a database called **OfficeDetails**.
+
+        ```bash
+        CREATE DATABASE OfficeDetails;
+        ```
+
+    2.  Create the **Offices** table:
+
+        ```bash
+        USE OfficeDetails;
+
+        CREATE TABLE `Offices` (`OfficeCode` int(11) NOT NULL, `AddressLine1` varchar(255) NOT NULL, `AddressLine2` varchar(255) DEFAULT NULL, `City` varchar(255) DEFAULT NULL, `State` varchar(255) DEFAULT NULL, `Country` varchar(255) DEFAULT NULL, `Phone` varchar(255) DEFAULT NULL, PRIMARY KEY (`OfficeCode`));
+        ```
+
+3.  Set up a database to store the employee information:
+    1.  Create a database called **EmployeeDetails** .
+
+        ```bash
+        CREATE DATABASE EmployeeDetails;
+        ```
+
+    2.  Create the **Employees** table:
+
+        ```bash
+        USE EmployeeDetails;
+
+        CREATE TABLE `Employees` (`EmployeeNumber` int(11) NOT NULL, `FirstName` varchar(255) NOT NULL, `LastName` varchar(255) DEFAULT NULL, `Email` varchar(255) DEFAULT NULL, `JobTitle` varchar(255) DEFAULT NULL, `OfficeCode` int(11) NOT NULL, PRIMARY KEY (`EmployeeNumber`));
+        ```
+
+## Synapse configuration
+
+Given below is the data service configuration you need to build. See the instructions on how to [build and run](#build-and-run) this example.
+
+```xml
+&lt;data name=&quot;distributed_transactions&quot; transports=&quot;http https local&quot;&gt;
+   &lt;config enableOData=&quot;false&quot; id=&quot;XAoffices&quot;&gt;
+      &lt;property name=&quot;dataSourceClassName&quot;&gt;com.mysql.jdbc.jdbc2.optional.MysqlXADataSource&lt;/property&gt;
+      &lt;property name=&quot;dataSourceProps&quot;&gt;
+         &lt;property name=&quot;url&quot;&gt;jdbc:mysql://localhost:3306/OfficeDetails&lt;/property&gt;
+         &lt;property name=&quot;user&quot;&gt;root&lt;/property&gt;
+         &lt;property name=&quot;password&quot;&gt;root&lt;/property&gt;
+      &lt;/property&gt;
+   &lt;/config&gt;
+   &lt;config enableOData=&quot;false&quot; id=&quot;XAemployees&quot;&gt;
+      &lt;property name=&quot;dataSourceClassName&quot;&gt;com.mysql.jdbc.jdbc2.optional.MysqlXADataSource&lt;/property&gt;
+      &lt;property name=&quot;dataSourceProps&quot;&gt;
+         &lt;property name=&quot;url&quot;&gt;jdbc:mysql://localhost:3306/EmployeeDetails&lt;/property&gt;
+         &lt;property name=&quot;user&quot;&gt;root&lt;/property&gt;
+         &lt;property name=&quot;password&quot;&gt;root&lt;/property&gt;
+      &lt;/property&gt;
+   &lt;/config&gt;
+   &lt;query id=&quot;InsertOfficeQuery&quot; useConfig=&quot;XAoffices&quot;&gt;
+      &lt;sql&gt;insert into Offices (OfficeCode,AddressLine1,AddressLine2,City,State,Country,Phone) values(:OfficeCode,:AddressLine1,&#x27;test&#x27;,&#x27;test&#x27;,&#x27;test&#x27;,&#x27;USA&#x27;,&#x27;test&#x27;)&lt;/sql&gt;
+      &lt;param name=&quot;OfficeCode&quot; sqlType=&quot;STRING&quot;/&gt;
+      &lt;param name=&quot;AddressLine1&quot; sqlType=&quot;STRING&quot;/&gt;
+   &lt;/query&gt;
+   &lt;query id=&quot;InsertEmployeeQuery&quot; useConfig=&quot;XAemployees&quot;&gt;
+      &lt;sql&gt;insert into Employees (EmployeeNumber,FirstName,LastName,Email,JobTitle,OfficeCode) values(:EmployeeNumber,:FirstName,:LastName,&#x27;test&#x27;,&#x27;test&#x27;,:OfficeCode)&lt;/sql&gt;
+      &lt;param name=&quot;EmployeeNumber&quot; sqlType=&quot;STRING&quot;/&gt;
+      &lt;param name=&quot;FirstName&quot; sqlType=&quot;STRING&quot;/&gt;
+      &lt;param name=&quot;LastName&quot; sqlType=&quot;STRING&quot;/&gt;
+      &lt;param name=&quot;OfficeCode&quot; sqlType=&quot;STRING&quot;/&gt;
+   &lt;/query&gt;
+   &lt;operation name=&quot;InsertOfficeOp&quot;&gt;
+      &lt;call-query href=&quot;InsertOfficeQuery&quot;&gt;
+         &lt;with-param name=&quot;OfficeCode&quot; query-param=&quot;OfficeCode&quot;/&gt;
+         &lt;with-param name=&quot;AddressLine1&quot; query-param=&quot;AddressLine1&quot;/&gt;
+      &lt;/call-query&gt;
+   &lt;/operation&gt;
+   &lt;operation name=&quot;InsertEmployeeOp&quot;&gt;
+      &lt;call-query href=&quot;InsertEmployeeQuery&quot;&gt;
+         &lt;with-param name=&quot;EmployeeNumber&quot; query-param=&quot;EmployeeNumber&quot;/&gt;
+         &lt;with-param name=&quot;FirstName&quot; query-param=&quot;FirstName&quot;/&gt;
+         &lt;with-param name=&quot;LastName&quot; query-param=&quot;LastName&quot;/&gt;
+         &lt;with-param name=&quot;OfficeCode&quot; query-param=&quot;OfficeCode&quot;/&gt;
+      &lt;/call-query&gt;
+   &lt;/operation&gt;
+&lt;/data&gt;
+```
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+
+3. [Create the data service]({{base_path}}/develop/creating-artifacts/data-services/creating-data-services) with the configurations given above.
+
+4. Download the JDBC driver for MySQL from [here](http://dev.mysql.com/downloads/connector/j/).
+
+5. Switch to the **EXPLORER** view in VS Code and copy the downloaded driver to the `&lt;PROJECT_NAME&gt;/deployment/lib/` directory in the project structure.
+
+    !!! Note
+        If the driver class does not exist in the relevant folders when you create the datasource, you will get an exception such as `Unable to load class: com.mysql.jdbc.Driver`.
+
+6. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+Invoke the **request box** operation and see that the data is successfully inserted into the two databases. Go to the MySQL terminal and run the following commands:  
+
+-   Check the office details in the offices table:
+
+    ```bash
+    USE OfficeDetails;
+    SELECT * FROM Offices;
+    ```
+
+-   Check the employee details in the employees table.
+
+    ```bash
+    USE EmployeeDetails;
+    SELECT * FROM Employees;
+    ```
+
+Now, enter another set of values for the two operations but enter an erroneous value for one field. Invoke the operation and check the database tables. You see that no records have been entered into either database.
+</body>
+</html>

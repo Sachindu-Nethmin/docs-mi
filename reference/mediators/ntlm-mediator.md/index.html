@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ntlm-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># NTLM Mediator
+
+NTLM (Windows NT LAN Manager) is an authentication protocol provided in Windows server. NTLM authentication is based on a challenge response-based protocol and WSO2 API Manager gives support to access NTLM protected services by using the NTLM mediator. You need to configure the NTLM backend and use that credentials to access NTLM protected services by using the WSO2 API Manager. First you need to initialize the NTLM mediator and then you can use call mediator or callout mediator to send requests to the backend service.
+
+## Syntax
+
+```xml
+&lt;NTLM [username=&quot;string&quot;] [password=&quot;string&quot;] [host=&quot;string&quot;] [domain=&quot;string&quot;] [ntlmVersion=&quot;string&quot;]&gt;
+&lt;/NTLM&gt;
+```
+
+## Configuration
+
+The parameters available for configuring the NTLM mediator are as follows.
+
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Domain&lt;/td&gt;
+        &lt;td&gt;Domain of the NTLM configured host. Set your NTLM configured computer domain name in here.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Host&lt;/td&gt;
+        &lt;td&gt;NTLM configured the backend host name.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;ntlmVersion&lt;/td&gt;
+        &lt;td&gt;NTLM version to connect with. Currently there are two NTLM versions available as v1 and v2.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Username&lt;/td&gt;
+        &lt;td&gt;NTLM backend username. This is the username of the NTLM enabled backend Windows server.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Password&lt;/td&gt;
+        &lt;td&gt;NTLM backend password. This is the password of the NTLM enabled backend Windows server.&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+
+## Example
+
+An example NTLM mediator config is as follows:
+
+```xml
+&lt;NTLM domain=&quot;DESKTOP-8J5ADEM&quot; host=&quot;localhost&quot; ntlmVersion=&quot;v2&quot; username=&quot;wso2&quot; password=&quot;xxxxxxx&quot;/&gt;
+```
+
+For MI versions, make sure to include jcifs dependency as it is not included in the product by default.
+
+Use call or callout mediator with initAxis2ClientOptions option set to &quot;false&quot;.
+
+Once you have initialized the NTLM mediator, you can call the NTLM enabled endpoint with a call with blocking mode or with a callout mediator. Check the following two example scenarios:
+
+**Example 1 - With Callout Mediator calling a SOAP endpoint**
+
+```xml
+&lt;Sequence&gt;
+        &lt;NTLM username=&quot;username&quot; password=&quot;password&quot; host=&quot;localhost&quot; domain=&quot;DESKTOP-ABCD&quot; ntlmVersion=&quot;v2&quot;/&gt;
+        &lt;callout serviceURL=&quot;http://localhost/WcfService1/Service1.svc/test&quot; action=&quot;http://tempuri.org/IService1/ResponseFromNTLMservice&quot;
+ initAxis2ClientOptions=&quot;false&quot;&gt;
+            &lt;source xpath=&quot;s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]&quot;/&gt;
+            &lt;target xpath=&quot;s11:Body/child::*[fn:position()=1] | s12:Body/child::*[fn:position()=1]&quot;/&gt;
+        &lt;/callout&gt;
+        &lt;property name=&quot;NO_ENTITY_BODY&quot; scope=&quot;axis2&quot; action=&quot;remove&quot;/&gt;
+        &lt;respond/&gt;
+&lt;/Sequence&gt;
+```
+
+**Example 2 - With Call Mediator calling a REST endpoint**
+
+```xml
+&lt;Sequence&gt;
+        &lt;NTLM username=&quot;username&quot; password=&quot;password&quot; host=&quot;localhost&quot; domain=&quot;DESKTOP-ABCD&quot; ntlmVersion=&quot;v2&quot;/&gt;
+        &lt;call blocking=&quot;true&quot; initAxis2ClientOptions=&quot;false&quot;&gt;
+          &lt;endpoint&gt;
+            &lt;address uri=&quot;http://localhost/WcfService/Service.svc/test&quot;/&gt;
+          &lt;/endpoint&gt;
+        &lt;/call&gt;
+        &lt;log level=&quot;full&quot;/&gt;
+        &lt;respond/&gt;
+&lt;/Sequence&gt;
+```</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>setting-up-mssql.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Setting up a Microsoft SQL Database
+
+Follow the steps given below to set up the required MSSQL databases for your WSO2 Integrator: MI.
+
+!!! Tip
+	WSO2 Integrator: MI requires databases for the following scenarios:
+
+	-	&lt;a href=&#x27;{{base_path}}/install-and-setup/setup/deployment/deploying-wso2-mi#cluster-coordination&#x27;&gt;cluster coordination&lt;/a&gt;
+    -	&lt;a href=&#x27;{{base_path}}/install-and-setup/setup/user-stores/setting-up-a-userstore&#x27;&gt;using an RDBMS user store&lt;/a&gt;
+
+## Enable TCP/IP
+
+1. In the start menu, click **Programs** and launch **Microsoft SQL Server 2012.**
+2. Click **Configuration Tools** , and then click **SQL Server Configuration Manager** .
+3. Enable **TCP/IP** and disable **Named Pipes** from protocols of your Microsoft SQL server.
+4. Double click **TCP/IP** to open the TCP/IP properties window and set **Listen All** to `Yes` on the **Protocol** tab.
+5. On the **IP Address** tab, disable **TCP Dynamic Ports** by leaving it blank and give a valid TCP port, so that Microsoft SQL server will listen on that port. The best practice is to use port 1433, because you can use it in order processing services.
+6. Similarly, enable TCP/IP from **SQL Native Client Configuration** and disable **Named Pipes**. Also, check whether the port is set correctly to 1433.
+7. Restart Microsoft SQL server.
+
+## Create the database and user
+
+The following MSSQL scripts are stored in the `&lt;MI_HOME&gt;/dbscripts/mssql` directory of your WSO2 Integrator: MI. First, select the scripts that are required for your deployment.
+
+You can run the scripts on one database instance or set up separate instances for each requirement. For convenience, it is recommended to set up separate databases for each use case.
+
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;th&gt;Script&lt;/th&gt;
+		&lt;th&gt;Description&lt;/th&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;mssql_cluster.sql&lt;/td&gt;
+		&lt;td&gt;This script creates the database tables that are required for &lt;a href=&#x27;{{base_path}}/install-and-setup/setup/deployment/deploying-wso2-mi#cluster-coordination&#x27;&gt;cluster coordination&lt;/a&gt; (i.e., coordinating the server nodes in your VM deployment).This is only applicable if you have stateful integration artifacts deployed in a clustered setup.
+		&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;mssql_user.sql&lt;/td&gt;
+		&lt;td&gt;This script creates the database tables that are required for storing users and roles. This is only required if you have configured an &lt;a href=&#x27;{{base_path}}/install-and-setup/setup/user-stores/setting-up-a-userstore&#x27;&gt;RDBMS user store&lt;/a&gt;.&lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+
+Create the databases and then create the DB tables by pointing to the relevant script in the `&lt;MI_HOME&gt;/dbscripts/mssql` directory.
+
+1. Open the Microsoft SQL Management Studio to create a database and user.
+2. Click **New Database** from the **Database** menu and specify all the options to create a new database.
+3. Click **New Login** from the **Logins** menu, and specify all the necessary options.
+
+## Grant permissions
+
+Assign newly created users the required grants/permissions to log in and
+create tables, to insert, index, select, update and delete data in
+tables in the newly created database. These are the minimum set of SQL
+server permissions.
+
+## Setting up the JDBC driver
+[Download](https://msdn.microsoft.com/en-us/data/aa937724.aspx) and copy the `sqljdbc4` Microsoft SQL JDBC driver file to the `MI_HOME/lib/` directory. Use `com.microsoft.sqlserver.jdbc.SQLServerDriver` as the &lt;driverClassName&gt; in your datasource configuration as explained below.
+
+## Connecting the database to the server
+
+Open the `deployment.toml` file in the `&lt;MI_HOME&gt;/conf` directory and add the following sections to create the connection between the WSO2 Integrator: MI and the relevant database. Note that you need separate configurations corresponding to the separate databases (`clusterdb` and `userdb`).
+
+=== &quot;Cluster DB Connection&quot;
+    ```toml  
+    [[datasource]]
+    id = &quot;WSO2_COORDINATION_DB&quot;
+    url= &quot;jdbc:sqlserver://&lt;IP&gt;:1433;databaseName=clusterdb;SendStringParametersAsUnicode=false&quot;
+    username=&quot;root&quot;
+    password=&quot;root&quot;
+    driver=&quot;com.microsoft.sqlserver.jdbc.SQLServerDriver&quot;
+    pool_options.maxActive=50
+    pool_options.maxWait = 60000
+    pool_options.testOnBorrow = true
+    ```
+=== &quot;User DB Connection&quot;     
+    ```toml 
+    [[datasource]]
+    id = &quot;WSO2CarbonDB&quot;
+    url= &quot;jdbc:sqlserver://&lt;IP&gt;:1433;databaseName=userdb;SendStringParametersAsUnicode=false&quot;
+    username=&quot;root&quot;
+    password=&quot;root&quot;
+    driver=&quot;com.microsoft.sqlserver.jdbc.SQLServerDriver&quot;
+    pool_options.maxActive=50
+    pool_options.maxWait = 60000
+    pool_options.testOnBorrow = true
+    ```
+
+{!includes/integration/pull-content-user-store-db-id.md!}
+
+See the descriptions of [database connection parameters]({{base_path}}/reference/config-catalog-mi/#database-connection).</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>amazonsqs-connector-1.x-example.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># AmazonSQS Connector Example
+
+The WSO2 Amazon SQS connector allows you to access the exposed Amazon SQS API from an integration sequence.
+
+## What you&#x27;ll build
+
+This example explains how to use Amazon SQS Connector to create a queue in the Amazon SQS, send a message to the queue, forward it to Simple Stock Quote Service Backend, and send the response to the user. 
+
+It has a single HTTP API resource, which is `sendToQueue`. 
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazonsqs-connector.jpg&quot; title=&quot;AmazonSQS-Connector&quot; width=&quot;800&quot; alt=&quot;AmazonSQS-Connector&quot;/&gt;
+
+If you do not want to configure this yourself, you can simply [get the project](#get-the-project) and run it.
+
+## Set up the environment 
+
+1. Follow the steps mentioned in the [Setting up Amazon SQS](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-setting-up.html) document to create an Amazon account and obtain access key ID and secret access key. Keep them saved to use in the next steps.  
+
+2. In this example, we will be using XPath 2.0 which needs to be enabled in the product as shown below before starting the integration service. 
+
+    Add the following to the `&lt;PRODUCT_HOME&gt;/conf/deployment.toml` file. You can further refer to the [Product Configurations]({{base_path}}/reference/config-catalog-mi/#message-mediation).
+    
+      ```
+        [mediation]
+        synapse.enable_xpath_dom_failover=&quot;true&quot;
+      ```
+
+    ??? note &quot;Click here for instructions on configuring WSO2 Enterprise Integrator 6&quot;
+        1. Uncomment the `synapse.xpath.dom.failover.enabled=true` property in the `&lt;PRODUCT_HOME&gt;/conf/synapse.properties` file.
+
+3. In this example we use the SimpleStockQuote service backend. Therefore, the SimpleStockQuote service needs to be started. 
+
+## Set up the integration project
+
+1. Launch Visual Studio Code with the WSO2 Integrator: MI for VS Code extension (MI for VS Code) installed.
+
+    !!! info
+        Follow the [Install WSO2 Integrator: MI for VS Code]({{base_path}}/develop/mi-for-vscode/install-wso2-mi-for-vscode) documentation for a complete installation guide.
+
+2. Create an [integration project]({{base_path}}/develop/create-integration-project/).
+
+## Create the integration logic
+
+1. First let&#x27;s create a connection to the Amazon SQS instance. Navigate to **MI Project Explorer** &gt; **Local Entries** &gt; **Connections** and click on the **+** sign next to **Connections** to open the **Add New Connection** view.
+2. Select the **Amazonsqs** connector.
+   Configure the below values.
+
+       - Connection Name - Unique name to identify the connection by.
+       - Connection Type - Type of the connection that specifies the protocol to be used.
+       - Access Key ID - Access key associated with your Amazon user account.
+       - Secret Access Key - Secret Access key associated with your Amazon user account.
+       - Region - Region that is used to select a regional endpoint to make requests.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-sqs/connectors.png&quot; title=&quot;Available connectors&quot; width=&quot;500&quot; alt=&quot;Available connectors&quot;/&gt;
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-sqs/create-new-connection.png&quot; title=&quot;Add new connection&quot; width=&quot;500&quot; alt=&quot;Add new connection&quot;/&gt;
+
+
+    The created connection is saved as a **Local Entry** as below.
+
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;localEntry key=&quot;AMAZON_SQS_CONNECTION&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;amazonsqs.init&gt;
+            &lt;connectionType&gt;amazonsqs&lt;/connectionType&gt;
+            &lt;name&gt;AMAZON_SQS_CONNECTION&lt;/name&gt;
+            &lt;accessKeyId&gt;access-key-id&lt;/accessKeyId&gt;
+            &lt;secretAccessKey&gt;secret-access-key&lt;/secretAccessKey&gt;
+            &lt;region&gt;us-east-2&lt;/region&gt;
+            &lt;version&gt;2009-02-01&lt;/version&gt;
+            &lt;blocking&gt;false&lt;/blocking&gt;
+            &lt;enableSSL&gt;true&lt;/enableSSL&gt;
+        &lt;/amazonsqs.init&gt;
+    &lt;/localEntry&gt;
+    ```
+
+3. Navigate to **MI Project Explorer** &gt; **Endpoints** and click on the **+** icon next to **Endpoints**.
+
+4. Select **Address Endpoint**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-sqs/add-endpoint.png&quot; title=&quot;Adding an endpoint&quot; width=&quot;800&quot; alt=&quot;Adding an endpoint&quot;/&gt;
+
+5. You can go to the source view of the XML configuration file of the endpoint and copy the following configuration.
+   ```xml
+   &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+   &lt;endpoint name=&quot;SimpleStockQuote&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+       &lt;address     uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;&gt;
+           &lt;suspendOnFailure&gt;
+               &lt;initialDuration&gt;-1&lt;/initialDuration&gt;
+               &lt;progressionFactor&gt;1&lt;/progressionFactor&gt;
+           &lt;/suspendOnFailure&gt;
+           &lt;markForSuspension&gt;
+               &lt;retriesBeforeSuspension&gt;0&lt;/retriesBeforeSuspension&gt;
+           &lt;/markForSuspension&gt;
+       &lt;/address&gt;
+   &lt;/endpoint&gt;
+   ```
+6. Then create the following sequences: `buildMessage`, `createQueue`, `sendMessage`, and `ReceiveAndForwardMessage`.
+7. Navigate to **MI Project Explorer** &gt; **Sequences** and click the **+** sign next to **Sequences** to open the **Create New Sequence** form.
+    
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-sqs/create-new-sequence.png&quot; title=&quot;Adding a Sequence&quot; width=&quot;800&quot; alt=&quot;Adding a Sequence&quot;/&gt;
+
+8. Provide the Sequence name as `buildMessage` and click **Create**. You can go to the source view of the XML configuration file of the sequence and copy the following configuration. In this sequence we are taking the user&#x27;s input `companyName` and we build the message using a Payload mediator. 
+    ```
+      &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+      &lt;sequence name=&quot;buildMessage&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+          &lt;property expression=&quot;json-eval($.companyName)&quot; name=&quot;companyName&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+          &lt;payloadFactory media-type=&quot;xml&quot;&gt;
+              &lt;format&gt;
+                  &lt;m0:getQuote xmlns:m0=&quot;http://services.samples&quot;&gt;
+                      &lt;m0:request&gt;
+                          &lt;m0:symbol&gt;$1&lt;/m0:symbol&gt;
+                      &lt;/m0:request&gt;
+                  &lt;/m0:getQuote&gt;
+              &lt;/format&gt;
+              &lt;args&gt;
+                  &lt;arg evaluator=&quot;xml&quot; expression=&quot;$ctx:companyName&quot;/&gt;
+              &lt;/args&gt;
+          &lt;/payloadFactory&gt;
+          &lt;header name=&quot;Action&quot; scope=&quot;default&quot; value=&quot;urn:getQuote&quot;/&gt;
+          &lt;enrich&gt;
+              &lt;source clone=&quot;true&quot; type=&quot;body&quot;/&gt;
+              &lt;target property=&quot;target_property&quot; type=&quot;property&quot;/&gt;
+          &lt;/enrich&gt;
+      &lt;/sequence&gt;
+    ```
+9. Create the `createQueue` sequence as shown below. In this sequence, we create a queue in the Amazon SQS instance. 
+  ```
+  &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;sequence name=&quot;createQueue&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;amazonsqs.createQueue configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+            &lt;queueName&gt;{$ctx:queueName}&lt;/queueName&gt;
+        &lt;/amazonsqs.createQueue&gt;
+        &lt;property expression=&quot;json-eval($.CreateQueueResponse.CreateQueueResult.QueueUrl)&quot; name=&quot;queueURL&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+        &lt;log level=&quot;custom&quot;&gt;
+            &lt;property expression=&quot;$ctx:queueURL&quot; name=&quot;queueURL&quot;/&gt;
+        &lt;/log&gt;
+        &lt;property expression=&quot;fn:substring($ctx:queueURL,41,12)&quot; name=&quot;queueId&quot; scope=&quot;default&quot; type=&quot;STRING&quot; xmlns:fn=&quot;http://www.w3.org/2005/xpath-functions&quot;/&gt;
+        &lt;log level=&quot;custom&quot;&gt;
+            &lt;property expression=&quot;$ctx:queueId&quot; name=&quot;queueId&quot;/&gt;
+        &lt;/log&gt;
+    &lt;/sequence&gt;
+  ```
+
+4. Create `sendMessage` sequence as shown below. In this sequence, we send the message that we built in step 5 to the Amazon SQS Queue. 
+  ```
+  &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;sequence name=&quot;sendMessage&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;amazonsqs.sendMessage configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+            &lt;queueId&gt;{$ctx:queueId}&lt;/queueId&gt;
+            &lt;queueName&gt;{$ctx:queueName}&lt;/queueName&gt;
+            &lt;messageBody&gt;{$ctx:target_property}&lt;/messageBody&gt;
+        &lt;/amazonsqs.sendMessage&gt;
+    &lt;/sequence&gt;
+  ```
+
+5. Create the `ReceiveAndForwardMessage` sequence as shown below. In this sequence, we will receive the message from the Amazon SQS queue and forward it to the `StockQuote` Endpoint. 
+    ```
+      &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+      &lt;sequence name=&quot;ReceiveAndForwardMessage&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+          &lt;amazonsqs.receiveMessage configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+              &lt;maxNumberOfMessages&gt;5&lt;/maxNumberOfMessages&gt;
+              &lt;queueId&gt;{$ctx:queueId}&lt;/queueId&gt;
+              &lt;queueName&gt;{$ctx:queueName}&lt;/queueName&gt;
+          &lt;/amazonsqs.receiveMessage&gt;
+          &lt;property xmlns:m0=&quot;http://services.samples&quot; name=&quot;messageBody&quot; expression=&quot;$body//m0:getQuote&quot;/&gt;
+          &lt;payloadFactory media-type=&quot;xml&quot;&gt;
+              &lt;format&gt;
+                  &lt;soapenv:Envelope xmlns:soapenv=&quot;http://www.w3.org/2003/05/soap-envelope&quot;&gt;
+                      &lt;soapenv:Body&gt;$1&lt;/soapenv:Body&gt;
+                  &lt;/soapenv:Envelope&gt;
+              &lt;/format&gt;
+              &lt;args&gt;
+                  &lt;arg evaluator=&quot;xml&quot; expression=&quot;$ctx:messageBody&quot;/&gt;
+              &lt;/args&gt;
+          &lt;/payloadFactory&gt;
+          &lt;header name=&quot;Action&quot; scope=&quot;default&quot; value=&quot;urn:getQuote&quot;/&gt;
+          &lt;call&gt;
+              &lt;endpoint key=&quot;SimpleStockQuote&quot;/&gt;
+          &lt;/call&gt;
+      &lt;/sequence&gt;
+    ```
+
+6. Navigate to **MI Project Explorer** &gt; **APIs** and click on the **+** sign next to APIs to open the **Synapse API Artifact** creation form.
+  
+7. Provide the API name as `SQSAPI` and the API context as `/sqs` and click **Create**. You can go to the source view of the XML configuration file of the API and copy the following configuration. 
+    ```
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;api context=&quot;/sqs&quot; name=&quot;SQSAPI&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;resource methods=&quot;POST&quot; uri-template=&quot;/sendToQueue&quot;&gt;
+            &lt;inSequence&gt;
+                &lt;property expression=&quot;json-eval($.queueName)&quot; name=&quot;queueName&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;sequence key=&quot;buildMessage&quot;/&gt;
+                &lt;sequence key=&quot;createQueue&quot;/&gt;
+                &lt;sequence key=&quot;sendMessage&quot;/&gt;
+                &lt;sequence key=&quot;ReceiveAndForwardMessage&quot;/&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence/&gt;
+        &lt;/resource&gt;
+    &lt;/api&gt;
+    ```
+
+Now we can export the artifacts into a Carbon Application (CApp) and deploy it to the server runtime to run it and test it.
+
+## Get the project
+
+You can download the ZIP file and extract the contents to get the project code.
+
+&lt;a href=&quot;{{base_path}}/assets/attachments/connectors/amazonSQSExample1.zip&quot;&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+&lt;/a&gt;
+
+!!! tip
+    You may need to update the value of the access key and make other such changes before deploying and running this project.
+
+## Deployment
+
+Follow the steps in [deploy-artifacts]({{base_path}}/develop/deploy-artifacts) guide to build and export it into a CAR file (`.car` file) using the WSO2 Integrator: MI for Visual Studio Code extension.
+
+## Test
+
+1. Deploy the back-end service `SimpleStockQuoteService`.
+
+    1. Download the ZIP file of the back-end service from [here](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/axis2Server.zip).
+    2. Extract the downloaded zip file.
+    3. Open a terminal and navigate to the `axis2Server/bin/` directory inside the extracted folder.
+    4. Execute the following command to start the axis2server with the `SimpleStockQuote` back-end service:
+
+        === &quot;On MacOS/Linux&quot;   
+            ```bash
+            sh axis2server.sh
+            ```
+        === &quot;On Windows&quot;              
+            ```bash
+            axis2server.bat
+            ```
+
+3. Invoke the API as shown below using the curl command. Curl Application can be downloaded from [here](https://curl.haxx.se/download.html).
+
+   ```
+       curl --location &#x27;http://localhost:8290/sqs/sendToQueue&#x27; \
+       --header &#x27;Content-Type: application/json&#x27; \
+       --data &#x27;{
+          &quot;companyName&quot;:&quot;WSO2&quot;,
+          &quot;queueName&quot;:&quot;Queue1&quot;
+       }&#x27;
+    ```
+
+**Expected Response**:
+
+```xml
+    &lt;ns:getQuoteResponse xmlns:ns=&quot;http://services.samples&quot;&gt;
+        &lt;ns:return xmlns:ax21=&quot;http://services.samples/xsd&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:type=&quot;ax21:GetQuoteResponse&quot;&gt;
+            &lt;ax21:change&gt;-2.3656563413900478&lt;/ax21:change&gt;
+            &lt;ax21:earnings&gt;13.92852425779543&lt;/ax21:earnings&gt;
+            &lt;ax21:high&gt;161.79828086332458&lt;/ax21:high&gt;
+            &lt;ax21:last&gt;155.25325499166968&lt;/ax21:last&gt;
+            &lt;ax21:lastTradeTimestamp&gt;Thu Aug 08 13:28:27 IST 2024&lt;/ax21:lastTradeTimestamp&gt;
+            &lt;ax21:low&gt;160.3277722524871&lt;/ax21:low&gt;
+            &lt;ax21:marketCap&gt;5.643236512855213E7&lt;/ax21:marketCap&gt;
+            &lt;ax21:name&gt;WSO2 Company&lt;/ax21:name&gt;
+            &lt;ax21:open&gt;-153.68772137674222&lt;/ax21:open&gt;
+            &lt;ax21:peRatio&gt;-18.75230816155238&lt;/ax21:peRatio&gt;
+            &lt;ax21:percentageChange&gt;-1.3934902393316715&lt;/ax21:percentageChange&gt;
+            &lt;ax21:prevClose&gt;169.76483039627422&lt;/ax21:prevClose&gt;
+            &lt;ax21:symbol&gt;WSO2&lt;/ax21:symbol&gt;
+            &lt;ax21:volume&gt;19325&lt;/ax21:volume&gt;
+        &lt;/ns:return&gt;
+    &lt;/ns:getQuoteResponse&gt;
+```
+
+## What&#x27;s next
+
+* To customize this example for your own scenario, see the [Amazon SQS Connector Reference Guide]({{base_path}}/reference/connectors/amazonsqs-connector/1.x/amazonsqs-connector-1.x-reference) documentation for detailed information on all connector operations.
+</body>
+</html>

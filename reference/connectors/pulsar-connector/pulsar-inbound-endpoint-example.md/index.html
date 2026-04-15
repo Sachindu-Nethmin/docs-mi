@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>pulsar-inbound-endpoint-example.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Apache Pulsar Inbound Endpoint Example
+
+The Apache Pulsar Inbound Endpoint allows you to connect to Apache Pulsar server and consume messages from specified topics. The messages are then injected into the mediation engine for further processing and mediation.
+
+## What you’ll build
+
+By following this tutorial, you will gain hands-on experience in:
+
+- Configuring the Apache Pulsar Inbound Endpoint in WSO2 Integrator: MI using the Visual Studio Code extension.
+- Consuming and processing messages from a Pulsar topic.
+- Run and test the integration to receive real-time notifications.
+
+The inbound endpoint acts as a message receiver and injects those messages into an integration sequence. In this section, we will demonstrate how to configure the inbound endpoint to establish a secure connection with the Apache Pulsar server using **TLS encryption** and **JWT-based authentication**. In this example, we will simply log the message. However, you can extend the flow to perform complex mediation tasks using [mediators]({{base_path}}/reference/mediators/about-mediators/).
+
+## Prerequisites 
+
+### Setup Apache Pulsar
+
+To connect with Apache Pulsar using the WSO2 Integrator: MI Apache Pulsar Inbound Endpoint, you need to first set up a running Pulsar instance locally or on a server. In this example, we will use an Apache Pulsar standalone server. Set up Apache Pulsar by following the instructions in [Set up Apache Pulsar]({{base_path}}/reference/connectors/pulsar-connector/pulsar-connector-setup/).
+
+## Configure Inbound Endpoint
+
+1. Follow the steps in [create Integration Project]({{base_path}}/develop/create-integration-project/) guide to set up your project.
+
+2. Create a sequence to process the message. In this example, we will just log the message for simplicity, but in a real-world use case, this can be any message mediation.
+
+      ```xml
+      &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+      &lt;sequence name=&quot;successSeq&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;log category=&quot;INFO&quot; logMessageID=&quot;false&quot; logFullPayload=&quot;false&quot;&gt;
+                &lt;message&gt;${payload}&lt;/message&gt;
+                &lt;property name=&quot;TopicNames&quot; expression=&quot;${properties.synapse.topicNames}&quot;/&gt;
+                &lt;property name=&quot;MessageID&quot; expression=&quot;${properties.synapse.messageId}&quot;/&gt;
+                &lt;property name=&quot;Key&quot; expression=&quot;${properties.synapse.key}&quot;/&gt;
+                &lt;property name=&quot;RedeliveryCount&quot; expression=&quot;${properties.synapse.redeliveryCount}&quot;/&gt;
+            &lt;/log&gt;
+      &lt;/sequence&gt; 
+      ```
+
+2. Then, go to the **Add Artifact** section and select **Event Integration**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/select_event_integration.png&quot; title=&quot;Add an Event Integration&quot; width=&quot;800&quot; alt=&quot;Add an Event Integration&quot;/&gt;
+
+3. Create an **Apache Pulsar Inbound Endpoint**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/pulsar-inbound/AddPulsarInboundEndpoint.png&quot; title=&quot;Create Pulsar Inbound Endpoint&quot; width=&quot;800&quot; alt=&quot;Create Pulsar Inbound Endpoint&quot;/&gt;
+
+4. Enter the following values in the form and click **Create**.
+
+      * **Inbound Functional:**
+        * **Event Integration Name**: `ApachePulsarInboundEP`
+        * **Injecting Sequence Name**: `successSeq`
+        * **Error Sequence Name**: `errorSeq`
+        * **Polling Interval**: `1000`
+        * **Coordination**: `true`
+      * **Pulsar Connection:**
+        * **Enable TLS Encryption**: `true`
+        * **Broker URL**: `pulsar+ssl://localhost:6651/`
+        * **Allow Insecure TLS Connection**: `false`
+        * **Use KeyStore TLS**: `false`
+        * **Broker CA Certificate Path**: absolute path to the CA certificate file (e.g., `/path/to/ca.cert.pem`)
+        * **Authentication Type**: `JWT`
+        * **JWT Token**: the JWT token generated from the Pulsar server (e.g., `eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2UifQ.ipevRNuRP6HflG8cFKnmUPtypruRC4fb1DWtoLL62SY`)
+      * **Consumer:**
+         * **Topic(s)**: `persistent://public/default/baa`
+         * **Subscription Name**: `mySubscription`
+         * **Subscription Type**: `Exclusive`
+         * **Subscription Initial Position**: `Latest`
+         * **Message Content Type**: `application/json`
+         * **Message Wait Timeout (in milliseconds)**: `3000`
+         * **Processing Mode**: `sync`
+
+    The source view of the created inbound endpoint is shown below. For detailed descriptions of each parameter, please refer to the [Apache Pulsar reference documentation]({{base_path}}/reference/connectors/pulsar-connector/pulsar-inbound-endpoint-reference).
+
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;inboundEndpoint name=&quot;ApachePulsarInboundEP&quot; class=&quot;org.wso2.integration.inbound.PulsarMessageConsumer&quot; 
+    sequence=&quot;successSeq&quot; onError=&quot;errorSeq&quot; suspend=&quot;false&quot;&gt;
+        &lt;parameters xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;parameter name=&quot;interval&quot;&gt;1000&lt;/parameter&gt;
+            &lt;parameter name=&quot;coordination&quot;&gt;true&lt;/parameter&gt;
+            &lt;parameter name=&quot;useTLS&quot;&gt;true&lt;/parameter&gt;
+            &lt;parameter name=&quot;serviceUrl&quot;&gt;pulsar+ssl://localhost:6651/&lt;/parameter&gt;
+            &lt;parameter name=&quot;useKeyStoreTls&quot;&gt;false&lt;/parameter&gt;
+            &lt;parameter name=&quot;tlsTrustCertsFilePath&quot;&gt;/path/to/ca.cert.pem&lt;/parameter&gt;
+            &lt;parameter name=&quot;authenticationType&quot;&gt;JWT&lt;/parameter&gt;
+            &lt;parameter name=&quot;jwtToken&quot;&gt;eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJKb2UifQ.ipevRNuRP6HflG8cFKnmUPtypruRC4fb1DWtoLL62SY&lt;/parameter&gt;
+            &lt;parameter name=&quot;topicNames&quot;&gt;persistent://public/default/baa&lt;/parameter&gt;
+            &lt;parameter name=&quot;subscriptionName&quot;&gt;mySubscription&lt;/parameter&gt;
+            &lt;parameter name=&quot;subscriptionType&quot;&gt;Exclusive&lt;/parameter&gt;
+            &lt;parameter name=&quot;subscriptionTopicsMode&quot;&gt;PersistentOnly&lt;/parameter&gt;
+            &lt;parameter name=&quot;subscriptionInitialPosition&quot;&gt;Latest&lt;/parameter&gt;
+            &lt;parameter name=&quot;contentType&quot;&gt;application/json&lt;/parameter&gt;
+            &lt;parameter name=&quot;messageWaitTimeout&quot;&gt;3000&lt;/parameter&gt;
+            &lt;parameter name=&quot;processingMode&quot;&gt;Sync&lt;/parameter&gt;
+            &lt;parameter name=&quot;dlqMaxRedeliverCount&quot;&gt;5&lt;/parameter&gt;
+            &lt;parameter name=&quot;batchReceiveEnabled&quot;&gt;false&lt;/parameter&gt;
+        &lt;/parameters&gt;
+    &lt;/inboundEndpoint&gt;
+    ```      
+
+## Export integration logic as a CApp
+
+Follow the steps in the [Build and Export the Carbon Application]({{base_path}}/develop/deploy-artifacts/#build-and-export-the-carbon-application) guide to build and export the CApp to a specified location.
+
+## Get the project
+
+You can download the ZIP file and extract the contents to get the project code.
+
+&lt;a href=&quot;{{base_path}}/assets/attachments/connectors/ApachePulsarProducerAndConsumer.zip&quot;&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+&lt;/a&gt;
+
+## Run the Integration
+
+In order to deploy and run the project, refer the [build and run]({{base_path}}/develop/deploy-artifacts/#build-and-run) guide or simply use the **Run** button in the Visual Studio Code extension to run the integration.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/salesforce-inbound/deploy-run.png&quot; title=&quot;Deploy and Run the Integration&quot; width=&quot;500&quot; alt=&quot;Deploy and Run the Integration&quot;/&gt;
+
+You can further refer the application deployed through the CLI tool. See the instructions on [managing integrations from the CLI]({{base_path}}/observe-and-manage/managing-integrations-with-micli).
+
+
+## Testing the Integration
+
+You can manually publish messages to Apache Pulsar using the pulsar-client CLI tool, as described in the [official Apache Pulsar documentation](https://pulsar.apache.org/docs/next/tutorials-produce-consume/).
+
+Alternatively, you can use the [Apache Pulsar Connector example]({{base_path}}/reference/connectors/pulsar-connector/pulsar-connector-example) to insert data programmatically. In this example, we will use the WSO2 MI Apache Pulsar connector to insert data into the Pulsar topic.
+
+1. Save the following payload as `data.json`:
+
+       ```json
+       {
+            &quot;topic&quot;: &quot;persistent://public/default/baa&quot;,
+            &quot;message&quot;: &quot;{\&quot;Hello\&quot;: \&quot;Pulsar\&quot;}&quot;,
+            &quot;key&quot;: &quot;sample-key&quot;,
+            &quot;properties&quot;: {
+                &quot;message-type&quot;: &quot;json&quot;,
+                &quot;event-date&quot;: &quot;2025-05-20&quot;
+            }
+        }
+       ```
+
+2. Invoke the API using the following `curl` command:
+
+   ```
+   curl -X POST -d @data.json http://localhost:8290/publishmessage --header &quot;Content-Type:application/json&quot;
+   ```
+
+#### Expected Output
+
+After inserting a record, you should see a log entry in the WSO2 Integrator: MI console similar to the following:
+
+   ```
+   TopicNames = persistent://public/default/baa, MessageID = 212:12:-1, Key = sample-key, RedeliveryCount = 0, MessageProperties = [{&quot;event-date&quot;:&quot;2025-05-20&quot;},{&quot;message-type&quot;:&quot;json&quot;}], Payload = {&quot;Hello&quot;:&quot;Pulsar&quot;}
+   ```
+</body>
+</html>

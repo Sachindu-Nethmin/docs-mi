@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>script-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Script Mediator
+
+The **Script Mediator** is used to invoke the functions of a variety of scripting languages such as JavaScript, Groovy, or Ruby.
+
+A Script mediator can be created using one of the following methods.
+
+-   With the script program statements stored in a separate file, referenced via the **Local or Remote Registry entry**.
+-   With the script program statements embedded inline within the Synapse configuration.
+
+Synapse uses the Apache [Bean Scripting Framework](http://jakarta.apache.org/bsf/) for scripting language support. 
+Any script language supported by BSF may be used to implement the Synapse Mediator. With the Script Mediator, you can invoke a function in the corresponding script. With these functions, it is possible to access the Synapse predefined in a script variable named `mc`. 
+The `mc` variable represents an implementation of the `MessageContext`, named `ScriptMessageContext.java`, which contains the following methods that can be accessed within the script as `mc.methodName`.
+
+| Return? | Method Name                        | Description                                                                                                                                                    |
+|---------|------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Yes     | getPayloadXML()                    | This gets an XML representation of SOAP Body payload.                                                                                                          |
+| No      | setPayloadXML(payload)             | This sets the SOAP body payload from XML.                                                                                                                      |
+| No      | addHeader(mustUnderstand, content) | This adds a new SOAP header to the message.                                                                                                                    |
+| Yes     | getEnvelopeXML()                   | This gets the XML representation of the complete SOAP envelope.                                                                                                |
+| No      | setTo(reference)                   | This is used to set the value which specifies the receiver of the message.                                                                                     |
+| Yes     | setFaultTo(reference)              | This is used to set the value which specifies the receiver of the faults relating to the message.                                                              |
+| No      | setFrom(reference)                 | This is used to set the value which specifies the sender of the message.                                                                                       |
+| No      | setReplyTo(reference)              | This is used to set the value which specifies the receiver of the replies to the message.                                                                      |
+| Yes     | getPayloadJSON()                   | This gets the JSON representation of a SOAP Body payload.                                                                                                      |
+| No      | setPayloadJSON( payload )          | This sets the JSON representation of a payload obtained via the `             getPayloadJSON()            ` method and sets it in the current message context. |
+| Yes     | getProperty(name)                  | This gets a property from the current message context.                                                                                                         |
+| No      | setProperty(key, value)            | This is used to set a property in the current message context. The previously set property values are replaced by this method.                                 |
+
+Implementing a Mediator with a script language has advantages over using
+the built-in Synapse Mediator types or implementing a custom Java class
+Mediator. The Script Mediators have the flexibility of a class Mediator
+with access to the Synapse `         MessageContext        ` and
+`         SynapseEnvironment        ` APIs. Also, the ease of use and
+dynamic nature of scripting languages allow the rapid development and
+prototyping of custom mediators. An additional benefit of some scripting
+languages is that they have very simple and elegant XML manipulation
+capabilities, which make them very usable in a Synapse mediation
+environment. e.g., JavaScript E4X with RhinoJS or Ruby REXML.
+
+For both types of script mediator definitions, the
+`         MessageContext        ` passed into the script has additional
+methods over the standard Synapse `         MessageContext        ` to
+enable working with XML natural to the scripting language. Example are
+when using JavaScript `         getPayloadXML        ` and
+`         setPayloadXML        ` , `         E4X        ` XML objects
+and when using Ruby, REXML documents.
+
+!!! Note
+    The WSO2 Integrator: MI uses GraalVM JS by default. If you have specified the language as `rhinoJs`, Rhino engine will be used to execute JavaScript. Rhino engine converts the script to a method inside a Java class. Therefore, when processing large JSON data volumes, the code length must be less than 65,536 characters, since the Script mediator converts the payload into a Java object. However, you can use the following alternative options to process large JSON data volumes.
+
+    -   Achieve the same functionality via a [Class mediator]({{base_path}}/reference/mediators/class-mediator).
+    -   If the original message consists of repetitive sections, you can use the [Iterate mediator]({{base_path}}/reference/mediators/iterate-mediator/) to generate a relatively
+    small payload using those repetitive sections. This will then allow you to use the Script mediator.
+    -   The Script Mediator supports using the default GraalVM JS to execute JavaScript.
+
+## Prerequisites
+
+-   Listed below are the prerequisites for writing a Script mediator using
+JavaScript, Groovy, or Ruby.
+
+    &lt;table&gt;
+    &lt;thead&gt;
+    &lt;tr class=&quot;header&quot;&gt;
+    &lt;th&gt;Scripting Language&lt;/th&gt;
+    &lt;th&gt;Prerequisite&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+    &lt;tr class=&quot;odd&quot;&gt;
+    &lt;td&gt;Groovy&lt;/td&gt;
+    &lt;td&gt;Download the groovy-all &lt;code&gt;-2.4.4.jar&lt;/code&gt; file and copy it to the &lt;code&gt;&amp;lt;MI_HOME&amp;gt;/&lt;/code&gt; dropins directory. Note that when you define the script, you need to start by importing Groovy.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr class=&quot;even&quot;&gt;
+    &lt;td&gt;Ruby&lt;/td&gt;
+    &lt;td&gt;&lt;p&gt;Install the JRuby engine for mediation. This is available in the WSO2 P2 repository as a feature (&lt;strong&gt;WSO2 Carbon - JRuby Engine for Mediation&lt;/strong&gt;).&lt;/p&gt;
+    &lt;p&gt;Alternatively, you can download and install the JRuby engine manually: Download the &lt;code&gt;              jruby-complete-1.3.0.wso2v1.jar             &lt;/code&gt; file from the WSO2 P2 repository and copy it to the &lt;code&gt;                             &amp;lt;MI_HOME&amp;gt;/              &lt;/code&gt; dropins directory.&lt;/p&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr class=&quot;odd&quot;&gt;
+    &lt;td&gt;JavaScript&lt;/td&gt;
+    &lt;td&gt;The JavaScript based on GraalVM JS is enabled by default in the WSO2 Integrator: MI and ready for use.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/tbody&gt;
+    &lt;/table&gt;
+
+    !!! Note
+         - The `nashornJs` language is deprecated in JDK 15 and above. If you are using JDK 15 or above, you need to manually copy the [nashorn-core](https://mvnrepository.com/artifact/org.openjdk.nashorn/nashorn-core/15.4) and [asm-util](https://mvnrepository.com/artifact/org.ow2.asm/asm-util/9.5) JAR files to the &lt;code&gt;&amp;lt;MI_HOME&amp;gt;/lib&lt;/code&gt; directory since Nashorn was [removed](https://openjdk.org/jeps/372) from the JDK.
+         - From MI 4.5.0 onward, access to the classes &lt;code&gt;java.lang&lt;/code&gt;, &lt;code&gt;java.io&lt;/code&gt;, &lt;code&gt;java.nio&lt;/code&gt;, and &lt;code&gt;java.net&lt;/code&gt; from the script mediator is revoked by default. For more details, see the [Security Guidelines]({{base_path}}/install-and-setup/setup/deployment-best-practices/security-guidelines-for-production-deployment).
+
+## Syntax
+
+Click on the relevant tab to view the syntax for a script mediator using an Inline script, or a script mediator using a script of a registry
+
+- **Using an Inline script**:
+  The following syntax applies when you create a Script mediator with the script program statements embedded inline within the Synapse configuration.
+  ```
+  &lt;script language=&quot;js&quot;&gt;&lt;![CDATA[...script source code...]]&gt;&lt;/script&gt;
+  ```
+- **Using a script of the registry**:
+  The following syntax applies when you create a Script mediator with the script program statements stored in a separate file, referenced via the Local or Remote Registry entry.
+
+    !!! Info
+        If you are creating the Registry Resource via Tooling, you need not specify the content/media type, because it gets automatically applied when you select the **JavaScript File Template**.
+
+        ``` 
+        &lt;script key=&quot;string&quot; language=&quot;js&quot; [function=&quot;script-function-name&quot;]&gt;
+          &lt;include key=&quot;string&quot;/&gt;
+        &lt;/script&gt;
+        ```
+
+## Configuration
+
+- **Inline**: If this script type is selected, the script is specified inline. The parameters available to configure a Script mediator using an inline script are as follows.
+    &lt;table&gt;
+    &lt;thead&gt;
+    &lt;tr class=&quot;header&quot;&gt;
+    &lt;th&gt;Parameter Name&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+    &lt;tr class=&quot;odd&quot;&gt;
+    &lt;td&gt;&lt;strong&gt;Language&lt;/strong&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;p&gt;The scripting language for the Script mediator. You can select from the following available languages.&lt;/p&gt;
+    &lt;ul&gt;
+    &lt;li&gt;JavaScript - This is represented as &lt;code&gt;                  js                 &lt;/code&gt; in the source view.&lt;/li&gt;
+    &lt;li&gt;Groovy - This is represented as &lt;code&gt;                  groovy                 &lt;/code&gt; in the source view.&lt;/li&gt;
+    &lt;li&gt;Ruby - This is represented as &lt;code&gt;                  rb                 &lt;/code&gt; in the source view.&lt;/li&gt;
+    &lt;/ul&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr class=&quot;even&quot;&gt;
+    &lt;td&gt;&lt;strong&gt;Source&lt;/strong&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+    &lt;p&gt;Enter the source in this parameter.&lt;/p&gt;
+    &lt;p&gt;&lt;strong&gt;Note:&lt;/strong&gt; If you are using Groovy as the scripting language, you need to first import Groovy in your script by adding the following:&lt;/p&gt;
+    &lt;div class=&quot;code panel pdl&quot; style=&quot;border-width: 1px;&quot;&gt;
+    &lt;div class=&quot;codeContent panelContent pdl&quot;&gt;
+    &lt;div class=&quot;sourceCode&quot; id=&quot;cb1&quot; data-syntaxhighlighter-params=&quot;brush: java; gutter: false; theme: Confluence&quot; data-theme=&quot;Confluence&quot; style=&quot;brush: java; gutter: false; theme: Confluence&quot;&gt;&lt;pre class=&quot;sourceCode java&quot;&gt;&lt;code class=&quot;sourceCode java&quot;&gt;&lt;span id=&quot;cb1-1&quot;&gt;&lt;a href=&quot;#cb1-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;im&quot;&gt; groovy.json.*;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;/div&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/tbody&gt;
+    &lt;/table&gt;
+
+- **Registry**: If this script type is selected, a script which is already saved in the registry will be referred using a key. The parameters available to configure a Script mediator using a script saved in the registry are as follows.
+    &lt;table&gt;
+      &lt;tr class=&quot;header&quot;&gt;
+         &lt;th&gt;Parameter Name&lt;/th&gt;
+         &lt;th&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;odd&quot;&gt;
+         &lt;td&gt;&lt;strong&gt;Language&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;
+            &lt;div class=&quot;content-wrapper&quot;&gt;
+               &lt;p&gt;The scripting language for the Script mediator. You can select from the following available languages.&lt;/p&gt;
+               &lt;ul&gt;
+                  &lt;li&gt;JavaScript - This is represented as &lt;code&gt;                   js                  &lt;/code&gt; in the source view.&lt;/li&gt;
+                  &lt;li&gt;
+                     &lt;p&gt;Groovy - This is represented as &lt;code&gt;                    groovy                   &lt;/code&gt; in the source view. &lt;strong&gt;Note:&lt;/strong&gt; Be sure that your script starts with the following, which indicates that Groovy is imported:&lt;/p&gt;
+                     &lt;div class=&quot;code panel pdl&quot; style=&quot;border-width: 1px;&quot;&gt;
+                        &lt;div class=&quot;codeContent panelContent pdl&quot;&gt;
+                           &lt;div class=&quot;sourceCode&quot; id=&quot;cb1&quot; data-syntaxhighlighter-params=&quot;brush: java; gutter: false; theme: Confluence&quot; data-theme=&quot;Confluence&quot; style=&quot;brush: java; gutter: false; theme: Confluence&quot;&gt;
+                              &lt;pre class=&quot;sourceCode java&quot;&gt;&lt;code class=&quot;sourceCode java&quot;&gt;&lt;span id=&quot;cb1-1&quot;&gt;&lt;a href=&quot;#cb1-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;im&quot;&gt; groovy.json.*;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+                           &lt;/div&gt;
+                        &lt;/div&gt;
+                     &lt;/div&gt;
+                  &lt;/li&gt;
+                  &lt;li&gt;Ruby - This is represented as &lt;code&gt;                   rb                  &lt;/code&gt; in the source view.&lt;/li&gt;
+               &lt;/ul&gt;
+            &lt;/div&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;even&quot;&gt;
+         &lt;td&gt;&lt;strong&gt;Function&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;The function of the selected script language to be invoked. This is an optional parameter. If no value is specified, a default function named &lt;code&gt;                mediate               &lt;/code&gt; will be applied. This function considers the Synapse MessageContext as a single parameter. The function may return a boolean. If it does not, then the value &lt;code&gt;                true               &lt;/code&gt; is assumed and the Script mediator returns this value.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;odd&quot;&gt;
+         &lt;td&gt;&lt;strong&gt;Key Type&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;
+            &lt;p&gt;You can select one of the following options.&lt;/p&gt;
+            &lt;ul&gt;
+               &lt;li&gt;&lt;strong&gt;Static Key&lt;/strong&gt; : If this is selected, an existing key can be selected from the registry for the &lt;strong&gt;Key&lt;/strong&gt; parameter.&lt;/li&gt;
+               &lt;li&gt;&lt;strong&gt;Dynamic Key&lt;/strong&gt; : If this is selected, the key can be entered dynamically in the &lt;strong&gt;Key&lt;/strong&gt; parameter.&lt;/li&gt;
+            &lt;/ul&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;even&quot;&gt;
+         &lt;td&gt;&lt;strong&gt;Key&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;The Registry location of the source. You can click either &lt;strong&gt;Configuration Registry&lt;/strong&gt; or the &lt;strong&gt;Governance Registry&lt;/strong&gt; to select the source from the resource tree.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;odd&quot;&gt;
+         &lt;td&gt;&lt;strong&gt;Include keys&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;
+            &lt;div class=&quot;content-wrapper&quot;&gt;
+               &lt;p&gt;This parameter allows you to include functions defined in two or more scripts your Script mediator configuration. After pointing to one script in the &lt;strong&gt;Key&lt;/strong&gt; parameter, you can click &lt;strong&gt;Add Include&lt;/strong&gt; &lt;strong&gt;Key&lt;/strong&gt; to add the function in another script.&lt;/p&gt;
+               &lt;p&gt;When you click &lt;strong&gt;Add Include&lt;/strong&gt; &lt;strong&gt;Key&lt;/strong&gt; , the following parameters will be displayed. Enter the script to be included in the &lt;strong&gt;Key&lt;/strong&gt; parameter by clicking either &lt;strong&gt;Configuration Registry&lt;/strong&gt; or the &lt;strong&gt;Governance Registry&lt;/strong&gt; &lt;strong&gt;&lt;/strong&gt; and then selecting the relevant script from the resource tree.&lt;/p&gt;
+            &lt;/div&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+
+!!! Note
+         The Script mediator now utilizes the GraalVM JS engine for the `js` language. The GraalVM JS engine does not provide E4X support for XML. For E4X support, you can use the Rhino engine. To use the Rhino engine, you need to specify the language as `rhinoJs` in the Script mediator language configuration.
+
+         If you want to use the Rhino engine as default, you need to add the following configuration to the `deployment.toml` file in the `&lt;MI_HOME&gt;/conf` directory.
+
+         ```toml
+         [synapse_properties]
+         &#x27;synapse.script.mediator.default.engine&#x27; = &quot;rhinoJs&quot;  # rhinoJs or graalJs
+         ```
+
+
+## Examples
+
+### Use an inline script
+
+The following configuration is an example of an inline mediator using `JavaScript/E4X` which returns false if the SOAP message body contains an element named `symbol`, which has a value of `IBM`.
+
+```xml
+&lt;script language=&quot;js&quot;&gt;&lt;![CDATA[mc.getPayloadXML()..symbol != &quot;IBM&quot;;]]&gt;&lt;/script&gt;
+```
+
+### Use a script saved in the registry
+
+In the following example, script is loaded from the registry by using the key `repository/conf/sample/resources/script/test.js`.
+
+```xml
+&lt;script language=&quot;js&quot;
+    key=&quot;repository/conf/sample/resources/script/test.js&quot;
+    function=&quot;testFunction&quot;/&gt;
+```
+
+`script language=&quot;js&quot;` indicates that the function invoked should be in the JavaScript language. The function named testFunction which is invoked should be saved as a resource in the **Registry**. 
+The script can be as shown in the example below.
+
+```js
+function testFunction(mc) {
+     var symbol = mc.getPayloadXML()..*::Code.toString();
+     mc.setPayloadXML(
+        &lt;m:getQuote xmlns:m=&quot;http://services.samples/xsd&quot;&gt;
+           &lt;m:request&gt;
+              &lt;m:symbol&gt;{symbol}&lt;/m:symbol&gt;
+           &lt;/m:request&gt;
+        &lt;/m:getQuote&gt;);
+}
+```
+
+### Add an include key
+
+The following configuration has an `include key`.
+
+```xml
+&lt;script language=&quot;js&quot; key=&quot;stockquoteScript&quot; function=&quot;transformRequest&quot;&gt;
+    &lt;include key=&quot;sampleScript&quot;/&gt;
+&lt;/script&gt;
+```
+
+The script is written in JavaScript. The function to be executed is `transformRequest`. This function may be as follows in a script saved in the **Registry**.
+
+```js
+// stockquoteTransform.js
+function transformRequest(mc) {
+transformRequestFunction(mc);
+}
+
+function transformResponse(mc) {
+transformResponseFunction(mc);
+}
+```
+
+In addition, the function in the script named
+`         sampleScript        ` which is included in the mediation
+configuration via the `         include key        ` sub element is also
+executed in the mediation. Note that in order to do this,
+`         sampleScript        ` script should also be saved as a
+resource in the Registry . This script can be as follows.
+
+```js
+// sample.js
+function transformRequestFunction(mc) {
+var symbol = mc.getPayloadXML()..*::Code.toString();
+mc.setPayloadXML(
+    &lt;m:getquote m=&quot;http://services.samples&quot;&gt;
+        &lt;m:request&gt;
+            &lt;m:symbol&gt;{symbol}&lt;/m:symbol&gt;
+        &lt;/m:request&gt;
+    &lt;/m:getquote&gt;);
+}
+ 
+function transformResponse(mc) {
+var symbol = mc.getPayloadXML()..*::symbol.toString();
+var price = mc.getPayloadXML()..*::last.toString();
+mc.setPayloadXML(
+    &lt;m:checkpriceresponse m=&quot;http://services.samples/xsd&quot;&gt;
+        &lt;m:code&gt;{symbol}&lt;/m:code&gt;
+        &lt;m:price&gt;{price}&lt;/m:price&gt;
+    &lt;/m:checkpriceresponse&gt;);
+}
+```
+
+### Add a custom SOAP header
+
+You can add custom SOAP headers to a request by using the `addHeader(mustUnderstand, content)` of the Script mediator in a proxy service as shown in the example below.
+
+```xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;proxy name=&quot;CustomSOAPHeaderProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;http https&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;target&gt;
+        &lt;inSequence&gt;
+            &lt;log category=&quot;INFO&quot; level=&quot;full&quot;&gt;
+                &lt;property name=&quot;Message&quot; value=&quot;IncomingRequest&quot;/&gt;
+            &lt;/log&gt;
+            &lt;script description=&quot;javascript scripts&quot; language=&quot;js&quot;&gt;&lt;![CDATA[mc.addHeader(false, &lt;ns:sampleCustomHeader xmlns:ns=&quot;gsb:http://wso2.org/sample&quot;&gt;&lt;ns:customInfo&gt;CustomHeader&lt;/ns:customInfo&gt;&lt;/ns:sampleCustomHeader&gt;);]]&gt;&lt;/script&gt;
+            &lt;log category=&quot;INFO&quot; level=&quot;full&quot;&gt;
+                &lt;property name=&quot;Message&quot; value=&quot;UpdatedMessage&quot;/&gt;
+            &lt;/log&gt;
+            &lt;drop/&gt;
+        &lt;/inSequence&gt;
+        &lt;faultSequence/&gt;
+    &lt;/target&gt;
+&lt;/proxy&gt;
+```
+
+### Example per method
+
+The following table contains examples of how some of the commonly used methods can be included in the script invoked by the following sample Script mediator configuration.
+
+```xml
+&lt;script language=&quot;js&quot;
+             key=&quot;conf:/repository/EI/transform.js&quot;
+             function=&quot;transform&quot;/&gt;
+```
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Return?&lt;/th&gt;
+&lt;th&gt;Method Name&lt;/th&gt;
+&lt;th&gt;Example&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;td&gt;getPayloadXML()&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;The script invoked can be as follows.&lt;/p&gt;
+&lt;div class=&quot;code panel pdl&quot; style=&quot;border-width: 1px;&quot;&gt;
+&lt;div class=&quot;codeContent panelContent pdl&quot;&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb1&quot; data-syntaxhighlighter-params=&quot;brush: js; gutter: false; theme: Confluence&quot; data-theme=&quot;Confluence&quot; style=&quot;brush: js; gutter: false; theme: Confluence&quot;&gt;&lt;pre class=&quot;sourceCode js&quot;&gt;&lt;code class=&quot;sourceCode javascript&quot;&gt;&lt;span id=&quot;cb1-1&quot;&gt;&lt;a href=&quot;#cb1-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;co&quot;&gt;// sample.js02.function transformRequestFunction(mc) {&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-2&quot;&gt;&lt;a href=&quot;#cb1-2&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;var&lt;/span&gt; symbol &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;va&quot;&gt;mc&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;getPayloadXML&lt;/span&gt;()..&lt;span class=&quot;op&quot;&gt;*::&lt;/span&gt;&lt;span class=&quot;va&quot;&gt;Code&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;toString&lt;/span&gt;()&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-3&quot;&gt;&lt;a href=&quot;#cb1-3&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;mc&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;setPayloadXML&lt;/span&gt;(&lt;/span&gt;
+&lt;span id=&quot;cb1-4&quot;&gt;&lt;a href=&quot;#cb1-4&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;op&quot;&gt;&amp;lt;&lt;/span&gt;m&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;getquote m&lt;span class=&quot;op&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;st&quot;&gt;&amp;quot;http://services.samples&amp;quot;&lt;/span&gt;&lt;span class=&quot;op&quot;&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-5&quot;&gt;&lt;a href=&quot;#cb1-5&quot;&gt;&lt;/a&gt;        &lt;span class=&quot;op&quot;&gt;&amp;lt;&lt;/span&gt;m&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;request&lt;span class=&quot;op&quot;&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-6&quot;&gt;&lt;a href=&quot;#cb1-6&quot;&gt;&lt;/a&gt;            &lt;span class=&quot;op&quot;&gt;&amp;lt;&lt;/span&gt;m&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;symbol&lt;span class=&quot;op&quot;&gt;&amp;gt;{&lt;/span&gt;symbol&lt;span class=&quot;op&quot;&gt;}&lt;/span&gt;&amp;lt;/m&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;symbol&lt;span class=&quot;op&quot;&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-7&quot;&gt;&lt;a href=&quot;#cb1-7&quot;&gt;&lt;/a&gt;        &amp;lt;/m&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;request&lt;span class=&quot;op&quot;&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-8&quot;&gt;&lt;a href=&quot;#cb1-8&quot;&gt;&lt;/a&gt;    &amp;lt;/m&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;getquote&lt;span class=&quot;op&quot;&gt;&amp;gt;&lt;/span&gt;)&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-9&quot;&gt;&lt;a href=&quot;#cb1-9&quot;&gt;&lt;/a&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;               mc.getPayloadXML()              &lt;/code&gt; returns the response received in XML form.&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;No&lt;/td&gt;
+&lt;td&gt;setPayloadXML(payload)&lt;/td&gt;
+&lt;td&gt;See the example above for the &lt;code&gt;             getPayloadXML()            &lt;/code&gt; method. &lt;code&gt;             mc.setPayloadXML(            &lt;/code&gt; &lt;code&gt;             &amp;lt;m:getquote m=&quot;http://services.samples&quot;&amp;gt;             &amp;lt;m:request&amp;gt;             &amp;lt;m:symbol&amp;gt;{symbol}&amp;lt;/m:symbol             &amp;lt;/m:request&amp;gt;             &amp;lt;/m:getquote&amp;gt;            &lt;/code&gt; &lt;code&gt;             )            &lt;/code&gt; is used in that script to set the XML representation of the SOAP body (obtained using the &lt;code&gt;             getPayloadXML()            &lt;/code&gt; method) to the current message context.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;No&lt;/td&gt;
+&lt;td&gt;addHeader(mustUnderstand, Object content)&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;The script invoked can be as follows.&lt;/p&gt;
+&lt;div class=&quot;code panel pdl&quot; style=&quot;border-width: 1px;&quot;&gt;
+&lt;div class=&quot;codeContent panelContent pdl&quot;&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb2&quot; data-syntaxhighlighter-params=&quot;brush: js; gutter: false; theme: Confluence&quot; data-theme=&quot;Confluence&quot; style=&quot;brush: js; gutter: false; theme: Confluence&quot;&gt;&lt;pre class=&quot;sourceCode js&quot;&gt;&lt;code class=&quot;sourceCode javascript&quot;&gt;&lt;span id=&quot;cb2-1&quot;&gt;&lt;a href=&quot;#cb2-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;op&quot;&gt;&amp;lt;&lt;/span&gt;script language&lt;span class=&quot;op&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;st&quot;&gt;&amp;quot;js&amp;quot;&lt;/span&gt;&lt;span class=&quot;op&quot;&gt;&amp;gt;&lt;/span&gt; &lt;/span&gt;
+&lt;span id=&quot;cb2-2&quot;&gt;&lt;a href=&quot;#cb2-2&quot;&gt;&lt;/a&gt;&lt;span class=&quot;op&quot;&gt;&amp;lt;!&lt;/span&gt;[CDATA[&lt;/span&gt;
+&lt;span id=&quot;cb2-3&quot;&gt;&lt;a href=&quot;#cb2-3&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;var&lt;/span&gt; wsse &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;at&quot;&gt;Namespace&lt;/span&gt;(&lt;span class=&quot;st&quot;&gt;&amp;#39;http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd&amp;#39;&lt;/span&gt;)&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt; &lt;/span&gt;
+&lt;span id=&quot;cb2-4&quot;&gt;&lt;a href=&quot;#cb2-4&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;var&lt;/span&gt; envelope &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;va&quot;&gt;mc&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;getEnvelopeXML&lt;/span&gt;()&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt; &lt;/span&gt;
+&lt;span id=&quot;cb2-5&quot;&gt;&lt;a href=&quot;#cb2-5&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;var&lt;/span&gt; username &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;va&quot;&gt;envelope&lt;/span&gt;..&lt;span class=&quot;at&quot;&gt;wsse&lt;/span&gt;&lt;span class=&quot;op&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;va&quot;&gt;Username&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;toString&lt;/span&gt;()&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt; &lt;/span&gt;
+&lt;span id=&quot;cb2-6&quot;&gt;&lt;a href=&quot;#cb2-6&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;var&lt;/span&gt; password &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;va&quot;&gt;envelope&lt;/span&gt;..&lt;span class=&quot;at&quot;&gt;wsse&lt;/span&gt;&lt;span class=&quot;op&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;va&quot;&gt;Password&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;toString&lt;/span&gt;()&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt;   &lt;/span&gt;
+&lt;span id=&quot;cb2-7&quot;&gt;&lt;a href=&quot;#cb2-7&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;mc&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;addHeader&lt;/span&gt;(&lt;span class=&quot;kw&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;op&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;op&quot;&gt;&amp;lt;&lt;/span&gt;urn&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;AuthenticationInfo&lt;span class=&quot;op&quot;&gt;&amp;gt;&amp;lt;&lt;/span&gt;urn&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;userName&lt;span class=&quot;op&quot;&gt;&amp;gt;{&lt;/span&gt;username&lt;span class=&quot;op&quot;&gt;}&lt;/span&gt;&amp;lt;/urn&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;userName&lt;span class=&quot;op&quot;&gt;&amp;gt;&amp;lt;&lt;/span&gt;urn&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;password&lt;span class=&quot;op&quot;&gt;&amp;gt;{&lt;/span&gt;password&lt;span class=&quot;op&quot;&gt;}&lt;/span&gt;&amp;lt;/urn&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;password&lt;span class=&quot;op&quot;&gt;&amp;gt;&lt;/span&gt;&amp;lt;/urn&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;AuthenticationInfo&lt;span class=&quot;op&quot;&gt;&amp;gt;&lt;/span&gt;)&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt; &lt;/span&gt;
+&lt;span id=&quot;cb2-8&quot;&gt;&lt;a href=&quot;#cb2-8&quot;&gt;&lt;/a&gt;]]&lt;span class=&quot;op&quot;&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb2-9&quot;&gt;&lt;a href=&quot;#cb2-9&quot;&gt;&lt;/a&gt;&amp;lt;/script&lt;span class=&quot;op&quot;&gt;&amp;gt;&lt;/span&gt; &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;The &lt;code&gt;               addHeader              &lt;/code&gt; method configured as&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;               mc.addHeader(false, &amp;lt;urn:AuthenticationInfo&amp;gt;&amp;lt;urn:userName&amp;gt;{username}&amp;lt;/urn:userName&amp;gt;&amp;lt;urn:password&amp;gt;{password}&amp;lt;/urn:password&amp;gt;&amp;lt;/urn:AuthenticationInfo&amp;gt;)              &lt;/code&gt; in the above script is used to extract user name and password values included in the request and add them to the header structure required for the backend service.&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;No&lt;/td&gt;
+&lt;td&gt;getEnvelopeXML()&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;The script invoked can be as follows.&lt;/p&gt;
+&lt;div class=&quot;code panel pdl&quot; style=&quot;border-width: 1px;&quot;&gt;
+&lt;div class=&quot;codeContent panelContent pdl&quot;&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb3&quot; data-syntaxhighlighter-params=&quot;brush: js; gutter: false; theme: Confluence&quot; data-theme=&quot;Confluence&quot; style=&quot;brush: js; gutter: false; theme: Confluence&quot;&gt;&lt;pre class=&quot;sourceCode js&quot;&gt;&lt;code class=&quot;sourceCode javascript&quot;&gt;&lt;span id=&quot;cb3-1&quot;&gt;&lt;a href=&quot;#cb3-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;op&quot;&gt;&amp;lt;&lt;/span&gt;script language&lt;span class=&quot;op&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;st&quot;&gt;&amp;quot;js&amp;quot;&lt;/span&gt;&lt;span class=&quot;op&quot;&gt;&amp;gt;&lt;/span&gt; &lt;/span&gt;
+&lt;span id=&quot;cb3-2&quot;&gt;&lt;a href=&quot;#cb3-2&quot;&gt;&lt;/a&gt;&lt;span class=&quot;op&quot;&gt;&amp;lt;!&lt;/span&gt;[CDATA[&lt;/span&gt;
+&lt;span id=&quot;cb3-3&quot;&gt;&lt;a href=&quot;#cb3-3&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;var&lt;/span&gt; wsse &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;at&quot;&gt;Namespace&lt;/span&gt;(&lt;span class=&quot;st&quot;&gt;&amp;#39;http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd&amp;#39;&lt;/span&gt;)&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt; &lt;/span&gt;
+&lt;span id=&quot;cb3-4&quot;&gt;&lt;a href=&quot;#cb3-4&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;var&lt;/span&gt; envelope &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;va&quot;&gt;mc&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;getEnvelopeXML&lt;/span&gt;()&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt; &lt;/span&gt;
+&lt;span id=&quot;cb3-5&quot;&gt;&lt;a href=&quot;#cb3-5&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;var&lt;/span&gt; username &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;va&quot;&gt;envelope&lt;/span&gt;..&lt;span class=&quot;at&quot;&gt;wsse&lt;/span&gt;&lt;span class=&quot;op&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;va&quot;&gt;Username&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;toString&lt;/span&gt;()&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt; &lt;/span&gt;
+&lt;span id=&quot;cb3-6&quot;&gt;&lt;a href=&quot;#cb3-6&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;var&lt;/span&gt; password &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;va&quot;&gt;envelope&lt;/span&gt;..&lt;span class=&quot;at&quot;&gt;wsse&lt;/span&gt;&lt;span class=&quot;op&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;va&quot;&gt;Password&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;toString&lt;/span&gt;()&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt;   &lt;/span&gt;
+&lt;span id=&quot;cb3-7&quot;&gt;&lt;a href=&quot;#cb3-7&quot;&gt;&lt;/a&gt;&lt;span class=&quot;va&quot;&gt;mc&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;addHeader&lt;/span&gt;(&lt;span class=&quot;kw&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;op&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;op&quot;&gt;&amp;lt;&lt;/span&gt;urn&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;AuthenticationInfo&lt;span class=&quot;op&quot;&gt;&amp;gt;&amp;lt;&lt;/span&gt;urn&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;userName&lt;span class=&quot;op&quot;&gt;&amp;gt;{&lt;/span&gt;username&lt;span class=&quot;op&quot;&gt;}&lt;/span&gt;&amp;lt;/urn&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;userName&lt;span class=&quot;op&quot;&gt;&amp;gt;&amp;lt;&lt;/span&gt;urn&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;password&lt;span class=&quot;op&quot;&gt;&amp;gt;{&lt;/span&gt;password&lt;span class=&quot;op&quot;&gt;}&lt;/span&gt;&amp;lt;/urn&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;password&lt;span class=&quot;op&quot;&gt;&amp;gt;&lt;/span&gt;&amp;lt;/urn&lt;span class=&quot;op&quot;&gt;:&lt;/span&gt;AuthenticationInfo&lt;span class=&quot;op&quot;&gt;&amp;gt;&lt;/span&gt;)&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt; ]]&lt;span class=&quot;op&quot;&gt;&amp;gt;&lt;/span&gt; &amp;lt;/script&lt;span class=&quot;op&quot;&gt;&amp;gt;&lt;/span&gt; &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;pre&gt;&lt;code&gt;See more at: http://sajithblogs.blogspot.com/2013/08/wso2-EI-adding-complex-soap-headers-to.html#sthash.jqpiEmf0.dpuf&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;td&gt;getPayloadJSON()&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;The script invoked can be as follows.&lt;/p&gt;
+&lt;div class=&quot;code panel pdl&quot; style=&quot;border-width: 1px;&quot;&gt;
+&lt;div class=&quot;codeContent panelContent pdl&quot;&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb5&quot; data-syntaxhighlighter-params=&quot;brush: js; gutter: false; theme: Confluence&quot; data-theme=&quot;Confluence&quot; style=&quot;brush: js; gutter: false; theme: Confluence&quot;&gt;&lt;pre class=&quot;sourceCode js&quot;&gt;&lt;code class=&quot;sourceCode javascript&quot;&gt;&lt;span id=&quot;cb5-1&quot;&gt;&lt;a href=&quot;#cb5-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;at&quot;&gt;transform&lt;/span&gt;(mc) &lt;span class=&quot;op&quot;&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb5-2&quot;&gt;&lt;a href=&quot;#cb5-2&quot;&gt;&lt;/a&gt;    payload &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;va&quot;&gt;mc&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;getPayloadJSON&lt;/span&gt;()&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb5-3&quot;&gt;&lt;a href=&quot;#cb5-3&quot;&gt;&lt;/a&gt;    results &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;va&quot;&gt;payload&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;results&lt;/span&gt;&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb5-4&quot;&gt;&lt;a href=&quot;#cb5-4&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;kw&quot;&gt;var&lt;/span&gt; response &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;at&quot;&gt;Array&lt;/span&gt;()&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb5-5&quot;&gt;&lt;a href=&quot;#cb5-5&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;cf&quot;&gt;for&lt;/span&gt; (i &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dv&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt; i &lt;span class=&quot;op&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;va&quot;&gt;results&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;op&quot;&gt;++&lt;/span&gt;i) &lt;span class=&quot;op&quot;&gt;{&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb5-6&quot;&gt;&lt;a href=&quot;#cb5-6&quot;&gt;&lt;/a&gt;        location_object &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; results[i]&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb5-7&quot;&gt;&lt;a href=&quot;#cb5-7&quot;&gt;&lt;/a&gt;        l &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kw&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;at&quot;&gt;Object&lt;/span&gt;()&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb5-8&quot;&gt;&lt;a href=&quot;#cb5-8&quot;&gt;&lt;/a&gt;        &lt;span class=&quot;va&quot;&gt;l&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;va&quot;&gt;location_object&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb5-9&quot;&gt;&lt;a href=&quot;#cb5-9&quot;&gt;&lt;/a&gt;        &lt;span class=&quot;va&quot;&gt;l&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;tags&lt;/span&gt; &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;va&quot;&gt;location_object&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;types&lt;/span&gt;&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb5-10&quot;&gt;&lt;a href=&quot;#cb5-10&quot;&gt;&lt;/a&gt;        &lt;span class=&quot;va&quot;&gt;l&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;id&lt;/span&gt; &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;st&quot;&gt;&amp;quot;ID:&amp;quot;&lt;/span&gt; &lt;span class=&quot;op&quot;&gt;+&lt;/span&gt; (&lt;span class=&quot;va&quot;&gt;location_object&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;id&lt;/span&gt;)&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb5-11&quot;&gt;&lt;a href=&quot;#cb5-11&quot;&gt;&lt;/a&gt;        response[i] &lt;span class=&quot;op&quot;&gt;=&lt;/span&gt; l&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb5-12&quot;&gt;&lt;a href=&quot;#cb5-12&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;op&quot;&gt;}&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb5-13&quot;&gt;&lt;a href=&quot;#cb5-13&quot;&gt;&lt;/a&gt;    &lt;span class=&quot;va&quot;&gt;mc&lt;/span&gt;.&lt;span class=&quot;at&quot;&gt;setPayloadJSON&lt;/span&gt;(response)&lt;span class=&quot;op&quot;&gt;;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb5-14&quot;&gt;&lt;a href=&quot;#cb5-14&quot;&gt;&lt;/a&gt;&lt;span class=&quot;op&quot;&gt;}&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;code&gt;               mc.getPayloadJSON()              &lt;/code&gt; returns the JSON payload (received as the response) as a JavaScript object. This object can be manipulated as a normal JavaScript variable within a script as shown in the above JavaScript code. See &lt;a href=&quot;{{base_path}}/learn/examples/json-examples/json-examples/#script-mediator&quot;&gt;JSON Support&lt;/a&gt; for further information about how this script is used.&lt;/p&gt;
+&lt;p&gt;&lt;br /&gt;
+&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;No&lt;/td&gt;
+&lt;td&gt;setPayloadJSON(payload)&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;See the example script for the &lt;code&gt;              getPayloadJSON()             &lt;/code&gt; method.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;              mc.setPayloadJSON()             &lt;/code&gt; method can be used to replace the existing payload with a new payload. In the above script, we build a new array object by using the fields of the incoming JSON payload and set that array object as the new payload. See &lt;a href=&quot;{{base_path}}/learn/examples/json-examples/json-examples/#script-mediator&quot;&gt;JSON Support&lt;/a&gt; for further information about how this script is used&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;Yes&lt;/td&gt;
+&lt;td&gt;getProperty (name)&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;The script invoked can be as follows.&lt;/p&gt;
+&lt;div class=&quot;code panel pdl&quot; style=&quot;border-width: 1px;&quot;&gt;
+&lt;div class=&quot;codeContent panelContent pdl&quot;&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb6&quot; data-syntaxhighlighter-params=&quot;brush: java; gutter: false; theme: Confluence&quot; data-theme=&quot;Confluence&quot; style=&quot;brush: java; gutter: false; theme: Confluence&quot;&gt;&lt;pre class=&quot;sourceCode java&quot;&gt;&lt;code class=&quot;sourceCode java&quot;&gt;&lt;span id=&quot;cb6-1&quot;&gt;&lt;a href=&quot;#cb6-1&quot;&gt;&lt;/a&gt;&amp;lt;script language=&lt;span class=&quot;st&quot;&gt;&amp;quot;js&amp;quot;&lt;/span&gt;&amp;gt;&lt;/span&gt;
+&lt;span id=&quot;cb6-2&quot;&gt;&lt;a href=&quot;#cb6-2&quot;&gt;&lt;/a&gt;&amp;lt;![CDATA[&lt;/span&gt;
+&lt;span id=&quot;cb6-3&quot;&gt;&lt;a href=&quot;#cb6-3&quot;&gt;&lt;/a&gt; var time1 = mc.&lt;span class=&quot;fu&quot;&gt;getProperty&lt;/span&gt;(&lt;span class=&quot;st&quot;&gt;&amp;quot;TIME_1&amp;quot;&lt;/span&gt;);&lt;/span&gt;
+&lt;span id=&quot;cb6-4&quot;&gt;&lt;a href=&quot;#cb6-4&quot;&gt;&lt;/a&gt; var time2 = mc.&lt;span class=&quot;fu&quot;&gt;getProperty&lt;/span&gt;(&lt;span class=&quot;st&quot;&gt;&amp;quot;TIME_2&amp;quot;&lt;/span&gt;);&lt;/span&gt;
+&lt;span id=&quot;cb6-5&quot;&gt;&lt;a href=&quot;#cb6-5&quot;&gt;&lt;/a&gt; var timeTaken = time2 - time1;&lt;/span&gt;
+&lt;span id=&quot;cb6-6&quot;&gt;&lt;a href=&quot;#cb6-6&quot;&gt;&lt;/a&gt; &lt;span class=&quot;fu&quot;&gt;print&lt;/span&gt;(&lt;span class=&quot;st&quot;&gt;&amp;quot;Time Duration :  &amp;quot;&lt;/span&gt; + timeTaken + &lt;span class=&quot;st&quot;&gt;&amp;quot; ms &amp;quot;&lt;/span&gt;);&lt;/span&gt;
+&lt;span id=&quot;cb6-7&quot;&gt;&lt;a href=&quot;#cb6-7&quot;&gt;&lt;/a&gt; mc.&lt;span class=&quot;fu&quot;&gt;setProperty&lt;/span&gt;(&lt;span class=&quot;st&quot;&gt;&amp;quot;RESPONSE_TIME&amp;quot;&lt;/span&gt;, timeTaken);&lt;/span&gt;
+&lt;span id=&quot;cb6-8&quot;&gt;&lt;a href=&quot;#cb6-8&quot;&gt;&lt;/a&gt;]]&amp;gt;&lt;/span&gt;
+&lt;span id=&quot;cb6-9&quot;&gt;&lt;a href=&quot;#cb6-9&quot;&gt;&lt;/a&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;In this example, the &lt;code&gt;               getProperty              &lt;/code&gt; method is used to get two time durations. The difference between the two time durations is calculated and the &lt;code&gt;               setProperty              &lt;/code&gt; method is used to set this difference in the message context.&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;No&lt;/td&gt;
+&lt;td&gt;setProperty(property)&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;See the example for the &lt;code&gt;               getProperty              &lt;/code&gt; method. The &lt;code&gt;               setProperty              &lt;/code&gt; method is used to set the response time calculated from the time durations obtained (using the &lt;code&gt;               getProperty              &lt;/code&gt; method) in the message context.&lt;/p&gt;
+&lt;p&gt;In the following example, &lt;strong&gt;var result = &quot;a&quot;&lt;/strong&gt; and then &lt;strong&gt;result = result + &quot;b&quot;&lt;/strong&gt; . When concatenating these strings, the script invoked needs to be as follows:&lt;/p&gt;
+&lt;div class=&quot;code panel pdl&quot; style=&quot;border-width: 1px;&quot;&gt;
+&lt;div class=&quot;codeContent panelContent pdl&quot;&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb7&quot; data-syntaxhighlighter-params=&quot;brush: xml; gutter: false; theme: Confluence&quot; data-theme=&quot;Confluence&quot; style=&quot;brush: xml; gutter: false; theme: Confluence&quot;&gt;&lt;pre class=&quot;sourceCode xml&quot;&gt;&lt;code class=&quot;sourceCode xml&quot;&gt;&lt;span id=&quot;cb7-1&quot;&gt;&lt;a href=&quot;#cb7-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;&amp;lt;script&lt;/span&gt;&lt;span class=&quot;ot&quot;&gt; language=&lt;/span&gt;&lt;span class=&quot;st&quot;&gt;&amp;quot;js&amp;quot;&lt;/span&gt;&lt;span class=&quot;kw&quot;&gt;&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb7-2&quot;&gt;&lt;a href=&quot;#cb7-2&quot;&gt;&lt;/a&gt;&lt;span class=&quot;bn&quot;&gt;&amp;lt;![CDATA[&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb7-3&quot;&gt;&lt;a href=&quot;#cb7-3&quot;&gt;&lt;/a&gt;{var result = &amp;quot;a&amp;quot;;&lt;/span&gt;
+&lt;span id=&quot;cb7-4&quot;&gt;&lt;a href=&quot;#cb7-4&quot;&gt;&lt;/a&gt; result = result + &amp;quot;b&amp;quot;;&lt;/span&gt;
+&lt;span id=&quot;cb7-5&quot;&gt;&lt;a href=&quot;#cb7-5&quot;&gt;&lt;/a&gt; mc.setProperty(&amp;#39;result_str&amp;#39;, result.toString()); &lt;/span&gt;
+&lt;span id=&quot;cb7-6&quot;&gt;&lt;a href=&quot;#cb7-6&quot;&gt;&lt;/a&gt;}&lt;span class=&quot;bn&quot;&gt;]]&amp;gt;&lt;/span&gt;&lt;/span&gt;
+&lt;span id=&quot;cb7-7&quot;&gt;&lt;a href=&quot;#cb7-7&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;br /&gt;
+&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+</body>
+</html>

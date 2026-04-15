@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>file-connector-example.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># File Connector Example
+
+File Connector can be used to perform operations in the local file system as well as in a remote server such as FTP and SFTP. 
+
+## What you&#x27;ll build
+
+This example explains how to use File Connector to create a file in the local file system and read the particular file. The user sends a payload specifying which content is to be written to the file. Based on that content, a file is created in the specified location. Then the content of the file can be read as an HTTP response by invoking the other API resource upon the existence of the file. Similarly, the same example can be configured to communicate with a remote file system (i.e FTP server) easily. The example also uses some other WSO2 mediators to manipulate messages.
+
+It will have two HTTP API resources, which are `create` and `read`.
+
+* `/create `: The user sends the request payload which includes the location where the file needs to be saved and the content needs to be added to the file. This request is sent to the integration runtime by invoking the FileConnector API. It saves the file in the specified location with the relevant content.
+
+    &lt;p&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/filecon-3.x/fileconnector-03.png&quot; title=&quot;Adding a Rest API&quot; width=&quot;800&quot; alt=&quot;Adding a Rest API&quot; /&gt;&lt;/p&gt;
+
+* `/read `: The user sends the request payload, which includes the location of the file that needs to be read. This request is sent to the integration runtime where the FileConnector API resides. Once the API is invoked, it first checks if the file exists in the specified location. If it exists, the content is read and response is sent to the user. If the file does not exist, it sends an error response to the user.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/filecon-3.x/fileconnector-02.png&quot; title=&quot;Adding a Rest API&quot; width=&quot;800&quot; alt=&quot;Adding a Rest API&quot;/&gt;
+
+If you do not want to configure this yourself, you can simply [get the project](#get-the-project) and run it.
+
+## Set up the integration project
+
+Follow these steps to set up the Integration Project using the WSO2 Integrator: MI Visual Studio Code extension.
+
+### Create the new project
+
+1. Go to **WSO2 Integrator: MI** in the VS Code.
+
+2. Click on **Create New Project** to create the new integration project.
+
+3. provide the **Project Name** and select the **Project Directory**
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/new-vscode-project.png&quot; title=&quot;Adding a Rest API&quot; width=&quot;500&quot; alt=&quot;Adding a Rest API&quot;/&gt;
+
+4. You have now created the new project with the following structure.
+
+     &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/prject-structure.png&quot; title=&quot;Adding a Rest API&quot; width=&quot;500&quot; alt=&quot;Adding a Rest API&quot;/&gt;
+
+### Create the integration logic
+
+#### Create the first resource
+
+1. Click on the **+** button next to the **APIs** and provide the API name as `FileConnector` and the API context as `/fileConnector`.
+
+     &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/file-add-api.png&quot; title=&quot;Adding a Rest API&quot; width=&quot;500&quot; alt=&quot;Adding a Rest API&quot;/&gt;
+
+2. To create the `/create` resource. Click on **Edit** and update the value of `URI template` to `/create` and value of `method` to `Post`.
+
+     &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/file-update-resource.png&quot; title=&quot;Adding the API resource.&quot; width=&quot;500&quot; alt=&quot;Adding the API resource.&quot;/&gt;
+
+3. Open the API in the diagram view and click on the **+** button below to **START** to add connectors or mediators.
+
+     &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/file-add-connector.png&quot; title=&quot;Adding the API resource.&quot; width=&quot;500&quot; alt=&quot;Adding the API resource.&quot;/&gt;
+
+4. To add the write operation under the API, click on **Connectors**, select the **file** connector, and choose the **write** operation.
+
+     &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/file-add-operation.png&quot; title=&quot;Adding the API resource.&quot; width=&quot;500&quot; alt=&quot;Adding the API resource.&quot;/&gt;
+
+5. Click on **Add new connection** to create the new local file connection.
+
+     &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/file-add-new-connection.png&quot; title=&quot;Adding createFile operation&quot; width=&quot;500&quot; alt=&quot;Adding createFile operation&quot;/&gt;
+
+6. After creating the local file connection, update the values for file path and Content for the write operation.
+
+     &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/file-write-operation.png&quot; title=&quot;First API Resource&quot; width=&quot;500&quot; alt=&quot;First API Resource&quot;/&gt;
+
+??? note &quot;Source view of the implemented resource&quot;
+    ```xml
+        &lt;resource methods=&quot;POST&quot; uri-template=&quot;/create&quot;&gt;
+            &lt;inSequence&gt;
+                &lt;file.write configKey=&quot;local_file_connection&quot;&gt;
+                    &lt;filePath&gt;{json-eval($.filePath)}&lt;/filePath&gt;
+                    &lt;contentOrExpression&gt;{json-eval($.inputContent)}&lt;/contentOrExpression&gt;
+                    &lt;mimeType&gt;Automatic&lt;/mimeType&gt;
+                    &lt;writeMode&gt;Overwrite&lt;/writeMode&gt;
+                    &lt;appendPosition&gt;0&lt;/appendPosition&gt;
+                    &lt;encoding&gt;UTF-8&lt;/encoding&gt;
+                    &lt;compress&gt;false&lt;/compress&gt;
+                    &lt;appendNewLine&gt;false&lt;/appendNewLine&gt;
+                    &lt;enableStreaming&gt;false&lt;/enableStreaming&gt;
+                    &lt;enableLock&gt;false&lt;/enableLock&gt;
+                    &lt;updateLastModified&gt;true&lt;/updateLastModified&gt;
+                    &lt;includeResultTo&gt;Message Body&lt;/includeResultTo&gt;
+                &lt;/file.write&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence&gt;
+            &lt;/faultSequence&gt;
+        &lt;/resource&gt;
+    ```
+#### Create the second resource
+
+1. Click on **+ Resource** to add new resource.
+
+     &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/file-add-new-resource.png&quot; title=&quot;Adding an API resource&quot; width=&quot;500&quot; alt=&quot;Adding an API resource&quot;/&gt;
+
+2. Use the URL template as `/read`. The method will be POST.
+
+3.  Implement the following API as described above.
+
+??? note &quot;Source view&quot;
+    ```
+        &lt;resource methods=&quot;POST&quot; uri-template=&quot;/read&quot;&gt;
+            &lt;inSequence&gt;
+                &lt;property name=&quot;path&quot; expression=&quot;json-eval($.filePath)&quot;/&gt;
+                &lt;file.checkExist configKey=&quot;local_file_connection&quot;&gt;
+                    &lt;path&gt;{$ctx:path}&lt;/path&gt;
+                    &lt;includeResultTo&gt;Message Body&lt;/includeResultTo&gt;
+                &lt;/file.checkExist&gt;
+                &lt;switch source=&quot;json-eval($.checkExistResult.fileExists)&quot;&gt;
+                    &lt;case regex=&quot;true&quot;&gt;
+                        &lt;file.read configKey=&quot;local_file_connection&quot;&gt;
+                        &lt;path&gt;{$ctx:path}&lt;/path&gt;
+                        &lt;readMode&gt;Complete File&lt;/readMode&gt;
+                        &lt;startLineNum&gt;0&lt;/startLineNum&gt;
+                        &lt;endLineNum&gt;0&lt;/endLineNum&gt;
+                        &lt;lineNum&gt;0&lt;/lineNum&gt;
+                        &lt;encoding&gt;UTF-8&lt;/encoding&gt;
+                        &lt;enableStreaming&gt;false&lt;/enableStreaming&gt;
+                        &lt;enableLock&gt;false&lt;/enableLock&gt;
+                        &lt;includeResultTo&gt;Message Body&lt;/includeResultTo&gt;
+                    &lt;/file.read&gt;
+                    &lt;respond/&gt;
+                    &lt;/case&gt;
+                &lt;default&gt;
+                    &lt;log category=&quot;INFO&quot; level=&quot;simple&quot;&gt;
+                        &lt;property name=&quot;Status&quot; value=&quot;File does not exist&quot;/&gt;
+                    &lt;/log&gt;
+                    &lt;drop/&gt;
+                &lt;/default&gt;
+                &lt;/switch&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence&gt;
+            &lt;/faultSequence&gt;
+        &lt;/resource&gt;
+    ```
+
+## Get the project
+
+You can download the ZIP file and extract the contents to get the project code.
+
+&lt;a href=&quot;{{base_path}}/assets/attachments/connectors/FileConnectorExample.zip&quot;&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+&lt;/a&gt;
+
+## Deployment
+
+Once you have [built your artifacts]({{base_path}}/develop/packaging-artifacts) into a composite application, you can
+export it into a CAR file (.car file) using the WSO2 Integrator: MI Visual Studio Code extension:
+
+1.  Open the project overview and click on **Export**.
+
+     &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/export_artifacts.jpeg&quot; width=&quot;800&quot; alt=&quot;Download ZIP&quot;&gt;
+
+2.  Click on **Select Destination** to select a destination folder to export the CAR file.
+
+## Test
+
+### File create operation
+
+Invoke the API as shown below using the curl command. Curl Application can be downloaded from [here](https://curl.haxx.se/download.html).
+```
+curl --location &#x27;http://localhost:8290/fileconnector/create&#x27; \
+--header &#x27;Content-Type: application/json&#x27; \
+--data &#x27;{
+&quot;filePath&quot;:&quot;/Users/wso2/Documents/mi_testing/doc/create.txt&quot;,
+&quot;inputContent&quot;: &quot;This is a test file&quot;
+}&#x27;
+```
+
+**Expected response**:
+
+You should get a &#x27;Success&#x27; response, and the file should be created in the specified location in the above payload.
+
+### File read operation
+
+Invoke the API as shown below using the curl command. Curl Application can be downloaded from [here](https://curl.haxx.se/download.html).
+```
+curl --location &#x27;http://localhost:8290/fileconnector/read&#x27; \
+--header &#x27;Content-Type: application/json&#x27; \
+--data &#x27;{
+&quot;filePath&quot;:&quot;/Users/wso2/Documents/mi_testing/doc/create.txt&quot;
+}&#x27;
+```
+
+**Expected response**:
+
+You should get the following text returned.
+
+```
+This is a test file.
+```
+
+## What&#x27;s next
+
+* To customize this example for your own scenario, see [File Connector Reference Guide]({{base_path}}/reference/connectors/file-connector/file-connector-config) documentation for all operation details of the connector.
+</body>
+</html>

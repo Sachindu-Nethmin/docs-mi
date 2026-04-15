@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>json-transform-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># JSON Transform Mediator
+
+The **JSON Transform mediator** is used for controlling XML to JSON transformations (possibly with a JSON Schema)  inside a mediation. Normally XML to JSON transformations are controlled by the properties defined in `synapse.properties`. 
+
+Those configurations are applied globally and you cannot have independent configurations for each mediation scenario. 
+With JSON Transform mediator you can define the properties inside the mediation and control the transformation independently. 
+Also you can have a JSON schema to correct the payload if there are inconsistencies in the transformation.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/mediators/json-transform-concept.png&quot;/&gt;
+
+## Syntax
+
+``` java
+&lt;jsontransform [schema=&quot;string&quot;]&gt;
+   &lt;property name=&quot;string&quot; value=&quot;string&quot;/&gt;*
+&lt;/jsontransform&gt;
+```
+
+## Configuration
+
+The general parameters available for configuring the JSON Transform mediator are as follows.
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Schema&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;This parameter is used for specifying the registry location of the JSON schema file. You can specify a Local Entry as well&lt;/p&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+Apart from defining a schema, you can also add properties to control XML to JSON transformation. The parameters available for configuring a property are as follows:
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Schema&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;The name of the property that needs to be overridden in the sequence. The &lt;b&gt;JSON Transform mediator&lt;/b&gt; supports only the parameters related to XML to JSON conversion. The list of properties that are supported can be found &lt;a href=&quot;{{base_path}}/learn/examples/json-examples/json-examples/#xml-to-json-transformation-parameters&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Property Value&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;The value that should be overridden.&lt;/p&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+## Challenges when converting XML to JSON
+
+### Converting an array of one from XML to JSON
+   
+Let&#x27;s say we do a search and get the results in XML. We want the results to be converted to JSON array when returned to the client. A blind XML to JSON transformation would look like this.
+   
+```xml
+   &lt;books&gt;
+    &lt;book&gt;Harry Potter&lt;/book&gt;
+    &lt;book&gt;Lord of the Rings&lt;/book&gt;
+   &lt;/books&gt;
+```
+
+```json
+    {&quot;books&quot; :  { &quot;book&quot; :  [&quot;Harry Potter&quot;, &quot;Lord of the Rings&quot;]}}
+```
+   
+Let&#x27;s say we get only one result. The converted JSON would come out like below.
+   
+```xml
+   &lt;books&gt;
+    &lt;book&gt;Harry Potter&lt;/book&gt;
+   &lt;/books&gt;
+```
+
+```json
+   {&quot;books&quot; :  { &quot;book&quot; :  &quot;Harry Potter&quot;}}
+```
+
+Theoretically the above conversion is correct. However, a client might expect an array and not a string.
+
+We can tackle the above issue with a JSON Schema and correct the output to be an JSON Array.
+
+```json
+   {
+   	&quot;$schema&quot;: &quot;http://json-schema.org/draft-04/schema#&quot;,
+   	&quot;type&quot;: &quot;object&quot;,
+   	&quot;properties&quot;: {
+   		&quot;books&quot;: {
+   			&quot;type&quot;: &quot;object&quot;,
+   			&quot;properties&quot;: {
+   				&quot;book&quot;: {
+   					&quot;type&quot;: &quot;array&quot;
+   				}
+   			}
+   		}
+   	}
+   }
+```
+
+### Losing data type information
+
+Since we cannot differentiate between String, Numeric and Boolean in XML, when we do a conversion from XML to JSON, the data type of value might be not what we expected. 
+Look at the following the example.
+
+```xml
+   &lt;person&gt;
+    &lt;id&gt;56783&lt;/id&gt;
+    &lt;name&gt;Alice&lt;/name&gt;
+    &lt;isAdmin&gt;true&lt;/isAdmin&gt;
+   &lt;/person&gt;
+```
+By default, the JSON output would look like below after the mediation.
+
+```json
+{
+    &quot;person&quot;: {
+        &quot;id&quot;: 56783,
+        &quot;name&quot;: &quot;Alice&quot;,
+        &quot;isAdmin&quot;: true
+    }
+}
+```
+
+The field `id` has been converted to number, `name` to String and `isAdmin` to boolean. 
+
+The runtime has automatically detected and parsed the values to native data-types. But there might be a scenario where the client expects a String type for `id`. 
+
+We want the native conversion rules applied to `name` and `isAdmin` fields and not `id`.
+
+With JSON Transform mediator, we can use a JSON schema to tackle this issue.
+
+```json
+{
+	&quot;$schema&quot;: &quot;http://json-schema.org/draft-04/schema#&quot;,
+	&quot;type&quot;: &quot;object&quot;,
+	&quot;properties&quot;: {
+		&quot;person&quot;: {
+			&quot;type&quot;: &quot;object&quot;,
+			&quot;properties&quot;: {
+				&quot;id&quot;: {
+					&quot;type&quot;: &quot;string&quot;
+				}
+			}
+		}
+	}
+}
+```
+
+With this schema correction, the JSON payload would come out as below. This gives granular level control over individual field data types rather than using a global property.
+
+```json
+{
+    &quot;person&quot;: {
+        &quot;id&quot;: &quot;56783&quot;,
+        &quot;name&quot;: &quot;Alice&quot;,
+        &quot;isAdmin&quot;: true
+    }
+}
+```
+
+## Example 
+
+Given below is a sample schema file (Schema.json) file that you can use for running the examples given below. 
+Add this sample schema file (i.e. Schema.json) to the following registry path: conf:/Schema.json. 
+For instructions on adding the schema file to the Registry Resources Project, see [Creating Registry Resource]({{base_path}}/develop/creating-artifacts/creating-registry-resources).
+
+```json
+{
+  &quot;$schema&quot;: &quot;http://json-schema.org/draft-04/schema#&quot;,
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;properties&quot;: {
+    &quot;fruit&quot;: {
+      &quot;type&quot;: &quot;string&quot;,
+      &quot;minLength&quot;: 4,
+      &quot;maxLength&quot;: 6,
+      &quot;pattern&quot;: &quot;^[0-9]{1,45}$&quot;
+    },
+    &quot;price&quot;: {
+      &quot;type&quot;: &quot;number&quot;,
+      &quot;minimum&quot;: 2,
+      &quot;maximum&quot;: 20,
+      &quot;exclusiveMaximum&quot;: 20,
+      &quot;multipleOf&quot;: 2.5
+    }
+  },
+  &quot;required&quot;: [
+    &quot;price&quot;
+  ]
+}
+```
+
+Use the following payload to test the examples:
+
+```xml
+&lt;jsonObject&gt;
+    &lt;fruit&gt;12345&lt;/fruit&gt;
+    &lt;price&gt;7.5&lt;/price&gt;
+    &lt;quantity&gt;10&lt;/quantity&gt;
+&lt;/jsonObject&gt;
+```
+
+### Example 1 - Overriding global synapse properties
+
+This example will override the XML to JSON transformation properties defined in the **synapse.properies** configuration with the properties given by the JSON transform mediator.
+
+``` xml
+    &lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;transformMediatorSimpleAutoPrimitive&quot; startOnLoad=&quot;true&quot; transports=&quot;https http&quot;&gt;
+        &lt;description/&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;property name=&quot;messageType&quot; scope=&quot;axis2&quot; value=&quot;application/json&quot;/&gt;
+                &lt;jsontransform&gt;
+                    &lt;property name=&quot;synapse.commons.json.output.autoPrimitive&quot; value = &quot;false&quot;/&gt;
+                &lt;/jsontransform&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt;
+```
+
+Output: All the numeric values have been converted to string values since the auto primitive property is defined as false.
+
+```json
+{
+    &quot;fruit&quot;: &quot;12345&quot;,
+    &quot;price&quot;: &quot;7.5&quot;,
+    &quot;quantity&quot;: &quot;10&quot;
+}
+```
+
+### Example 2 - Using a JSON schema
+
+This will perform the XML to JSON transformation using the global synapse settings and then apply the JSON schema that is added from the JSON transform mediator.
+
+``` xml
+    &lt;proxy name=&quot;transformMediatorSimpleSchema&quot; startOnLoad=&quot;true&quot; transports=&quot;https http&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;description/&gt;
+            &lt;target&gt;
+                &lt;inSequence&gt;
+    				&lt;property name=&quot;messageType&quot; scope=&quot;axis2&quot; value=&quot;application/json&quot;/&gt;
+                    &lt;jsontransform schema=&quot;conf:/Schema.json&quot;/&gt;
+                    &lt;respond/&gt;
+                &lt;/inSequence&gt;
+            &lt;/target&gt;
+        &lt;/proxy&gt;
+```
+
+Output: The &#x27;fruit&#x27; value has been converted to string and the &#x27;price&#x27; value has been converted to a number according to the schema definition. Please note that &#x27;quantity&#x27; has been converted to a number because it is the default property according to the **synapse.properties** file.
+
+``` json
+    {
+        &quot;fruit&quot;: &quot;12345&quot;,
+        &quot;price&quot;: 7.5,
+        &quot;quantity&quot;: 10
+    }
+```
+
+### Example 3 - Overriding global synapse properties and applying a JSON schema
+
+This will first override the XML to JSON transformation properties defined in the synapse.properies configuration with the properties given by the JSON transform mediator and also apply the JSON Schema given in the mediator.
+
+``` java
+    &lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;transformMediatorPropertyAndSchema&quot; startOnLoad=&quot;true&quot; transports=&quot;https http&quot;&gt;
+        &lt;description/&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;property name=&quot;messageType&quot; scope=&quot;axis2&quot; value=&quot;application/json&quot;/&gt;
+                &lt;jsontransform schema=&quot;conf:/Schema.json&quot;&gt;
+                    &lt;property name=&quot;synapse.commons.json.output.autoPrimitive&quot; value = &quot;false&quot;/&gt;
+                &lt;/jsontransform&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt;
+```
+
+Output: The &#x27;fruit&#x27; value has been converted to a string and the &#x27;price&#x27; value has been converted to a number according to the schema definition. 
+Please note that &#x27;quantity&#x27; has been converted to a string because we have overridden the global synapse.properties file.
+
+``` json
+    {
+        &quot;fruit&quot;: &quot;12345&quot;,
+        &quot;price&quot;: 7.5,
+        &quot;quantity&quot;: &quot;10&quot;
+    }
+```
+
+</body>
+</html>

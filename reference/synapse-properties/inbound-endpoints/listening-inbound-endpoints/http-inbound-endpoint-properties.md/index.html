@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>http-inbound-endpoint-properties.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># HTTP/HTTPS Inbound Endpoint
+## Introduction
+
+The HTTP inbound protocol is used to separate endpoint listeners for each HTTP inbound endpoint so that messages are handled separately. The HTTP inbound endpoint can bypass the inbound side axis2 layer and directly inject messages to a given sequence or API. For proxy services, messages will be routed through the axis2 transport layer in a manner similar to normal transports. You can start dynamic HTTP inbound endpoints without restarting the server.
+
+## Syntax
+
+=== &quot;HTTP Listener&quot;
+    ```xml 
+    &lt;inboundEndpoint name=&quot;HttpListenerEP&quot; protocol=&quot;http&quot; suspend=&quot;false&quot; sequence=&quot;TestIn&quot; onError=&quot;fault&quot; &gt;
+        &lt;p:parameters xmlns:p=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;p:parameter  name=&quot;inbound.http.port&quot;&gt;8081&lt;/p:parameter&gt;
+        &lt;/p:parameters&gt;
+    &lt;inboundEndpoint&gt;
+    ```
+=== &quot;HTTPS Listener&quot;    
+    ```xml 
+    &lt;inboundEndpoint name=&quot;HttpListenerEP&quot; protocol=&quot;https&quot; suspend=&quot;false&quot; sequence=&quot;TestIn&quot; onError=&quot;fault&quot; &gt;
+            &lt;p:parameters xmlns:p=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+                &lt;p:parameter  name=&quot;inbound.http.port&quot;&gt;8081&lt;/p:parameter&gt;
+                &lt;p:parameter name=&quot;keystore&quot;&gt;
+                    &lt;KeyStore&gt;
+                        &lt;Location&gt;repository/resources/security/wso2carbon.jks&lt;/Location&gt;
+                        &lt;Type&gt;JKS&lt;/Type&gt;
+                        &lt;Password&gt;wso2carbon&lt;/Password&gt;
+                        &lt;KeyPassword&gt;wso2carbon&lt;/KeyPassword&gt;
+                    &lt;/KeyStore&gt;
+                &lt;/p:parameter&gt;
+                &lt;p:parameter name=&quot;truststore&quot;&gt;
+                    &lt;TrustStore&gt;
+                        &lt;Location&gt;repository/resources/security/client-truststore.jks&lt;/Location&gt;
+                        &lt;Type&gt;JKS&lt;/Type&gt;
+                        &lt;Password&gt;wso2carbon&lt;/Password&gt;
+                    &lt;/TrustStore&gt;
+                &lt;/p:parameter&gt;
+                &lt;p:parameter name=&quot;SSLVerifyClient&quot;&gt;require&lt;/p:parameter&gt;
+                &lt;p:parameter name=&quot;HttpsProtocols&quot;&gt;TLSv1,TLSv1.1,TLSv1.2&lt;/p:parameter&gt;
+                &lt;p:parameter name=&quot;SSLProtocol&quot;&gt;SSLV3&lt;/p:parameter&gt;
+                &lt;p:parameter name=&quot;CertificateRevocationVerifier&quot;&gt;
+                    &lt;CertificateRevocationVerifier enable=&quot;true&quot;&gt;
+                       &lt;CacheSize&gt;10&lt;/CacheSize&gt;
+                       &lt;CacheDelay&gt;2&lt;/CacheDelay&gt;
+                    &lt;/CertificateRevocationVerifier&gt;
+                 &lt;/p:parameter&gt;
+             &lt;/p:parameters&gt;
+    &lt;/inboundEndpoint&gt;
+    ```
+
+## Properties
+
+Listed below are the properties used for [creating an HTTP/HTTPS inbound endpoint]({{base_path}}/develop/creating-artifacts/creating-an-inbound-endpoint).
+
+### Required Properties
+
+Listed below are the required properties when [creating an HTTP/HTTPS inbound endpoint]({{base_path}}/develop/creating-artifacts/creating-an-inbound-endpoint).
+
+&lt;table&gt;
+      &lt;tr&gt;
+         &lt;th&gt;
+            Property
+         &lt;/th&gt;
+         &lt;th&gt;
+            Description
+         &lt;/th&gt;
+      &lt;/tr&gt;
+   &lt;tbody&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Property&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;inbound.http.port&lt;/td&gt;
+         &lt;td&gt;
+          The port on which the endpoint listener should be started.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;sequential&lt;/td&gt;
+         &lt;td&gt;The behavior when executing the given sequence.&lt;br /&gt;
+            When set as &lt;code&gt;true&lt;/code&gt; , mediation will happen within the same thread. When set as &lt;code&gt;false&lt;/code&gt; , the mediation engine will use the inbound thread pool. The default thread pool values can be found in the &lt;code&gt;MI_HOME/conf/deployment.toml&lt;/code&gt; file, under the `[mediation]` section. The default setting is &lt;code&gt;true&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Suspend&lt;/td&gt;
+        &lt;td&gt;
+          If the inbound listener should pause when accepting incoming requests, set this to &lt;code&gt;true&lt;/code&gt;. If the inbound listener should not pause when accepting incoming requests, set this to &lt;code&gt;false&lt;/code&gt;.
+        &lt;/td&gt;
+      &lt;/tr&gt;
+   &lt;/tbody&gt;
+&lt;/table&gt;
+
+### Optional Properties
+
+Listed below are the optional properties you can configure when [creating an HTTP/HTTPS inbound endpoint]({{base_path}}/develop/creating-artifacts/creating-an-inbound-endpoint).
+
+&lt;table&gt;
+   &lt;thead&gt;
+      &lt;tr&gt;
+         &lt;th&gt;
+            &lt;p&gt;Property Name&lt;/p&gt;
+         &lt;/th&gt;
+         &lt;th&gt;
+            &lt;p&gt;Description&lt;/p&gt;
+         &lt;/th&gt;
+      &lt;/tr&gt;
+   &lt;/thead&gt;
+   &lt;tbody&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            keystore
+         &lt;/td&gt;
+         &lt;td&gt;The KeyStore location where keys are stored.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            truststore
+         &lt;/td&gt;
+         &lt;td&gt;The TrustStore location where keys are stored.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+          SSLVerifyClient
+         &lt;/td&gt;
+         &lt;td&gt;
+            &lt;p&gt;Used when enabling mutual verification.&lt;/p&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+          HttpsProtocols
+         &lt;/td&gt;
+         &lt;td&gt;The supporting protocols.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            SSLProtocol
+         &lt;/td&gt;
+         &lt;td&gt;The supporting SSL protocol.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            CertificateRevocationVerifier
+         &lt;/td&gt;
+         &lt;td&gt;
+            When the &lt;code&gt;enable&lt;/code&gt; attribute is set to &lt;code&gt;true&lt;/code&gt;, this validates and verifies the revocation status of the host certificates using OCSP/CRL when making HTTPS connections.&lt;br /&gt;
+            If the &lt;code&gt;enable&lt;/code&gt; attribute of this parameter is set to &lt;code&gt;true&lt;/code&gt;, you also need to specify the following:
+            &lt;ul&gt;
+              &lt;li&gt;&lt;b&gt;CacheSize&lt;/b&gt;: The maximum size of the cache.&lt;/li&gt;
+              &lt;li&gt;&lt;b&gt;CacheDelay&lt;/b&gt;: The time duration between two consecutive scheduled cache managing tasks that perform housekeeping work for the cache.&lt;/li&gt;
+            &lt;/ul&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+   &lt;/tbody&gt;
+&lt;/table&gt;
+
+### Worker Pool Configuration Properties
+
+By default inbound endpoints share the PassThrough transport worker pool to handle incoming requests. If you need a separate worker pool for the inbound endpoint, you need to configure the following properties when [creating an HTTP/HTTPS inbound endpoint]({{base_path}}/develop/creating-artifacts/creating-an-inbound-endpoint).
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Property Name&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;inbound.worker.pool.size.core&lt;/td&gt;
+    &lt;td&gt;
+      The initial number of threads in the worker thread pool. This value can be changed accordingly based on the number of messages to be processed. The maximum value that can be specified here is the value of the inbound.worker.pool.size.max parameter.&lt;/br&gt;&lt;/br&gt; The default value is 400.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;inbound.worker.pool.size.max&lt;/td&gt;
+    &lt;td&gt;
+      The maximum number of threads in the worker thread pool. Specify a maximum limit in order to avoid performance degradation that can occur due to context switching.&lt;/br&gt;&lt;/br&gt; The default value is 500.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;inbound.worker.thread.keep.alive.sec&lt;/td&gt;
+    &lt;td&gt;
+      The keep-alive time for extra threads in the worker pool. This value should be less than the socket timeout. When this time is elapsed for an extra thread, it will be destroyed. The purpose of this parameter is to optimize the usage of resources by avoiding wastage that results from having extra threads that are not utilized.&lt;/br&gt;&lt;/br&gt; The default value is 60.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;inbound.worker.pool.queue.length&lt;/td&gt;
+    &lt;td&gt;
+      The length of the queue that is used to hold runnable tasks that are to be executed by the worker pool. The thread pool starts queuing jobs when all existing threads are busy and the pool has reached the maximum number of threads. The value for this parameter should be -1 to use an unbounded queue. If a bound queue is used and the queue gets filled to its capacity, any further attempt to submit jobs will fail causing synapse to drop some messages. &lt;/br&gt;&lt;/br&gt; The default value is -1.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;inbound.thread.group.id&lt;/td&gt;
+    &lt;td&gt;
+      Unique Identifier of the thread group. The default value is the PassThrough inbound worker thread group.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;inbound.thread.id&lt;/td&gt;
+    &lt;td&gt;
+      Unique Identifier of the thread group. The default value is the PassThrough inbound worker thread.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;dispatch.filter.pattern&lt;/td&gt;
+    &lt;td&gt;
+      The regular expression that defines the proxy services and API&#x27;s to expose via the inbound endpoint. Provide the .* expression to expose all proxy services and API&#x27;s or provide an expression similar to &lt;code&gt;^(/foo|/bar|/services/MyProxy)$&lt;/code&gt; to define a set of services to expose via the inbound endpoint. If you do not provide an expression only the defined sequence of the inbound endpoint will be accessible.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</body>
+</html>

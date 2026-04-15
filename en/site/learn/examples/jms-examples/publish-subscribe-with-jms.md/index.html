@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>publish-subscribe-with-jms.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Publish and Subscribe with JMS
+
+JMS supports two models for messaging as follows:
+
+- Queues: point-to-point
+- Topics: publish and subscribe  
+
+Many business use cases can be implemented using the publisher-subscriber (pub-sub) pattern. For example, consider a blog with subscribed readers. The blog author posts a blog entry, which the subscribers of the blog can view. In other words, the blog author publishes a message (the blog post content) and the subscribers (the blog readers) receive that message. Popular publisher-subscriber patterns like these can be implemented using JMS topics.
+
+In this sample scenario, two proxy services in the WSO2 Integrator: MI act as the publisher and subscriber to a topic defined in the message broker. 
+
+When we invoke the back-end service, the publisher is invoked and sends the message to the JMS topic. The topic delivers the message to all the subscribers of that topic. In this case, the subscribers are WSO2 Integrator: MI proxy services.
+
+## Synapse configurations
+
+Shown below are the synapse artifacts that are used to define this use case. See the instructions on how to [build and run](#build-and-run) this example.
+
+=== &quot;Proxy Service (Publisher)&quot;
+    ```xml
+    &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;http&quot; startOnLoad=&quot;true&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+      &lt;target&gt;
+        &lt;inSequence&gt;
+            &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot; /&gt;
+            &lt;property name=&quot;FORCE_SC_ACCEPTED&quot; value=&quot;true&quot; scope=&quot;axis2&quot; /&gt;
+            &lt;call&gt;
+                &lt;endpoint&gt;
+                    &lt;address
+                        uri=&quot;jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=TopicConnectionFactory&amp;amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;amp;java.naming.provider.url=tcp://localhost:61616&amp;amp;transport.jms.DestinationType=topic&quot; /&gt;
+                &lt;/endpoint&gt;
+            &lt;/call&gt;
+        &lt;/inSequence&gt;
+      &lt;/target&gt;
+    &lt;/proxy&gt; 
+    ```
+=== &quot;Proxy Service (Subscriber 1)&quot;    
+    ```xml
+    &lt;proxy name=&quot;SimpleStockQuoteService1&quot; transports=&quot;jms&quot; startOnLoad=&quot;true&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+          &lt;target&gt;
+            &lt;inSequence&gt;
+              &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+              &lt;log level=&quot;custom&quot;&gt;
+                &lt;property name=&quot;Subscriber1&quot; value=&quot;I am Subscriber1&quot;/&gt;
+              &lt;/log&gt;
+              &lt;drop/&gt;
+            &lt;/inSequence&gt;
+          &lt;/target&gt;
+      &lt;parameter name=&quot;transport.jms.ContentType&quot;&gt;
+          &lt;rules&gt;
+            &lt;jmsProperty&gt;contentType&lt;/jmsProperty&gt;
+            &lt;default&gt;application/xml&lt;/default&gt;
+          &lt;/rules&gt;
+      &lt;/parameter&gt;
+      &lt;parameter name=&quot;transport.jms.ConnectionFactory&quot;&gt;myTopicConnectionFactory&lt;/parameter&gt;
+      &lt;parameter name=&quot;transport.jms.DestinationType&quot;&gt;topic&lt;/parameter&gt;
+      &lt;parameter name=&quot;transport.jms.Destination&quot;&gt;SimpleStockQuoteService&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;Proxy Service (Subscriber 2)&quot;    
+    ```xml
+    &lt;proxy name=&quot;SimpleStockQuoteService2&quot; transports=&quot;jms&quot; startOnLoad=&quot;true&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+      &lt;target&gt;
+        &lt;inSequence&gt;
+          &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+          &lt;log level=&quot;custom&quot;&gt;
+            &lt;property name=&quot;Subscriber2&quot; value=&quot;I am Subscriber2&quot;/&gt;
+          &lt;/log&gt;
+          &lt;drop/&gt;
+        &lt;/inSequence&gt;
+      &lt;/target&gt;
+      &lt;parameter name=&quot;transport.jms.ContentType&quot;&gt;
+        &lt;rules&gt;
+          &lt;jmsProperty&gt;contentType&lt;/jmsProperty&gt;
+          &lt;default&gt;application/xml&lt;/default&gt;
+        &lt;/rules&gt;
+      &lt;/parameter&gt;
+      &lt;parameter name=&quot;transport.jms.ConnectionFactory&quot;&gt;myTopicConnectionFactory&lt;/parameter&gt;
+      &lt;parameter name=&quot;transport.jms.DestinationType&quot;&gt;topic&lt;/parameter&gt;
+      &lt;parameter name=&quot;transport.jms.Destination&quot;&gt;SimpleStockQuoteService&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    ```
+
+!!!note
+    Make sure to configure the relevant [JMS parameters]({{base_path}}/reference/synapse-properties/transport-parameters/jms-transport-parameters) in the `deployment.toml` file.
+    ```
+    [[transport.jms.listener]]
+    name = &quot;myTopicConnectionFactory&quot;
+    parameter.initial_naming_factory = &quot;org.apache.activemq.jndi.ActiveMQInitialContextFactory&quot;
+    parameter.provider_url = &quot;tcp://localhost:61616&quot;
+    parameter.connection_factory_name = &quot;TopicConnectionFactory&quot;
+    parameter.connection_factory_type = &quot;topic&quot;
+    ```
+
+See the descriptions of the above configurations:
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Artifact&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Publisher&lt;/td&gt;
+    &lt;td&gt;
+      This proxy service (StockQuoteProxy) is configured to publish messages to the &lt;code&gt;SimpleStockQuoteService&lt;/code&gt; topic in the broker. Note that there are two ways to define the endpoint URL:
+      &lt;ul&gt;
+        &lt;li&gt;
+          Specify the JNDI name of the JMS topic and the connection factory parameters in the connection URL as shown in the above example.
+        &lt;/li&gt;
+        &lt;li&gt;
+          If you have already specified the endpoint&#x27;s connection factory parameters (for the JMS sender configuration) in the &lt;code&gt;deployment.toml&lt;/code&gt; file, the connection URL in the proxy service should be as shown below. In this example, the endpoint URL of the proxy service refers to the relevant connection factory in the &lt;code&gt;deployment.toml&lt;/code&gt; file. &lt;/br&gt;&lt;/br&gt;
+          &lt;b&gt;When the broker is ActiveMQ&lt;/b&gt;&lt;/br&gt;
+          &lt;code&gt;jms:/SimpleStockQuoteService?transport.jms.ConnectionFactory=TopicSenderConnectionFactory&lt;/code&gt;&lt;/br&gt;&lt;/br&gt;
+          &lt;b&gt;When the broker is WSO2 Message Broker&lt;/b&gt;&lt;/br&gt;
+          &lt;code&gt;jms:/SimpleStockQuoteService?transport.jms.ConnectionFactory=TopicSenderConnectionFactory&lt;/code&gt;&lt;/br&gt;
+        &lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Subscriber 1&lt;/td&gt;
+    &lt;td&gt;Proxy service that consumes messages from the broker.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Subscriber 2&lt;/td&gt;
+    &lt;td&gt;Proxy service that consumes messages from the broker.&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+3. Create [proxy services]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service) with the configurations given above.
+4. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+Set up the broker:
+
+1.  [Configure a broker]({{base_path}}/install-and-setup/setup/transport-configurations/configuring-transports/#configuring-the-jms-transport) with your WSO2 Integrator: MI instance. Let&#x27;s use Active MQ for this example.
+2.  Start the broker.
+3.  Start the WSO2 Integrator: MI (after starting the broker).
+
+Publishing to the topic:
+
+1. Start the WSO2 Integrator: MI. A log message similar to the following will appear:
+    ```bash
+    INFO {org.apache.axis2.transport.jms.JMSListener} - Started to listen on destination : SimpleStockQuoteService of type topic for service SimpleStockQuoteService2
+    INFO {org.apache.axis2.transport.jms.JMSListener} - Started to listen on destination : SimpleStockQuoteService of type topic for service SimpleStockQuoteService1
+    ```
+ 
+2. To invoke the publisher, send a request to `StockQuoteProxy` (`http://localhost:8290/services/StockQuoteProxy`) with the following payload:
+    ```xml
+    &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+       &lt;soapenv:Header/&gt;
+       &lt;soapenv:Body&gt;
+          &lt;ser:getQuote&gt;
+             &lt;ser:request&gt;
+                &lt;xsd:symbol&gt;IBM&lt;/xsd:symbol&gt;
+             &lt;/ser:request&gt;
+          &lt;/ser:getQuote&gt;
+       &lt;/soapenv:Body&gt;
+    &lt;/soapenv:Envelope&gt;
+    ```
+
+    When the stockquote client sends the message to the `StockQuoteProxy` service, the publisher is invoked and sends the message to the JMS topic. The topic delivers the message to all the subscribers of that topic. In this case, the subscribers are proxy services deployed in the WSO2 Integrator: MI.
+
+    !!! Note
+        There can be many types of publishers and subscribers for a given JMS topic. The following [article in the WSO2 library](https://wso2.com/library/articles/2011/12/wso2-esb-example-pubsub-soa/) provides more information on different types of publishers and subscribers.</body>
+</html>

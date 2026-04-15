@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>example.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>## Introduction
+
+The **Ballerina Module** feature in WSO2 Integrator: MI allows developers to integrate custom data transformation logic into integration flows using the [Ballerina](https://ballerina.io/) programming language. By leveraging this capability, you can encapsulate complex business logic, data mappings, and type-specific operations as reusable modules and invoke them directly within your integration sequences.
+
+This document demonstrates how to use Ballerina code inside MI projects using the **WSO2 Integrator: MI&#x27;s Ballerina Module**, with practical examples that showcase JSON-to-JSON mapping, XML total calculation, and dynamic type-based transformations.
+
+#### Example 1: Patient Mapping
+
+This example demonstrates the transformation of a JSON payload representing patient data into a new format. The Ballerina module mapPatient processes the input data, extracts relevant details such as name, gender, and address, and maps them into a structured response.
+
+&lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/patient-mapping.png&quot; title=&quot;Patient Mapping Flow&quot; width=&quot;800&quot; alt=&quot;Patient Mapping Flow&quot;/&gt;
+
+#### Example 2: Price Calculation
+This example illustrates the use of a Ballerina module to calculate the total price of items in an XML payload. The module calculates the total price by summing up the prices of individual items and returns the result as a JSON response.
+
+&lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/price-calculation.png&quot; title=&quot;Price Calculation Flow&quot; width=&quot;800&quot; alt=&quot;Price Calculation Flow&quot;/&gt;
+
+#### Example 3: Dynamic Type-Based Transformation
+This example handles various data types like string, integer, boolean, float, and decimal. Based on the input type, the corresponding Ballerina module performs operations such as doubling a string, inverting a boolean, or calculating a reciprocal of a float. The result is returned in a standardized format.
+
+&lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/dynamic-type-transformation.png&quot; title=&quot;Dynamic Type-Based Transformation Flow&quot; width=&quot;800&quot; alt=&quot;Dynamic Type-Based Transformation Flow&quot;/&gt;
+
+If you do not want to configure this yourself, you can simply [get the project](#get-the-project) and run it.
+
+## Setup the Integration Project
+
+1. **Install the WSO2 Integrator: MI VS Code Extension**
+   To begin, install the [WSO2 Integrator: MI VS Code extension](https://mi.docs.wso2.com/en/latest/develop/mi-for-vscode/install-wso2-mi-for-vscode/) from the Visual Studio Code marketplace. This extension enables you to create, manage, and deploy integration projects with ease.
+
+2. **Create or Open an Integration Project**
+   Use the extension to [Create a new integration project](https://mi.docs.wso2.com/en/latest/develop/create-integration-project/) given the name `ballerina-module-example` or open an existing integration project. This project will serve as the workspace for your Ballerina module development.
+   &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/createNewProject.png&quot; title=&quot;Create Integration Project&quot; width=&quot;800&quot; alt=&quot;Create Integration Project&quot;/&gt;
+
+
+## Create the Ballerina Module
+
+1. Expand the artifact types in the **Add artifact** view and select **Ballerina Module**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/addModule.png&quot; title=&quot;Select Ballerina Module&quot; width=&quot;800&quot; alt=&quot;Select Ballerina Module&quot;/&gt;
+
+2. In the `Create Ballerina Module` form, enter a **name** and a **version** for the module and click **Create**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-add-bal.png&quot; title=&quot;Create Ballerina Module Form&quot; width=&quot;800&quot; alt=&quot;Create Ballerina Module Form&quot;/&gt;
+
+3. Update the generated sample Ballerina code with following transformation logic and save the file.
+    
+    ??? note &quot;Ballerina Implementation for All Three Examples&quot;
+
+            import wso2/mi;
+
+            // Patient Mapping Logic
+
+            type Patient record {
+                string patientType;
+                string patientId;
+                string version;
+                string lastUpdatedOn;
+                string originSource;
+                Description description;
+                Identifier[] identifiers;
+                string firstName;
+                string lastName;
+                string gender;
+                LocationDetail[] locationDetail;
+            };
+
+            type Identifier record {
+                IdType id_type;
+                string id_value;
+            };
+
+            type IdType record {
+                Code[] codes;
+            };
+
+            type Code record {
+                string system_source;
+                string identifier_code;
+            };
+
+            type Description record {
+                string status;
+                string details?;
+            };
+
+            type LocationDetail record {
+                string nation?;
+                string town?;
+                string region?;
+                string zipCode?;
+                string identifier?;
+                string province?;
+            };
+
+            @mi:Operation
+            public function mapPatient(json payload) returns json {
+                Patient|error patient = payload.cloneWithType();
+            if patient is error {
+                return {
+                    &quot;error&quot;: &quot;Could not convert payload to Patient record&quot;
+                };
+                
+            }
+
+                return {
+                    name: [
+                        {
+                            given: [patient.firstName],
+                            family: patient.lastName
+                        }
+                    ],
+                    meta: {
+                        versionId: patient.version,
+                        lastUpdated: patient.lastUpdatedOn,
+            &quot;source&quot;: patient.originSource
+                    },
+                    text: {
+                        div: patient.description.details ?: &quot;&quot;,
+                        status: patient.description.status
+                    },
+                    gender: patient.gender,
+                    identifier: [
+                        {
+                            system: patient.identifiers[0].id_type.codes[0].system_source,
+                            value: patient.identifiers[0].id_value
+                        }
+                    ],
+                    address: from var {nation, town, region, province, zipCode, identifier} in patient.locationDetail
+                        select {
+                            country: nation,
+                            city: town,
+                            district: region,
+                            state: province,
+                            postalCode: zipCode,
+                            id: identifier
+                        },
+                    id: patient.patientId
+                };
+            }
+
+            // Price Calculation Logic
+
+            @mi:Operation
+            public function calculateTotal(xml invoice) returns xml {
+                xml&lt;xml:Element&gt; prices = invoice/**/&lt;price&gt;;
+
+                int total = from xml:Element element in prices
+                    let int|error price = int:fromString(element.data())
+                    where price is int
+                    collect sum(price);
+
+                return xml `&lt;total&gt;${total}&lt;/total&gt;`;
+            }
+
+            // Type Processing Logic
+
+            @mi:Operation
+            public function invertBoolean(boolean b) returns boolean =&gt; !b;
+
+            @mi:Operation
+            public function doubleInt(int n) returns int =&gt; n * 2;
+
+            @mi:Operation
+            public function reciprocalFloat(float f) returns float {
+                if f == 0.0 {
+                    return 1;
+                }
+                return 1.0 / f;
+            }
+
+            @mi:Operation
+            public function addConstantToDecimal(decimal d) returns decimal =&gt; d + 10;
+
+            @mi:Operation
+            public function doubleString(string s) returns string =&gt; s + s;
+
+            @mi:Operation
+            public function getJsonNameProperty(json j) returns json {
+                json jsn = j;
+                if jsn is string {
+                    json|error je = jsn.fromJsonString();
+                    if je is error {
+                        return {err: je.message()};
+                    }
+                    jsn = je;
+                }
+                json|error val = jsn.name;
+                if val is error {
+                    return {err: val.message()};
+                }
+                return {val};
+            }
+
+            @mi:Operation
+            public function getXmlNameElement(xml x) returns xml {
+                xml y = x/&lt;name&gt;;
+
+                return xml `&lt;result&gt;${y}&lt;/result&gt;`;
+            }
+
+4. Click the **Build Ballerina Module** icon.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-bal-code.png&quot; title=&quot;Ballerina Module Code&quot; width=&quot;800&quot; alt=&quot;Ballerina Module Code&quot;/&gt;
+
+5. Once the Ballerina module is successfully built, it will appear in the **Mediator palette**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/built-module.png&quot; title=&quot;Mediator Palette View&quot; width=&quot;800&quot; alt=&quot;Mediator Palette View&quot;/&gt;
+
+## Create the Integration Logic
+
+1. Lets build the three APIs that will use the above Ballerina module. Go the **Project Overview** and click on the **+** button. and select **API**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-add-api.png&quot; title=&quot;Adding a Rest API&quot; width=&quot;800&quot; alt=&quot;Adding a Rest API&quot;/&gt;
+
+2. Provide the name of the API as `patientmap` and context as `/patientmap` and click **Create**.&lt;br/&gt;
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-add-api-name.png&quot; title=&quot;Adding a Rest API Name&quot; width=&quot;600&quot; alt=&quot;Adding a Rest API Name&quot;/&gt;
+
+    Follow the same steps to create the other two APIs: `/pricecal` and `/typeprocess`.
+
+3. By default, the API will be created with a `GET` method. Click on the **patientmap** API and then click **Edit**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-edit-api.png&quot; title=&quot;Edit API&quot; width=&quot;800&quot; alt=&quot;Edit API&quot;/&gt;
+
+4. Select the **POST** method and click on **Update**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-edit-api-method.png&quot; title=&quot;Edit API Method&quot; width=&quot;400&quot; alt=&quot;Edit API Method&quot;/&gt;
+
+    Repeat the above steps for the other two APIs as well.
+
+5. Now, click on the **patientmap** API and click on **+** to add a new mediator then select *MapPatient* operation in **Ballerina Module**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-add-ballerina-mediator.png&quot; title=&quot;Add Mediator&quot; width=&quot;800&quot; alt=&quot;Add Mediator&quot;/&gt;
+
+6. Click the **Ex** button and select the **payload** as the input.&lt;br/&gt;
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-add-ballerina-mediator-input.png&quot; title=&quot;Add Mediator Input&quot; width=&quot;600&quot; alt=&quot;Add Mediator Input&quot;/&gt;
+
+    Make sure the **Overwrite Message Body** option is selected, and then click **Add**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-add-ballerina-mediator-input-2.png&quot; title=&quot;Add Mediator Input&quot; width=&quot;300&quot; alt=&quot;Add Mediator Input&quot;/&gt;
+
+7. Click on the **+** button again and add a **Respond** mediator.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-add-response-mediator.png&quot; title=&quot;Add Response Mediator&quot; width=&quot;800&quot; alt=&quot;Add Response Mediator&quot;/&gt;
+
+8. We also need to build the other two APIs. For this purpose, you can use the following Synapse configurations. Open the `pricecal` and `typeprocess` APIs, navigate to the **Code View**, and replace the existing code with the following
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-code-view.png&quot; title=&quot;Code View&quot; width=&quot;800&quot; alt=&quot;Code View&quot;/&gt;
+
+??? note &quot;Synapse Code for Price Calculation API&quot;
+        &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        &lt;api context=&quot;/pricecal&quot; name=&quot;pricecal&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;resource methods=&quot;POST&quot; uri-template=&quot;/&quot;&gt;
+                &lt;inSequence&gt;
+                    &lt;ballerinaFunctions.calculateTotal&gt;
+                        &lt;responseVariable&gt;ballerinaFunctions_calculateTotal_1&lt;/responseVariable&gt;
+                        &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+                        &lt;invoice&gt;{${xpath(&#x27;$body/*&#x27;)}}&lt;/invoice&gt;
+                    &lt;/ballerinaFunctions.calculateTotal&gt;
+                    &lt;respond/&gt;
+                &lt;/inSequence&gt;
+                &lt;faultSequence&gt;
+                &lt;/faultSequence&gt;
+            &lt;/resource&gt;
+        &lt;/api&gt;
+??? note &quot;Synapse Code for Type Processing API&quot;
+        &lt;api xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;typeprocess&quot; context=&quot;/typeprocess&quot;&gt;
+            &lt;resource methods=&quot;POST&quot; uri-template=&quot;/&quot;&gt;
+                &lt;inSequence&gt;
+                    &lt;switch source=&quot;${payload.type}&quot;&gt;
+                        &lt;case regex=&quot;string&quot;&gt;
+                            &lt;ballerinaFunctions.doubleString&gt;
+                                &lt;responseVariable&gt;bal_response&lt;/responseVariable&gt;
+                                &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+                                &lt;s&gt;{${payload.val}}&lt;/s&gt;
+                            &lt;/ballerinaFunctions.doubleString&gt;
+                        &lt;/case&gt;
+                        &lt;case regex=&quot;integer&quot;&gt;
+                            &lt;ballerinaFunctions.doubleInt&gt;
+                                &lt;responseVariable&gt;bal_response&lt;/responseVariable&gt;
+                                &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+                                &lt;n&gt;{${payload.val}}&lt;/n&gt;
+                            &lt;/ballerinaFunctions.doubleInt&gt;
+                        &lt;/case&gt;
+                        &lt;case regex=&quot;boolean&quot;&gt;
+                            &lt;ballerinaFunctions.invertBoolean&gt;
+                                &lt;responseVariable&gt;bal_response&lt;/responseVariable&gt;
+                                &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+                                &lt;b&gt;{${payload.val}}&lt;/b&gt;
+                            &lt;/ballerinaFunctions.invertBoolean&gt;
+                        &lt;/case&gt;
+                        &lt;case regex=&quot;float&quot;&gt;
+                            &lt;ballerinaFunctions.reciprocalFloat&gt;
+                                &lt;responseVariable&gt;bal_response&lt;/responseVariable&gt;
+                                &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+                                &lt;f&gt;{${payload.val}}&lt;/f&gt;
+                            &lt;/ballerinaFunctions.reciprocalFloat&gt;
+                        &lt;/case&gt;
+                        &lt;case regex=&quot;decimal&quot;&gt;
+                            &lt;ballerinaFunctions.addConstantToDecimal&gt;
+                                &lt;responseVariable&gt;bal_response&lt;/responseVariable&gt;
+                                &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+                                &lt;d&gt;{${payload.val}}&lt;/d&gt;
+                            &lt;/ballerinaFunctions.addConstantToDecimal&gt;
+                        &lt;/case&gt;
+                        &lt;case regex=&quot;json&quot;&gt;
+                            &lt;ballerinaFunctions.getJsonNameProperty&gt;
+                                &lt;responseVariable&gt;bal_response&lt;/responseVariable&gt;
+                                &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+                                &lt;j&gt;{${payload.val}}&lt;/j&gt;
+                            &lt;/ballerinaFunctions.getJsonNameProperty&gt;
+                        &lt;/case&gt;
+                        &lt;default&gt;
+                            &lt;variable name=&quot;bal_response&quot; type=&quot;JSON&quot;
+                                value=&quot;{
+        &amp;quot;payload&amp;quot;: &amp;quot;Unknown message type&amp;quot;
+        }&quot; /&gt;
+                        &lt;/default&gt;
+                    &lt;/switch&gt;
+                    &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;default&quot;&gt;
+                        &lt;format&gt;{ &quot;Result&quot; : ${vars.bal_response.payload} }&lt;/format&gt;
+                    &lt;/payloadFactory&gt;
+                    &lt;respond /&gt;
+                &lt;/inSequence&gt;
+                &lt;faultSequence /&gt;
+    &lt;/resource&gt;
+        &lt;/api&gt;
+
+## Get the project
+
+You can download the ZIP file and extract the contents to get the project code.
+
+&lt;a href=&quot;{{base_path}}/assets/attachments/reference/ballerina-module-example.zip&quot;&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+&lt;/a&gt;
+
+
+## Run the Project and Test the APIs
+1. Click on the **Run** icon to run the integration project.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-run-integration-project.png&quot; title=&quot;Run Integration Project&quot; width=&quot;800&quot; alt=&quot;Run Integration Project&quot;/&gt;
+
+2. Open the integrated **Try it** feature or use a tool like Postman to test the APIs.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-try-it.png&quot; title=&quot;Try It Feature&quot; width=&quot;800&quot; alt=&quot;Try It Feature&quot;/&gt;
+    
+3. For the **Patient Mapping API**, use the following JSON payload:
+
+    ```json
+    {
+    &quot;patientType&quot;: &quot;Patient&quot;,
+    &quot;patientId&quot;: &quot;123456&quot;,
+    &quot;version&quot;: &quot;1&quot;,
+    &quot;lastUpdatedOn&quot;: &quot;2020-02-01T05:30:41.785+00:00&quot;,
+    &quot;originSource&quot;: &quot;#hYoipn8902&quot;,
+    &quot;status&quot;: &quot;generated&quot;,
+    &quot;identifiers&quot;: [
+        {
+            &quot;id_type&quot;: {
+            &quot;codes&quot;: [
+                {
+                &quot;system_source&quot;: &quot;http://hl7.org/fhir/v2/0203&quot;,
+                &quot;identifier_code&quot;: &quot;MR&quot;
+                }
+            ]
+            },
+            &quot;id_value&quot;: &quot;1213I7-bhjasb-80232-82032-shab9201212&quot;
+        }
+    ],
+    &quot;firstName&quot;: &quot;Andrew&quot;,
+    &quot;lastName&quot;: &quot;Simons&quot;,
+    &quot;description&quot;: {
+        &quot;status&quot;: &quot;generated&quot;
+    },
+    &quot;gender&quot;: &quot;male&quot;,
+    &quot;locationDetail&quot;: [
+        {
+            &quot;nation&quot;: &quot;US&quot;,
+            &quot;town&quot;: &quot;Seattle&quot;,
+            &quot;region&quot;: &quot;WA&quot;,
+            &quot;zipCode&quot;: &quot;98101&quot;,
+            &quot;identifier&quot;: &quot;5648223&quot;,
+            &quot;province&quot;: &quot;WA&quot;
+        }
+    ]
+    }
+    ```
+
+    You will get a response similar to the following:
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-patient-response.png&quot; title=&quot;Patient Mapping API Response&quot; width=&quot;800&quot; alt=&quot;Patient Mapping API Response&quot;/&gt;
+
+4. For the **Price Calculation API**, use the following XML payload:
+
+    ```xml
+        &lt;items&gt;
+        &lt;item&gt;
+            &lt;name&gt;book&lt;/name&gt;
+            &lt;price&gt;180&lt;/price&gt;
+        &lt;/item&gt;
+        &lt;item&gt;
+            &lt;name&gt;pen&lt;/name&gt;
+            &lt;price&gt;25&lt;/price&gt;
+        &lt;/item&gt;
+        &lt;item&gt;
+            &lt;name&gt;pencil&lt;/name&gt;
+            &lt;price&gt;12&lt;/price&gt;
+        &lt;/item&gt;
+    &lt;/items&gt;
+    ```
+
+    You will get a response similar to the following:
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-price-response.png&quot; title=&quot;Price Calculation API Response&quot; width=&quot;800&quot; alt=&quot;Price Calculation API Response&quot;/&gt;
+
+5. For the **Type Processing API**, use the following JSON payload:
+
+    ```json
+    {
+    &quot;type&quot;: &quot;decimal&quot;,
+    &quot;val&quot;: 5.3
+    }
+    ```
+    You will get a response similar to the following:
+
+    &lt;img src=&quot;{{base_path}}/assets/img/develop/ballerina-module/example-type-response.png&quot; title=&quot;Type Processing API Response&quot; width=&quot;800&quot; alt=&quot;Type Processing API Response&quot;/&gt;</body>
+</html>

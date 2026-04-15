@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>service-catalog-tutorial-for-data-services.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Exposing an Integration Data Service as a Managed API
+
+Managed APIs refer to the APIs that are managed using WSO2 API Manager, namely REST APIs, GraphQL APIs, SOAP APIs, and Streaming APIs.
+
+This guide explains how to create a Data Service that exposes data from a relational database or another data source through WSO2 Integrator: MI, generate the relevant metadata for the corresponding Data Service, publish the WSDL/WADL or OpenAPI definition in the WSO2 API Manager Service Catalog, and then create a managed API (for example, a REST API) in WSO2 API Manager based on that Data Service.
+
+It also demonstrates how the integration components (WSO2 Integrator: MI) and the API management components (WSO2 API Manager) work together to enable API-led data integration, providing a seamless mechanism to expose, secure, and manage data-driven APIs.
+
+## Let&#x27;s get started!
+
+Follow the steps given below to build this use case and try it out.
+
+### Step 1: Set up the workspace
+
+{!includes/setting-up-workspace-for-mi-for-vscode.md!}
+
+### Step 2: Develop the integration artifacts
+
+Follow the instructions given in this section to create and configure the required artifacts.
+
+#### Create an Integration project
+
+{!includes/create-new-project.md!}
+
+4. In the **Project Creation Form**, enter `ServiceCatalogSample` as the **Project Name**.
+
+5. Provide a location under **Select Project Directory**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/create-new-project-integration-first.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/create-new-project-integration-first.png&quot; alt=&quot;create new project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+6. Click **Create**.
+
+Now let&#x27;s start designing the integration by adding the necessary artifacts.
+
+#### Creating a Data Service
+
+1. Navigate to **WSO2 Integrator: MI Project Explorer**.
+
+2. Click on the **+** symbol to open the **Add Artifact** pane.
+
+     &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/add-artifact-icon.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/add-artifact-icon.png&quot; alt=&quot;add artifact&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. Click **+ View More** under **Create an Integration**.
+
+4. Click on **Data Service** and enter **RDBMSDataService** as the **Data Service Name**.
+
+5. Click **+ Add Datasource** and enter **RDBMSDataService** as the **Datasource Identifier**.
+
+6. Select **RDBMS** as the **Datasource Type**.
+
+7. Fill in the **Database Name** , **Username**, and **Password** and specify the **Driver Location** as well.
+
+8. Check the connection and Click **Create**.
+
+9. Open the Source view of the **RDBMSDataService**, and copy and paste the **query**, **resource**, and **operation** code. For more information, see [How to Expose an RDBMS Datasource]({{base_path}}/learn/examples/data-integration/rdbms-data-service/)
+
+ ```xml
+ &lt;data name=&quot;RDBMSDataService&quot; serviceNamespace=&quot;&quot; serviceGroup=&quot;&quot; transports=&quot;http https&quot;       disableStreaming=&quot;true&quot;&gt;
+    &lt;description/&gt;
+    &lt;config id=&quot;RDBMSDataService&quot; &gt;
+        &lt;property name=&quot;driverClassName&quot;&gt;com.mysql.jdbc.Driver&lt;/property&gt;
+        &lt;property name=&quot;url&quot;&gt;jdbc:mysql://localhost:3306/Employees&lt;/property&gt;
+        &lt;property name=&quot;username&quot;&gt;root&lt;/property&gt;
+        &lt;property name=&quot;password&quot;&gt;Ashakalai123@&lt;/property&gt;
+    &lt;/config&gt;
+    &lt;query id=&quot;GetEmployeeDetails&quot; useConfig=&quot;RDBMSDataService&quot;&gt;
+        &lt;sql&gt;select EmployeeNumber, FirstName, LastName, Email, Salary from Employees where EmployeeNumber=:EmployeeNumber&lt;/sql&gt;
+        &lt;param name=&quot;EmployeeNumber&quot; paramType=&quot;SCALAR&quot; sqlType=&quot;STRING&quot;/&gt;
+        &lt;result element=&quot;Employees&quot; rowName=&quot;Employee&quot;&gt;
+            &lt;element column=&quot;EmployeeNumber&quot; name=&quot;EmployeeNumber&quot; xsdType=&quot;xs:string&quot;/&gt;
+            &lt;element column=&quot;FirstName&quot; name=&quot;FirstName&quot; xsdType=&quot;xs:string&quot;/&gt;
+            &lt;element column=&quot;LastName&quot; name=&quot;LastName&quot; xsdType=&quot;xs:string&quot;/&gt;
+            &lt;element column=&quot;Email&quot; name=&quot;Email&quot; xsdType=&quot;xs:string&quot;/&gt;
+            &lt;element column=&quot;Salary&quot; name=&quot;Salary&quot; xsdType=&quot;xs:string&quot;/&gt;
+        &lt;/result&gt;
+    &lt;/query&gt;
+    &lt;resource method=&quot;GET&quot; path=&quot;Employee/{EmployeeNumber}&quot;&gt;
+        &lt;call-query href=&quot;GetEmployeeDetails&quot;&gt;
+            &lt;with-param name=&quot;EmployeeNumber&quot; query-param=&quot;EmployeeNumber&quot;/&gt;
+        &lt;/call-query&gt;
+    &lt;/resource&gt;
+    &lt;operation name=&quot;getEmployeeDetailsOp&quot; disableStreaming=&quot;true&quot;&gt;
+        &lt;call-query href=&quot;GetEmployeeDetails&quot;&gt;
+            &lt;with-param name=&quot;EmployeeNumber&quot; query-param=&quot;EmployeeNumber&quot;/&gt;
+        &lt;/call-query&gt;
+    &lt;/operation&gt;
+ &lt;/data&gt;
+ ```
+
+### Step 3: Configure the WSO2 Integrator: MI
+
+!!! info &quot;Prerequisites&quot;
+    Before you begin, install WSO2 Integrator: MI on your machine:
+
+    1. Go to the [WSO2 Integrator: MI web page](https://wso2.com/integration/micro-integrator/#), click **Download**, provide the necessary details, and then click **Zip Archive** to download the WSO2 Integrator: MI distribution as a ZIP file.
+    
+    2. Extract the ZIP file. The extracted folder will be referred to as the `&lt;MI_HOME&gt;` folder.
+
+The WSO2 Integrator: MI can automatically publish artifacts to the **Service Catalog** in the **API Publisher** portal.
+
+Let&#x27;s enable this feature in the WSO2 Integrator: MI.
+
+
+1. Uncomment the `[[service_catalog]]` section as shown below and change the APIM server configurations accordingly in the `&lt;MI_HOME&gt;/conf/deployment.toml` file.
+
+    !!! Tip
+        The default username and password for connecting to the API gateway is `admin`.
+
+    ```toml
+    [[service_catalog]]
+    apim_host = &quot;https://localhost:9443&quot;
+    enable = true
+    username = &quot;admin&quot;
+    password = &quot;admin&quot;
+    ```
+
+!!! Note
+    Since the integration developer may not know the API URL when it gets deployed in the WSO2 Integrator: MI, the URL of the API will be parameterized as `https://{MI_HOST}:{MI_PORT}/healthcare` which will be resolved later using environment variables `MI_HOST` and `MI_PORT` respectively. By default, `localhost` will be used as the `MI_HOST` and `8253` as the `MI_PORT`. Depending on your deployment, you may need to update these environment variables.
+
+### Step 4: Start the API Manager runtime
+
+Let&#x27;s start the API Manager runtime before starting the WSO2 Integrator: MI.
+
+1.  Download and set up [WSO2 API Manager](https://wso2.com/api-management/).
+2.  Start the [API-M server](https://apim.docs.wso2.com/en/latest/install-and-setup/install/installing-the-product/running-the-api-m/).
+
+### Step 5: Build and run the artifacts
+
+1. Click on the Command Palette at the top of the VS Code.
+
+2. Type `&gt;` to show the available commands.
+
+3. Select **MI: Add MI server**.
+
+4. Select **Add MI server**.
+
+5. Select the folder where `&lt;MI_HOME&gt;` is located. This will be set as the **current server path**.
+
+   &lt;a href=&quot;../../../assets/img/develop/mi-for-vscode/qsg/current-server-path.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;../../../assets/img/develop/mi-for-vscode/qsg/current-server-path.png&quot; alt=&quot;Current server path&quot; width=&quot;50%&quot;&gt;&lt;/a&gt;
+
+6. Run the project.
+
+   Click the **Build and Run** icon located in the top right corner of the VS Code.
+
+   &lt;a href=&quot;../../../assets/img/develop/mi-for-vscode/qsg/build-and-run.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;../../../assets/img/develop/mi-for-vscode/qsg/build-and-run.png&quot; alt=&quot;Build and run&quot; width=&quot;25%&quot;&gt;&lt;/a&gt;
+
+When the WSO2 Integrator: MI starts, the integration service will be deployed to the **Service Catalog** during server startup. You will see the following in the server start-up log.
+
+```bash
+Successfully updated the service catalog
+```
+
+### Step 6: Create and Deploy the API
+
+**Create the API**
+
+Let&#x27;s expose the integration service as a managed API.
+
+1.  Sign in to the API Publisher portal: `https://localhost:9443/publisher`.
+
+    !!! Tip
+        Use `admin` as the username and password.
+
+2.  You can also click the **hamburger** icon on the upper-left and click **Services** to see the available services.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/proxy-service.png&quot; alt=&quot;Proxy open service catalog&quot; width=&quot;50%&quot;&gt;
+
+3. Open **RDBMSDataService** from the above list.
+
+4. Click **Create API** in the above screen to open the **Create API** dialog box.
+   
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/dataservice-create-api.png&quot; alt=&quot;Proxy create api&quot; width=&quot;50%&quot;&gt;
+
+5.  Specify an API name, context, and version, and then click **Create API**.
+
+    !!! Tip
+        You will find these values already populated based on the information in the integration service.
+
+You can now see the new API&#x27;s overview page.
+
+!!! Note
+    -   You can use the left-hand navigation to explore the new API.
+    -   Click **Endpoints** in the left-hand navigator. You will see that the new API uses the integration service deployed in the WSO2 Integrator: MI as the endpoint (backend).
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/dataservice-api.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/dataservice-api.png&quot; alt=&quot;endpoint view&quot;&gt;&lt;/a&gt;
+
+**Select business plans**
+
+Let&#x27;s allocate some business plans for the API.
+
+1.  Click on **Overview**, then **Business Plan**.
+
+2.  Select at least one business plan for the API and save.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/data-service-business-plan.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/data-service-business-plan.png&quot; alt=&quot;add business plans to api&quot;&gt;&lt;/a&gt;
+
+**Deploy API in the Gateway**
+
+Let&#x27;s deploy the API in a gateway environment.
+
+1.  Click on **Overview**, then **Deploy**.
+
+    !!! Tip
+        This opens the **Deployment** tab in the left-hand navigator.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/dataservice-deployment.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/dataservice-deployment.png&quot; alt=&quot;open the deployment options&quot;&gt;&lt;/a&gt;
+
+2.  Click **Default** to specify the gateway environment and host.
+
+    !!! Tip
+        This setting deploys the API in Production as well as Sandbox gateways. Find out more about [gateway environments](https://apim.docs.wso2.com/en/4.3.0/deploy-and-publish/deploy-on-gateway/api-gateway/maintaining-separate-production-and-sandbox-gateways/).
+
+3.  **Optionally**, you can add a description.
+
+4.  Click **Deploy**.
+
+You will now see the deployment as the first revision of the API.
+
+### Step 7: Publish the API
+
+Click on **Overview** in the **Publisher** portal and click **Publish** for the `RDBMSDataService` as shown below.
+
+&lt;a href=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/data-service-publish.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/data-service-publish.png&quot;&gt;&lt;/a&gt;
+
+The API is now available in the **Developer** portal for consumers to access.
+
+### Step 8: Use the API
+
+1. Sign in to the **Developer** portal: `https://localhost:9443/devportal/apis`.
+
+    !!! Tip
+        Use `admin` as the username and password.
+
+2. Go to the **API** tab and click on the `RDBMSDataService`to open the API overview.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/data-service-api-overview.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/data-service-api-overview.png&quot;&gt;&lt;/a&gt;
+
+4. Click **API Console** under **Try Out** for the `RDBMSDataService` in the **Developer** portal as shown below.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/data-service-developer-portal.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/data-service-developer-portal.png&quot;&gt;&lt;/a&gt;
+
+5. Enter the username and password for Basic Authentication.
+
+    !!! Tip
+        Use `admin` as the username and password.
+
+6. Expand the **/Employee/{EmployeeNumber}** resource and click **Try it out**. 
+7. Fill the EmployeeNumber. 
+8. Click **Execute**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/data-service-try-it.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/data-service-try-it.png&quot;&gt;&lt;/a&gt;
+
+    You will get the response message from the **RDBMSDataService** service, if you send the **EmployeeNumber** as `3`:
+    
+    ```xml
+    &lt;Employees xmlns=&quot;http://ws.wso2.org/dataservice&quot;&gt;
+      &lt;Employee&gt;
+        &lt;EmployeeNumber&gt;3&lt;/EmployeeNumber&gt;
+        &lt;FirstName&gt;Smith&lt;/FirstName&gt;
+        &lt;LastName&gt;Will&lt;/LastName&gt;
+        &lt;Email&gt;will@google.com&lt;/Email&gt;
+        &lt;Salary&gt;30000.0&lt;/Salary&gt;
+      &lt;/Employee&gt;
+    &lt;/Employees&gt;
+    ```
+
+9. Expand the **SOAP Request** resource and click **Try it out**.
+10. Update the payload.
+11. Click **Execute**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/data-service-soap-request.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/service-catalog/data-service-soap-request.png&quot;&gt;&lt;/a&gt;
+
+    You will get the response message from the **RDBMSDataService** service, if you send the **EmployeeNumber** as `3`:
+    
+    ```xml
+    &lt;Employees xmlns=&quot;http://ws.wso2.org/dataservice&quot;&gt;
+      &lt;Employee&gt;
+        &lt;EmployeeNumber&gt;3&lt;/EmployeeNumber&gt;
+        &lt;FirstName&gt;Smith&lt;/FirstName&gt;
+        &lt;LastName&gt;Will&lt;/LastName&gt;
+        &lt;Email&gt;will@google.com&lt;/Email&gt;
+        &lt;Salary&gt;30000.0&lt;/Salary&gt;
+      &lt;/Employee&gt;
+    &lt;/Employees&gt;
+    ```
+
+!!! Tip
+    For detailed instructions see [Invoke an API using the Integrated API Console](https://apim.docs.wso2.com/en/4.3.0/consume/invoke-apis/invoke-apis-using-tools/invoke-an-api-using-the-integrated-api-console/).
+</body>
+</html>

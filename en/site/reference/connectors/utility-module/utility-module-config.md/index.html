@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>utility-module-config.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Utility Module Reference
+
+The Utility Module in WSO2 Enterprise Integrator helps to perform basic utility functions such as math, string, date, and signature. The connector will compute the result and save it to a property.
+
+The following operations can be performed with this module.
+
+## string.Length
+
+You can use the `string.Length` operation to retrieve the length of a string.
+
+### Operation details
+
+&lt;table&gt;
+&lt;thead&gt;
+  &lt;tr&gt;
+    &lt;th&gt;&lt;b&gt;Name&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Parameter&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Default Value&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Description&lt;/b&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Input String&lt;/td&gt;
+    &lt;td&gt;inputString&lt;/td&gt;
+    &lt;td&gt;&lt;/td&gt;
+    &lt;td&gt;The string for which you need to identify the length. The string can contain any characters. It will also consider whitespace characters when calculating the length.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Target Property&lt;/td&gt;
+    &lt;td&gt;target&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;length&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;Specify the property name to which the result should be saved.&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+### Sample configuration
+
+The following is a sample request, Synapse configuration, and response for the given request.
+
+=== &quot;Request&quot;
+    ```  
+    {&quot;string&quot;:&quot;utility module&quot;}
+    ```
+=== &quot;Synapse Configuration&quot;    
+    ```xml 
+    &lt;utility.string.Length&gt;
+        &lt;inpuString&gt;{json-eval($.string)}&lt;/inputString&gt;
+        &lt;target&gt;length&lt;/target&gt;
+    &lt;/utility.string.Length&gt;  
+    ```
+=== &quot;Request&quot;    
+    ``` 
+    length=14
+    ```
+
+## string.LowerCase
+
+You can use the `string.LowerCase` operation to change the case of the string to lowercase.
+
+### Operation details
+
+&lt;table&gt;
+&lt;thead&gt;
+  &lt;tr&gt;
+    &lt;th&gt;&lt;b&gt;Name&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Parameter&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Default Value&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Description&lt;/b&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Input String&lt;/td&gt;
+    &lt;td&gt;inputString&lt;/td&gt;
+    &lt;td&gt;&lt;/td&gt;
+    &lt;td&gt;The string that needs to be transformed to lowercase.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Target Property&lt;/td&gt;
+    &lt;td&gt;target&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;lower&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;Specify the property name to which the result should be saved.&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+### Sample configuration
+
+The following is a sample request, Synapse configuration, and response for the given request.
+
+=== &quot;Request&quot;
+    ```  
+    {&quot;string&quot;:&quot;UTILITY MODULE&quot;}
+    ```
+=== &quot;Synapse Configuration&quot;      
+    ```xml  
+    &lt;utility.string.LowerCase&gt;
+      &lt;inputString&gt;json-eval($.string)&lt;/inputString&gt;
+      &lt;target&gt;lowercase&lt;/target&gt;
+    &lt;/utility.string.LowerCase&gt;
+    ```
+=== &quot;Request&quot;      
+    ```  
+    lowercase=&quot;utility module&quot;
+    ```
+
+## string.UpperCase
+
+You can use the `string.UpperCase` operation to change the case of the string to uppercase.
+
+### Operation details
+
+&lt;table&gt;
+&lt;thead&gt;
+  &lt;tr&gt;
+    &lt;th&gt;&lt;b&gt;Name&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Parameter&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Default Value&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Description&lt;/b&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Input String&lt;/td&gt;
+    &lt;td&gt;inputString&lt;/td&gt;
+    &lt;td&gt;&lt;/td&gt;
+    &lt;td&gt;The string that needs to be transformed to uppercase.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Target Property&lt;/td&gt;
+    &lt;td&gt;target&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;upper&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;Specify the property name to which the result should be saved.&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+### Sample configuration
+
+The following is a sample request, Synapse configuration, and response for the given request.
+ 
+=== &quot;Request&quot;
+    ``` 
+    {&quot;string&quot;:&quot;utility module&quot;}
+    ```
+=== &quot;Synapse Configuration&quot;   
+    ```xml  
+    &lt;utility.string.UpperCase&gt;
+      &lt;inputString&gt;json-eval($.string)&lt;/inputString&gt;
+      &lt;target&gt;uppercase&lt;/target&gt;
+    &lt;/utility.string.UpperCase&gt;
+    ```
+=== &quot;Request&quot;    
+    ``` tab 
+    uppercase=&quot;UTILITY MODULE&quot;
+    ```
+
+## string.RegexMatcher
+
+You can use the `string.RegexMatcher` operation to check whether the given string is in the desired format. It returns true if the string matches with the regular expression (Regex).
+
+### Operation details
+
+&lt;table&gt;
+&lt;thead&gt;
+  &lt;tr&gt;
+    &lt;th&gt;&lt;b&gt;Name&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Parameter&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Default Value&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Description&lt;/b&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Input String&lt;/td&gt;
+    &lt;td&gt;inputString&lt;/td&gt;
+    &lt;td&gt;&lt;/td&gt;
+    &lt;td&gt;The string that needs to be checked with the regular expression.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Regular Expression&lt;/td&gt;
+    &lt;td&gt;regex&lt;/td&gt;
+    &lt;td&gt;&lt;/td&gt;
+    &lt;td&gt;The regular expression of the desired string.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Target Property&lt;/td&gt;
+    &lt;td&gt;target&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;match&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;Specify the property name to which the result should be saved.&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+### Sample configuration
+
+The following is a sample request, Synapse configuration, and response for the given request.
+
+=== &quot;Request&quot;
+    ```  
+    {&quot;string&quot;:&quot;utility module&quot;}
+    ```
+=== &quot;Synapse Configuration&quot;    
+    ```xml 
+    &lt;utility.string.RegexMatcher&gt;
+      &lt;regex&gt;u.*m.*e&lt;/regex&gt;
+      &lt;inputString&gt;json-eval($.string)&lt;/inputString&gt;
+      &lt;target&gt;isMatching&lt;/target&gt;
+    &lt;/utility.string.RegexMatcher&gt;
+    ```
+=== &quot;Request&quot;    
+    ``` 
+    isMatching=&quot;true&quot;
+    ```
+
+## string.UUID
+
+You can use the `string.UUID` operation to generate a random UUID.
+
+### Operation details
+
+&lt;table&gt;
+&lt;thead&gt;
+  &lt;tr&gt;
+    &lt;th&gt;&lt;b&gt;Name&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Parameter&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Default Value&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Description&lt;/b&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Target Property&lt;/td&gt;
+    &lt;td&gt;target&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;uuid&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;Specify the property name to which the generated random UUID should be saved.&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+### Sample configuration
+
+The following is a sample configuration and response.
+
+=== &quot;Synapse Configuration&quot;
+    ```xml 
+    &lt;utility.string.UUID&gt;
+      &lt;target&gt;uuid&lt;/target&gt;
+    &lt;/utility.string.UUID&gt;
+    ```
+=== &quot;Request&quot;     
+    ```  
+    uuid=&quot;07801d34-bbaf-43aa-8d70-98b4ead1b198&quot;
+    ```
+
+## date.GetDate
+
+You can use the `date.GetDate` operation to get the current date and time in a preferred date format.
+
+### Operation details
+
+&lt;table&gt;
+&lt;thead&gt;
+  &lt;tr&gt;
+    &lt;th&gt;&lt;b&gt;Name&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Parameter&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Default Value&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Description&lt;/b&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Date Format&lt;/td&gt;
+    &lt;td&gt;format&lt;/td&gt;
+    &lt;td&gt;default value:&lt;code&gt;yyyy-MM-dd HH:mm:ss&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;The format in which the date is needed. Refer to Java date format patterns.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Target Property&lt;/td&gt;
+    &lt;td&gt;target&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;date&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;Specify the property name to which the current date should be saved.&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+### Sample configuration
+
+The following is a sample Synapse configuration and response.
+
+=== &quot;Synapse Configuration&quot;
+    ```xml  
+    &lt;utility.date.GetDate&gt;
+      &lt;format&gt;yy/MM/dd HH:mm:ss&lt;/format&gt;
+      &lt;target&gt;date&lt;/target&gt;
+    &lt;/utility.date.GetDate&gt;
+    ```
+=== &quot;Request&quot;    
+    ```  
+    date=&quot;22/02/01 08:32:40&quot;
+    ```
+
+## math.GetRandomInt
+
+You can use the `math.GetRandomInt` operation to get a random integer in a given range.
+
+### Operation details
+
+&lt;table&gt;
+&lt;thead&gt;
+  &lt;tr&gt;
+    &lt;th&gt;&lt;b&gt;Name&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Parameter&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Default Value&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Description&lt;/b&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Lower Bound&lt;/td&gt;
+    &lt;td&gt;lowerBound&lt;/td&gt;
+    &lt;td&gt;&lt;/td&gt;
+    &lt;td&gt;Lower bound for the random integer. If it is kept blank, the lower bound will be considered as 0.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Upper Bound&lt;/td&gt;
+    &lt;td&gt;upperBound&lt;/td&gt;
+    &lt;td&gt;&lt;/td&gt;
+    &lt;td&gt;Upper bound for the random integer. If it is kept blank, it will consider the upper bound as infinity.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Target Property&lt;/td&gt;
+    &lt;td&gt;target&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;random&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;Specify the property name to which the generated random integer should be saved.&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+### Sample configuration
+
+The following is a sample Synapse configuration and response.
+
+=== &quot;Synapse Configuration&quot;
+    ```xml  
+    &lt;utility.math.GetRandomInt&gt;
+      &lt;lowerBound&gt;100&lt;/lowerBound&gt;
+      &lt;upperBound&gt;1000&lt;/upperBound&gt;
+      &lt;target&gt;random&lt;/target&gt;
+    &lt;/utility.math.GetRandomInt&gt;
+    ```
+=== &quot;Request&quot;
+    ```  
+    random=785
+    ```
+
+## signature.Generate
+
+You can use the `signature.Generate` operation to generate a HMAC signature for the payload of the request.
+
+### Operation details
+
+&lt;table&gt;
+&lt;thead&gt;
+  &lt;tr&gt;
+    &lt;th&gt;&lt;b&gt;Name&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Parameter&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Default Value&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Description&lt;/b&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Payload&lt;/td&gt;
+    &lt;td&gt;payload&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;Body&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;Dropdown menu to select whether the payload is from the body of the request or a custom payload.&lt;br/&gt;The following are the supported HTTP MIME types. &lt;br/&gt;&lt;code&gt;application/json&lt;/code&gt;&lt;br/&gt;&lt;code&gt;application/xml&lt;/code&gt;&lt;br/&gt;&lt;code&gt;text/plain&lt;/code&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Custom Payload&lt;/td&gt;
+    &lt;td&gt;customPayload&lt;/td&gt;
+    &lt;td&gt;&lt;/td&gt;
+    &lt;td&gt;The field to enter a custom payload when the payload is selected as &lt;code&gt;Custom Payload&lt;/code&gt;.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Secret&lt;/td&gt;
+    &lt;td&gt;secret&lt;/td&gt;
+    &lt;td&gt;&lt;/td&gt;
+    &lt;td&gt;The secret used to generate the signature for the payload using an algorithm.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Algorithm&lt;/td&gt;
+    &lt;td&gt;algorithm&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;HMACSHA1&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;The algorithm that is used to generate the signature.&lt;br/&gt;The following are the supported algorithms:&lt;br/&gt;&lt;code&gt;HMACSHA1&lt;/code&gt;&lt;br/&gt;&lt;code&gt;HMACSHA256&lt;/code&gt;&lt;br/&gt;&lt;code&gt;HMACSHA384&lt;/code&gt;&lt;br/&gt;&lt;code&gt;HMACSHA512&lt;/code&gt;&lt;br/&gt;&lt;code&gt;HMACMD5&lt;/code&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Target Property&lt;/td&gt;
+    &lt;td&gt;target&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;sign&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;Specify the property name to which the signature should be saved.&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+### Sample configuration
+
+The following is a sample request, Synapse configuration, and response for the given request.
+
+=== &quot;Request&quot;
+    ```  
+    {&quot;string&quot;:&quot;utility module&quot;}
+    ```
+=== &quot;Synapse Configuration&quot;     
+    ```xml  
+    &lt;utility.signature.Generate&gt;
+      &lt;payload&gt;Body&lt;/payload&gt;
+      &lt;secret&gt;123&lt;/secret&gt;
+      &lt;algorithm&gt;HMACSHA1&lt;/algorithm&gt;
+      &lt;target&gt;signature&lt;/target&gt;
+    &lt;/utility.signature.Generate&gt;
+    ```
+=== &quot;Request&quot;     
+    ```  
+    signature=&quot;32423411140bdebed0b017e738797be452481dbb&quot;
+    ```
+
+## signature.Verify
+
+You can use the `signature.Verify` operation to verify the payload using the HMAC signature in the header of the request. Thereby, this is used to ensure that the payload is not modified.
+
+### Operation details
+
+&lt;table&gt;
+&lt;thead&gt;
+  &lt;tr&gt;
+    &lt;th&gt;&lt;b&gt;Name&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Parameter&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Default Value&lt;/b&gt;&lt;/th&gt;
+    &lt;th&gt;&lt;b&gt;Description&lt;/b&gt;&lt;/th&gt;
+  &lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Payload&lt;/td&gt;
+    &lt;td&gt;payload&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;Body&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;Dropdown menu to select whether the payload is from the body of the request or a custom payload.&lt;br/&gt;The following are the supported HTTP MIME types. &lt;br/&gt;&lt;code&gt;application/json&lt;/code&gt;&lt;br/&gt;&lt;code&gt;application/xml&lt;/code&gt;&lt;br/&gt;&lt;code&gt;text/plain&lt;/code&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Custom Payload&lt;/td&gt;
+    &lt;td&gt;customPayload&lt;/td&gt;
+    &lt;td&gt;&lt;/td&gt;
+    &lt;td&gt;The field to enter a custom payload when the payload is selected as &lt;code&gt;Custom Payload&lt;/code&gt;.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Signature&lt;/td&gt;
+    &lt;td&gt;signature&lt;/td&gt;
+    &lt;td&gt;&lt;/td&gt;
+    &lt;td&gt;The HMAC signature of the payload.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Secret&lt;/td&gt;
+    &lt;td&gt;secret&lt;/td&gt;
+    &lt;td&gt;&lt;/td&gt;
+    &lt;td&gt;The secret used to generate the signature for the payload using an algorithm.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Algorithm&lt;/td&gt;
+    &lt;td&gt;algorithm&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;HMACSHA1&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;The algorithm that is used to genearte the signature.&lt;br/&gt;The following algorithms are supported,&lt;br/&gt;&lt;code&gt;HMACSHA1&lt;/code&gt;&lt;br/&gt;&lt;code&gt;HMACSHA256&lt;/code&gt;&lt;br/&gt;&lt;code&gt;HMACSHA384&lt;/code&gt;&lt;br/&gt;&lt;code&gt;HMACSHA512&lt;/code&gt;&lt;br/&gt;&lt;code&gt;HMACMD5&lt;/code&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Target Property&lt;/td&gt;
+    &lt;td&gt;target&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;verify&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;Specify the property name to which the signature should be saved.&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+### Sample configuration
+
+The following is a sample request, Synapse configuration, and response for the given request.
+
+=== &quot;Request&quot;
+    ```  
+    {&quot;string&quot;:&quot;utility module&quot;}
+    ```
+=== &quot;Synapse Configuration&quot;    
+    ```xml  
+    &lt;utility.signature.Verify&gt;
+      &lt;payload&gt;Body&lt;/payload&gt;
+      &lt;signature&gt;32423411140bdebed0b017e738797be452481dbb&lt;/signature&gt;
+      &lt;secret&gt;123&lt;/secret&gt;
+      &lt;algorithm&gt;HMACSHA1&lt;/algorithm&gt;
+      &lt;target&gt;verify&lt;/target&gt;
+    &lt;/utility.signature.Verify&gt;
+    ```
+=== &quot;Request&quot;    
+    ```  
+    verify=&quot;true&quot;
+    ```
+</body>
+</html>

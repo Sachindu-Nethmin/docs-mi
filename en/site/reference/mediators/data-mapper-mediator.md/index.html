@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>data-mapper-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Data Mapper Mediator
+
+The Data Mapper mediator is a data mapping solution that can be integrated
+into a mediation sequence. It converts and transforms one data format to
+another or changes the structure of the data in a message. The WSO2 Integrator: MI for Visual Studio Code (MI for VS Code) extension
+provides a graphical mapping configuration and
+generates the files required for executing this graphical mapping
+configuration through the WSO2 Data Mapper engine.
+
+The Data Mapper component utilizes TypeScript to define the mapping when you use the WSO2 MI for VS Code extension. When you build the Integration project using the WSO2 MI for VS Code extension, the Data Mapper component generates the required configuration files needed by the Data Mapper Engine to execute the mapping. These files are stored in the Governance Registry.
+
+## Syntax
+
+```xml
+&lt;datamapper config=&quot;name&quot; inputSchema=&quot;string&quot; inputType=&quot;string&quot; outputSchema=&quot;string&quot; outputType=&quot;string&quot;/&gt; 
+```
+
+## Configuration
+
+The parameters available for configuring the Data Mapper mediator are as follows.
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Mapping Configuration&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;The file, which contains the script file that is used to execute the mapping. This file is generated when you build the Integration project using the WSO2 MI for VS Code extension. It is stored under &lt;b&gt;Governance Registry&lt;/b&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Input Schema&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;JSON schema, which represents the input message format. This file is generated when you build the Integration project using the WSO2 MI for VS Code extension. It is stored under &lt;b&gt;Governance Registry&lt;/b&gt;.&lt;/td&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Output Schema&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;JSON schema, which represents the output message format. This file is generated when you build the Integration project using the WSO2 MI for VS Code extension. It is stored under &lt;b&gt;Governance Registry&lt;/b&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Input Type&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Expected input message type (XML/JSON/CSV).&lt;/br&gt;
+&lt;div class=&quot;admonition note&quot;&gt;
+&lt;p class=&quot;admonition-title&quot;&gt;Note&lt;/p&gt;
+&lt;p&gt;By default, the Input Type is selected from the Input Schema if you have not provided one. If you want to specify the Input Type, then you can specify it in the WSO2 MI for VS Code extension.&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Output Type&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Target output message type (XML/JSON/CSV).&lt;/br&gt;
+&lt;div class=&quot;admonition note&quot;&gt;
+&lt;p class=&quot;admonition-title&quot;&gt;Note&lt;/p&gt;
+&lt;p&gt;By default, the Output Type is selected from the output schema if you have not provided one. If you want to specify the Output Type, you can specify it in the WSO2 MI for VS Code extension.&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+## Components of Data Mapper
+
+### Mapping configuration file
+
+The Data Mapper component utilizes TypeScript to define the mapping when you use the WSO2 MI for VS Code extension. When you build the integration project using the WSO2 MI for VS Code extension, the data mapping configuration file is compiled into JavaScript, which is used by the Data Mapper engine to map the elements in the MI runtime.
+
+![mapping configuration]({{base_path}}/assets/img/integrate/mediators/datamapper/mapping-configuration.png) 
+
+### Input and output files
+
+You can load the following input/output message formats:
+
+-   **XML:** to load a sample XML file
+-   **JSON:** to load a sample JSON file
+-   **CSV:** to load a sample CSV file with column names as the first
+    record
+-   **JSONSCHEMA:** to load a JSON schema
+
+![input and output files]({{base_path}}/assets/img/integrate/mediators/datamapper/input-output-files.png) 
+
+
+Based on the provided input/output files, the Typescript interfaces are generated inside the Mapping configuration file. JSON schema files are generated when you build a project using the WSO2 MI for VS Code extension. These files are stored in the CAR file and deployed inside the governance registry. These files are used to validate the input and output messages at runtime.
+
+!!! info &quot;Reimport input/output files&quot;
+    If you need to reimport input/output, you can right click on top of the input/output widget. 
+
+!!! info &quot;Filter elements&quot;
+    If you need to filter elements in input/output, you can use the filter bar on the upper right corner of the Data Mapper view.
+
+    ![filtered fields]({{base_path}}/assets/img/integrate/mediators/datamapper/filtered-fields.png) 
+
+### Expression Editor
+
+The Expression Editor is used to define the mapping with additional operations between the input and output messages. It provides a set of operations that can be used to define the mapping. You can find the list of operations supported by the Data Mapper below in the [Data Mapper operations](#data-mapper-operations) section.
+
+![empty expression bar]({{base_path}}/assets/img/integrate/mediators/datamapper/expression-bar-initial.png) 
+
+![complete expression bar]({{base_path}}/assets/img/integrate/mediators/datamapper/expression-bar-complete.png) 
+
+!!! info &quot;Expressions&quot;
+    You can define any expression in the Expression Editor by clicking on the output element. The expression editor will be enabled and you can define the expression.
+
+    ![expressions]({{base_path}}/assets/img/integrate/mediators/datamapper/expressions.png)
+
+### Array mappings
+
+Mappings between arrays are supported with multiple options. You can do,
+
+- [Map array-array directly](#map-array-array-directly)
+
+- [Map elements individually](#map-elements-individually)
+
+- [Map into initialized elements](#map-into-initialized-elements)
+
+- [Access single element and map](#access-single-element-and-map)
+
+!!! info
+    You can preview array structure by expanding the field
+
+#### Map array-array directly
+When the input array and the output array have the same data type/structure, you can directly assign an input array to an output array. Select this option from the menu that appears after mapping the input array to the output array.
+![direct array mappings]({{base_path}}/assets/img/integrate/mediators/datamapper/array-mappings-direct.png)
+
+#### Map elements individually
+When the input array and the output array have different data types/structures, you can map elements individually. This option directs you to a focused view where you can further access and map child elements. Additionally, filters can be applied to filter the elements.
+![individual array mappings]({{base_path}}/assets/img/integrate/mediators/datamapper/array-mappings-individual.gif)
+
+#### Map into initialized elements
+You can initialize an array and add elements to it. Input fields can be mapped into the elements or inner child properties of the elements. Use the context menu options of the output array field to initialize and add elements.
+![init arrays]({{base_path}}/assets/img/integrate/mediators/datamapper/array-mappings-init.png)
+
+#### Access single element and map
+You can map an element of an input field array to an output field. By default, it accesses the 0th element. Use the [Expression Editor](#expression-editor) to edit the accessed element.
+![singleton array mapping]({{base_path}}/assets/img/integrate/mediators/datamapper/array-mappings-singleton.png) 
+
+### Sub Mapping
+
+The Sub Mapping feature allows you to define a mapping for a specific part of the input message. This is useful when you have a complex input message and you want to reuse the mapping logic for different parts of the message.
+
+![sub mapping]({{base_path}}/assets/img/integrate/mediators/datamapper/submapping.png) 
+
+![using sub mapping]({{base_path}}/assets/img/integrate/mediators/datamapper/utilize-submapping.png) 
+
+### Custom Functions
+
+The Data Mapper supports custom functions that can be used to define the mapping. You can define custom functions in the mapping configuration file and use them in the mapping.
+
+![custom functions]({{base_path}}/assets/img/integrate/mediators/datamapper/custom-functions.png) 
+
+### Data Mapper operations
+
+The operations that the Data Mapper supports as shown below.
+
+#### Arithmetic
+
+- **sum:** adds two/more numbers.
+
+- **ceiling:** derives the ceiling value of a number (closest larger integer value).
+
+- **floor:** derives the floor value of a number (closest lower integer value).
+
+- **round:** derives the nearest integer value.
+
+- **min:** derives the minimum number from given inputs
+
+- **max:** derives the maximum number from given inputs
+
+#### Type conversion
+
+- **toNumber:** converts a String value to number (“0” -&gt; 0).
+
+- **toBoolean:** converts a String value to boolean (“true” -&gt; true).
+
+- **numberToString:** converts a number or a boolean value to String.
+
+- **booleanToString:** converts a boolean value to String.
+
+#### String
+
+- **concat:** concatenates two or more Strings.
+
+- **split:** splits a String by a matching String value.
+
+- **toUppercase:** converts a String to uppercase letters.
+
+- **toLowercase:** converts a String to lowercase letters.
+
+- **stringLength:** gets the length of the String.
+
+- **startsWith:** checks whether a String starts with a specific value. (This is not supported in Java 7.)
+
+- **endsWith:** checks whether String ends with a specific value. (This is not supported in Java 7.)
+
+- **substring:** extracts a part of the String value.
+
+- **trim:** removes white spaces from the beginning and end of a String.
+
+- **replaceFirst:** replaces the first occurrence of a target String with another.
+
+- **match** – check whether the input match with a (JS) Regular Expression
+
+## AI Data Mapper
+The MI Copilot AI Assistant will allow you to seamlessly generate the input-output mapping. Simply load the input and output schema (of any type) to the relevant sections as shown below and click **Map**. Use the **Clear** button to clear all mappings.
+
+!!! info &quot;WSO2 Account and Usage Limits&quot;
+    To use this feature, you must have a WSO2 account. If you do not have one, attempting to access Copilot or the mapping feature will prompt you to create an account. If your account exceeds the usage limit, it will be refreshed after the specified time limit.
+
+!!! info &quot;Review and Fine-tune&quot;
+    Since AI powers the automated mapping, it may contain errors. Always verify the accuracy of the generated mappings. To fine tune the mappings you can use the `&lt;/&gt;` button and edit the TypeScript (TS) file.
+
+![AI Data Mapper diagram]({{base_path}}/assets/img/integrate/mediators/datamapper/ai-mapping.png)
+
+## Examples
+
+### Example 1 - Creating a SOAP payload with namespaces
+
+This example creates a Salesforce login SOAP payload using a JSON
+payload. The login payload consists of XML namespaces. Even though the
+JSON payload does not contain any namespace information, the output JSON
+schema will be generated with XML namespace information using the
+provided SOAP payload.
+
+![example one Data mapper diagram]({{base_path}}/assets/img/integrate/mediators/datamapper/example-1.png)
+
+The sample input JSON payload is as follows.
+
+``` js
+{  
+   &quot;name&quot;:&quot;Watson&quot;,
+   &quot;password&quot;:&quot;watson@123&quot;
+}
+```
+
+The sample output XML is as follows.
+
+``` xml
+&lt;soapenv:Envelope xmlns:urn=&quot;urn:enterprise.soap.sforce.com&quot; xmlns:soapenv=&quot;http://www.w3.org/2003/05/soap-envelope/&quot;&gt;
+  &lt;soapenv:Body&gt;
+    &lt;urn:login&gt;
+      &lt;urn:username&gt;&lt;b&gt;user@domain.com&lt;/b&gt;&lt;/urn:username&gt;
+      &lt;urn:password&gt;&lt;b&gt;secret&lt;/b&gt;&lt;/urn:password&gt;
+    &lt;/urn:login&gt;
+  &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+```
+
+### Example 2 - Mapping SOAP header elements
+
+This example demonstrates how to map SOAP header elements along with
+SOAP body elements to create a certain SOAP payload, by creating a
+Salesforce convertLead SOAP payload using a JSON payload. The Convert
+Lead SOAP payload needs mapping SOAP header information.  
+For example: `&lt;urn:sessionId&gt;QwWsHJyTPW.1pd0_jXlNKOSU&lt;/urn:sessionId&gt;`
+
+![example 2 datamapping]({{base_path}}/assets/img/integrate/mediators/datamapper/complete-datamapping.png)
+
+The sample input JSON payload is as follows.
+
+``` js
+{  
+   &quot;owner&quot;:{  
+      &quot;ID&quot;:&quot;005D0000000nVYVIA2&quot;,
+      &quot;name&quot;:&quot;Smith&quot;,
+      &quot;city&quot;:&quot;CA&quot;,
+      &quot;code&quot;:&quot;94041&quot;,
+      &quot;country&quot;:&quot;US&quot;
+   },
+   &quot;lead&quot;:{  
+      &quot;ID&quot;:&quot;00QD000000FP14JMAT&quot;,
+      &quot;name&quot;:&quot;Carl&quot;,
+      &quot;city&quot;:&quot;NC&quot;,
+      &quot;code&quot;:&quot;97788&quot;,
+      &quot;country&quot;:&quot;US&quot;
+   },
+   &quot;sendNotificationEmail&quot;:&quot;true&quot;,
+   &quot;convertedStatus&quot;:&quot;Qualified&quot;,
+   &quot;doNotCreateOpportunity&quot;:&quot;true&quot;,
+   &quot;opportunityName&quot;:&quot;Partner Opportunity&quot;,
+   &quot;overwriteLeadSource&quot;:&quot;true&quot;,
+   &quot;sessionId&quot;:&quot;QwWsHJyTPW.1pd0_jXlNKOSU&quot;
+}
+```
+
+The sample output XML is as follows.
+
+``` xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;  
+&lt;soapenv:Envelope xmlns:urn=&quot;urn:enterprise.soap.sforce.com&quot; xmlns:soapenv=&quot;http://www.w3.org/2003/05/soap-envelope/&quot;&gt;
+  &lt;soapenv:Header&gt;
+     &lt;urn:SessionHeader&gt;
+        &lt;urn:sessionId&gt;QwWsHJyTPW.1pd0_jXlNKOSU&lt;/urn:sessionId&gt;
+     &lt;/urn:SessionHeader&gt;
+     &lt;/soapenv:Header&gt;
+     &lt;soapenv:Body&gt;
+     &lt;urn:convertLead &gt;
+        &lt;urn:leadConverts&gt; &lt;!-- Zero or more repetitions --&gt;
+           &lt;urn:convertedStatus&gt;Qualified&lt;/urn:convertedStatus&gt;
+           &lt;urn:doNotCreateOpportunity&gt;false&lt;/urn:doNotCreateOpportunity&gt;
+           &lt;urn:leadId&gt;00QD000000FP14JMAT&lt;/urn:leadId&gt;
+           &lt;urn:opportunityName&gt;Partner Opportunity&lt;/urn:opportunityName&gt;
+           &lt;urn:overwriteLeadSource&gt;true&lt;/urn:overwriteLeadSource&gt;
+           &lt;urn:ownerId&gt;005D0000000nVYVIA2&lt;/urn:ownerId&gt;
+           &lt;urn:sendNotificationEmail&gt;true&lt;/urn:sendNotificationEmail&gt;
+        &lt;/urn:leadConverts&gt;
+     &lt;/urn:convertLead&gt;
+&lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+```
+
+### Example 3 - Mapping primitive types
+
+This example demonstrates how you can map an XML payload with integer,
+boolean and other values into a JSON payload with required primitive types,
+by specifying the required primitive type in the JSON schema.
+
+![example 3 datamapping]({{base_path}}/assets/img/integrate/mediators/datamapper/mapping-primitive-types.png) 
+
+![example 3 array mapping]({{base_path}}/assets/img/integrate/mediators/datamapper/mapping-primitive-types-array.png) 
+
+The sample input XML payload is as follows.
+
+``` xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+    &lt;root&gt;
+        &lt;name&gt;app_name&lt;/name&gt;
+        &lt;version&gt;version&lt;/version&gt;
+        &lt;manifest_version&gt;2&lt;/manifest_version&gt;
+        &lt;description&gt;description_text&lt;/description&gt;
+        &lt;container&gt;GOOGLE_DRIVE&lt;/container&gt;
+        &lt;api_console_project_id&gt;YOUR_APP_ID&lt;/api_console_project_id&gt;
+        &lt;gdrive_mime_types&gt;
+            &lt;opendrivedoc&gt;
+                &lt;type&gt;image/png&lt;/type&gt;
+                &lt;type&gt;image/jpeg&lt;/type&gt;
+                &lt;type&gt;image/gif&lt;/type&gt;
+                &lt;type&gt;application/vnd.google.drive.ext-type.png&lt;/type&gt;
+                &lt;type&gt;application/vnd.google.drive.ext-type.jpg&lt;/type&gt;
+                &lt;type&gt;application/vnd.google.drive.ext-type.gif&lt;/type&gt;
+                &lt;href&gt;http://your_web_url_1/&lt;/href&gt;
+                &lt;title&gt;Open&lt;/title&gt;
+                &lt;disposition&gt;window&lt;/disposition&gt;
+            &lt;/opendrivedoc&gt;
+            &lt;opendrivedoc&gt;
+                &lt;type&gt;image/png&lt;/type&gt;
+                &lt;type&gt;image/gif&lt;/type&gt;
+                &lt;type&gt;application/vnd.google.drive.ext-type.png&lt;/type&gt;
+                &lt;type&gt;application/vnd.google.drive.ext-type.gif&lt;/type&gt;
+                &lt;href&gt;http://your_web_url_2/&lt;/href&gt;
+                &lt;title&gt;Close&lt;/title&gt;
+                &lt;disposition&gt;window&lt;/disposition&gt;
+            &lt;/opendrivedoc&gt;
+        &lt;/gdrive_mime_types&gt;
+        &lt;icons&gt;
+            &lt;icon_128&gt;icon_128.png&lt;/icon_128&gt;
+        &lt;/icons&gt;
+        &lt;app&gt;
+            &lt;launch&gt;
+                &lt;web_url&gt;http://yoursite.com&lt;/web_url&gt;
+            &lt;/launch&gt;
+        &lt;/app&gt;
+    &lt;/root&gt;
+```
+
+The sample output JSON is as follows.
+
+``` js
+{
+&quot;name&quot; : &quot;app_name&quot;,
+&quot;version&quot; : &quot;version&quot;,
+&quot;manifest_version&quot; : 2,
+&quot;description&quot; : &quot;description_text&quot;,
+&quot;container&quot; : &quot;GOOGLE_DRIVE&quot;,
+&quot;api_console_project_id&quot; : &quot;YOUR_APP_ID&quot;,
+&quot;gdrive_mime_types&quot;: {
+  &quot;opendrivedoc&quot;: [
+    {
+      &quot;type&quot;: [&quot;image/png&quot;, &quot;image/jpeg&quot;, &quot;image/gif&quot;, &quot;application/vnd.google.drive.ext-type.png&quot;,
+      &quot;application/vnd.google.drive.ext-type.jpg&quot;,&quot;application/vnd.google.drive.ext-type.gif&quot;],
+      &quot;href&quot;: &quot;http://your_web_url/&quot;,
+      &quot;title&quot; : &quot;Open&quot;,
+      &quot;disposition&quot; : &quot;window&quot;
+    }
+  ]
+},
+&quot;icons&quot;: {
+  &quot;icon_128&quot;: &quot;icon_128.png&quot;
+},
+&quot;app&quot; : {
+  &quot;launch&quot; : {
+  &quot;web_url&quot; : &quot;http://yoursite.com&quot;
+  }
+}
+}
+```
+
+### Example 4 - Mapping XML to CSV
+
+This example demonstrates how you can map an XML payload to CSV format.
+
+!!! Info
+    If you specify special characters (For example `&amp;`,
+    `&amp;amp;`) within the `&lt;text&gt;`
+    tag when converting from CSV to CSV, they will be displayed as follows
+    by default.
+    -   `&amp; -&gt; &amp;amp;`
+    -   `&amp;amp; -&gt; &amp;amp;amp;`
+    -   `&lt; -&gt; &amp;lt;`
+    -   `&amp;lt; -&gt; &amp;lt;lt;`
+
+To avoid this and to display the exact special characters as text in the
+returned output, add the following properties in the Synapse
+configuration.
+
+``` xml
+&lt;property name=&quot;messageType&quot; value=&quot;text/plain&quot; scope=&quot;axis2&quot;/&gt;
+&lt;property name=&quot;ContentType&quot; value=&quot;text/plain&quot; scope=&quot;axis2&quot;/&gt;
+```
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/mediators/datamapper/example-4.gif&quot; alt=&quot;Example 4&quot;&gt;
+
+The sample input XML payload is as follows.
+
+``` xml
+&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;PurchaseOrder PurchaseOrderNumber=&quot;001&quot;&gt;
+&lt;Address&gt;
+    &lt;Name&gt;James Yee&lt;/Name&gt;
+    &lt;Street&gt;Downtown Bartow&lt;/Street&gt;
+    &lt;City&gt;Old Town&lt;/City&gt;
+    &lt;State&gt;PA&lt;/State&gt;
+    &lt;Zip&gt;95819&lt;/Zip&gt;
+    &lt;Country&gt;USA&lt;/Country&gt;
+&lt;/Address&gt;
+&lt;Address&gt;
+    &lt;Name&gt;Elen Smith&lt;/Name&gt;
+    &lt;Street&gt;123 Maple Street&lt;/Street&gt;
+    &lt;City&gt;Mill Valley&lt;/City&gt;
+    &lt;State&gt;CA&lt;/State&gt;
+    &lt;Zip&gt;10999&lt;/Zip&gt;
+    &lt;Country&gt;USA&lt;/Country&gt;
+&lt;/Address&gt;
+ &lt;DeliveryNotes&gt;Please leave packages in shed by driveway.&lt;/DeliveryNotes&gt;
+&lt;/PurchaseOrder&gt;
+```
+
+The sample output CSV is as follows.
+
+``` text
+Name,Street,City,State,Zip,Country
+James Yee,Downtown Bartow,Old Town,PA,95819,USA
+Ellen Smith,123 Maple Street,Mill Valley,CA,10999,USA
+```
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>running-the-mi.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Running the WSO2 Integrator: MI Runtime
+
+Follow the steps given below to run the WSO2 Integrator:  MI runtime.
+
+## Before you begin
+
+[Download and install]({{base_path}}/install-and-setup/install/installing-mi) the WSO2 Integrator: MI.
+
+## Starting the MI server
+
+Follow the steps given below to start the server.
+
+1. Open a command prompt as explained below.
+
+      &lt;table&gt;
+            &lt;tr&gt;
+                  &lt;th&gt;On &lt;b&gt;Linux/macOS&lt;/b&gt;&lt;/th&gt;
+                  &lt;td&gt;Establish an SSH connection to the server, log on to the text Linux console, or open a terminal window.&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+                  &lt;th&gt;On &lt;b&gt;Windows&lt;/b&gt;&lt;/th&gt;
+                  &lt;td&gt;Click &lt;b&gt;Start &amp;gt;Run&lt;/b&gt;, type &lt;b&gt;cmd&lt;/b&gt; at the prompt, and then press &lt;b&gt;Enter&lt;/b&gt;.&lt;/td&gt;
+            &lt;/tr&gt;
+      &lt;/table&gt;     
+
+2. Navigate to the `&lt;MI_HOME&gt;/bin` folder from your command line.
+3. Execute one of the commands given below.
+
+    -   To start the server:
+
+        === &quot;On macOS/Linux&quot;          
+            ```bash 
+            sh micro-integrator.sh
+            ```
+        === &quot;On Windows&quot;              
+            ```bash 
+            micro-integrator.bat
+            ```
+            
+    -       To start the server in background mode:
+
+        === &quot;On macOS/Linux&quot;              
+            ```bash 
+            sh micro-integrator.sh start
+            ```
+        === &quot;On Windows&quot;             
+            ```bash 
+            micro-integrator.bat --start
+            ```
+
+## Stopping the MI server
+
+- To stop the WSO2 Integrator: MI standalone application, go to the terminal and press &lt;i&gt;Ctrl+C&lt;/i&gt;.
+- To stop the WSO2 Integrator: MI in background mode:
+      
+    === &quot;On macOS/Linux&quot;
+        ```bash  
+        sh micro-integrator.sh stop
+        ```
+    === &quot;On Windows&quot;              
+        ```bash 
+        micro-integrator.bat --stop
+        ```
+
+## See Also
+
+-   [Running the MI as a Windows Service]({{base_path}}/install-and-setup/install/installing-mi-as-a-windows-service)</body>
+</html>

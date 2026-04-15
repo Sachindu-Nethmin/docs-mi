@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>sf-soap-connector-config.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Salesforce SOAP Connector Configuration
+
+The Salesforce SOAP connector allows you to access the [Salesforce SOAP API](https://developer.salesforce.com/docs/atlas.en-us.api.meta/api/sforce_api_quickstart_intro.htm?search_text=SOAP%20API%20Developer%20Guide) from the integration sequence. 
+
+## Setting up the Salesforce account
+
+1. To work with the Salesforce SOAP connector, you need to have a Salesforce account. If you do not have a Salesforce account, go to [https://developer.salesforce.com/signup](https://developer.salesforce.com/signup) and create a Salesforce developer account.
+
+2. After creating a Salesforce account you will get a [Salesforce security token](https://help.salesforce.com/articleView?id=user_security_token.htm&amp;type=5). 
+
+3. To configure the Salesforce SOAP Connector you need to save and keep the **username**, **password**, and **security token** of your Salesforce account.
+
+## Importing the Salesforce Certificate
+
+To use the Salesforce connector, add the `&lt;salesforce.init&gt;` element to your configuration before carrying out any other Salesforce operations.
+
+Before you start configuring the connector, import the **Salesforce certificate** to your integration runtime&#x27;s **client keystore**.
+
+Follow the steps below to import the Salesforce certificate into the integration runtime&#x27;s client keystore:
+
+1. To view the certificate, log in to your Salesforce account in your browser.
+2. Search the **Certificate and Key Management** in the search box.
+
+     &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/salesforcesoap-certificste-and-key-management.png&quot; title=&quot;salesforcesoap-certificste-and-key-management&quot; width=&quot;90%&quot; alt=&quot;salesforcesoap-certificste-and-key-management&quot;/&gt;  
+    
+3. Export the certificate to the file system.
+4. Import the certificate to the integration runtime&#x27;s client keystore using the following [command]({{base_path}}/install-and-setup/setup/security/importing-ssl-certificate/).
+
+    ```
+    keytool -importcert -file &lt;certificate file&gt; -keystore &lt;PRODUCT_HOME&gt;/repository/resources/security/client-truststore.jks -alias &quot;Salesforce&quot;
+    ```
+
+5. Restart the server and deploy the following Salesforce configuration:
+
+    ```
+     &lt;salesforce.init&gt;
+        &lt;username&gt;MyUsername&lt;/username&gt;
+        &lt;password&gt;MyPassword&lt;/password&gt;
+        &lt;loginUrl&gt;https://login.salesforce.com/services/Soap/u/42.0&lt;/loginUrl&gt;
+        &lt;blocking&gt;false&lt;/blocking&gt;
+     &lt;/salesforce.init&gt;
+    ```
+
+&gt; **Note**: Secure Vault is supported for [encrypting passwords]({{base_path}}/install-and-setup/setup/security/encrypting-plain-text). See, Working with Passwords on integrating and using Secure Vault.
+
+## Re-using Salesforce configurations
+
+You can save the Salesforce connection configuration as a [local entry]({{base_path}}/develop/creating-artifacts/registry/creating-local-registry-entries/) and then easily reference it with the configKey attribute in your operations. For example, if you saved the above &lt;salesforce.init&gt; entry as a local entry named MySFConfig, you could reference it from an operation like getUserInfo as follows:
+
+```
+&lt;salesforce.getUserInformation configKey=&quot;MySFConfig&quot;/&gt;
+```
+The Salesforce connector operation examples use this convention to show how to specify the connection configuration for that operation. In all cases, the configKey attribute is optional if the connection to Salesforce has already been established and is required only if you need to specify a different connection from the current connection.
+</body>
+</html>

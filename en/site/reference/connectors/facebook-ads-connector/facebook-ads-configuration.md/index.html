@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>facebook-ads-configuration.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Facebook Ads Connector Reference
+
+The following operations allow you to work with the Facebook Ads API. Click an operation name to see parameter details and samples on how to use it.
+
+## Initialize the connector
+
+To use the Facebook Ads connector, first create the connection with your configuration. When calling a Facebook Ads operation, ensure the connection is referenced using the `configKey` attribute.
+
+??? note &quot;init&quot;
+    The `init` operation initializes the connection to Facebook Ads API.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;name&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Unique name to identify the connection by.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;base&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The service root URL. The default value is `https://graph.facebook.com/v20.0`.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;accessToken&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The access token to authenticate the request.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.init&gt;
+        &lt;connectionType&gt;facebookAds&lt;/connectionType&gt;
+        &lt;name&gt;FB_CONN_1&lt;/name&gt;
+        &lt;base&gt;https://graph.facebook.com/v20.0&lt;/base&gt;
+        &lt;accessToken&gt;REPLACE_WITH_ACCESS_TOKEN&lt;/accessToken&gt;
+    &lt;/facebookAds.init&gt;
+    ```
+
+## Operations
+
+??? note &quot;createCampaign&quot;
+    The `createCampaign` operation creates a campaign.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adAccountId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad account.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;properties&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;A JSON object containing the campaign properties. See the [Campaign parameters](https://developers.facebook.com/docs/marketing-api/reference/ad-account/campaigns/#parameters-2) documentation for all the available properties.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.createCampaign configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adAccountId&gt;{json-eval($.account_id)}&lt;/adAccountId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+        &lt;responseVariable&gt;campaignResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.createCampaign&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;account_id&quot;:&quot;123123123&quot;,
+        &quot;properties&quot;: {
+            &quot;name&quot;: &quot;New Furniture Campaign&quot;,
+            &quot;objective&quot;: &quot;OUTCOME_TRAFFIC&quot;,
+            &quot;status&quot;: &quot;PAUSED&quot;,
+            &quot;special_ad_categories&quot;: [&quot;EMPLOYMENT&quot;]
+        }
+    }
+    ```
+
+??? note &quot;getCampaigns&quot;
+    The `getCampaigns` operation returns campaigns under this ad account.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adAccountId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad account.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;datePreset&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Predefined date range used to aggregate insights metrics.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;effectiveStatus&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Effective status for the campaigns.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;isCompleted&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;If true, we return completed campaigns.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;timeRange&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Date range used to aggregate insights metrics.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;fields&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Fields of the campaign that the response should contain. See the [Fields](https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group#fields) documentation for a list of all available fields.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.getCampaigns configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adAccountId&gt;{json-eval($.account_id)}&lt;/adAccountId&gt;
+        &lt;fields&gt;{json-eval($.fields)}&lt;/fields&gt;
+        &lt;effectiveStatus&gt;{json-eval($.status)}&lt;/effectiveStatus&gt;
+        &lt;isCompleted&gt;{json-eval($.is_completed)}&lt;/isCompleted&gt;
+        &lt;responseVariable&gt;campaignsResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.getCampaigns&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;account_id&quot;: &quot;123123123&quot;,
+        &quot;fields&quot;: &quot;id,name&quot;,
+        &quot;is_completed&quot;: true,
+        &quot;status&quot;: [
+            &quot;PAUSED&quot;
+        ]
+    }
+    ```
+
+??? note &quot;updateCampaign&quot;
+    The `updateCampaign` operation updates a campaign.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;campaignId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the campaign.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;properties&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;A JSON object containing the campaign properties. See the [Campaign parameters](https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group#parameters-3) documentation for all the available properties.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.updateCampaign configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;campaignId&gt;{json-eval($.campaign_id)}&lt;/campaignId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+        &lt;responseVariable&gt;updateResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.updateCampaign&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;campaign_id&quot;: &quot;123123123&quot;,
+        &quot;properties&quot;: {
+            &quot;name&quot;: &quot;New Furniture Likes Campaign 2&quot;,
+            &quot;objective&quot;: &quot;OUTCOME_ENGAGEMENT&quot;
+        }
+    }
+    ```
+
+??? note &quot;dissociateCampaign&quot;
+    The `dissociateCampaign` operation dissociate a campaign from an ad account.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adAccountId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad account.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;deleteStrategy&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Delete strategy. Possible values &lt;code&gt;DELETE_ANY&lt;/code&gt;, &lt;code&gt;DELETE_OLDEST&lt;/code&gt; or &lt;code&gt;DELETE_ARCHIVED_BEFORE&lt;/code&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;beforeDate&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Set a before date to delete campaigns before this date.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;objectCount&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Object count.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.dissociateCampaign configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adAccountId&gt;{json-eval($.account_id)}&lt;/adAccountId&gt;
+        &lt;deleteStrategy&gt;{json-eval($.strategy)}&lt;/deleteStrategy&gt;
+        &lt;objectCount&gt;{json-eval($.count)}&lt;/objectCount&gt;
+        &lt;responseVariable&gt;dissociateResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.dissociateCampaign&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;account_id&quot;: &quot;123123123&quot;,
+        &quot;strategy&quot;: &quot;DELETE_OLDEST&quot;,
+        &quot;count&quot;: 1
+    }
+    ```
+
+??? note &quot;deleteCampaign&quot;
+    The `deleteCampaign` operation deletes a campaign.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;campaignId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the campaign.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.deleteCampaign configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;campaignId&gt;{json-eval($.campaign_id)}&lt;/campaignId&gt;
+        &lt;responseVariable&gt;deleteResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.deleteCampaign&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;campaign_id&quot;: &quot;123123123&quot;
+    }
+    ```
+
+??? note &quot;createAdSet&quot;
+    The `createAdSet` operation creates an ad set.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adAccountId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad account.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;properties&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;A JSON object containing the adset properties. See the [Ad set parameters](https://developers.facebook.com/docs/marketing-api/reference/ad-account/adsets/#parameters-2) documentation for all the available properties.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.createAdSet configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adAccountId&gt;{json-eval($.account_id)}&lt;/adAccountId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+        &lt;responseVariable&gt;adSetResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.createAdSet&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;account_id&quot;: &quot;123123123&quot;,
+        &quot;properties&quot;: {
+            &quot;name&quot;: &quot;New Furniture Ad set&quot;,
+            &quot;status&quot;: &quot;PAUSED&quot;,
+            &quot;campaign_id&quot;: &quot;123123123&quot;,
+            &quot;daily_budget&quot;: &quot;10000&quot;,
+            &quot;bid_amount&quot;: &quot;300&quot;,
+            &quot;billing_event&quot;: &quot;IMPRESSIONS&quot;,
+            &quot;targeting&quot;: {
+                &quot;facebook_positions&quot;: [
+                    &quot;feed&quot;
+                ],
+                &quot;geo_locations&quot;: {
+                    &quot;countries&quot;: [
+                        &quot;US&quot;
+                    ]
+                }
+            }
+        }
+    }
+    ```
+
+??? note &quot;getAdSets&quot;
+    The `getAdSets` operation returns all ad sets from one ad account.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adAccountId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad account.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;datePreset&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Predefined date range used to aggregate insights metrics.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;timeRange&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Time Range. Note if the time range is invalid, it will be ignored.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;fields&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Fields of the ad set that the response should contain. See the [Fields]( https://developers.facebook.com/docs/marketing-api/reference/adgroup#fields) documentation for a list of all available fields.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.getAdSets configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adAccountId&gt;{json-eval($.account_id)}&lt;/adAccountId&gt;
+        &lt;fields&gt;{json-eval($.fields)}&lt;/fields&gt;
+        &lt;responseVariable&gt;adSetsResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.getAdSets&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;account_id&quot;:&quot;123123123&quot;,
+        &quot;fields&quot;:&quot;id,name,status,campaign&quot;
+    }
+    ```
+
+??? note &quot;getAdSet&quot;
+    The `getAdSet` operation return data related to an ad set.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adSetId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad set.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;datePreset&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Predefined date range used to aggregate insights metrics.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;timeRange&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Time Range. Note if time range is invalid, it will be ignored.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;fields&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Fields of the ad set that the response should contain. See the [Fields](https://developers.facebook.com/docs/marketing-api/reference/ad-account/adsets/#parameters-2) documentation for a list of all available fields.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.getAdSet configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adSetId&gt;{json-eval($.ad_set_id)}&lt;/adSetId&gt;
+        &lt;fields&gt;{json-eval($.fields)}&lt;/fields&gt;
+        &lt;responseVariable&gt;adSetResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.getAdSet&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;ad_set_id&quot;:&quot;456456456&quot;,
+        &quot;fields&quot;:&quot;name, targeting&quot;
+    }
+    ```
+
+??? note &quot;updateAdSet&quot;
+    The `updateAdSet` operation updates an ad set.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adSetId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad set.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;properties&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;A JSON object containing the adset properties. See the [Ad set parameters](https://developers.facebook.com/docs/marketing-api/reference/ad-account/adsets/#parameters-2) documentation for all the available properties.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.updateAdSet configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adSetId&gt;{json-eval($.ad_set_id)}&lt;/adSetId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+        &lt;responseVariable&gt;updateResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.updateAdSet&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;ad_set_id&quot;: &quot;123123123&quot;,
+        &quot;properties&quot;: {
+            &quot;name&quot;: &quot;New Furniture Ad set Updated&quot;,
+            &quot;status&quot;: &quot;PAUSED&quot;,
+            &quot;bid_amount&quot;: &quot;500&quot;
+        }
+    }
+    ```
+
+??? note &quot;deleteAdSet&quot;
+    The `deleteAdSet` operation deletes an ad set.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adSetId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad set.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.deleteAdSet configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adSetId&gt;{json-eval($.ad_set_id)}&lt;/adSetId&gt;
+        &lt;responseVariable&gt;deleteResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.deleteAdSet&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;ad_set_id&quot;: &quot;123123123&quot;
+    }
+    ```
+
+??? note &quot;createAd&quot;
+    The `createAd` operation creates an ad.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adAccountId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad account.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;properties&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;A JSON object containing the ad properties. See the [Ad parameters](https://developers.facebook.com/docs/marketing-api/reference/ad-account/ads/#parameters-2) documentation for all the available properties.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.createAd configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adAccountId&gt;{json-eval($.account_id)}&lt;/adAccountId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+        &lt;responseVariable&gt;adResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.createAd&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;account_id&quot;: &quot;123123123&quot;,
+        &quot;properties&quot;: {
+            &quot;name&quot;: &quot;New Furniture Ad&quot;,
+            &quot;status&quot;: &quot;PAUSED&quot;,
+            &quot;adset_id&quot;: &quot;456456456&quot;,
+            &quot;creative&quot;: {
+                &quot;creative_id&quot;: &quot;789789789&quot;
+            }
+        }
+    }
+    ```
+
+??? note &quot;getAds&quot;
+    The `getAds` operation returns ads under this ad account.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adAccountId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad account.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;datePreset&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Predefined date range used to aggregate insights metrics.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;effectiveStatus&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Filter ads by effective status.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;updatedSince&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Time since the ad has been updated.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;timeRange&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Date range used to aggregate insights metrics.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;fields&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Fields of the ad that the response should contain. See the [Fields]( https://developers.facebook.com/docs/marketing-api/reference/adgroup#fields) documentation for a list of all available fields.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.getAds configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adAccountId&gt;{json-eval($.account_id)}&lt;/adAccountId&gt;
+        &lt;fields&gt;{json-eval($.fields)}&lt;/fields&gt;
+        &lt;effectiveStatus&gt;{json-eval($.status)}&lt;/effectiveStatus&gt;
+        &lt;updatedSince&gt;{json-eval($.updated_since)}&lt;/updatedSince&gt;
+        &lt;responseVariable&gt;adsResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.getAds&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;account_id&quot;: &quot;123123123&quot;,
+        &quot;fields&quot;: &quot;id,name,status,ad_active_time&quot;,
+        &quot;status&quot;: [
+            &quot;ACTIVE&quot;
+        ],
+        &quot;updated_since&quot;: 34564356
+    }
+    ```
+
+??? note &quot;getAd&quot;
+    The `getAd` operation returns data of an ad.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;datePreset&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Predefined date range used to aggregate insights metrics.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;timeRange&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Date range used to aggregate insights metrics.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;fields&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Fields of the ad that the response should contain. See the [Fields]( https://developers.facebook.com/docs/marketing-api/reference/adgroup#fields) documentation for a list of all available fields.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.getAd configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adId&gt;{json-eval($.ad_id)}&lt;/adId&gt;
+        &lt;fields&gt;{json-eval($.fields)}&lt;/fields&gt;
+        &lt;responseVariable&gt;adResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.getAd&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;ad_id&quot;:&quot;789789789&quot;,
+        &quot;fields&quot;:&quot;id,name,status,campaign,ad_active_time&quot;
+    }
+    ```
+
+??? note &quot;updateAd&quot;
+    The `updateAd` operation updates an ad.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;properties&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;A JSON object containing the ad properties. See the [Update Limitations](https://developers.facebook.com/docs/marketing-api/reference/adgroup#limitations) documentation for all the available properties.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.updateAd configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adId&gt;{json-eval($.ad_id)}&lt;/adId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+        &lt;responseVariable&gt;updateResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.updateAd&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;ad_id&quot;: &quot;456456456&quot;,
+        &quot;properties&quot;: {
+            &quot;name&quot;: &quot;New Furniture Ad 2&quot;,
+            &quot;status&quot;: &quot;PAUSED&quot;
+        }
+    }
+    ```
+
+??? note &quot;deleteAd&quot;
+    The `deleteAd` operation deletes an ad.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.deleteAd configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adId&gt;{json-eval($.ad_id)}&lt;/adId&gt;
+        &lt;responseVariable&gt;deleteResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.deleteAd&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;ad_id&quot;: &quot;456456456&quot;
+    }
+    ```
+??? note &quot;createCustomAudience&quot;
+    The `createCustomAudience` operation creates a custom audience.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adAccountId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad account.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+            &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;properties&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Custom audience properties.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.createCustomAudience configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adId&gt;{json-eval($.ad_id)}&lt;/adId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+        &lt;responseVariable&gt;audienceResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.createCustomAudience&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;ad_id&quot;: &quot;456456456&quot;,
+        &quot;properties&quot;: {
+            &quot;name&quot;: &quot;My Custom Audience&quot;,
+            &quot;subtype&quot;: &quot;CUSTOM&quot;, 
+            &quot;description&quot;: &quot;Audience based on website traffic&quot;,
+            &quot;customer_file_source&quot;: &quot;USER_PROVIDED_ONLY&quot;
+        }
+    }
+    ```
+
+??? note &quot;createAdCreative&quot;
+    The `createAdCreative` operation creates an ad creative.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adAccountId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad account.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;properties&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Ad creative properties.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.createAdCreative configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adId&gt;{json-eval($.ad_id)}&lt;/adId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+        &lt;responseVariable&gt;creativeResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.createAdCreative&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;ad_id&quot;: &quot;456456456&quot;,
+        &quot;properties&quot;: {
+            &quot;name&quot;: &quot;My Ad Creative&quot;,
+            &quot;object_story_spec&quot;: {
+                &quot;page_id&quot;: &quot;465229476789834&quot;,
+                &quot;link_data&quot;: {
+                    &quot;description&quot;: &quot;My ad creative&quot;,
+                    &quot;image_hash&quot;: &quot;f2cafafae01fc9201c8d2e70687dhk675Ddsac&quot;,
+                    &quot;link&quot;: &quot;https://sample.com/&quot;,
+                    &quot;message&quot;: &quot;Check out my website!&quot;,
+                    &quot;name&quot;: &quot;headline&quot;,
+                    &quot;call_to_action&quot;: {
+                        &quot;type&quot;: &quot;LEARN_MORE&quot;,
+                        &quot;value&quot;: {
+                            &quot;link&quot;: &quot;https://sample.com/&quot;,
+                            &quot;link_caption&quot;: &quot;&quot;
+                        }
+                    }
+                }
+            },
+            &quot;degrees_of_freedom_spec&quot;: {
+                &quot;creative_features_spec&quot;: {
+                    &quot;standard_enhancements&quot;: {
+                        &quot;enroll_status&quot;: &quot;OPT_OUT&quot;
+                    }
+                }
+            }
+        }
+    }
+    ```
+
+??? note &quot;updateCustomAudience&quot;
+    The `updateCustomAudience` operation updates a custom audience.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;customAudienceId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the custom audience.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;properties&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Custom audience update properties.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.updateCustomAudience configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;customAudienceId&gt;{json-eval($.audience_id)}&lt;/customAudienceId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+        &lt;responseVariable&gt;updateResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.updateCustomAudience&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;audience_id&quot;: &quot;456456456&quot;,
+        &quot;properties&quot;: {
+            &quot;name&quot;: &quot;My Custom Audience Update&quot;,
+            &quot;subtype&quot;: &quot;CUSTOM&quot;, 
+            &quot;description&quot;: &quot;Audience based on website traffic&quot;,
+        }
+    }
+    ```
+
+??? note &quot;addUsersToAudience&quot;
+    The `addUsersToAudience` operation adds users to a custom audience. 
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;customAudienceId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the custom audience.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;properties&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Properties of the users to be added to the audience.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;inputStructure&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Structure of the user data to be added.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations for Facebook API compatible input**
+
+    ```xml
+    &lt;facebookAds.addUsersToAudience configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;customAudienceId&gt;{json-eval($.audience_id)}&lt;/customAudienceId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+        &lt;responseVariable&gt;audienceUpdateResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.addUsersToAudience&gt;
+
+    &lt;facebookAds.addUsersToAudience configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;customAudienceId&gt;{json-eval($.audience_id)}&lt;/customAudienceId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+        &lt;inputStructure&gt;FACEBOOK_API_COMPATIBLE&lt;/inputStructure&gt;
+        &lt;responseVariable&gt;audienceUpdateResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.addUsersToAudience&gt;
+    ```
+ 
+    **Sample request for Facebook API compatible input**
+
+    ```json
+    {
+        &quot;audience_id&quot;: &quot;456456456&quot;,
+        &quot;properties&quot;: {
+            &quot;payload&quot;: {
+                &quot;schema&quot;: [
+                    &quot;COUNTRY&quot;,
+                    &quot;EMAIL&quot;,
+                    &quot;FN&quot;,
+                    &quot;GEN&quot;,
+                    &quot;LN&quot;,
+                    &quot;MADID&quot;,
+                    &quot;PHONE&quot;
+                ],
+                &quot;data&quot;: [
+                    [
+                        &quot;79adb2a2fce5c6ba215fe5f27f532d4e7edbac4b6a5e09e1ef3a08084a904621&quot;,
+                        &quot;23b9cb38c8e9c75a466a349eec16aff2c3eabc707cf57432a872aab7e532d069&quot;,
+                        &quot;b54f08623ae4039f55bcecba4961037fb4513d2ba9cb2b0667c5db970ac94911&quot;,
+                        &quot;252f10c83610ebca1a059c0bae8255eba2f95be4d1d7bcfa89d7248a82d9f111&quot;,
+                        &quot;d07227456ed0f3a3ca01456ee769b4662c1c679d754465b44c93b075fea751cd&quot;,
+                        &quot;aece52e7-03ee-455a-b3c4-e57283966239&quot;,
+                        &quot;c7e1a5948418c64b472abbe6a7b443ec83c4e31573874d600de828f89dd71339&quot;
+                    ]
+                ]
+            }
+        }
+    }
+    ```
+
+    **Sample configurations for JSON array input**
+
+    ```xml
+    &lt;facebookAds.addUsersToAudience configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;customAudienceId&gt;{json-eval($.audience_id)}&lt;/customAudienceId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+        &lt;inputStructure&gt;JSON_ARRAY&lt;/inputStructure&gt;
+        &lt;responseVariable&gt;audienceUpdateResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.addUsersToAudience&gt;
+    ```
+ 
+    **Sample request for JSON array input**
+
+    ```json
+    {
+        &quot;audience_id&quot;: &quot;456456456&quot;,
+        &quot;properties&quot;: [
+            {
+                &quot;email&quot;: &quot;elizabetho@fb.com&quot;,
+                &quot;phone&quot;: &quot;1-(650)-561-5622&quot;,
+                &quot;madid&quot;: &quot;aece52e7-03ee-455a-b3c4-e57283966239&quot;,
+                &quot;fn&quot;: &quot;Elizabeth&quot;,
+                &quot;ln&quot;: &quot;Olsen&quot;,
+                &quot;zip&quot;: &quot;94046&quot;,
+                &quot;ct&quot;: &quot;Menlo Park&quot;,
+                &quot;st&quot;: &quot;CA&quot;,
+                &quot;country&quot;: &quot;US&quot;,
+                &quot;dob&quot;: &quot;10\/21\/68&quot;,
+                &quot;doby&quot;: 1968,
+                &quot;gen&quot;: &quot;F&quot;,
+                &quot;age&quot;: 48,
+                &quot;uid&quot;: 1234567890
+            },
+            {
+                &quot;email&quot;: &quot;andrewj@fb.com&quot;,
+                &quot;phone&quot;: &quot;1-(212) 736-3100&quot;,
+                &quot;madid&quot;: &quot;BEBE52E7-03EE-455A-B3C4-E57283966239&quot;,
+                &quot;fn&quot;: &quot;Andrew&quot;,
+                &quot;ln&quot;: &quot;Jamison&quot;,
+                &quot;zip&quot;: &quot;10118&quot;,
+                &quot;ct&quot;: &quot;New York&quot;,
+                &quot;st&quot;: &quot;NY&quot;,
+                &quot;country&quot;: &quot;US&quot;,
+                &quot;dob&quot;: &quot;10\/17\/78&quot;,
+                &quot;doby&quot;: 1978,
+                &quot;gen&quot;: &quot;M&quot;,
+                &quot;age&quot;: 38,
+                &quot;uid&quot;: 1443637309
+            }
+        ]
+    }
+    ```
+
+??? note &quot;removeUsersFromAudience&quot;
+    The `removeUsersFromAudience` operation removes users from a custom audience.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;customAudienceId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the custom audience.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;properties&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Properties of the users to be removed from the audience.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;inputStructure&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Structure of the user data to be removed.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations for Facebook API compatible input**
+
+    ```xml
+    &lt;facebookAds.removeUsersFromAudience configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;customAudienceId&gt;{json-eval($.audience_id)}&lt;/customAudienceId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+        &lt;responseVariable&gt;audienceUpdateResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.removeUsersFromAudience&gt;
+
+    &lt;facebookAds.removeUsersFromAudience configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;customAudienceId&gt;{json-eval($.audience_id)}&lt;/customAudienceId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+        &lt;inputStructure&gt;FACEBOOK_API_COMPATIBLE&lt;/inputStructure&gt;
+        &lt;responseVariable&gt;audienceUpdateResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.removeUsersFromAudience&gt;
+    ```
+ 
+    **Sample request for Facebook API compatible input**
+
+    ```json
+    {
+        &quot;audience_id&quot;: &quot;456456456&quot;,
+        &quot;properties&quot;: {
+            &quot;payload&quot;: {
+                &quot;schema&quot;: [
+                    &quot;COUNTRY&quot;,
+                    &quot;EMAIL&quot;,
+                    &quot;FN&quot;,
+                    &quot;GEN&quot;,
+                    &quot;LN&quot;,
+                    &quot;MADID&quot;,
+                    &quot;PHONE&quot;
+                ],
+                &quot;data&quot;: [
+                    [
+                        &quot;79adb2a2fce5c6ba215fe5f27f532d4e7edbac4b6a5e09e1ef3a08084a904621&quot;,
+                        &quot;23b9cb38c8e9c75a466a349eec16aff2c3eabc707cf57432a872aab7e532d069&quot;,
+                        &quot;b54f08623ae4039f55bcecba4961037fb4513d2ba9cb2b0667c5db970ac94911&quot;,
+                        &quot;252f10c83610ebca1a059c0bae8255eba2f95be4d1d7bcfa89d7248a82d9f111&quot;,
+                        &quot;d07227456ed0f3a3ca01456ee769b4662c1c679d754465b44c93b075fea751cd&quot;,
+                        &quot;aece52e7-03ee-455a-b3c4-e57283966239&quot;,
+                        &quot;c7e1a5948418c64b472abbe6a7b443ec83c4e31573874d600de828f89dd71339&quot;
+                    ]
+                ]
+            }
+        }
+    }
+    ```
+
+    **Sample configurations for JSON array input**
+
+    ```xml
+    &lt;facebookAds.removeUsersFromAudience configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;customAudienceId&gt;{json-eval($.audience_id)}&lt;/customAudienceId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+        &lt;inputStructure&gt;JSON_ARRAY&lt;/inputStructure&gt;
+        &lt;responseVariable&gt;audienceUpdateResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.removeUsersFromAudience&gt;
+    ```
+ 
+    **Sample request for JSON array input**
+
+    ```json
+    {
+        &quot;audience_id&quot;: &quot;456456456&quot;,
+        &quot;properties&quot;: [
+            {
+                &quot;email&quot;: &quot;elizabetho@fb.com&quot;,
+                &quot;phone&quot;: &quot;1-(650)-561-5622&quot;,
+                &quot;madid&quot;: &quot;aece52e7-03ee-455a-b3c4-e57283966239&quot;,
+                &quot;fn&quot;: &quot;Elizabeth&quot;,
+                &quot;ln&quot;: &quot;Olsen&quot;,
+                &quot;zip&quot;: &quot;94046&quot;,
+                &quot;ct&quot;: &quot;Menlo Park&quot;,
+                &quot;st&quot;: &quot;CA&quot;,
+                &quot;country&quot;: &quot;US&quot;,
+                &quot;dob&quot;: &quot;10\/21\/68&quot;,
+                &quot;doby&quot;: 1968,
+                &quot;gen&quot;: &quot;F&quot;,
+                &quot;age&quot;: 48,
+                &quot;uid&quot;: 1234567890
+            },
+            {
+                &quot;email&quot;: &quot;andrewj@fb.com&quot;,
+                &quot;phone&quot;: &quot;1-(212) 736-3100&quot;,
+                &quot;madid&quot;: &quot;BEBE52E7-03EE-455A-B3C4-E57283966239&quot;,
+                &quot;fn&quot;: &quot;Andrew&quot;,
+                &quot;ln&quot;: &quot;Jamison&quot;,
+                &quot;zip&quot;: &quot;10118&quot;,
+                &quot;ct&quot;: &quot;New York&quot;,
+                &quot;st&quot;: &quot;NY&quot;,
+                &quot;country&quot;: &quot;US&quot;,
+                &quot;dob&quot;: &quot;10\/17\/78&quot;,
+                &quot;doby&quot;: 1978,
+                &quot;gen&quot;: &quot;M&quot;,
+                &quot;age&quot;: 38,
+                &quot;uid&quot;: 1443637309
+            }
+        ]
+    }
+    ```
+
+??? note &quot;getCustomAudiences&quot;
+    The `getCustomAudiences` operation retrieves all custom audiences. Provide a value for the `filterByName` parameter to retrieve specific audiences by name.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;adAccountId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;ID of the ad account.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;filterByName&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Provide a name to filter and retrieve specific audiences.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;responseVariable&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Variable name to store the response payload.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;overwriteBody&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Replace the current message payload with the operation response.&lt;/td&gt;
+            &lt;td&gt;No (Default: false)&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;facebookAds.getCustomAudiences configKey=&quot;FB_CONN_1&quot;&gt;
+        &lt;adAccountId&gt;{json-eval($.ad_account_id)}&lt;/adAccountId&gt;
+        &lt;filterByName&gt;{json-eval($.filter_name)}&lt;/filterByName&gt;
+        &lt;responseVariable&gt;audiencesResponse&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/facebookAds.getCustomAudiences&gt;
+    ```
+ 
+    **Sample request**
+
+    Retrieve all the custom audiences.
+
+    ```json
+    {
+        &quot;ad_account_id&quot;: &quot;123123123&quot;
+    }
+    ```
+
+    Retrieve specific audiences by name.
+    
+    ```json
+    {
+        &quot;ad_account_id&quot;: &quot;123123123&quot;,
+        &quot;filter_name&quot;: &quot;Custom Audience With Users&quot;
+    }
+    ```
+
+## Error codes related to Facebook Ads Connector
+
+The connector may encounter errors during operation execution. When an error occurs, the `ERROR_MESSAGE` property will contain detailed information about the error. You can handle these errors using a `Fault Sequence` in your integration. For more information, see [Using Fault Sequences]({{base_path}}/learn/examples/sequence-examples/using-fault-sequences/).
+
+| Error code | Description |
+| -------- | ------- |
+| 701101 | General error. |
+| 701102 | Invalid configuration error. |
+</body>
+</html>

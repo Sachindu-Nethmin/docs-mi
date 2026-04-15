@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>switching-from-fix-to-jms.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Switch from FIX to JMS
+
+This example demonstrates how WSO2 Integrator: MI receives messages through FIX and forwards them through JMS.
+
+Synapse will forward the order request by binding it to a JMS message payload and sending it to the ActiveMQ consumer. The ActiveMQ consumer will send an execution back to Banzai.
+
+## Synapse configuration
+
+Following are the integration artifacts (proxy service) that we can use to implement this scenario. See the instructions on how to [build and run](#build-and-run) this example.
+
+=== &quot;Proxy Service&quot;
+    ```xml 
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy name=&quot;FIXProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;fix&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;log category=&quot;INFO&quot; level=&quot;full&quot;/&gt;
+                &lt;property name=&quot;transport.fix.ServiceName&quot; scope=&quot;axis2-client&quot; type=&quot;STRING&quot; value=&quot;FIXProxy&quot;/&gt;
+                &lt;call&gt;
+                    &lt;endpoint key=&quot;QueueStockQuoteServiceEp&quot;/&gt;
+                &lt;/call&gt;
+                &lt;log category=&quot;INFO&quot; level=&quot;full&quot;/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence/&gt;
+        &lt;/target&gt;
+        &lt;parameter name=&quot;transport.fix.AcceptorConfigURL&quot;&gt;file:/{file_path}/fix-synapse.cfg&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.fix.AcceptorMessageStore&quot;&gt;file&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;Endpoint&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;endpoint name=&quot;QueueStockQuoteServiceEp&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;address uri=&quot;jms:/QueueStockQuoteService?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;amp;java.naming.provider.url=tcp://localhost:61616&amp;amp;transport.jms.ReplyDestination=replyQueue&quot;&gt;
+            &lt;suspendOnFailure&gt;
+                &lt;initialDuration&gt;-1&lt;/initialDuration&gt;
+                &lt;progressionFactor&gt;1&lt;/progressionFactor&gt;
+            &lt;/suspendOnFailure&gt;
+            &lt;markForSuspension&gt;
+                &lt;retriesBeforeSuspension&gt;0&lt;/retriesBeforeSuspension&gt;
+            &lt;/markForSuspension&gt;
+        &lt;/address&gt;
+    &lt;/endpoint&gt;
+    ```
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+3. Create the [proxy service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service) with the configurations given above.
+4. Download the FIX transport resources from [here](https://github.com/wso2-docs/WSO2_EI/tree/master/FIX-transport-resources) and change the `{file_path}` of the proxy with the downloaded location.
+5. [Configure MI with the selected message broker]({{base_path}}/install-and-setup/setup/brokers/configure-with-activemq) and start the Micro-Integrator.
+6. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+[Enable the FIX transport]({{base_path}}/install-and-setup/setup/transport-configurations/configuring-transports/#configuring-the-fix-transport) and start the Micro-Integrator.
+
+Run the quickfixj **Banzai** sample application.
+
+```bash
+java -jar quickfixj-examples-banzai-2.3.1.jar
+```
+
+Send an order request from Banzai to Synapse. For example, Buy 1000 DELL @ $100. 
+&lt;img src=&quot;{{base_path}}/assets/img/learn/fix-to-http.png&quot; title=&quot;FIX order request&quot; width=&quot;800&quot; alt=&quot;FIX order request&quot; /&gt;
+
+Then, the message count of the queue should be increased. To check this, follow these steps:
+
+1. Navigate to the URL where the ActiveMQ WebConsole is available. You can find this URL in the terminal where you started ActiveMQ. It is similar to `http://127.0.0.1:8161/`. 
+2. By default, the username and password are both `admin`.
+3. After signing in, click on **Manage ActiveMQ broker**.
+4. On the opened page, select the **Queues** tab.
+
+You will see a page similar to the one below.
+
+&lt;img src=&quot;{{base_path}}/assets/img/learn/activemq-result.png&quot; title=&quot;ActiveMQ result&quot; width=&quot;800&quot; alt=&quot;ActiveMQ result&quot; /&gt;
+
+You can again send a request and check the increment of the count in the queue. 
+</body>
+</html>

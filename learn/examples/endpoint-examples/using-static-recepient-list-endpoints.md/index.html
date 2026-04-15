@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>using-static-recepient-list-endpoints.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Route Messages to a Static List of Recipients
+This example demonstrates how messages can be routed to a list of static endpoints. This configuration routes a cloned copy of a message to each recipient defined within the static recipient list. The WSO2 Integrator: MI will create cloned copies of the message and route to the endpoints mentioned in the configuration.
+
+## Synapse configuration
+Following are the synapse configurations that we can use to implement this scenario. 
+
+!!! Note
+    Add the endpoints of your backend services replacing the placeholders and if there are more or less endpoints they also can be added or removed accordingly. The payload also can be updated based on the requirement.
+
+=== &quot;API&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;api context=&quot;/callEndpoint&quot; name=&quot;callEndpoint&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;resource methods=&quot;GET&quot; uri-template=&quot;/&quot;&gt;
+            &lt;inSequence&gt;
+                &lt;property name=&quot;REST_URL_POSTFIX&quot; scope=&quot;axis2&quot; action=&quot;remove&quot;/&gt;
+                &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;default&quot;&gt;
+                    &lt;format&gt;{&quot;payload&quot;: &quot;sample&quot;}&lt;/format&gt;
+                    &lt;args&gt;&lt;/args&gt;
+                &lt;/payloadFactory&gt;
+                &lt;sequence key=&quot;EndpointCaller&quot;/&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence&gt;
+                &lt;sequence key=&quot;ErrorHandler&quot;/&gt;
+            &lt;/faultSequence&gt;
+        &lt;/resource&gt;
+    &lt;/api&gt;
+    ```
+
+=== &quot;Recipient List Endpoint&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;endpoint name=&quot;RecipientListEndpoint&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;recipientlist&gt;
+            &lt;endpoint&gt;
+                &lt;http method=&quot;post&quot; uri-template=&quot;&lt;ENDPOINT_URL_01&gt;&quot;/&gt;
+            &lt;/endpoint&gt;
+            &lt;endpoint&gt;
+                &lt;http method=&quot;post&quot; uri-template=&quot;&lt;ENDPOINT_URL_02&gt;&quot;/&gt;
+            &lt;/endpoint&gt;
+            &lt;endpoint&gt;
+                &lt;http method=&quot;post&quot; uri-template=&quot;&lt;ENDPOINT_URL_03&gt;&quot;/&gt;
+            &lt;/endpoint&gt;
+        &lt;/recipientlist&gt;
+    &lt;/endpoint&gt;
+    ```
+
+=== &quot;Endpoint Calling Sequence&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;sequence name=&quot;EndpointCaller&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;call&gt;
+            &lt;endpoint key=&quot;RecipientListEndpoint&quot;/&gt;
+        &lt;/call&gt;
+        &lt;aggregate&gt;
+            &lt;onComplete expression=&quot;json-eval($)&quot;&gt;
+                &lt;log level=&quot;full&quot;/&gt;
+            &lt;/onComplete&gt;
+        &lt;/aggregate&gt;
+    &lt;/sequence&gt;
+    ```
+
+=== &quot;Error Handling Sequence&quot;    
+    ```xml
+    &lt;sequence name=&quot;ErrorHandler&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;makefault response=&quot;true&quot; version=&quot;soap12&quot;&gt;
+            &lt;code xmlns:soap12Env=&quot;http://www.w3.org/2003/05/soap-envelope&quot; value=&quot;soap12Env:Receiver&quot;/&gt;
+            &lt;reason value=&quot;Couldn&#x27;t send the request to the server&quot;/&gt;
+        &lt;/makefault&gt;
+        &lt;respond/&gt;
+    &lt;/sequence&gt;
+    ```
+
+## Testing the scenario
+
+Open a terminal and execute the following curl to invoke the API.
+    ```bash
+    curl --location http://localhost:8290/callEndpoint/
+    ```
+
+You will receive a response that aggregates the outputs from each endpoint, showing that the payload was cloned and sent to all the endpoints.
+
+!!! Note
+    The **Aggregate** mediator was used in the above configuration to aggregate the responses received from each endpoint.
+</body>
+</html>

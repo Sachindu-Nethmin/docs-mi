@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>rabbitmq-nonblocking-client-ack.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Manage Guaranteed Delivery with Non-Blocking Client Acknowledgement
+
+This sample demonstrates how **WSO2 Integrator: MI** can ensure
+guaranteed message delivery from RabbitMQ queue while maintaining a
+**non-blocking processing model** using **client-controlled
+acknowledgements**.
+
+In this approach, messages are consumed from RabbitMQ queue using **client
+acknowledgement mode**, and message acknowledgement is controlled
+explicitly through mediation logic. This allows the Micro Integrator to
+process messages using a **non-blocking architecture**, improving
+throughput while still preserving delivery guarantees.
+
+If the message processing succeeds, the message is acknowledged and
+removed from the queue. If processing fails, the message can either be
+**requeued or routed to a Dead Letter Queue (DLQ)** depending on the
+configuration.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/rabbitmq/rabbitmq-dead-letter-exchange.png&quot;&gt;
+
+------------------------------------------------------------------------
+
+## Configure Callback Controlled Acknowledgement
+
+To enable **non-blocking client acknowledgements**, configure the
+following settings in the `deployment.toml` file.
+
+``` toml
+[messaging_callback]
+callback_controlled_ack_enabled = true
+enable_client_api_nonblocking_mode = true
+preserve_payload_on_timeout = true
+default_pub_confirm_timeout_for_callback_controlled_flow = 120000
+rabbitmq_inbound_ack_max_wait_ms = 120000
+```
+
+### Configuration Description
+
+**callback_controlled_ack_enabled**
+
+Enables callback-controlled acknowledgement support in the Micro
+Integrator.
+
+**enable_client_api_nonblocking_mode**
+
+Enables the **non-blocking multi-threaded architecture** of the Micro
+Integrator when client acknowledgements are used.
+
+**preserve_payload_on_timeout**
+
+Ensures the original message payload is preserved when a timeout occurs
+during processing.
+
+**default_pub_confirm_timeout_for_callback_controlled_flow**
+
+Defines the default timeout used for publisher confirms when
+callback-controlled acknowledgement is enabled.
+
+This timeout is mainly relevant if previous artifacts had configured
+publisher confirm timeouts. In the callback-controlled flow, endpoint
+timeouts typically handle connection termination, so long publisher
+confirm timeouts are usually preferred.
+
+**rabbitmq_inbound_ack_max_wait_ms**
+
+Defines the maximum time the listener waits for an acknowledgement. If
+the acknowledgement is not received within this time, the message will
+be **negatively acknowledged (NACK)** and returned to the queue.
+
+------------------------------------------------------------------------
+
+## Reliable Error Queue Publishing with Publisher Confirms
+
+When routing messages to a configured **error queue** or **final queue**, there is a possibility of message loss if the publish operation fails.
+
+To improve reliability, the Micro Integrator supports **publisher confirms** for error queue publishing. When enabled, the broker acknowledges each published message, allowing the Micro Integrator to ensure that the message has been successfully delivered before removing it from the source queue.
+
+If a publish attempt fails, or if a confirmation is not received within the configured timeout, the operation is retried based on the configured retry count.
+
+### Enable Publisher Confirms for Error Queue Publishing
+
+Add the following parameters to the **proxy service configuration**:
+
+```xml
+&lt;parameter name=&quot;rabbitmq.message.error.publish.with.confirms.enabled&quot;&gt;true&lt;/parameter&gt;
+&lt;parameter name=&quot;rabbitmq.message.error.publish.confirm.timeout&quot;&gt;5000&lt;/parameter&gt;
+&lt;parameter name=&quot;rabbitmq.message.error.publish.max.retry.count&quot;&gt;3&lt;/parameter&gt;
+```
+
+### Configuration Description
+
+### `rabbitmq.message.error.publish.with.confirms.enabled`
+
+Enables publisher confirms when publishing messages to the error or final queue. The message is acknowledged only after a successful broker confirmation.
+
+### `rabbitmq.message.error.publish.confirm.timeout`
+
+The time, in milliseconds, to wait for a broker confirmation. If the timeout is exceeded, the publish is treated as failed.
+
+### `rabbitmq.message.error.publish.max.retry.count`
+
+The total number of publish attempts when sending a message to the error or final queue. If all attempts fail, the message is acknowledged and discarded.
+
+
+## Overriding the ACK Wait Time per Listener
+
+The global acknowledgement wait time can be overridden at the **proxy
+service level** using the following parameter.
+
+``` xml
+&lt;parameter name=&quot;rabbitmq.inbound.ack.max.wait.time&quot;&gt;30000&lt;/parameter&gt;
+```
+
+This configuration allows each RabbitMQ listener proxy to define its own
+**maximum acknowledgement wait time**.
+
+------------------------------------------------------------------------
+
+## Controlling Acknowledgement in Mediation
+
+Message acknowledgement can be explicitly controlled in mediation using
+the following Axis2 properties.
+
+### Acknowledge the message
+
+``` xml
+&lt;property name=&quot;ACKNOWLEDGE&quot; value=&quot;true&quot; scope=&quot;axis2&quot; type=&quot;STRING&quot;/&gt;
+```
+
+If this property is set to **true**, the message will be acknowledged
+and removed from the queue.
+
+### Reject the message
+
+``` xml
+&lt;property name=&quot;ACKNOWLEDGE&quot; value=&quot;false&quot; scope=&quot;axis2&quot; type=&quot;STRING&quot;/&gt;
+```
+
+If the value is **false**:
+
+-   If the proxy is configured with a **Dead Letter Exchange**, the
+    message will be routed to the DLQ.
+-   Otherwise the message will be **requeued**.
+
+### Rollback message processing
+
+``` xml
+&lt;property name=&quot;SET_ROLLBACK_ONLY&quot; value=&quot;true&quot; scope=&quot;axis2&quot; type=&quot;STRING&quot;/&gt;
+```
+
+Marks the message as failed and triggers rollback handling.
+
+### Requeue message on rollback
+
+``` xml
+&lt;property name=&quot;SET_REQUEUE_ON_ROLLBACK&quot; value=&quot;true&quot; scope=&quot;axis2&quot; type=&quot;STRING&quot;/&gt;
+```
+
+Forces the message to be requeued when a rollback occurs.
+
+------------------------------------------------------------------------
+
+## Synapse Configurations
+
+### Proxy Service
+
+``` xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;proxy name=&quot;RabbitMqProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;rabbitmq&quot;
+ xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+
+    &lt;target faultSequence=&quot;ErrorSequence&quot;
+            inSequence=&quot;RabbitMqProxyServiceInSequence&quot;&gt;
+        &lt;outSequence/&gt;
+    &lt;/target&gt;
+
+    &lt;parameter name=&quot;rabbitmq.message.error.exchange.name&quot;&gt;LAST_Q&lt;/parameter&gt;
+    &lt;parameter name=&quot;rabbitmq.message.error.queue.routing.key&quot;&gt;lastRk&lt;/parameter&gt;
+
+    &lt;parameter name=&quot;rabbitmq.queue.auto.ack&quot;&gt;false&lt;/parameter&gt;
+    &lt;parameter name=&quot;rabbitmq.queue.name&quot;&gt;MAIN_Q&lt;/parameter&gt;
+
+    &lt;parameter name=&quot;rabbitmq.connection.factory&quot;&gt;AMQPConnectionFactory&lt;/parameter&gt;
+
+    &lt;parameter name=&quot;rabbitmq.queue.autodeclare&quot;&gt;false&lt;/parameter&gt;
+
+    &lt;parameter name=&quot;rabbitmq.message.content.type&quot;&gt;application/json&lt;/parameter&gt;
+
+    &lt;parameter name=&quot;rabbitmq.channel.consumer.qos&quot;&gt;1&lt;/parameter&gt;
+    &lt;parameter name=&quot;rabbitmq.concurrent.consumer.count&quot;&gt;1&lt;/parameter&gt;
+
+    &lt;parameter name=&quot;rabbitmq.AckMode&quot;&gt;clientAck&lt;/parameter&gt;
+
+    &lt;parameter name=&quot;rabbitmq.inbound.ack.max.wait.time&quot;&gt;30000&lt;/parameter&gt;
+
+    &lt;parameter name=&quot;rabbitmq.proxy.throttle.enabled&quot;&gt;true&lt;/parameter&gt;
+    &lt;parameter name=&quot;rabbitmq.proxy.throttle.mode&quot;&gt;FIXED_INTERVAL&lt;/parameter&gt;
+    &lt;parameter name=&quot;rabbitmq.proxy.throttle.count&quot;&gt;100&lt;/parameter&gt;
+    &lt;parameter name=&quot;rabbitmq.proxy.throttle.timeUnit&quot;&gt;minute&lt;/parameter&gt;
+
+    &lt;parameter name=&quot;rabbitmq.message.max.dead.lettered.count&quot;&gt;5&lt;/parameter&gt;
+
+&lt;/proxy&gt;
+```
+
+------------------------------------------------------------------------
+
+## In Sequence
+
+``` xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;sequence name=&quot;RabbitMqProxyServiceInSequence&quot;
+ xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
+ trace=&quot;disable&quot;
+ onError=&quot;fault&quot;&gt;
+
+    &lt;header name=&quot;To&quot; scope=&quot;default&quot;
+     value=&quot;rabbitmq:/?rabbitmq.connection.factory=SampleConnectionFactory&amp;amp;
+rabbitmq.queue.name=queue2&amp;amp;
+rabbitmq.exchange.name=exchange2&amp;amp;
+rabbitmq.queue.routing.key=queue2&amp;amp;
+rabbitmq.queue.autodeclare=false&amp;amp;
+rabbitmq.publisher.confirms.enabled=true&quot;/&gt;
+
+    &lt;call&gt;
+        &lt;endpoint key=&quot;RabbitMQ-Endpoint&quot;/&gt;
+    &lt;/call&gt;
+
+    &lt;property name=&quot;ACKNOWLEDGE&quot;
+              value=&quot;true&quot;
+              scope=&quot;axis2&quot;
+              type=&quot;STRING&quot;/&gt;
+
+    &lt;respond/&gt;
+
+&lt;/sequence&gt;
+```
+
+------------------------------------------------------------------------
+
+## Fault Sequence
+
+``` xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;sequence name=&quot;ErrorSequence&quot;
+ xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
+ trace=&quot;disable&quot;&gt;
+
+    &lt;log level=&quot;custom&quot;&gt;
+        &lt;property name=&quot;MESSAGE&quot;
+                  value=&quot;Publishing Failed Rolling Back&quot;/&gt;
+        &lt;property name=&quot;ERROR_CODE&quot;
+                  expression=&quot;get-property(&#x27;ERROR_CODE&#x27;)&quot;/&gt;
+    &lt;/log&gt;
+
+    &lt;property name=&quot;ACKNOWLEDGE&quot;
+              value=&quot;false&quot;
+              scope=&quot;axis2&quot;
+              type=&quot;STRING&quot;/&gt;
+
+&lt;/sequence&gt;
+```
+
+------------------------------------------------------------------------
+
+## Connection Factory Configuration
+
+Configure the RabbitMQ listener connection factory in `deployment.toml`.
+
+``` toml
+[[transport.rabbitmq.listener]]
+name = &quot;AMQPConnectionFactory&quot;
+
+parameter.hostname = &quot;localhost&quot;
+parameter.port = 5672
+parameter.username = &quot;***&quot;
+parameter.password = &quot;***&quot;
+
+parameter.factory_executor_pool_size = 150
+```
+
+------------------------------------------------------------------------
+
+## Build and Run
+
+1.  Make sure a RabbitMQ broker instance is running.
+2.  Create a queue named `MAIN_Q`.
+3.  Configure a Dead Letter Exchange if required.
+4.  Enable the RabbitMQ listener in the `deployment.toml`.
+5.  Deploy the proxy service and sequences in WSO2 Integrator: MI.
+6.  Publish a message to the `MAIN_Q` queue.
+7.  The message will be processed asynchronously.
+8.  If processing succeeds, the message is acknowledged.
+9.  If processing fails, the message will be requeued or routed to the
+    configured DLQ.
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>salesforce-marketing-cloud-email-prerequisites.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Prerequisites for Sending an Email
+
+!!!Note
+    Make sure authentication is set up before sending emails to prevent them from being bounced. Specifically, if the sending domain fails any of the SPF, DKIM, or DMARC checks, the email will be rejected.
+
+To ensure reliable email delivery and avoid bounces, it&#x27;s important to properly configure the following authentication mechanisms:
+
+1. Sender Policy Framework (SPF): SPF validates that Salesforce is authorized to send emails on your domain’s behalf. [Learn more about SPF](https://help.salesforce.com/s/articleView?id=emailadmin_spf_overview.htm&amp;type=5).
+2. DomainKeys Identified Mail (DKIM): DKIM adds a cryptographic signature to outgoing emails, verifying they weren&#x27;t altered in transit. Generate and activate DKIM keys in Salesforce and add the provided CNAME records to your DNS. [Learn more about DKIM setup](https://help.salesforce.com/s/articleView?id=sf.emailadmin_setup_dkim_key.htm&amp;type=5).
+3. Domain-based Message Authentication, Reporting, and Conformance (DMARC): DMARC builds on SPF and DKIM to define how email receivers should handle authentication failures and provides reporting. [Learn more about DMARC](https://help.salesforce.com/s/articleView?id=sf.emailadmin_dmarc.htm&amp;type=5).
+
+## Create and send emails in Salesforce Marketing Cloud
+
+### Step 1: Log in and access Email Studio
+
+1. Navigate to your [Salesforce Marketing Cloud login page](https://mc.exacttarget.com/cloud/login.html) and log in with your credentials.
+
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/sfmc/sfmc-login.png&quot; title=&quot;SFMC login&quot; width=&quot;50%&quot; alt=&quot;SFMC login&quot;/&gt;
+
+2. Navigate to Email Studio from the main dashboard.
+
+### Step 2: Develop Your Email Template
+
+1. Access the Email Templates Home. Within Email Studio, locate the Content section or Email Templates.
+
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/sfmc/email-template-home.png&quot; title=&quot;Email Template Home&quot; width=&quot;50%&quot; alt=&quot;Email Template Home&quot;/&gt;
+
+2. Click **New Email Template**, fill in the required details, and save.
+
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/sfmc/email-template-new.png&quot; title=&quot;New Email Template&quot; width=&quot;100%&quot; alt=&quot;New Email Template&quot;/&gt;
+
+3. Open the template details page and click &quot;Edit in Builder.&quot; From there, you can modify the HTML, paste an existing template, or choose from their available templates. I have also added a custom HTML template, which you can find [here](https://gist.github.com/aashikam/999fc472ebc16e06be4e72f644fff55d).
+
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/sfmc/email-template-edit.png&quot; title=&quot;Edit Email Template&quot; width=&quot;100%&quot; alt=&quot;Edit Email Template&quot;/&gt;
+
+5. Save your changes and return to the Email Templates home. This template can now be used in subsequent email sends.
+
+### Step 3: Create the Email Message in Content Builder
+
+1. From Email Studio, click on **Content**.
+2. Choose **Create** and select your preferred email type (Template Based, HTML Paste, or Text Only).
+
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/sfmc/create-email.png&quot; title=&quot;Create Email&quot; width=&quot;100%&quot; alt=&quot;Create Email&quot;/&gt;
+
+3. Enter the necessary details such as the email subject, preheader, and other required fields.
+4. Construct the email content according to the chosen format.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/sfmc/email-content.png&quot; title=&quot;Email Content&quot; width=&quot;100%&quot; alt=&quot;Email Content&quot;/&gt;
+
+5. Use the preview features (desktop, mobile, HTML, and plain text) to verify the email’s appearance.
+6. Save your email draft when satisfied.
+
+### Step 4 Configure a Sender Profile
+
+1. In Email Studio, click the **Admin** tab (or use the Email drop-down to find **Admin**).
+2. Find the **Sender Profiles** option in the left-hand menu.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/sfmc/sender-profiles.png&quot; title=&quot;Sender Profiles&quot; width=&quot;30%&quot; alt=&quot;Sender Profiles&quot;/&gt;
+
+3. Click **Create** to make a new profile or select an existing profile to update.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/sfmc/new-profile.png&quot; title=&quot;New Profile&quot; width=&quot;100%&quot; alt=&quot;New Profile&quot;/&gt;
+
+4. Provide a **From Name** and a verified **From Email Address** that is authorized in your Salesforce Marketing Cloud account.
+5. Confirm and save your sender profile.
+
+### Step 5: Set Up a Delivery Profile
+
+1. Provide a reply-to email address.
+2. Configure additional settings such as headers, footers, and tracking options as needed.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/sfmc/delivery-profile.png&quot; title=&quot;Delivery Profile&quot; width=&quot;100%&quot; alt=&quot;Delivery Profile&quot;/&gt;
+
+### Step 6: Create a Send-Classification
+
+1. Combine your sender profile and delivery profile in a send-classification.
+2. Choose whether your send is Commercial or Transactional.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/sfmc/send-classification.png&quot; title=&quot;Send Classification&quot; width=&quot;100%&quot; alt=&quot;Send Classification&quot;/&gt;
+
+### Step 7: Build the Email Send Definition
+
+1. Attach your email template/message, send classification, and target audience.
+2. Define scheduling options or decide on an immediate send.
+
+&gt; Note: You can use the WSO2 Integrator: MI &quot;Create Email Send Definition&quot; operation to programmatically create the send-definition.
+
+### Step 8: Test Your Email
+
+1. Use Email Studio’s preview features to ensure the email renders correctly across different devices and email clients.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/sfmc/send-test-email.png&quot; title=&quot;Send Test Email&quot; width=&quot;100%&quot; alt=&quot;Send Test Email&quot;/&gt;
+
+2. Send a test email to a small group to validate the sender profile, delivery profile, send classification, and overall email formatting.
+
+### Step 9: Execute the Full Send
+
+After a successful test send and verification of all settings, proceed with the full email send to your entire target audience.
+
+&gt; Note: You can use the WSO2 Integrator: MI &quot;Send Email Message&quot; operation to programmatically trigger the full email send.
+</body>
+</html>

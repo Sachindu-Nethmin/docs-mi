@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>pub-sub-rabbitmq.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Publish and Subscribe with RabbitMQ
+
+This sample demonstrates how WSO2 Integrator: MI can be used to implement a publisher-subscriber messaging scenario using RabbitMQ topics. That is, a message publisher can broadcast a message to multiple consumers through the RabbitMQ topic.
+
+As shown below, the publisher proxy in the WSO2 Integrator: MI will publish messages to a RabbitMQ topic, which multiple subscriber proxies (defined in the WSO2 Integrator: MI) will consume.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/rabbitmq/rabbitmq-pub-sub.png&quot;&gt;
+
+## Synapse configurations
+
+See the instructions on how to [build and run](#build-and-run) this example.
+
+=== &quot;RabbitMQ Subscriber 1&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;TopicSubscriber1&quot; transports=&quot;rabbitmq&quot; startOnLoad=&quot;true&quot;&gt;
+      &lt;description/&gt;
+      &lt;target&gt;
+          &lt;inSequence&gt;
+              &lt;log level=&quot;custom&quot;&gt;
+                  &lt;property name=&quot;Message Received&quot; expression=&quot;//Message&quot;/&gt;
+              &lt;/log&gt;
+              &lt;call&gt;
+                  &lt;endpoint&gt;
+                      &lt;http uri-template=&quot;http://localhost:8280/employees&quot; method=&quot;post&quot;/&gt;
+                  &lt;/endpoint&gt;
+              &lt;/call&gt;
+          &lt;/inSequence&gt;
+      &lt;/target&gt;
+      &lt;parameter name=&quot;rabbitmq.queue.routing.key&quot;&gt;topic1&lt;/parameter&gt;
+      &lt;parameter name=&quot;rabbitmq.exchange.name&quot;&gt;amq.topic&lt;/parameter&gt;
+      &lt;parameter name=&quot;rabbitmq.queue.name&quot;&gt;queue2&lt;/parameter&gt;
+      &lt;parameter name=&quot;rabbitmq.connection.factory&quot;&gt;AMQPConnectionFactory&lt;/parameter&gt;
+      &lt;parameter name=&quot;rabbitmq.message.content.type&quot;&gt;application/xml&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    
+    ```
+=== &quot;RabbitMQ Subscriber 2&quot;    
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;TopicSubscriber2&quot; transports=&quot;rabbitmq&quot; startOnLoad=&quot;true&quot;&gt;
+      &lt;description/&gt;
+      &lt;target&gt;
+          &lt;inSequence&gt;
+              &lt;log level=&quot;custom&quot;&gt;
+                  &lt;property name=&quot;Message Received&quot; expression=&quot;//Message&quot;/&gt;
+              &lt;/log&gt;
+              &lt;call&gt;
+                  &lt;endpoint&gt;
+                      &lt;http uri-template=&quot;http://localhost:8280/employees&quot; method=&quot;post&quot;/&gt;
+                  &lt;/endpoint&gt;
+              &lt;/call&gt;
+          &lt;/inSequence&gt;
+      &lt;/target&gt;
+      &lt;parameter name=&quot;rabbitmq.queue.routing.key&quot;&gt;topic1&lt;/parameter&gt;
+      &lt;parameter name=&quot;rabbitmq.exchange.name&quot;&gt;amq.topic&lt;/parameter&gt;
+      &lt;parameter name=&quot;rabbitmq.queue.name&quot;&gt;queue3&lt;/parameter&gt;
+      &lt;parameter name=&quot;rabbitmq.connection.factory&quot;&gt;AMQPConnectionFactory&lt;/parameter&gt;
+      &lt;parameter name=&quot;rabbitmq.message.content.type&quot;&gt;application/xml&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;RabbitMQ Publisher&quot;    
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;TopicPublisher&quot; transports=&quot;http https&quot; startOnLoad=&quot;true&quot;&gt;
+      &lt;description/&gt;
+      &lt;target&gt;
+          &lt;inSequence&gt;
+              &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+              &lt;property name=&quot;FORCE_SC_ACCEPTED&quot; value=&quot;true&quot; scope=&quot;axis2&quot;/&gt;
+              &lt;send&gt;
+                  &lt;endpoint&gt;
+                      &lt;address uri=&quot;rabbitmq:/topic1?rabbitmq.server.host.name=localhost&amp;amp;rabbitmq.server.port=5672&amp;amp;rabbitmq.server.user.name=guest&amp;amp;rabbitmq.server.password=guest&amp;amp;rabbitmq.exchange.name=amq.topic&quot;/&gt;
+                  &lt;/endpoint&gt;
+              &lt;/send&gt;
+          &lt;/inSequence&gt;
+      &lt;/target&gt;
+    &lt;/proxy&gt;
+    ```
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+3. Create the [proxy service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service) with the configurations given above.
+4. Enable the RabbitMQ sender and receiver in the Micro-Integrator from the deployment.toml. Refer the 
+ [configuring RabbitMQ documentation]({{base_path}}/install-and-setup/setup/brokers/configure-with-rabbitmq) for more information.
+5. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+6. Make sure you have a RabbitMQ broker instance running.
+7. Create queue2 and queue3 and bind them in the `amq.topic` exchange with the routing key `topic1`.
+8. Publish the following payload to the topic using the publisher proxy (TopicPublisher).
+
+    ```xml
+    &lt;Message&gt;
+    &lt;Name&gt;John Doe&lt;/Name&gt;
+    &lt;Age&gt;27&lt;/Age&gt;
+    &lt;/Message&gt;
+    ```
+</body>
+</html>

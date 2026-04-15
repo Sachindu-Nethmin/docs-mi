@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>amazondynamodb-connector-example.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Amazon DynamoDB Connector Example
+
+ Amazon DynamoDB Connector allows you to access the [Amazon DynamoDB REST API](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.API.html) from an integration sequence.
+
+## What you&#x27;ll build
+
+Given below is a sample scenario that demonstrates how to work with the Amazon DynamoDB Connector and how to perform various `table` and `items` operations with Amazon DynamoDB.
+
+This example explains how to use Amazon DynamoDB Connector to:
+
+1. Create a table (a location for storing employee details) in Amazon DynamoDB.
+2. Insert employee details (items) into the created table.
+3. Update the employee details table.
+4. Retrieve information about the inserted employee details (items).
+5. Remove inserted employee details (items).
+6. Retrieve the list of tables.
+7. Remove the created employee details table.
+
+All seven operations are exposed via an API. The API with the context `/resources` has seven resources.
+
+* `/addtable` : Create a new table in the Amazon DynamoDB with the specified table name to store employee details.
+* `/insertdetails` : Insert employee data (items) and store in the specified table.
+* `/updatetable` : Update the specified table (provisioned throughput settings, global secondary indexes, or DynamoDB Streams settings for a specified table).
+* `/listdetails` : Retrieve information about the added employee details (items).
+* `/deletedetails` : Remove added employee details from the specified table (items).
+* `/listtable` : Retrieve information about the created tables.
+* `/deletetable` : Remove the created table in the Amazon DynamoDB.
+
+For more information about these operations, please refer to the [Amazon DynamoDB connector reference guide]({{base_path}}/reference/connectors/amazondynamodb-connector/amazondynamodb-connector-configuration/).
+
+&gt; **Note**: Before invoking the API, you need to configure message builders/formatters in deployment.toml. See [Setting up the Amazon DynamoDB Connector]({{base_path}}/reference/connectors/amazondynamodb-connector/amazondynamodb-connector-configuration/) documentation for more information.
+
+The following diagram shows the overall solution. The user creates a table, stores some employee details (items) into the table, and then receives it back. To invoke each operation, the user uses the same API. 
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamoDB-connector-example.jpg&quot; title=&quot;Amazon DynamoDB connector example&quot; width=&quot;800&quot; alt=&quot;Amazon DynamoDB connector example&quot;/&gt;
+
+If you do not want to configure this yourself, you can simply [get the project](#get-the-project) and run it.
+
+## Set up the integration project
+
+Follow the steps in the [create integration project]({{base_path}}/develop/create-integration-project/) guide to set up the integration project. 
+
+### Add integration logic
+
+Select the WSO2 Integrator: MI extension and click on the `+` on APIs to create a REST API. Specify the API name as `amazonDynamoDBAPI` and the API context as `/resources`.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/adding-an-api.png&quot; title=&quot;Adding a Rest API&quot; width=&quot;800&quot; alt=&quot;Adding a Rest API&quot;/&gt;
+
+#### Configure the API
+
+Now follow the steps below to add resources to the API.
+
+#### Configure a resource for the addtable operation
+
+1. Initialize the connector.
+
+    1. Navigate into the **Connectors** pane and select the `init` operation under the **Amazondynamodb Connector**.
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-api-init.png&quot; title=&quot;Drag and drop init operation&quot; width=&quot;800&quot; alt=&quot;Drag and drop init operation&quot;/&gt;   
+    
+    2. Add the property values into the `init` operation as shown below. Replace the `region`, `accessKeyId`, `secretAccessKey`, and `blocking` with your values.
+
+        - **region** : The region of the application access.
+        - **accessKeyId** : The AWS secret access key.
+        - **secretAccessKey** : The AWS accessKeyId of the user account to generate the signature.
+        - **blocking** : Boolean type, this property helps the connector perform blocking invocations to AmazonDynamoDB. 
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-api-init-operation.png&quot; title=&quot;Add values to the init operation&quot; width=&quot;800&quot; alt=&quot;Add values to the init operation&quot;/&gt;
+
+2. Set up the createTable operation.
+
+    1. Navigate into the **Connectors** pane and select the `createTable` operation under the **Amazondynamodb Connector**.
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-create-table.png&quot; title=&quot;Drag and drop create table operation&quot; width=&quot;800&quot; alt=&quot;Drag and drop create table operation&quot;/&gt;    
+
+    2. The createTable operation creates a new table. Table names must be unique within each region. The `createTable` operation parameters are listed here.
+
+        - **attributeDefinitions** : A list of attributes that describe the key schema for the table and indexes. If you are adding a new global secondary index to the table, AttributeDefinitions should include the key element(s) of the new index. 
+        - **tableName** : The name of the table to create. 
+        - **keySchema** : Specifies the attributes that make up the primary key for a table or an index. The attributes in keySchema must also be defined in attributeDefinitions.
+        - **localSecondaryIndexes** : One or more local secondary indexes (the maximum is five) to be created on the table. Each index is scoped to a given partition key value. There is a 10 GB size limit per partition key value. Alternately, the size of a local secondary index is unconstrained.
+        - **provisionedThroughput** : Represents the provisioned throughput setting for a specified table or index.
+
+        While invoking the API, the above five parameter values come as user input.
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-create-table-parameters.png&quot; title=&quot;Drag and drop create table operation&quot; width=&quot;800&quot; alt=&quot;Drag and drop create table operation&quot;/&gt; 
+
+    3. To get the input values into the API, we can use the [property mediator]({{base_path}}/reference/mediators/property-mediator). Navigate into the **Mediators** pane and select the `Property` mediator.
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-property-mediator.png&quot; title=&quot;Add property mediators&quot; width=&quot;800&quot; alt=&quot;Add property mediators&quot;/&gt;
+
+        The parameters available for configuring the Property mediator are as follows:
+    
+        &gt; **Note**: The properties should be added to the pallet before creating the operation.
+
+    4. Add the property mediator to capture the `attributeDefinitions` value.
+
+        - **name** : `attributeDefinitions`
+        - **expression** : `json-eval($.attributeDefinitions)`
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-property-mediator-property1-value1.png&quot; title=&quot;Add property mediators attributeDefinitions&quot; width=&quot;800&quot; alt=&quot;Add property mediators attributeDefinitions&quot;/&gt;
+
+    5. Add the property mediator to capture the `tableName` value.
+
+        - **name** : `tableName`
+        - **expression** : `json-eval($.tableName)`
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-property-mediator-property2-value2.png&quot; title=&quot;Add values to capture tableName&quot; width=&quot;800&quot; alt=&quot;Add values to capture tableName&quot;/&gt;  
+      
+    6. Add the property mediator to capture the `keySchema` value.
+
+        - **name** : `keySchema`
+        - **expression** : `json-eval($.keySchema)`
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-property-mediator-property3-value3.png&quot; title=&quot;Add values to capture keySchema&quot; width=&quot;800&quot; alt=&quot;Add values to capture keySchema&quot;/&gt;  
+
+    7. Add the property mediator to capture the `localSecondaryIndexes` value.
+
+        - **name** : `localSecondaryIndexes`
+        - **expression** : `json-eval($.localSecondaryIndexes)`
+         
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-property-mediator-property4-value4.png&quot; title=&quot;Add values to capture localSecondaryIndexes&quot; width=&quot;800&quot; alt=&quot;Add values to capture localSecondaryIndexes&quot;/&gt;  
+
+    8. Add the property mediator to capture the `provisionedThroughput` value.
+
+        - **name** : `provisionedThroughput`
+        - **expression** : `json-eval($.provisionedThroughput)`
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-property-mediator-property5-value5.png&quot; title=&quot;Add values to capture provisionedThroughput&quot; width=&quot;800&quot; alt=&quot;Add values to capture provisionedThroughput&quot;/&gt;  
+    
+#### Configure a resource for the insertdetails operation
+
+1. Initialize the connector.
+   
+   You can use the same configuration to initialize the connector. Please follow the steps given in 1.1 for setting up the `init` operation to the addtable operation.
+   
+2. Set up the putItem operation.
+
+    1. Navigate into the **Connectors** pane and select the `putItem` operation under the **Amazondynamodb Connector**.
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-put-items.png&quot; title=&quot;Drag and drop create put items operation&quot; width=&quot;800&quot; alt=&quot;Drag and drop put items operation&quot;/&gt;    
+
+    2. The putItem operation is used to insert new items to the tables. The `putItem` operation parameters are listed here.
+
+        - **item** : A map of attribute name/value pairs, one for each attribute. Only the primary key attributes are required, but you can optionally provide other attribute name-value pairs for the item 
+        - **tableName** :  The name of the table to contain the item. 
+        
+        While invoking the API, the above two parameter values come as user input.
+        
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-put-items-table-parameters.png&quot; title=&quot;Drag and drop put items table operation&quot; width=&quot;800&quot; alt=&quot;Drag and drop put items table operation&quot;/&gt; 
+    
+    3. Select the `Property` mediator as mentioned in `addtable` operation. Add the property mediator to capture the `item` value.  
+
+        - **name** : `item`
+        - **expression** : `json-eval($.item)`
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-property-mediator-put-items-table-property1-value1.png&quot; title=&quot;Add property mediators to capture item&quot; width=&quot;800&quot; alt=&quot;Add property mediators to capture item&quot;/&gt;
+    
+    4. Add the property mediator to capture the `tableName` value.
+
+        - **name** : `tableName`
+        - **expression** : `json-eval($.tableName)`
+     
+#### Configure a resource for the updatetable operation
+
+1. Initialize the connector.
+
+   You can use the same configuration to initialize the connector. Please follow the steps given in 1.1 for setting up the `init` operation to the addtable operation.
+
+2. Set up the updateTable operation.
+
+    1. Navigate into the **Connectors** pane and select the `updateTable` operation under the **Amazondynamodb Connector**.
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-update-table.png&quot; title=&quot;Drag and drop create put items operation&quot; width=&quot;800&quot; alt=&quot;Drag and drop put items operation&quot;/&gt;    
+
+    2. The updateTable operation is used to update the created tables. The `updateTable` operation parameters are listed here.
+
+        - **provisionedThroughput** : The new provisioned throughput setting for the specified table or index. 
+        - **tableName** :  The name of the table to contain the item. 
+
+        While invoking the API, the above two parameter values come as user input.
+        
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-update-table-parameters.png&quot; title=&quot;Drag and drop put items table operation&quot; width=&quot;800&quot; alt=&quot;Drag and drop put items table operation&quot;/&gt; 
+    
+    3. Select the `Property` mediators as mentioned in the `addtable` operation. Add the property mediator to capture the `provisionedThroughput` value.  
+
+        - **name** : `provisionedThroughput`
+        - **expression** : `json-eval($.provisionedThroughput)`
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-property-mediator-update-table-property1-value1.png&quot; title=&quot;Add property mediators to capture provisionedThroughput&quot; width=&quot;800&quot; alt=&quot;Add property mediators to capture provisionedThroughput&quot;/&gt;
+    
+    4. Add the property mediator to capture the `tableName` value.
+
+        - **name** : `tableName`
+        - **expression** : `json-eval($.tableName)`
+
+#### Configure a resource for the listdetails operation
+
+1. Initialize the connector.
+
+   You can use the same configuration to initialize the connector. Please follow the steps given in 1.1 for setting up the `init` operation to the addtable operation.
+   
+2. Set up the getItem operation.
+
+    1. Navigate into the **Connectors** pane and select the `getItem` operation under the **Amazondynamodb Connector**.
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-get-item.png&quot; title=&quot;Drag and drop create get items operation&quot; width=&quot;800&quot; alt=&quot;Drag and drop get items operation&quot;/&gt;    
+
+    2. The getItem operation is used to retrieve inserted items to the tables. The `getItem` operation parameters are listed here.
+
+        - **key** : An array of primary key attribute values that define specific items in the table. For each primary key, you must provide all of the key attributes. 
+        - **tableName** :  The name of the table to contain the item. 
+
+        While invoking the API, the above two parameter values come as user input.
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-get-item-parameters.png&quot; title=&quot;Drag and drop put items table operation&quot; width=&quot;800&quot; alt=&quot;Drag and drop put items table operation&quot;/&gt; 
+
+    3. Select the `Property` mediator as mentioned in `addtable` operation. Add the property mediator to capture the `key` value.
+
+        - **name** : `key`
+        - **expression** : `json-eval($.key)`
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-property-mediator-get-item-property1-value1.png&quot; title=&quot;Add property mediators to capture key&quot; width=&quot;800&quot; alt=&quot;Add property mediators to capture key&quot;/&gt;
+    
+    4. Add the property mediator to capture the `tableName` value.
+
+        - **name** : `tableName`
+        - **expression** : `json-eval($.tableName)`
+
+#### Configure a resource for the deletedetails operation
+
+1. Initialize the connector.
+
+   You can use the same configuration to initialize the connector. Please follow the steps given in 1.1 for setting up the `init` operation to the addtable operation.
+   
+2. Set up the deleteItem operation.
+
+    1. Navigate into the **Connectors** pane and select the `deleteItem` operation under the **Amazondynamodb Connector**.
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-delete-item.png&quot; title=&quot;Drag and drop create get items operation&quot; width=&quot;800&quot; alt=&quot;Drag and drop get items operation&quot;/&gt;    
+
+    2. The deleteItem operation is used to remove inserted items from the table. The `deleteItem` operation parameters are listed here.
+
+        - **key** : An array of primary key attribute values that define specific items in the table. For each primary key, you must provide all of the key attributes. 
+        - **tableName** :  The name of the table to contain the item.
+        - **returnConsumedCapacity** : Determines the level of detail about provisioned throughput consumption that is returned in the response.
+        - **returnValues** : Use returnValues if you want to get the item attributes as they appeared before they were deleted.
+
+        While invoking the API, the above two parameter values (key, tableName) come as user input.
+        
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-delete-item-parameters.png&quot; title=&quot;Drag and drop put items table operation&quot; width=&quot;800&quot; alt=&quot;Drag and drop put items table operation&quot;/&gt; 
+    
+    3. Select the `Property` mediator as mentioned in the `addtable` operation. Add the property mediator to capture the `key` value.
+
+        - **name** : `key`
+        - **expression** : `json-eval($.key)`
+       
+    4. Add the property mediator to capture the `tableName` value.
+
+        - **name** : `tableName`
+        - **expression** : `json-eval($.tableName)`
+        
+#### Configure a resource for the listtable operation
+
+1. Initialize the connector.
+
+   You can use the same configuration to initialize the connector. Please follow the steps given in 1.1 for setting up the `init` operation to the addtable operation.
+
+2. Set up the listTables operation.
+
+    1. Navigate into the **Connectors** pane and select the `listTables` operation under the **Amazondynamodb Connector**.
+           
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-list-table.png&quot; title=&quot;Drag and drop list table operation&quot; width=&quot;800&quot; alt=&quot;Drag and drop list table operation&quot;/&gt;    
+
+    2. The listTables operation is used to retrieve information about the created tables. `listTables` operation parameters listed here.
+
+        - **exclusiveStartTableName** : The first table name that the listTables operation evaluates. Use the value returned for LastEvaluatedTableName. 
+        - **limit** : The maximum number of table names to retrieve. If this parameter is not specified, the limit is 100.
+
+        While invoking the API, the above two parameter values come as user input.
+       
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-list-table-parameters.png&quot; title=&quot;Drag and drop list table parameter operation&quot; width=&quot;800&quot; alt=&quot;Drag and drop list table parameter operation&quot;/&gt; 
+    
+    3. Select the `Property` mediator as mentioned in `addtable` operation. Add the property mediator to capture the `exclusiveStartTableName` value.
+
+        - **name** : `exclusiveStartTableName`
+        - **expression** : `json-eval($.exclusiveStartTableName)`
+        
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-property-mediator-list-table-property1-value1.png&quot; title=&quot;Add property mediators to capture key&quot; width=&quot;800&quot; alt=&quot;Add property mediators to capture exclusiveStartTableName&quot;/&gt;
+       
+    4. Add the property mediator to capture the `limit` value.
+
+        - **name** : `limit`
+        - **expression** : `json-eval($.limit)`
+         
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-property-mediator-list-table-property2-value2.png&quot; title=&quot;Add property mediators to capture key&quot; width=&quot;800&quot; alt=&quot;Add property mediators to capture limit&quot;/&gt;
+        
+#### Configure a resource for the deletetable operation
+
+1. Initialize the connector.
+   
+   You can use the same configuration to initialize the connector. Please follow the steps given in 1.1 for setting up the `init` operation to the addtable operation.
+   
+2. Set up the deleteTable operation.
+
+    1. Navigate into the **Connectors** pane and select the `deleteTable` operation under the **Amazondynamodb Connector**.
+
+       &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-delete-table.png&quot; title=&quot;Drag and drop list table operation&quot; width=&quot;800&quot; alt=&quot;Drag and drop list table operation&quot;/&gt;    
+
+    2. The listTables operation is used to retrieve information about the created tables. The `deleteTable` operation parameters are listed here.
+
+        - **exclusiveStartTableName** : The first table name that the listTables operation evaluates. Use the value returned for LastEvaluatedTableName. 
+        - **limit** : The maximum number of table names to retrieve. If this parameter is not specified, the limit is 100.
+       
+        While invoking the API, the above two parameter values come as user input.
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-delete-table-parameters.png&quot; title=&quot;Drag and drop list table parameter operation&quot; width=&quot;800&quot; alt=&quot;Drag and drop list table parameter operation&quot;/&gt; 
+
+    3. Select the `Property` mediator as mentioned in `addtable` operation. Add the property mediator to capture the `tableName` value.
+
+        - **name** : `tableName`
+        - **expression** : `json-eval($.tableName)`
+    
+#### Get a response.   
+ 
+When you are invoking the created API, the request of the message is going through the each resource. Finally, it is passed to the [Respond mediator]({{base_path}}/reference/mediators/respond-mediator/). The Respond Mediator stops the processing on the current message and sends the message back to the client as a response. 
+
+Add the **respond mediator** to the **Design view**.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazon-dynamodb/amazon-dynamodb-drag-and-drop-respond-mediator.png&quot; title=&quot;Add Respond mediator&quot; width=&quot;800&quot; alt=&quot;Add Respond mediator&quot;/&gt; 
+
+Now you can switch into the Source view and check the XML configuration files of the created API.
+
+??? note &quot;amazonDynamoDBAPI.xml&quot;
+       ```
+       &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+       &lt;api xmlns=&quot;http://ws.apache.org/ns/synapse&quot; context=&quot;/resources&quot; name=&quot;amazonDynamoDBAPI&quot;&gt;
+          &lt;resource methods=&quot;POST&quot; url-mapping=&quot;/addtable&quot;&gt;
+             &lt;inSequence&gt;
+                &lt;property expression=&quot;json-eval($.attributeDefinitions)&quot; name=&quot;attributeDefinitions&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;property expression=&quot;json-eval($.tableName)&quot; name=&quot;tableName&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;property expression=&quot;json-eval($.keySchema)&quot; name=&quot;keySchema&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;property expression=&quot;json-eval($.localSecondaryIndexes)&quot; name=&quot;localSecondaryIndexes&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;property expression=&quot;json-eval($.provisionedThroughput)&quot; name=&quot;provisionedThroughput&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;amazondynamodb.init&gt;
+                   &lt;region&gt;us-east-2&lt;/region&gt;
+                   &lt;accessKeyId&gt;&lt;!-- access key id --&gt;&lt;/accessKeyId&gt;
+                   &lt;secretAccessKey&gt;&lt;!-- secret access key --&gt;&lt;/secretAccessKey&gt;
+                   &lt;blocking&gt;false&lt;/blocking&gt;
+                &lt;/amazondynamodb.init&gt;
+                &lt;amazondynamodb.createTable&gt;
+                   &lt;attributeDefinitions&gt;{$ctx:attributeDefinitions}&lt;/attributeDefinitions&gt;
+                   &lt;tableName&gt;{$ctx:tableName}&lt;/tableName&gt;
+                   &lt;keySchema&gt;{$ctx:keySchema}&lt;/keySchema&gt;
+                   &lt;localSecondaryIndexes&gt;{$ctx:localSecondaryIndexes}&lt;/localSecondaryIndexes&gt;
+                   &lt;provisionedThroughput&gt;{$ctx:provisionedThroughput}&lt;/provisionedThroughput&gt;
+                &lt;/amazondynamodb.createTable&gt;
+                &lt;respond /&gt;
+             &lt;/inSequence&gt;
+             &lt;faultSequence /&gt;
+          &lt;/resource&gt;
+          &lt;resource methods=&quot;POST&quot; url-mapping=&quot;/insertdetails&quot;&gt;
+             &lt;inSequence&gt;
+                &lt;property expression=&quot;json-eval($.item)&quot; name=&quot;item&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;property expression=&quot;json-eval($.tableName)&quot; name=&quot;tableName&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;amazondynamodb.init&gt;
+                   &lt;region&gt;us-east-2&lt;/region&gt;
+                   &lt;accessKeyId&gt;&lt;!-- access key id --&gt;&lt;/accessKeyId&gt;
+                   &lt;secretAccessKey&gt;&lt;!-- secret access key --&gt;&lt;/secretAccessKey&gt;
+                   &lt;blocking&gt;false&lt;/blocking&gt;
+                &lt;/amazondynamodb.init&gt;
+                &lt;amazondynamodb.putItem&gt;
+                   &lt;item&gt;{$ctx:item}&lt;/item&gt;
+                   &lt;tableName&gt;{$ctx:tableName}&lt;/tableName&gt;
+                &lt;/amazondynamodb.putItem&gt;
+                &lt;respond /&gt;
+             &lt;/inSequence&gt;
+             &lt;faultSequence /&gt;
+          &lt;/resource&gt;
+          &lt;resource methods=&quot;POST&quot; url-mapping=&quot;/deletedetails&quot;&gt;
+             &lt;inSequence&gt;
+                &lt;property expression=&quot;json-eval($.key)&quot; name=&quot;key&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;property expression=&quot;json-eval($.tableName)&quot; name=&quot;tableName&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;amazondynamodb.init&gt;
+                   &lt;region&gt;us-east-2&lt;/region&gt;
+                   &lt;accessKeyId&gt;&lt;!-- access key id --&gt;&lt;/accessKeyId&gt;
+                   &lt;secretAccessKey&gt;&lt;!-- secret access key --&gt;&lt;/secretAccessKey&gt;
+                   &lt;blocking&gt;false&lt;/blocking&gt;
+                &lt;/amazondynamodb.init&gt;
+                &lt;amazondynamodb.deleteItem&gt;
+                   &lt;key&gt;{$ctx:key}&lt;/key&gt;
+                   &lt;tableName&gt;{$ctx:tableName}&lt;/tableName&gt;
+                   &lt;returnConsumedCapacity&gt;TOTAL&lt;/returnConsumedCapacity&gt;
+                   &lt;returnValues&gt;ALL_OLD&lt;/returnValues&gt;
+                &lt;/amazondynamodb.deleteItem&gt;
+                &lt;respond /&gt;
+             &lt;/inSequence&gt;
+             &lt;faultSequence /&gt;
+          &lt;/resource&gt;
+          &lt;resource methods=&quot;POST&quot; url-mapping=&quot;/listdetails&quot;&gt;
+             &lt;inSequence&gt;
+                &lt;property expression=&quot;json-eval($.key)&quot; name=&quot;key&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;property expression=&quot;json-eval($.tableName)&quot; name=&quot;tableName&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;amazondynamodb.init&gt;
+                   &lt;region&gt;us-east-2&lt;/region&gt;
+                   &lt;accessKeyId&gt;&lt;!-- access key id --&gt;&lt;/accessKeyId&gt;
+                   &lt;secretAccessKey&gt;&lt;!-- secret access key --&gt;&lt;/secretAccessKey&gt;
+                   &lt;blocking&gt;false&lt;/blocking&gt;
+                &lt;/amazondynamodb.init&gt;
+                &lt;amazondynamodb.getItem&gt;
+                   &lt;key&gt;{$ctx:key}&lt;/key&gt;
+                   &lt;tableName&gt;{$ctx:tableName}&lt;/tableName&gt;
+                &lt;/amazondynamodb.getItem&gt;
+                &lt;respond /&gt;
+             &lt;/inSequence&gt;
+             &lt;faultSequence /&gt;
+          &lt;/resource&gt;
+          &lt;resource methods=&quot;POST&quot; url-mapping=&quot;/listtable&quot;&gt;
+             &lt;inSequence&gt;
+                &lt;property expression=&quot;json-eval($.exclusiveStartTableName)&quot; name=&quot;exclusiveStartTableName&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;property expression=&quot;json-eval($.limit)&quot; name=&quot;limit&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;amazondynamodb.init&gt;
+                   &lt;region&gt;us-east-2&lt;/region&gt;
+                   &lt;accessKeyId&gt;&lt;!-- access key id --&gt;&lt;/accessKeyId&gt;
+                   &lt;secretAccessKey&gt;&lt;!-- secret access key --&gt;&lt;/secretAccessKey&gt;
+                   &lt;blocking&gt;false&lt;/blocking&gt;
+                &lt;/amazondynamodb.init&gt;
+                &lt;amazondynamodb.listTables&gt;
+                   &lt;exclusiveStartTableName&gt;{$ctx:exclusiveStartTableName}&lt;/exclusiveStartTableName&gt;
+                   &lt;limit&gt;{$ctx:limit}&lt;/limit&gt;
+                &lt;/amazondynamodb.listTables&gt;
+                &lt;respond /&gt;
+             &lt;/inSequence&gt;
+             &lt;faultSequence /&gt;
+          &lt;/resource&gt;
+          &lt;resource methods=&quot;POST&quot; url-mapping=&quot;/updatetable&quot;&gt;
+             &lt;inSequence&gt;
+                &lt;property expression=&quot;json-eval($.tableName)&quot; name=&quot;tableName&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;property expression=&quot;json-eval($.provisionedThroughput)&quot; name=&quot;provisionedThroughput&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;amazondynamodb.init&gt;
+                   &lt;region&gt;us-east-2&lt;/region&gt;
+                   &lt;accessKeyId&gt;&lt;!-- access key id --&gt;&lt;/accessKeyId&gt;
+                   &lt;secretAccessKey&gt;&lt;!-- secret access key --&gt;&lt;/secretAccessKey&gt;
+                   &lt;blocking&gt;false&lt;/blocking&gt;
+                &lt;/amazondynamodb.init&gt;
+                &lt;amazondynamodb.updateTable&gt;
+                   &lt;tableName&gt;{$ctx:tableName}&lt;/tableName&gt;
+                   &lt;provisionedThroughput&gt;{$ctx:provisionedThroughput}&lt;/provisionedThroughput&gt;
+                &lt;/amazondynamodb.updateTable&gt;
+                &lt;respond /&gt;
+             &lt;/inSequence&gt;
+             &lt;faultSequence /&gt;
+          &lt;/resource&gt;
+          &lt;resource methods=&quot;POST&quot; url-mapping=&quot;/deletetable&quot;&gt;
+             &lt;inSequence&gt;
+                &lt;property expression=&quot;json-eval($.tableName)&quot; name=&quot;tableName&quot; scope=&quot;default&quot; type=&quot;STRING&quot; /&gt;
+                &lt;amazondynamodb.init&gt;
+                   &lt;region&gt;us-east-2&lt;/region&gt;
+                   &lt;accessKeyId&gt;&lt;!-- access key id --&gt;&lt;/accessKeyId&gt;
+                   &lt;secretAccessKey&gt;&lt;!-- secret access key --&gt;&lt;/secretAccessKey&gt;
+                   &lt;blocking&gt;false&lt;/blocking&gt;
+                &lt;/amazondynamodb.init&gt;
+                &lt;amazondynamodb.deleteTable&gt;
+                   &lt;tableName&gt;{$ctx:tableName}&lt;/tableName&gt;
+                &lt;/amazondynamodb.deleteTable&gt;
+                &lt;respond /&gt;
+             &lt;/inSequence&gt;
+             &lt;faultSequence /&gt;
+          &lt;/resource&gt;
+       &lt;/api&gt;
+       ```        
+## Get the project
+
+You can download the ZIP file and extract the contents to get the project code.
+
+&lt;a href=&quot;{{base_path}}/assets/attachments/connectors/amazondynamodb-connector.zip&quot;&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+&lt;/a&gt;
+
+## Deployment
+
+In order to deploy and run the project, refer the [build and run]({{base_path}}/develop/deploy-artifacts/#build-and-run) guide.
+
+You can further refer the application deployed through the CLI tool. See the instructions on [managing integrations from the CLI]({{base_path}}/observe-and-manage/managing-integrations-with-micli).
+
+## Test
+
+Invoke the API as shown below using the curl command. Curl application can be downloaded from [here](https://curl.haxx.se/download.html).
+
+1. Creating a new table in the Amazon DynamoDB with the specified table name to store employee details.
+ 
+   **Sample request**
+   
+   Save a file called data.json with the following payload. 
+   
+   ```json
+   {
+      &quot;attributeDefinitions&quot;:[
+         {
+            &quot;AttributeName&quot;:&quot;employee_id&quot;,
+            &quot;AttributeType&quot;:&quot;S&quot;
+         },
+         {
+            &quot;AttributeName&quot;:&quot;name&quot;,
+            &quot;AttributeType&quot;:&quot;S&quot;
+         },
+         {
+            &quot;AttributeName&quot;:&quot;department&quot;,
+            &quot;AttributeType&quot;:&quot;S&quot;
+         }
+      ],
+      &quot;tableName&quot;:&quot;Employee_Details&quot;,
+      &quot;keySchema&quot;:[
+         {
+            &quot;AttributeName&quot;:&quot;employee_id&quot;,
+            &quot;KeyType&quot;:&quot;HASH&quot;
+         },
+         {
+            &quot;AttributeName&quot;:&quot;name&quot;,
+            &quot;KeyType&quot;:&quot;RANGE&quot;
+         }
+      ],
+      &quot;localSecondaryIndexes&quot;:[
+         {
+            &quot;IndexName&quot;:&quot;department&quot;,
+            &quot;KeySchema&quot;:[
+               {
+                  &quot;AttributeName&quot;:&quot;employee_id&quot;,
+                  &quot;KeyType&quot;:&quot;HASH&quot;
+               },
+               {
+                  &quot;AttributeName&quot;:&quot;department&quot;,
+                  &quot;KeyType&quot;:&quot;RANGE&quot;
+               }
+            ],
+            &quot;Projection&quot;:{
+               &quot;ProjectionType&quot;:&quot;KEYS_ONLY&quot;
+            }
+         }
+      ],
+      &quot;provisionedThroughput&quot;:{
+         &quot;ReadCapacityUnits&quot;:5,
+         &quot;WriteCapacityUnits&quot;:5
+      }
+   } 
+   ```
+   
+   Invoke the API as shown below using the curl command.
+   ```
+   curl -v POST -d @data.json &quot;http://localhost:8290/resources/addtable&quot; -H &quot;Content-Type:application/json&quot;
+   ```
+
+   **Expected Response**
+    
+   ```json
+   {
+      &quot;TableDescription&quot;:{
+         &quot;AttributeDefinitions&quot;:[
+            {
+               &quot;AttributeName&quot;:&quot;department&quot;,
+               &quot;AttributeType&quot;:&quot;S&quot;
+            },
+            {
+               &quot;AttributeName&quot;:&quot;employee_id&quot;,
+               &quot;AttributeType&quot;:&quot;S&quot;
+            },
+            {
+               &quot;AttributeName&quot;:&quot;name&quot;,
+               &quot;AttributeType&quot;:&quot;S&quot;
+            }
+         ],
+         &quot;CreationDateTime&quot;:1590068547.564,
+         &quot;ItemCount&quot;:0,
+         &quot;KeySchema&quot;:[
+            {
+               &quot;AttributeName&quot;:&quot;employee_id&quot;,
+               &quot;KeyType&quot;:&quot;HASH&quot;
+            },
+            {
+               &quot;AttributeName&quot;:&quot;name&quot;,
+               &quot;KeyType&quot;:&quot;RANGE&quot;
+            }
+         ],
+         &quot;LocalSecondaryIndexes&quot;:[
+            {
+               &quot;IndexArn&quot;:&quot;arn:aws:dynamodb:us-east-2:610968236798:table/Employee_Details/index/department&quot;,
+               &quot;IndexName&quot;:&quot;department&quot;,
+               &quot;IndexSizeBytes&quot;:0,
+               &quot;ItemCount&quot;:0,
+               &quot;KeySchema&quot;:[
+                  {
+                     &quot;AttributeName&quot;:&quot;employee_id&quot;,
+                     &quot;KeyType&quot;:&quot;HASH&quot;
+                  },
+                  {
+                     &quot;AttributeName&quot;:&quot;department&quot;,
+                     &quot;KeyType&quot;:&quot;RANGE&quot;
+                  }
+               ],
+               &quot;Projection&quot;:{
+                  &quot;ProjectionType&quot;:&quot;KEYS_ONLY&quot;
+               }
+            }
+         ],
+         &quot;ProvisionedThroughput&quot;:{
+            &quot;NumberOfDecreasesToday&quot;:0,
+            &quot;ReadCapacityUnits&quot;:5,
+            &quot;WriteCapacityUnits&quot;:5
+         },
+         &quot;TableArn&quot;:&quot;arn:aws:dynamodb:us-east-2:610968236798:table/Employee_Details&quot;,
+         &quot;TableId&quot;:&quot;10520308-ae1e-4742-b9d4-fc6aae67191e&quot;,
+         &quot;TableName&quot;:&quot;Employee_Details&quot;,
+         &quot;TableSizeBytes&quot;:0,
+         &quot;TableStatus&quot;:&quot;CREATING&quot;
+      }
+   }
+    
+   ```
+   
+2. Insert the employee details (items) into the specified table.
+   
+   **Sample request**
+   
+   Save a file called data.json with the following payload.
+   
+   ```json
+   {
+      &quot;tableName&quot;:&quot;Employee_Details&quot;,
+      &quot;item&quot;:{
+         &quot;employee_id&quot;:{
+            &quot;S&quot;:&quot;001&quot;
+         },
+         &quot;name&quot;:{
+            &quot;S&quot;:&quot;Jhone Fedrick&quot;
+         },
+         &quot;department&quot;:{
+            &quot;S&quot;:&quot;Engineering&quot;
+         }
+      }
+   }
+   ```
+   
+   Invoke the API as shown below using the curl command.
+   
+   ```
+   curl -v POST -d @data.json &quot;http://localhost:8290/resources/insertdetails&quot; -H &quot;Content-Type:application/json&quot;
+   ```
+   
+   **Expected Response**
+   
+   ``` 
+   {}
+   ``` 
+3. Update the specified table.
+   
+   **Sample request**
+   
+   Save a file called data.json with the following payload.
+   
+   ```json
+   {
+      &quot;tableName&quot;:&quot;Employee_Details&quot;,
+      &quot;provisionedThroughput&quot;:{
+         &quot;ReadCapacityUnits&quot;:12,
+         &quot;WriteCapacityUnits&quot;:12
+      }
+   }
+   ```
+   
+   Invoke the API as shown below using the curl command.
+   
+   ```
+   curl -v POST -d @data.json &quot;http://localhost:8290/resources/updatetable&quot; -H &quot;Content-Type:application/json&quot;
+   ```
+   
+   **Expected Response**
+   
+   ```json
+   {
+      &quot;TableDescription&quot;:{
+         &quot;AttributeDefinitions&quot;:[
+            {
+               &quot;AttributeName&quot;:&quot;department&quot;,
+               &quot;AttributeType&quot;:&quot;S&quot;
+            },
+            {
+               &quot;AttributeName&quot;:&quot;employee_id&quot;,
+               &quot;AttributeType&quot;:&quot;S&quot;
+            },
+            {
+               &quot;AttributeName&quot;:&quot;name&quot;,
+               &quot;AttributeType&quot;:&quot;S&quot;
+            }
+         ],
+         &quot;CreationDateTime&quot;:1590068547.564,
+         &quot;ItemCount&quot;:0,
+         &quot;KeySchema&quot;:[
+            {
+               &quot;AttributeName&quot;:&quot;employee_id&quot;,
+               &quot;KeyType&quot;:&quot;HASH&quot;
+            },
+            {
+               &quot;AttributeName&quot;:&quot;name&quot;,
+               &quot;KeyType&quot;:&quot;RANGE&quot;
+            }
+         ],
+         &quot;LocalSecondaryIndexes&quot;:[
+            {
+               &quot;IndexArn&quot;:&quot;arn:aws:dynamodb:us-east-2:610968236798:table/Employee_Details/index/department&quot;,
+               &quot;IndexName&quot;:&quot;department&quot;,
+               &quot;IndexSizeBytes&quot;:0,
+               &quot;ItemCount&quot;:0,
+               &quot;KeySchema&quot;:[
+                  {
+                     &quot;AttributeName&quot;:&quot;employee_id&quot;,
+                     &quot;KeyType&quot;:&quot;HASH&quot;
+                  },
+                  {
+                     &quot;AttributeName&quot;:&quot;department&quot;,
+                     &quot;KeyType&quot;:&quot;RANGE&quot;
+                  }
+               ],
+               &quot;Projection&quot;:{
+                  &quot;ProjectionType&quot;:&quot;KEYS_ONLY&quot;
+               }
+            }
+         ],
+         &quot;ProvisionedThroughput&quot;:{
+            &quot;LastIncreaseDateTime&quot;:1590071461.81,
+            &quot;NumberOfDecreasesToday&quot;:0,
+            &quot;ReadCapacityUnits&quot;:5,
+            &quot;WriteCapacityUnits&quot;:5
+         },
+         &quot;TableArn&quot;:&quot;arn:aws:dynamodb:us-east-2:610968236798:table/Employee_Details&quot;,
+         &quot;TableId&quot;:&quot;10520308-ae1e-4742-b9d4-fc6aae67191e&quot;,
+         &quot;TableName&quot;:&quot;Employee_Details&quot;,
+         &quot;TableSizeBytes&quot;:0,
+         &quot;TableStatus&quot;:&quot;UPDATING&quot;
+      }
+   }
+   ```
+
+4. Retrieve information about the added employee details (items).
+   
+   **Sample request**
+   
+   Save a file called data.json with the following payload.
+   
+   ```json
+   {
+      &quot;tableName&quot;:&quot;Employee_Details&quot;,
+      &quot;key&quot;:{
+         &quot;employee_id&quot;:{
+            &quot;S&quot;:&quot;001&quot;
+         },
+         &quot;name&quot;:{
+            &quot;S&quot;:&quot;Jhone Fedrick&quot;
+         }
+      }
+   }
+   ```
+   
+   Invoke the API as shown below using the curl command.
+   
+   ```
+   curl -v POST -d @data.json &quot;http://localhost:8290/resources/listdetails&quot; -H &quot;Content-Type:application/json&quot;
+   ```
+   
+   **Expected Response**
+   
+   ```json
+   {
+      &quot;Item&quot;:{
+         &quot;department&quot;:{
+            &quot;S&quot;:&quot;Engineering&quot;
+         },
+         &quot;name&quot;:{
+            &quot;S&quot;:&quot;Jhone Fedrick&quot;
+         },
+         &quot;employee_id&quot;:{}
+      }
+   }
+    
+   ```
+5. Remove added employee details from the specified table (items).
+   
+   **Sample request**
+   
+   Save a file called data.json with the following payload.
+   
+   ```json
+   {
+      &quot;tableName&quot;:&quot;Employee_Details&quot;,
+      &quot;key&quot;:{
+         &quot;employee_id&quot;:{
+            &quot;S&quot;:&quot;001&quot;
+         },
+         &quot;name&quot;:{
+            &quot;S&quot;:&quot;Jhone Fedrick&quot;
+         }
+      }
+   }
+   ```
+   
+   Invoke the API as shown below using the curl command.
+   
+   ```
+   curl -v POST -d @data.json &quot;http://localhost:8290/resources/deletedetails&quot; -H &quot;Content-Type:application/json&quot;
+   ```
+   
+   **Expected Response**
+   
+   ```json
+   {
+      &quot;Attributes&quot;:{
+         &quot;department&quot;:{
+            &quot;S&quot;:&quot;Engineering&quot;
+         },
+         &quot;name&quot;:{
+            &quot;S&quot;:&quot;Jhone Fedrick&quot;
+         },
+         &quot;employee_id&quot;:{
+            &quot;S&quot;:&quot;001&quot;
+         }
+      },
+      &quot;ConsumedCapacity&quot;:{
+         &quot;CapacityUnits&quot;:2,
+         &quot;TableName&quot;:&quot;Employee_Details&quot;
+      }
+   } 
+   ```  
+6. Retrieve information about the created tables.
+   
+   **Sample request**
+   
+   Save a file called data.json with the following payload.
+   
+   ```json
+   {
+      &quot;exclusiveStartTableName&quot;:&quot;Employee_Details&quot;,
+      &quot;limit&quot;:4
+   }
+   ```
+   
+   Invoke the API as shown below using the curl command.
+   
+   ```
+   curl -v POST -d @data.json &quot;http://localhost:8290/resources/listtable&quot; -H &quot;Content-Type:application/json&quot;
+   ```
+   
+   **Expected Response**
+   
+   ```json
+   {
+      &quot;LastEvaluatedTableName&quot;:&quot;TTestMyTablehread&quot;,
+      &quot;TableNames&quot;:[
+         &quot;Results&quot;,
+         &quot;Results1&quot;,
+         &quot;Results123&quot;,
+         &quot;TTestMyTablehread&quot;
+      ]
+   } 
+   ``` 
+7. Remove the created table in the Amazon DynamoDB.
+   
+   **Sample request**
+   
+   Save a file called data.json with the following payload.
+   
+   ```json
+   {
+   	&quot;tableName&quot;:&quot;Employee_Details&quot;
+   }
+   
+   ```
+   
+   Invoke the API as shown below using the curl command.
+   
+   ```
+   curl -v POST -d @data.json &quot; http://localhost:8290/resources/deletetable&quot; -H &quot;Content-Type:application/json&quot;
+   ```
+   
+   **Expected Response**
+   
+   ```json
+   {
+      &quot;TableDescription&quot;:{
+         &quot;ItemCount&quot;:0,
+         &quot;ProvisionedThroughput&quot;:{
+            &quot;NumberOfDecreasesToday&quot;:0,
+            &quot;ReadCapacityUnits&quot;:12,
+            &quot;WriteCapacityUnits&quot;:12
+         },
+         &quot;TableArn&quot;:&quot;arn:aws:dynamodb:us-east-2:610968236798:table/Employee_Details&quot;,
+         &quot;TableId&quot;:&quot;10520308-ae1e-4742-b9d4-fc6aae67191e&quot;,
+         &quot;TableName&quot;:&quot;Employee_Details&quot;,
+         &quot;TableSizeBytes&quot;:0,
+         &quot;TableStatus&quot;:&quot;DELETING&quot;
+      }
+   }
+   ```
+</body>
+</html>

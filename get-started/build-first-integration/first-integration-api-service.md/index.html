@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>first-integration-api-service.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Develop an Integration API
+
+In this tutorial, you&#x27;ll learn the basics of setting up and using WSO2 MI to create and deploy an Integration API service with minimal hassle.
+
+## What you&#x27;ll build
+
+Let’s try a simple scenario where the client sends a request to the `Bank` API deployed in the WSO2 Integrator: MI and receives a `Welcome to O2 Bank !!` greeting response.
+
+&lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/what_you_will_build_greeting.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/what_you_will_build_greeting.png&quot; alt=&quot;Create New Project&quot; width=&quot;40%&quot;&gt;&lt;/a&gt;
+
+## What you&#x27;ll learn
+
+- How to create an integration project.
+- How to create an Integration API.
+- How to deploy and test.
+
+## Prerequisites
+
+You need Visual Studio Code (VS Code) with the &lt;a target=&quot;_blank&quot; href=&quot;https://marketplace.visualstudio.com/items?itemName=WSO2.micro-integrator&quot;&gt;WSO2 Integrator: MI for VS Code&lt;/a&gt; extension installed. The MI for VS Code extension is the official developer tool for designing, developing, and testing integration solutions with WSO2 Integrator: MI.
+
+!!! Info
+    See the [Install WSO2 Integrator: MI for VS Code]({{base_path}}/develop/mi-for-vscode/install-wso2-mi-for-vscode/) documentation to learn how to install WSO2 Integrator: MI for VS Code.
+
+Follow the instructions below to create your first Integration API.
+
+## Step 1 - Create a new integration project
+
+To develop the above scenario, let&#x27;s get started with creating an integration project in the WSO2 Integrator: MI extension installed VS Code.
+
+1. Launch VS Code with the WSO2 Integrator: MI extension installed.
+
+2. Click on the WSO2 Integrator: MI icon on the Activity Bar of the VS Code editor.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/mi-vscode-extension.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/mi-vscode-extension.png&quot; alt=&quot;MI VS Code Extension&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. Click **Create New Project** on **Design View**. For more options for creating a new integration project, see [Create an Integration Project]({{base_path}}/develop/create-integration-project).
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/create_new_project_btn.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/create_new_project_btn.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+4. In the **Project Creation Form**, enter `BankIntegration` as the **Project Name**.
+
+5. Ensure `4.6.0` is selected as the **WSO2 Integrator: MI runtime version**.
+
+6. Provide a location for the integration project under **Project Directory**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/create_new_project.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/create_new_project.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+7. Click **Create**.
+
+   Once you click **Create**, the **Add Artifact** pane will be opened.
+
+!!! note
+    You need the following to work with the MI for VS Code extension.
+
+    - Java Development Kit (JDK) version 21
+    - WSO2 Integrator:  MI 4.6.0 runtime
+
+    If you don&#x27;t have them installed on your local machine, these will be automatically prompted for downloading and configured by the WSO2 Integrator: MI for VS Code extension during the project creation step:
+
+    1. Click **Download Java &amp; MI** to download and set up Java and MI runtime.
+
+        &lt;a href=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/qsg/download-java-and-mi.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/qsg/download-java-and-mi.png&quot; alt=&quot;Download Java and MI&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+        !!! info
+            If a different JDK or WSO2 MI version is installed on your local machine, you&#x27;ll be prompted to download the required versions. 
+
+            1. Click **Download** to install the required JDK or/and MI version(s).
+            2. Once the download is complete, configure the Java Home or/and MI Home paths by clicking **Select Java Home** or/and **Select MI Path**, respectively.
+
+            If the required JDK and WSO2 MI versions are already installed, you can directly configure the Java Home and MI Home paths in this step by clicking **Select Java Home** and **Select MI Path**, respectively.
+
+        Once the process is complete, a window reload will be required, and you will be prompted with the following message:
+
+        &lt;a href=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/qsg/reload-window.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/qsg/reload-window.png&quot; alt=&quot;Reload Window&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    2. Click **Reload Window**.
+
+## Step 2 - Create an API
+
+Now the integration project is ready to add an API. In this scenario, the API responds to the client with a greeting message. First, let&#x27;s create an API.
+
+1. In the **Add Artifact** interface, under **Create an Integration**, click on **API**. This opens the **API Form**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_artifact_api.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_artifact_api.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+2. Enter `BankAPI` as the API **Name**. The API **Context** field will be automatically populated with the same value.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/create_bank_api.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/create_bank_api.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. Click **Create**.
+
+Once you create the API, a default resource will be automatically generated. You can see this default resource listed in the **Service Designer** under **Available resources**. You&#x27;ll use this resource in this tutorial.
+
+## Step 3 - Design the integration
+
+Now it&#x27;s time to design your API. This is the underlying logic that&#x27;s executed behind the scenes when an API request is made. In this scenario, you need to send back a greeting message to the client. For that, you have to add a [Payload mediator]({{base_path}}/reference/mediators/payloadfactory-mediator/). Follow the below steps to add a Payload mediator.
+
+!!! Tip &quot;What is a mediator?&quot;
+    Mediators are the core building blocks of message processing in WSO2 Integrator:  MI. They define how messages are transformed and routed as they pass through an integration flow. To explore mediators in detail and understand how they work, see the [Mediator documentation]({{base_path}}/reference/mediators/about-mediators/).
+
+1. Open the **Resource View** of the API resource by clicking the `GET` resource under **Available resources** on **Service Designer**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/select_get_resource.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/select_get_resource.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+2. Once you open the **Resource View**, click on the **+** icon on the canvas to open the **Mediator Palette**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_new_mediator.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_new_mediator.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. Under **Mediators**, select the **Payload** mediator.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/select_payload_mediator.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/select_payload_mediator.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+4. In the **Add Payload Mediator** pane that appears, provide the following as the payload.
+
+    ```json
+    {
+        &quot;greetings&quot;:&quot;Welcome to O2 Bank !!&quot;
+    }
+    ```
+ 
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/set_greeting_payload.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/set_greeting_payload.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+5. Click **Add** to add the Payload mediator to the integration flow.
+
+    Now let&#x27;s add a [Respond Mediator]({{base_path}}/reference/mediators/respond-mediator) to respond the message to the client.
+
+6. Click on the **+** icon placed just after the Payload mediator to open the **Mediator Palette**.
+
+7. Select the **Respond** mediator from the **Mediator Palette**, and click **Add** to add it to the integration flow.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/select_respond_mediator.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/select_respond_mediator.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+You may refer to the following API configuration for reference,
+
+??? &quot;Bank API&quot;
+
+    !!! info
+        You can view the source view by clicking on the **Show Source** (`&lt;/&gt;`) icon located in the top right corner of the VS Code.
+
+    === &quot;Design View&quot;
+        &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/greeting_api_completed.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/greeting_api_completed.png&quot; alt=&quot;Create New Project&quot; width=&quot;70%&quot;&gt;&lt;/a&gt;
+
+    === &quot;Source View&quot;
+        ```yaml
+        &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        &lt;api context=&quot;/bankapi&quot; name=&quot;BankAPI&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;resource methods=&quot;GET&quot; uri-template=&quot;/&quot;&gt;
+                &lt;inSequence&gt;
+                    &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;default&quot;&gt;
+                        &lt;format&gt;{
+                            &quot;greetings&quot;:&quot;Welcome to O2 Bank !!&quot;
+                            }
+                        &lt;/format&gt;
+                    &lt;/payloadFactory&gt;
+                    &lt;respond/&gt;
+                &lt;/inSequence&gt;
+                &lt;faultSequence&gt;
+                &lt;/faultSequence&gt;
+            &lt;/resource&gt;
+        &lt;/api&gt;
+        ```
+
+## Step 4 - Run the Integration API
+
+Now that you have developed an integration using the WSO2 Integrator: MI for the Visual Studio Code plugin, it&#x27;s time to deploy the integration to the WSO2 Integrator: MI server runtime.
+
+Click the **Build and Run** icon located in the top right corner of VS Code.
+
+&lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/build_and_run_btn.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/build_and_run_btn.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+## Step 5 - Test the Integration API
+
+Now, let&#x27;s test the Integration API. For that, you can use the inbuilt try-it functionality in the MI for VS Code extension.
+
+When you run the integration as in [Step 4](#step-4-run-the-integration-api), the **Runtime Services** interface is opened up. You can see all the available services.
+
+Select `BankAPI` that you have developed and test the resource.
+
+&lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/tryout_greeting.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/tryout_greeting.gif&quot; alt=&quot;Test API&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+Congratulations!
+Now, you have created your first Integration API.
+
+## What&#x27;s next?  
+
+So far, you have responded to the client with a mock payload. Next, you will explore how to route and transform the payload effectively.
+
+Click on the **Next** button below to continue to the next tutorial.
+
+&lt;div style=&quot;display: flex; justify-content: center; align-items: center; gap: 20px; margin-top: 20px;&quot;&gt;
+  &lt;a href=&quot;{{base_path}}/get-started/build-first-integration/first-integration-route-and-transform/&quot; class=&quot;md-button md-button--primary&quot;&gt;Next →&lt;/a&gt;
+&lt;/div&gt;
+</body>
+</html>

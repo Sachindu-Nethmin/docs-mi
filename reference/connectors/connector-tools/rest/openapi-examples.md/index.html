@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>openapi-examples.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>## What you&#x27;ll build
+
+##### Integrate with a Pet Store API using OpenAPI Connector Generator
+
+This example demonstrates how you can use the WSO2 Integrator: MI OpenAPI Connector Generator to easily integrate with an external PetStore REST API.
+
+It covers generating the connector from an OpenAPI spec, importing into your integration project, and wiring it up to create and retrieve pets details.
+
+&lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/openapi-diagram.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/openapi-diagram.png&quot; alt=&quot;generated connector&quot; width=&quot;80%&quot; &gt;&lt;/a&gt;
+
+
+## Prerequisites
+
+1. Download the sample petStore openapi contract file [`petstore-service.yaml`](https://raw.githubusercontent.com/swagger-api/swagger-petstore/refs/tags/swagger-petstore-v3-1.0.19/src/main/resources/openapi.yaml) file.
+
+## Set up the integration project
+
+**Step 01:** Create a new integration project in WSO2 Integrator: MI for VS Code, see [Create an Integration Project]({{base_path}}/develop/create-integration-project).
+
+## Create for integration with generated connector
+
+**Step 01:** Create a new sequence or API artifact within your integration project, see [Create Sequence]({{base_path}}/reference/mediators/sequence-mediator).
+
+&lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/openapi-seq.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/openapi-seq.png&quot; alt=&quot;generated connector&quot; width=&quot;20%&quot; height=&quot;40%&quot; &gt;&lt;/a&gt;
+
+
+**Step 02:** Using `petstore-service.yaml` file, Generate the REST connector following the steps describe in under [the section Generate OpenAPI Connector]({{base_path}}/reference/connectors/connector-tools/rest/rest-connector-overview)
+
+**Step 03:** From the Mediator Palette, select the `swagger_petstore` connector that was generated from the [`petstore-service.yaml`](https://raw.githubusercontent.com/swagger-api/swagger-petstore/refs/tags/swagger-petstore-v3-1.0.19/src/main/resources/openapi.yaml).
+
+&lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/petstore-connection.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/petstore-connection.png&quot; alt=&quot;generated connector&quot; width=&quot;60%&quot; &gt;&lt;/a&gt;
+
+**Step 04:** Create a connection by filling in the form with the required authentication details.
+
+| Property        | Value                          | 
+|-----------------|--------------------------------|
+| Connection Name | petStoreConnection             |
+| Base URL        | https://petstore.swagger.io/v2 |
+
+&lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/petstore-connection-2.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/petstore-connection-2.png&quot; alt=&quot;Create Order&quot; width=&quot;50%&quot; height=&quot;60%&quot; &gt;&lt;/a&gt;
+
+**Step 05:** Add the `AddPet` operation to your sequence or API. Provide the necessary input for the form UI for the operation.
+&lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/AddPet.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/addpet-operation.png&quot; alt=&quot;generated connector&quot; width=&quot;40%&quot; height=&quot;40%&quot; &gt;&lt;/a&gt;
+
+&lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/AddPet.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/AddPet.png&quot; alt=&quot;generated connector&quot; width=&quot;40%&quot; height=&quot;30%&quot;&gt;&lt;/a&gt;
+
+**Step 06:** Similarly, you can use the `GetPetById` operation to retrieve pet details by supplying the `pet id`. Again, make sure the response overwrites the payload.
+
+**Step 07:** Add any response handling logic needed to process the output from the openAPI calls at the end of your sequence or API.
+
+&lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/rest-sequance.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/rest-sequance.png&quot; alt=&quot;generated connector&quot; width=&quot;40%&quot; &gt;&lt;/a&gt;
+
+**Step 08:** Deploy, Run and Test the Integration
+
+In order to deploy and run the project, refer the [build and run](https://mi.docs.wso2.com/en/latest/develop/deploy-artifacts/) guide or simply use the Run button in the Visual Studio Code extension to run the integration.
+Once the pet details added to the petstore, you can see similar output below.
+
+&lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/response.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/openapi-tool/response.png&quot; alt=&quot;generated connector&quot; width=&quot;60%&quot; &gt;&lt;/a&gt;
+
+
+</body>
+</html>

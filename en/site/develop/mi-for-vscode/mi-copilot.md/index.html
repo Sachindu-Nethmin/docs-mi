@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>mi-copilot.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># MI Copilot
+
+The WSO2 Integrator:  MI Copilot is an AI-powered tool that simplifies the process of creating integration scenarios. It allows you to specify integration requirements using natural language or by providing relevant files, such as OpenAPI specifications. MI Copilot generates the necessary integration artifacts, which can be seamlessly incorporated into your projects. You can iteratively refine your projects through conversational prompts, enabling the addition of features or modifications with ease. This approach supports incremental development, allowing you to build and enhance your integration projects over time.
+
+1. [Create a new integration project]({{base_path}}/develop/create-integration-project) or [open an existing integration project]({{base_path}}/develop/opening-projects).
+
+2. Click the **Open AI Panel** icon in the top-right corner of VS Code to open the MI Copilot interface. You can also type in the text box below and click **Generate** to open the MI Copilot interface.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/open-ai-panel.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/open-ai-panel.png&quot; alt=&quot;Open AI Panel&quot; width=&quot;100%&quot;&gt;&lt;/a&gt;
+
+    !!! note
+        To use WSO2 MI Copilot in your integration project, you need an MI Copilot account.
+
+        If you don’t have an account, the MI Copilot interface will display a message: **MI Copilot Account Not Found**.  
+
+        Follow these steps to create an account if you don&#x27;t already have one:
+
+        1.Click **Sign In**. A dialog box will appear, asking if you want VS Code to open an external website.
+
+        2.Click **Open**. 
+
+        3.To create an account, click **Register**.
+
+        &lt;a href=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/sign-in-to-copilot.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/sign-in-to-copilot.png&quot; alt=&quot;sign-in-to-copilot&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+        4.Sign up using your email, Google account, or GitHub account.
+
+        &lt;a href=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/sign-up-to-copilot.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/sign-up-to-copilot.png&quot; alt=&quot;sign-up-to-copilot&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+3. You can describe your integration scenarios in natural language in the provided text box, and the Copilot will generate the necessary integration projects, configurations, and required artifacts.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/mi-copilot.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/mi-copilot.png&quot; alt=&quot;MI Copilot&quot; width=&quot;100%&quot;&gt;&lt;/a&gt;
+
+    !!! info
+        You can provide integration requirements as:
+        
+        - Text prompts: Describe your integration scenario in natural language.
+        - Files: Upload relevant files, such as OpenAPI specifications, that provide additional context for the integration.
+
+4. Click **Generate** or the arrow button next to the text box.
+
+    Based on the provided input, the MI Copilot processes the data and automatically generates an integration sequence tailored to your scenario.
+
+5. Add artifacts to your integration project.
+
+    Once the integration sequence and artifacts are generated,
+    
+    1. Review the generated artifacts to ensure they align with your requirements.
+    2. Click **Add to Project** to add the artifacts to your existing integration project.
+
+??? &quot;Click here for examples&quot;
+
+    **Example 1:** Describe the integration scenario in natural language.
+    
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/text-prompt.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/text-prompt.gif&quot; alt=&quot;text prompt&quot; width=&quot;900&quot;&gt;&lt;/a&gt;
+    
+    **Example 2:** Describe the integration scenario in natural language and upload an additional file.
+    
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/file-upload.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/file-upload.gif&quot; alt=&quot;file upload&quot; width=&quot;900&quot;&gt;&lt;/a&gt;
+</body>
+</html>

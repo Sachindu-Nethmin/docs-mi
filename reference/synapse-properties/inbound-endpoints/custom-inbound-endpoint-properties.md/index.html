@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>custom-inbound-endpoint-properties.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Custom Inbound Endpoint Properties
+
+Given below are the properties that should be configured when you define a custom inbound endpoint.
+ 
+=== &quot;Custom Listening Inbound&quot;
+    ``` java 
+    &lt;inboundEndpoint xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;custom_listener&quot; sequence=&quot;request&quot; onError=&quot;fault&quot;
+                             class=&quot;org.wso2.carbon.inbound.custom.listening.SampleListeningEP&quot; suspend=&quot;false&quot;&gt;
+           &lt;parameters&gt;
+              &lt;parameter name=&quot;sequential&quot;&gt;true&lt;/parameter&gt;
+              &lt;parameter name=&quot;inbound.behavior&quot;&gt;listening&lt;/parameter&gt;
+              &lt;parameter name=&quot;coordination&quot;&gt;true&lt;/parameter&gt;
+           &lt;/parameters&gt;
+    &lt;/inboundEndpoint&gt;
+    ```
+=== &quot;Custom Polling Inbound&quot;    
+    ``` java 
+    &lt;inboundEndpoint xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;class&quot; sequence=&quot;request&quot; onError=&quot;fault&quot;
+                                    class=&quot;org.wso2.carbon.inbound.custom.poll.SamplePollingClient&quot; suspend=&quot;false&quot;&gt;
+           &lt;parameters&gt;
+              &lt;parameter name=&quot;sequential&quot;&gt;true&lt;/parameter&gt;
+              &lt;parameter name=&quot;interval&quot;&gt;2000&lt;/parameter&gt;
+              &lt;parameter name=&quot;coordination&quot;&gt;true&lt;/parameter&gt;
+           &lt;/parameters&gt;
+    &lt;/inboundEndpoint&gt;
+    ```
+=== &quot;Custom Event-Based Inbound&quot;    
+    ``` java 
+    &lt;inboundEndpoint xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;custom_waiting&quot; sequence=&quot;request&quot; onError=&quot;fault&quot;
+                             class=&quot;org.wso2.carbon.inbound.custom.wait.SampleWaitingClient&quot; suspend=&quot;false&quot;&gt;
+           &lt;parameters&gt;
+              &lt;parameter name=&quot;sequential&quot;&gt;true&lt;/parameter&gt;
+              &lt;parameter name=&quot;inbound.behavior&quot;&gt;eventBased&lt;/parameter&gt;
+              &lt;parameter name=&quot;coordination&quot;&gt;true&lt;/parameter&gt;
+           &lt;/parameters&gt;
+    &lt;/inboundEndpoint&gt;
+    ```
+
+&lt;table&gt;
+   &lt;thead&gt;
+      &lt;tr&gt;
+         &lt;th&gt;
+            &lt;p&gt;Property Name&lt;/p&gt;
+         &lt;/th&gt;
+         &lt;th&gt;
+            &lt;p&gt;Description&lt;/p&gt;
+         &lt;/th&gt;
+      &lt;/tr&gt;
+   &lt;/thead&gt;
+   &lt;tbody&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+          class
+         &lt;/td&gt;
+         &lt;td&gt;
+          Name of the custom class implementation. Specify a valid class name.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+          sequence
+         &lt;/td&gt;
+         &lt;td&gt;Name of the sequence message that should be injected. Specify a valid sequence name.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            onError
+         &lt;/td&gt;
+         &lt;td&gt;Name of the fault sequence that should be invoked in case of failure. Specify a valid sequence name.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+          inbound.behavior
+         &lt;/td&gt;
+         &lt;td&gt;
+          The behaviour of the inbound endpoint. Specify &lt;code&gt;listening&lt;/code&gt;, &lt;code&gt;polling&lt;/code&gt;, or &lt;code&gt;event-based&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+   &lt;/tbody&gt;
+&lt;/table&gt;</body>
+</html>

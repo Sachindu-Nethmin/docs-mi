@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>twitter-connector-credentials.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Creating the Client ID, Access Token and Refresh Token
+
+In this documentation, you will learn how to create the Client ID, Access Token and Refresh Token for the Twitter connector using the Twitter developer portal.
+
+For the Twitter connector 4.0.0+ version, **OAuth 2.0 Authorization Code Flow with PKCE** is used to authenticate the user. The connector features automatic token refresh, eliminating manual token management. This is different from the Twitter connector 2.0.x version which uses **OAuth 1.0a** authentication mechanism. For more information about the authentication mechanism, see [Twitter OAuth 2 guide](https://developer.twitter.com/en/docs/authentication/oauth-2-0/authorization-code). 
+
+## Steps to follow
+
+1. To get started with the new Twitter API, you need a developer account. If you do not have one yet, you can [sign up](https://developer.twitter.com/en/portal/petition/essential/basic-info) for one. 
+
+2. Then log into the [developer portal](https://developer.twitter.com/en/portal/dashboard). 
+
+!!! info
+    The Twitter **Free tier** subscription is only sufficient for **createTweet, deleteTweet**, and **getMe** operations. If you want to use other operations, you need to upgrade your subscription to **Basic Tier**.
+
+3. Create a new project and create an app inside the project.
+  &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/twitter-connector-newproject.png&quot; title=&quot;New Project&quot; width=&quot;800&quot; alt=&quot;New Project&quot; /&gt;
+
+4. In the app, you will need to set up the OAuth 2.0 as the WSO2 Twitter connector uses this authentication mechanism. 
+  &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/twitter-connector-auth-setup.png&quot; title=&quot;OAuth setup&quot; width=&quot;800&quot; alt=&quot;OAuth setup&quot; /&gt;
+
+5. Provide necessary variables. The Access tokens and refresh tokens will be sent to the callback URL.
+  &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/twitter-connector-callbackurl.png&quot; title=&quot;Callback URL&quot; width=&quot;400&quot; alt=&quot;Callback URL&quot; /&gt;
+
+6. After successfully setting up the user authentication you can obtain the client ID of the Twitter app which is used for the Twitter connector configuration.
+  &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/twitter-connector-clientid.png&quot; title=&quot;Client ID&quot; width=&quot;800&quot; alt=&quot;Client ID&quot; /&gt;
+
+7. To obtain the Access Token and Refresh Token, follow the [Twitter OAuth 2 guide](https://developer.twitter.com/en/docs/authentication/oauth-2-0/user-access-token#:~:text=Steps%20to%20connect%20using%20OAuth%202.0). 
+
+!!! info
+    The Twitter access token is valid for 2 hours. The refresh token is valid until a new access token is created from the refresh token. The Twitter connector 4.0.0+ automatically handles token refresh, so you don&#x27;t need to manually manage token expiry.
+
+!!! warning
+    By default the Twitter App provides an access token for OAuth 1.0a flow which is not used in the Twitter connector. You need to create a new access token for OAuth 2.0 flow.
+    </body>
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ai-data-mapping.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Data Mapping using AI
+
+Did you know that the WSO2 Integrator: MI component of WSO2 Integrator comes with built-in data mapping capabilities to streamline your integration workflows?
+This data mapping solution brings you a powerful graphical interface, combined with AI-driven assistance, to perform all sorts of data mappings in mere seconds.
+
+In this guide, we are generating an API that processes weather data retrieved from the OpenWeather API for a mobile app. The app only requires a selected set of data from the API response and needs to modify some of the retrieved data to meet its requirements.
+
+Check out this &lt;a target=&quot;_blank&quot; href=&quot;https://www.youtube.com/watch?v=O3qiFdjfS00&quot;&gt;video on YouTube&lt;/a&gt; to see it in action.
+
+## Let&#x27;s get started!
+
+### Prerequisites
+
+You need Visual Studio Code (VS Code) with the &lt;a target=&quot;_blank&quot; href=&quot;https://marketplace.visualstudio.com/items?itemName=WSO2.micro-integrator&quot;&gt;WSO2 Integrator: MI for VS Code&lt;/a&gt; extension installed.
+
+!!! Info
+    See the [Install WSO2 Integrator: MI for VS Code]({{base_path}}/develop/mi-for-vscode/install-wso2-mi-for-vscode) documentation to learn how to install WSO2 Integrator: MI for VS Code.
+
+### Step 1: Create an integration project
+
+{!includes/create-new-project.md!}
+
+4. In the **Project Creation Form**, enter `AIDataMappingDemo` as the **Project Name**.
+
+5. Provide a location under the **Project Directory**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-create-project.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-create-project.png&quot; alt=&quot;create new project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+6. Click **Create**.
+
+You will now see the projects listed in the **Project Explorer**.
+
+### Step 3: Design the integration
+
+#### Create a REST API
+
+1. Go to **Project Settings** &gt; **Add Artifact**.
+2. Select **API** under **Create an Integration**.
+3. Enter `Weather` as the API **Name**. The API **Context** field will be automatically populated with the same value.                                                         
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-create-api.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-create-api.png&quot; alt=&quot;create API artifact&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+4. Click **Create**.
+
+5. On the Service Designer, click on the three dots (**⋮**) and then **edit** to access the **Properties** of the default API resource.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-resource-edit.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-resource-edit.png&quot; alt=&quot;edit API resource&quot; width=&quot;70%&quot;&gt;&lt;/a&gt;
+
+6. Click **+ Add Query Param**, provide `city` as the query parameter and click **Add**.
+
+7. Click **Update**.
+
+#### Define the mediation flow
+
+You can now start configuring the API resource.
+
+1. Navigate to **MI Project Explorer** &gt; **APIs** &gt; **Weather** &gt; **/?city={city}** to open the **Resource View**.
+
+2. Click on the **+** icon in the diagram to open the **Mediator Palette**. 
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-first-mediator.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-first-mediator.png&quot; alt=&quot;open palette&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. Select **Variable** mediator under **Mediators**.
+
+4. Specify the following values and click **Add**.
+
+    !!! Info
+        This parameter is used to store the API key required for &lt;a target=&quot;_blank&quot; href=&quot;https://openweathermap.org&quot;&gt;OpenWeather&lt;/a&gt;. It is recommended to use secure vault to store credentials. For more information, refer to &lt;a href=&quot;{{base_path}}/install-and-setup/setup/security/encrypting-plain-text/&quot;&gt;Encrypting Secrets&lt;/a&gt;.
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter&lt;/th&gt;
+            &lt;th&gt;Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Name&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;API_KEY&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Data Type&lt;/td&gt;
+            &lt;td&gt;Select &lt;code&gt;STRING&lt;/code&gt;.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Value&lt;/td&gt;
+            &lt;td&gt;
+            Your OpenWeather API Key
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-apikey-var.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-apikey-var.png&quot; alt=&quot;API key variable&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+5. Click on the **+** icon and search for `get` in the **Mediator Palette** to add the HTTP GET operation for retrieving the coordinates of a location.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-http-get.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-http-get.png&quot; alt=&quot;search get in palette&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+6. Click **+ Add new connection** to create a new connection.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-new-http-conn.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-new-http-conn.png&quot; alt=&quot;add new connection&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+7. Select `HTTPS` and fill in the following details to create a connection to OpenWeather API. Finally, click **Add** in the **Add New Connection** form to create the connection.
+
+    | Property            | Value                   |
+    |---------------------|-------------------------|
+    | **Connection Name** | `OpenWeather`        |
+    | **Base URL**        | `https://api.openweathermap.org/` |
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-connection.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-connection.png&quot; alt=&quot;create connection&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+8. Provide `/geo/1.0/direct` as the **Relative Path**, and click **+ Add Query Param** to add the following query parameters.
+
+    !!! Note
+        To add an expression as the query parameter value, make sure the **EX** button is checked as follows,
+
+        &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-query-expression.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-query-expression.png&quot; alt=&quot;query expression editor&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Query Parameter Name&lt;/th&gt;
+            &lt;th&gt;Is Expression&lt;/th&gt;
+            &lt;th&gt;Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;q&lt;/td&gt;
+            &lt;td&gt;true&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;params.queryParams.city&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;limit&lt;/td&gt;
+            &lt;td&gt;false&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;1&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;appid&lt;/td&gt;
+            &lt;td&gt;true&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;vars.API_KEY&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+9. Click **Submit** to add the operation to the integration flow.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-geo-request.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-geo-request.png&quot; alt=&quot;geo http request&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+10. Next, click on the **+** icon in the diagram and search for `get` in the **Mediator Palette** to add the HTTP GET operation for retrieving the weather details using the coordinates.
+
+11. Select the connection created in Step 6, provide `/data/2.5/weather` as the **Relative Path**, and click **+ Add Query Param** to add the following query parameters. Finally, click **Submit** to add the operation to the integration flow.
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Query Parameter Name&lt;/th&gt;
+            &lt;th&gt;Is Expression&lt;/th&gt;
+            &lt;th&gt;Value&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;lat&lt;/td&gt;
+            &lt;td&gt;true&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;payload[0].lat&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;lon&lt;/td&gt;
+            &lt;td&gt;true&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;payload[0].lon&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;appid&lt;/td&gt;
+            &lt;td&gt;true&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;vars.API_KEY&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-weather-request.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-weather-request.png&quot; alt=&quot;weather http request&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+12. Click on the **+** icon in the diagram and search for for the **Datamapper** mediator in the **Mediator Palette**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-data-mapper.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-data-mapper.png&quot; alt=&quot;search data mapper&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+13. Click **+ Add new**, provide `weatherDataMapper` as the name and click **Create** in the **Create New Datamapper** form.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-data-mapper-new.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-data-mapper-new.png&quot; alt=&quot;create new mapping&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+14. Click **Add** to add the data mapper to the integration flow.
+
+15. Click on the name of the newly added Data Mapper mediator to open the input and output mapping window.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-data-mapper-open-src.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-data-mapper-open-src.png&quot; alt=&quot;open mapping file&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+16. Click on the **Import input schema** to import the input schema. Since this scenario involves JSON to JSON mapping, you can import from either a JSON sample or a JSON schema. In this guide, we will be using the **Import from JSON** option.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-import-json.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-import-json.png&quot; alt=&quot;input output mapping&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    ??? &quot;Sample Input JSON&quot;
+        Here’s a sample response received from the OpenWeatherMap API. You can copy and paste this as your input schema in this scenario.
+
+        ```json
+        {
+            &quot;coord&quot;: {
+                &quot;lon&quot;: 79.8478,
+                &quot;lat&quot;: 6.9319
+            },
+            &quot;weather&quot;: [
+                {
+                    &quot;id&quot;: 800,
+                    &quot;main&quot;: &quot;Clear&quot;,
+                    &quot;description&quot;: &quot;clear sky&quot;,
+                    &quot;icon&quot;: &quot;01d&quot;
+                }
+            ],
+            &quot;base&quot;: &quot;stations&quot;,
+            &quot;main&quot;: {
+                &quot;temp&quot;: 296.91,
+                &quot;feels_like&quot;: 297.61,
+                &quot;temp_min&quot;: 296.91,
+                &quot;temp_max&quot;: 296.91,
+                &quot;pressure&quot;: 1011,
+                &quot;humidity&quot;: 87,
+                &quot;sea_level&quot;: 1011,
+                &quot;grnd_level&quot;: 1010
+            },
+            &quot;visibility&quot;: 10000,
+            &quot;wind&quot;: {
+                &quot;speed&quot;: 3.87,
+                &quot;deg&quot;: 39,
+                &quot;gust&quot;: 3.99
+            },
+            &quot;clouds&quot;: {
+                &quot;all&quot;: 0
+            },
+            &quot;dt&quot;: 1736385682,
+            &quot;sys&quot;: {
+                &quot;country&quot;: &quot;LK&quot;,
+                &quot;sunrise&quot;: 1736384109,
+                &quot;sunset&quot;: 1736426384
+            },
+            &quot;timezone&quot;: 19800,
+            &quot;id&quot;: 1248991,
+            &quot;name&quot;: &quot;Colombo&quot;,
+            &quot;cod&quot;: 200
+        }
+        ```
+
+17. Follow the same steps to import the following output schema.
+
+    ??? &quot;Sample Output JSON&quot;
+        The data mapper will map the above input schema to the below output schema. You can copy and paste this as your output schema in this scenario.
+
+        ```json
+        {
+            &quot;weather&quot;: {
+                &quot;main&quot;: &quot;Clear&quot;,
+                &quot;description&quot;: &quot;clear sky&quot;,
+                &quot;icon&quot;: &quot;01d&quot;,
+                &quot;daylight_hours&quot;: 11.74
+            },
+            &quot;temp&quot;: {
+                &quot;temp&quot;: 23.76,
+                &quot;temp_description&quot;: &quot;23.76 Feels like 24.46&quot;
+            },
+            &quot;wind&quot;: {
+                &quot;speed&quot;: 3.87,
+                &quot;deg&quot;: 39
+            },
+            &quot;pressure&quot;: 1011,
+            &quot;humidity&quot;: &quot;87%&quot;,
+            &quot;visibility&quot;: 10
+        }
+        ```
+
+    !!! Tip
+       WSO2 Integrator: MI allows you to do data mappings between different data types like XML and CSV. Check out more on this in our [documentation]({{base_path}}/reference/mediators/data-mapper-mediator/#input-and-output-files).
+
+    Now that all our schemas are in place, how does the actual mapping happen?
+
+    You could always fall back on the age-old approach of manually mapping each field. But why go through all that hassle?
+
+18. Click on the **Map** button. 
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-map-btn.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-map-btn.png&quot; alt=&quot;map schemas&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    The WSO2 Integrator: MI Data Mapper leverages AI to generate various types of mappings. With a simple button click, you&#x27;ll find that all of your mappings have been automatically completed.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-map.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-map.png&quot; alt=&quot;mapped schemas&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    The AI Data Mapper is capable of handling complex mapping scenarios as well.
+
+    For instance,
+
+    - In our output schema, `daylight_hours` is calculated from the formula `(sunset - sunrise) / 3600` based on the input data. 
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-daylight.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-daylight.png&quot; alt=&quot;daylight mapping&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    - The `humidity` field in the input data is a percentage value and must be displayed accurately to the user.
+
+    The AI Data Mapper can recognize and manage these types of use cases effectively.
+
+19. If you need to apply additional operations to define mappings between the input and output data, try using the Expression Editor. Explore the following scenarios to gain insight into how you can utilize the Expression Editor effectively.
+
+    - Display the weather description in upper-case letters
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-uppercase.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-uppercase.gif&quot; alt=&quot;convert to uppercase&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    !!! Tip
+        You can learn further about the Expression Editor and other features from our [documentation]({{base_path}}/reference/mediators/data-mapper-mediator/#expression-editor).
+
+20. Click on the **+** icon in the diagram, select the **Respond** mediator from the **Mediator Palette**, and click **Add** to add it to the integration flow.
+
+    You may refer to the following API, HTTP connection, and Data Mapper configurations for reference,
+
+    ??? &quot;Weather API&quot;
+
+        === &quot;Design View&quot;
+            &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-api.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-api.png&quot; alt=&quot;ai datamapping api&quot; width=&quot;70%&quot;&gt;&lt;/a&gt;
+
+        === &quot;Source View&quot;
+            ```yaml
+            &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+            &lt;api context=&quot;/weather&quot; name=&quot;Weather&quot;
+                xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+                &lt;resource methods=&quot;GET&quot; uri-template=&quot;/?city={city}&quot;&gt;
+                    &lt;inSequence&gt;
+                        &lt;variable name=&quot;API_KEY&quot; type=&quot;STRING&quot; value=&quot;REPLACE_API_KEY&quot;/&gt;
+                        &lt;http.get configKey=&quot;OpenWeather&quot;&gt;
+                            &lt;relativePath&gt;/geo/1.0/direct?q=${params.queryParams.city}&amp;amp;limit=1&amp;amp;appid=${vars.API_KEY}&lt;/relativePath&gt;
+                            &lt;headers&gt;[]&lt;/headers&gt;
+                            &lt;forceScAccepted&gt;false&lt;/forceScAccepted&gt;
+                            &lt;disableChunking&gt;false&lt;/disableChunking&gt;
+                            &lt;forceHttp10&gt;false&lt;/forceHttp10&gt;
+                            &lt;noKeepAlive&gt;false&lt;/noKeepAlive&gt;
+                            &lt;responseVariable&gt;http_get_1&lt;/responseVariable&gt;
+                            &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+                        &lt;/http.get&gt;
+                        &lt;http.get configKey=&quot;OpenWeather&quot;&gt;
+                            &lt;relativePath&gt;/data/2.5/weather?lat=${payload[0].lat}&amp;amp;lon=${payload[0].lon}&amp;amp;appid=${vars.API_KEY}&lt;/relativePath&gt;
+                            &lt;headers&gt;[]&lt;/headers&gt;
+                            &lt;forceScAccepted&gt;false&lt;/forceScAccepted&gt;
+                            &lt;disableChunking&gt;false&lt;/disableChunking&gt;
+                            &lt;forceHttp10&gt;false&lt;/forceHttp10&gt;
+                            &lt;noKeepAlive&gt;false&lt;/noKeepAlive&gt;
+                            &lt;responseVariable&gt;http_get_2&lt;/responseVariable&gt;
+                            &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+                        &lt;/http.get&gt;
+                        &lt;datamapper config=&quot;resources:datamapper/weatherDataMapper/weatherDataMapper.dmc&quot; inputSchema=&quot;resources:datamapper/weatherDataMapper/weatherDataMapper_inputSchema.json&quot; outputSchema=&quot;resources:datamapper/weatherDataMapper/weatherDataMapper_outputSchema.json&quot;/&gt;
+                        &lt;respond/&gt;
+                    &lt;/inSequence&gt;
+                    &lt;faultSequence&gt;&lt;/faultSequence&gt;
+                &lt;/resource&gt;
+            &lt;/api&gt;
+            ```
+
+    ??? &quot;HTTP Connection&quot;
+        === &quot;Design View&quot;
+            &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-http-connection.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-http-connection.png&quot; alt=&quot;http connection config&quot; width=&quot;40%&quot;&gt;&lt;/a&gt;
+		    
+        === &quot;Source View&quot;
+		    ```yaml
+            &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+            &lt;localEntry key=&quot;OpenWeather&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+                &lt;http.init&gt;
+                    &lt;connectionType&gt;HTTPS&lt;/connectionType&gt;
+                    &lt;baseUrl&gt;https://api.openweathermap.org/&lt;/baseUrl&gt;
+                    &lt;authType&gt;None&lt;/authType&gt;
+                    &lt;timeoutAction&gt;Never&lt;/timeoutAction&gt;
+                    &lt;retryCount&gt;0&lt;/retryCount&gt;
+                    &lt;retryDelay&gt;0&lt;/retryDelay&gt;
+                    &lt;suspendInitialDuration&gt;-1&lt;/suspendInitialDuration&gt;
+                    &lt;suspendProgressionFactor&gt;1&lt;/suspendProgressionFactor&gt;
+                    &lt;name&gt;OpenWeather&lt;/name&gt;
+                &lt;/http.init&gt;
+            &lt;/localEntry&gt;
+            ```
+
+    ??? &quot;DataMapper Configuration&quot;
+        ```js
+        import * as dmUtils from &quot;./dm-utils&quot;;
+        /*
+        * title : &quot;root&quot;,
+        * inputType : &quot;JSON&quot;,
+        */
+        interface Root {
+            coord: {
+                lon: number
+                lat: number
+            }
+            weather: {
+                id: number
+                main: string
+                description: string
+                icon: string
+            }[]
+            base: string
+            main: {
+                temp: number
+                feels_like: number
+                temp_min: number
+                temp_max: number
+                pressure: number
+                humidity: number
+                sea_level: number
+                grnd_level: number
+            }
+            visibility: number
+            wind: {
+                speed: number
+                deg: number
+                gust: number
+            }
+            clouds: {
+                all: number
+            }
+            dt: number
+            sys: {
+                country: string
+                sunrise: number
+                sunset: number
+            }
+            timezone: number
+            id: number
+            name: string
+            cod: number
+        }
+
+        /*
+        * title : &quot;root&quot;,
+        * outputType : &quot;JSON&quot;,
+        */
+        interface OutputRoot {
+            weather: {
+                main: string
+                description: string
+                icon: string
+                daylight_hours: number
+            }
+            temp: {
+                temp: number
+                temp_description: string
+            }
+            wind: {
+                speed: number
+                deg: number
+            }
+            pressure: number
+            humidity: string
+            visibility: number
+        }
+
+        /**
+        * functionName : map_S_root_S_root
+        * inputVariable : inputroot
+        */
+        export function mapFunction(input: Root): OutputRoot {
+            return {
+                weather: {
+                    main: input.weather[0].main,
+                    description: input.weather[0].description.toLocaleUpperCase(),
+                    icon: input.weather[0].icon,
+                    daylight_hours: (input.sys.sunset - input.sys.sunrise) / 3600,
+                },
+                temp: {
+                    temp: input.main.temp - 273.15,
+                    temp_description: input.main.temp &gt; 30 ? &quot;Hot&quot; : input.main.temp &lt; 15 ? &quot;Cold&quot; : &quot;Moderate&quot;,
+                },
+                wind: {
+                    speed: input.wind.speed,
+                    deg: input.wind.deg,
+                },
+                pressure: input.main.pressure,
+                humidity: `${input.main.humidity}%`,
+                visibility: input.visibility,
+            };
+        }
+        ```
+
+### Step 4: Build and run
+
+1. Click on the **Build and Run** button to build and deploy the integration.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-build.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-build.png&quot; alt=&quot;build and run&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+2. **Runtime Services** will open after the server is up and running, and from that panel, select the API that you need to try out using the **Try It** button.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-tryit.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-tryit.png&quot; alt=&quot;try it out&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. Click the **Try it Out** button to provide the required query parameters.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-operation-tryit.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-operation-tryit.png&quot; alt=&quot;try it out operation&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+4. Provide the required parameters and click the **Execute** button to invoke the API.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-request.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-request.png&quot; alt=&quot;execute request&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+5. Check the response received from the server and confirm that the weather details for the specified city have been mapped to the output data schema you provided.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-response.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/how-to-guides/ai-data-mapping/ai-data-mapping-response.png&quot; alt=&quot;response&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+Try this feature along with our other exciting AI capabilities and discover how much simpler integration development can be.
+</body>
+</html>

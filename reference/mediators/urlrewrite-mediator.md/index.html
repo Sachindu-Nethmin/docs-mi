@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>urlrewrite-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># URLRewrite Mediator
+
+The **URLRewrite Mediator** is used to modify and transform the URL
+values available in messages. This can be done by defining a rewrite
+action for each fragment of a selected property value. Alternatively,
+you can rewrite the entire URL string at once.
+
+## Syntax
+
+``` xml
+&lt;rewrite [inProperty=&quot;string&quot;] [outProperty=&quot;string&quot;]&gt;
+    &lt;rewriterule&gt;
+        &lt;condition&gt;
+        ...
+        &lt;/condition&gt;?
+        &lt;action [type=&quot;append|prepend|replace|remove|set&quot;] [value=&quot;string&quot;]
+          [xpath=&quot;xpath&quot;] [fragment=&quot;protocol|host|port|path|query|ref|user|full&quot;] [regex=&quot;regex&quot;]&gt;+
+    &lt;/rewriterule&gt;+
+&lt;/rewrite&gt;
+```
+
+## Configuration
+
+The parameters available to configure the URL Rewrite mediator are as
+follows.
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;In Property&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;This parameter is used to enter property of which the value should be considered the input URL. The rewrite rules are applied to the value of the property entered in this parameter to generate the result URL. If no property is entered, the rewrite rules will be applied to the &lt;code&gt;             To            &lt;/code&gt; header of the message.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;strong&gt;Out Property&lt;/strong&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;td&gt;This parameter is used to enter the property to which the transformations done via the rewrite rules should be applied. If no property is entered, the transformations will be applied to the &lt;code&gt;             To            &lt;/code&gt; header of the message.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+The Rewrite mediator applies the URL transformations by evaluating a set
+of rules on the message. To add a rule to the mediator, click **Add
+Rule** . The rewrite rule will be added to the mediator tree as a child
+of the URLRewrite mediator.
+
+Click `         URLRewriteRule        ` in the mediator to configure the
+rewrite rule you added.
+
+A rule can consist of one or more rewrite actions and an optional
+condition. The **Condition** parameter is used to enter the optional
+condition. If a condition is specified, it will be evaluated before the
+rewrite actions, and the rewrite actions will be executed only if the
+condition evaluates to `         true        `.
+
+The parameters available to configure a rewrite action are as follows.
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Action&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;This parameter is used to specify the action to be performed by the rewrite action. Each rewrite action is performed on a fragment entered in the &lt;strong&gt;Fragment&lt;/strong&gt; parameter. Possible values are as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Replace&lt;/strong&gt;: If this is selected, the existing &lt;b&gt;in property&lt;/b&gt; value fragment will be replaced by the result value.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Remove&lt;/strong&gt;: If this is selected, the result value will be removed from the &lt;b&gt;in property&lt;/b&gt; value fragment.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Append&lt;/strong&gt;: If this is selected, the result value will be added to the end of the &lt;b&gt;in property&lt;/b&gt; value fragment.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Prepend&lt;/strong&gt;: If this is selected, the result value will be added to the beginning of the &lt;b&gt;in property&lt;/b&gt; value fragment.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Set&lt;/strong&gt;: If this is selected, the result value will be set as the &lt;b&gt;in property&lt;/b&gt; value fragment.&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Fragment&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;The fragment of the &lt;b&gt;in property&lt;/b&gt; (i.e. input URL) for which the rewrite action should be performed. The available fragments are as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Protocol&lt;/strong&gt; :&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Host&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Port&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Path&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Query&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Ref&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;User&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Full&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;b&gt;Note&lt;/b&gt; that this breakdown is inline with the URI specification (RFC2396). URL rewrite mediator enables rewriting each of the above segments separately and finally combining them to get the final URL value. It also supports rewriting the entire URL string at once.
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Option&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;This parameter is used to define the result value of the rewrite action. Select one of the following.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Value&lt;/strong&gt; : If this is selected, the result value would be a static value.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Expression&lt;/strong&gt; : If this is selected, the result value will be evaluated using an expression.&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Value/Expression&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;This parameter is used to enter the result value of the URLRewrite mediator as a static value or an expression, depending on what you selected for the &lt;strong&gt;Option&lt;/strong&gt; parameter.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Namespace Editor&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;You can click this link to add namespaces when you are providing an expression. Then the &lt;strong&gt;Namespace Editor&lt;/strong&gt; panel would appear where you can provide any number of namespace prefixes and URLs used in the XPath expression.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Regex&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;This parameter is used to specify which part of the &lt;b&gt;in property&lt;/b&gt; value fragment should be replaced by the result value if you selected &lt;code&gt;Replace&lt;/code&gt; for the &lt;strong&gt;Action&lt;/strong&gt; parameter.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Delete&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Click &lt;strong&gt;Delete&lt;/strong&gt; in the relevant row to remove a rewrite action.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+## Example
+
+In this example, the URLRewrite mediator has a rewrite action, which replaces the value `         soap        ` with value `         services        ` in the fragment `         path        ` of
+the input URL. Since no in property or an out  property is specified,
+the `         To        ` header of the  request is both the input  to
+which the rewrite rule is applied and the target where the result URL is
+set. This configuration is typically used when the address URL of a
+request contains the context `         soap        ` which needs to be
+converted since all the services are deployed under a context named
+`         services        ` in the WSO2 Integrator: MI. Thus, the URL
+`                   http://localhost:8280/soap/StockQuoteProxy1                 `
+is rewritten as
+`         http://localhost:8280/                   services                 `
+`         /StockQuoteProxy1        ` to ensure that the requests
+are successfully delivered to the server.
+
+``` java
+&lt;rewrite&gt;
+    &lt;rewriterule&gt;
+        &lt;action type=&quot;replace&quot; regex=&quot;soap&quot; value=&quot;services&quot; fragment=&quot;path&quot; /&gt;
+    &lt;/rewriterule&gt;
+&lt;/rewrite&gt;
+```
+</body>
+</html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>endpoint-error-handling.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Handle Endpoint Errors
+
+The last step of message processing inside WSO2 Integrator: MI
+is to send the message to a service provider (see also [Working with Mediators]({{base_path}}/reference/mediators/about-mediators))
+by sending the message to a listening service
+[endpoint]({{base_path}}/reference/synapse-properties/endpoint-properties). During this process, transport
+errors can occur. For example, the connection might time out, or it
+might be closed by the actual service. Therefore, endpoint error
+handling is a key part of any successful Micro
+Integrator deployment.
+
+Messages can fail or be lost due to various reasons in a real TCP
+network. When an error occurs, if the WSO2 Integrator: MI is not
+configured to accept the error, it will mark the endpoint as failed,
+which leads to a message failure. By default, the endpoint is marked as
+failed for quite a long time, and due to this error, subsequent messages
+can get lost.
+
+To avoid lost messages, you can configure error handling at the endpoint
+level. You should also run a few long-running load tests to discover
+errors and fine-tune the endpoint configurations for errors that can
+occur intermittently due to various reasons.
+
+## Example 1: Using endpoint error codes
+This example demonstrates a simple use case where error codes are used to move an endpoint into Timeout state.
+
+### Synapse configuration
+Following is a sample REST API configuration that we can used to implement this scenario. See the instructions on how to [build and run](#build-and-run-example-1) this example.
+
+```xml
+&lt;api xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;TestAPI&quot; context=&quot;/test&quot;&gt;
+   &lt;resource methods=&quot;GET&quot;&gt;
+      &lt;inSequence&gt;
+         &lt;call&gt;
+            &lt;endpoint name=&quot;Sample_First&quot;&gt;
+                &lt;address uri=&quot;http://localhost:123/myendpoint&quot; statistics=&quot;enable&quot; trace=&quot;disable&quot;&gt;
+                    &lt;timeout&gt;
+                        &lt;duration&gt;60000&lt;/duration&gt;
+                    &lt;/timeout&gt;
+                    &lt;suspendOnFailure&gt;
+                        &lt;errorCodes&gt;101500, 101501, 101506, 101507, 101508&lt;/errorCodes&gt;
+                        &lt;initialDuration&gt;1000&lt;/initialDuration&gt;
+                        &lt;progressionFactor&gt;2&lt;/progressionFactor&gt;
+                        &lt;maximumDuration&gt;60000&lt;/maximumDuration&gt;
+                    &lt;/suspendOnFailure&gt;
+                    &lt;markForSuspension&gt;
+                        &lt;errorCodes&gt;101504, 101505&lt;/errorCodes&gt;
+                        &lt;retriesBeforeSuspension&gt;3&lt;/retriesBeforeSuspension&gt;
+                        &lt;retryDelay&gt;1&lt;/retryDelay&gt;
+                    &lt;/markForSuspension&gt;
+                &lt;/address&gt;
+            &lt;/endpoint&gt;
+         &lt;/call&gt;
+        &lt;respond/&gt;
+      &lt;/inSequence&gt;
+   &lt;/resource&gt;
+&lt;/api&gt;
+```
+
+In this example, the errors 101504 and 101505 move the endpoint into the
+&quot;Timeout&quot; state. At that point, three requests can fail for one of these
+errors before the endpoint is moved into the &quot;Suspended&quot; state.
+Additionally, errors 101500, 101501, 101506, 101507, and 101508 will put
+the endpoint directly into the &quot;Suspended&quot; state. If a 101503 error
+occurs, the endpoint will remain in the &quot;Active&quot; state as you have not
+specified it under `         suspendOnFailure        ` . The default
+setting to suspend the endpoint for all error codes except the ones
+specified under `         markForSuspension        ` will apply only if
+you do not specify error codes under `         suspendOnFailure        `
+.
+
+When the endpoint is first suspended, the retry happens after one
+second. Because the progression factor is 2, the next suspension
+duration before retry is two seconds, then four seconds, then eight, and
+so on until it gets to sixty seconds, which is the maximum duration we
+have configured. At this point, all subsequent suspension periods will
+be sixty seconds until the endpoint succeeds and is back in the Active
+state, at which point the initial duration will be used on subsequent
+suspensions.
+
+### Build and run (Example 1)
+
+Create the artifacts:
+
+1. [Launch Visual Studio Code with the WSO2 Integrator: MI Extension installed]({{base_path}}/develop/mi-for-vscode/install-wso2-mi-for-vscode).
+2. [Create a project]({{base_path}}/develop/create-integration-project).
+3. [Create the REST API]({{base_path}}/develop/creating-artifacts/creating-an-api) with the configurations given above.
+4. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+Invoke the sample API by executing the following command:
+
+```bash
+curl -v -X GET &quot;http://localhost:8290/test&quot;
+```
+
+## Example 2: Configuration for Endpoint Dynamic Timeout
+Let&#x27;s look at a sample configuration where you have dynamic timeout for
+the endpoint.
+
+### Synapse configuration
+
+Following is a sample REST API configuration that we can used to implement this scenario. See the instructions on how to [build and run](#build-and-run-example-2) this example.
+
+```xml
+&lt;api xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;TestAPI&quot; context=&quot;/test&quot;&gt;
+   &lt;resource methods=&quot;GET&quot;&gt;
+      &lt;inSequence&gt;
+         &lt;property name=&quot;timeout&quot; scope=&quot;default&quot; type=&quot;INTEGER&quot; value=&quot;20000&quot;/&gt;
+          &lt;call&gt;
+              &lt;endpoint&gt;
+                  &lt;address uri=&quot;http://localhost:123/myendpoint&quot; statistics=&quot;enable&quot; trace=&quot;disable&quot;&gt;
+                      &lt;timeout&gt;
+                          &lt;duration&gt;{get-property(&#x27;timeout&#x27;)}&lt;/duration&gt;
+                          &lt;responseAction&gt;discard&lt;/responseAction&gt;
+                      &lt;/timeout&gt;
+                  &lt;/address&gt;
+              &lt;/endpoint&gt;
+          &lt;/call&gt;
+          &lt;respond/&gt;
+      &lt;/inSequence&gt;
+   &lt;/resource&gt;
+&lt;/api&gt;
+```
+
+In this example, the timeout value is defined using a [Property mediator]({{base_path}}/reference/mediators/property-mediator) outside
+the endpoint configuration. The timeout parameter in the endpoint
+configuration is then evaluated against an [XPATH expression]({{base_path}}/reference/synapse-properties/xpath-expressions) that is used
+to reference and read the timeout value. Using this timeout values can
+be configured without having to change the endpoint configuration.
+
+!!! Info
+    You also have the option of defining a dynamic timeout for the endpoint as a [local entry]({{base_path}}/develop/creating-artifacts/registry/creating-local-registry-entries).
+    ```xml
+    &lt;localEntry key=&quot;timeout&quot;&gt;&lt;![CDATA[20000]]&gt;
+       &lt;description/&gt;
+    &lt;/localEntry&gt;
+    ```
+
+### Build and run (Example 2)
+
+Create the artifacts:
+
+1. [Launch Visual Studio Code with the WSO2 Integrator: MI Extension installed]({{base_path}}/develop/mi-for-vscode/install-wso2-mi-for-vscode).
+2. [Create a project]({{base_path}}/develop/create-integration-project).
+3. [Create the REST API]({{base_path}}/develop/creating-artifacts/creating-an-api) with the configurations given above.
+4. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+## Example 3: Dynamic endpoint failover management
+Let&#x27;s look at a sample configuration where you have a dynamic URL with failover management for
+the endpoint.
+
+### Synapse configuration
+Following is a sample REST API configuration that we can used to implement this scenario. See the instructions on how to [build and run](#build-and-run-example-3) this example.
+
+```xml
+&lt;api xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;TestAPI&quot; context=&quot;/test&quot;&gt;
+   &lt;resource methods=&quot;GET&quot;&gt;
+      &lt;inSequence&gt;
+         &lt;call&gt;
+            &lt;endpoint name=&quot;NoSuspendEndpoint&quot;&gt; 
+               &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;&gt; 
+                   &lt;timeout&gt; 
+                       &lt;duration&gt;30000&lt;/duration&gt; 
+                       &lt;responseAction&gt;fault&lt;/responseAction&gt; 
+                   &lt;/timeout&gt; 
+                   &lt;suspendOnFailure&gt; 
+                       &lt;errorCodes&gt;-1&lt;/errorCodes&gt; 
+                       &lt;initialDuration&gt;0&lt;/initialDuration&gt; 
+                       &lt;progressionFactor&gt;1.0&lt;/progressionFactor&gt; 
+                       &lt;maximumDuration&gt;0&lt;/maximumDuration&gt; 
+                   &lt;/suspendOnFailure&gt; 
+                   &lt;markForSuspension&gt; 
+                       &lt;errorCodes&gt;-1&lt;/errorCodes&gt; 
+                   &lt;/markForSuspension&gt; 
+               &lt;/address&gt; 
+            &lt;/endpoint&gt;
+         &lt;/call&gt;
+         &lt;respond/&gt;
+      &lt;/inSequence&gt;
+   &lt;/resource&gt;
+&lt;/api&gt;
+```
+
+If a dynamic URL is used as the endpoint and if one URL fails, the
+endpoint is suspended even though the URL is changed dynamically. Follow
+the steps given below to avoid suspension or to re-enable the endpoint.
+
+- Disabling endpoint suspension: If you do not want the endpoint to be suspended at all, you can configure the `Timeout` , `MarkForSuspension` , and `suspendOnFailure` settings as shown in the following example.
+  -   Use `&lt;errorCodes&gt;-1&lt;/errorCodes&gt;` to disable suspension for the endpoint under the
+      `MarkForSuspension` and `suspendOnFailure` settings.
+  -   Use `&lt;responseAction&gt;fault&lt;/responseAction&gt;`
+      under the `&lt;timeout&gt;         ` setting.
+  -   Define the `          &lt;initialDuration&gt;         ` and
+      `          &lt;maximumDuration&gt;         ` properties as
+      `          0         ` under the
+      `          suspendOnFailure         ` setting.
+
+Follow any of the options given below to re-enable an endpoint that is suspended.
+
+-   Define the error codes that cause endpoint failure.  
+    For example, use
+    `          &lt;errorCodes&gt;101504, 101505&lt;/errorCodes&gt;         ` to
+    exclude the error codes from `          suspendOnFailure         `
+    and `          markForSuspension         ` under endpoint
+    configuration, so that the endpoint does not get suspended for these
+    error codes.
+-   If the endpoint is defined as a registry resource, activate the
+    endpoint through the Java Management Extension (JMX).  
+    For example, use the `          switchOn         ` operation for
+    that particular endpoint in the JConsole, which comes under
+    **MBeans \&gt; org.apache.synapse \&gt; Endpoint** . This activates the
+    endpoint again.
+
+### Build and run (Example 3)
+
+Create the artifacts:
+
+1. [Launch Visual Studio Code with the WSO2 Integrator: MI Extension installed]({{base_path}}/develop/mi-for-vscode/install-wso2-mi-for-vscode).
+2. [Create a project]({{base_path}}/develop/create-integration-project).
+3. [Create the REST API]({{base_path}}/develop/creating-artifacts/creating-an-api) with the configurations given above.
+4. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+Set up the back-end service:
+
+1. Download the [back-end service](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/axis2Server.zip).
+2. Extract the downloaded zip file.
+3. Open a terminal, navigate to the `axis2Server/bin/` directory inside the extracted folder.
+4. Execute the following command to start the axis2server with the SimpleStockQuote back-end service:
+
+    === &quot;On MacOS/Linux&quot;   
+          ```bash
+          sh axis2server.sh
+          ```
+    === &quot;On Windows&quot;              
+          ```bash
+          axis2server.bat
+          ```
+
+Invoke the sample API by executing the following command:
+
+```bash
+curl -v -X GET &quot;http://localhost:8290/test&quot;
+```
+
+You will not observe any endpoint suspended logs for the above API call.
+
+## Example 4: Configuring retry
+You can configure the WSO2 Integrator: MI to enable or disable retry for an endpoint when a specific error code occurs.
+
+### Synapse configuration
+
+In this example, if the error code 101503 occurs when trying to connect to the endpoint, it is not retried.
+```xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;endpoint name=&quot;StopRetryEndpoint&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;address uri=&quot;http://localhost:9001/services/LBService1&quot;&gt;
+        &lt;retryConfig&gt;
+            &lt;disabledErrorCodes&gt;101503&lt;/disabledErrorCodes&gt;
+        &lt;/retryConfig&gt;
+    &lt;/address&gt;
+&lt;/endpoint&gt;
+```
+
+In the below example, the endpoint is always retried if error code 101503 occurs.
+```xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;endpoint name=&quot;RetryEndpoint&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;address uri=&quot;http://localhost:9002/services/LBService1&quot;&gt;
+        &lt;retryConfig&gt;
+            &lt;enabledErrorCodes&gt;101503&lt;/enabledErrorCodes&gt;
+        &lt;/retryConfig&gt;
+    &lt;/address&gt;
+&lt;/endpoint&gt;
+```
+
+You can specify enabled or disabled error codes (but not both) for a given endpoint.
+</body>
+</html>

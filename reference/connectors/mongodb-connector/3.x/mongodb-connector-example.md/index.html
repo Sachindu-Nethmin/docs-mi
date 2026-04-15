@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>mongodb-connector-example.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>---
+search:
+  boost: 2
+---
+
+# MongoDB connector example
+
+The MongoDB Connector can be used to perform CRUD operations in the local MongoDB database as well as in MongoDB Atlas (cloud version of MongoDB).
+
+## What you&#x27;ll build
+
+This example explains how to use MongoDB Connector to insert and find documents from a MongoDB database.
+
+The sample API given below demonstrates how the MongoDB connector can be used to connect to the MongoDB Server and perform **insert many** and **find** operations on it.
+
+- `/insertmany`: The user sends a request payload that includes the connection information, collection name, and the documents to be inserted. This request is sent to the integration runtime by invoking the MongodbConnector API. This will insert the documents into the MongoDB database.
+
+    &lt;p&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/mongodb-conn-1.png&quot; title=&quot;Insert many function&quot; width=&quot;800&quot; alt=&quot;Insert many function&quot; /&gt;&lt;/p&gt;
+
+- `/find`: The user sends the request payload containing the connection information, collection name, and the find query. This request is sent to the integration runtime by invoking the MongodbConnector API. Once the API is invoked, it returns the documents matching the find query.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/mongodb-conn-2.png&quot; title=&quot;Find function&quot; width=&quot;800&quot; alt=&quot;Find function&quot;/&gt;
+
+If you do not want to configure this yourself, you can simply [get the project](#get-the-project) and run it.
+
+## Before you begin
+
+If you want to connect to MongoDB Atlas, follow the steps mentioned below to get the connection string.
+
+1. In the Clusters view, click **Connect** for the cluster to which you want to connect.
+
+2. Click **Choose a connection method**.
+
+3. Click **Connect your application**.
+
+4. Select Java from the **Driver** menu.
+
+5. Select the correct driver version from the **Version**(`4.3 or later`) menu.
+
+6. Clear the **Include full driver code example** check box to get the connection string.
+
+
+## Set up the integration project
+
+Follow the steps in the [Create Integration Project]({{base_path}}/develop/create-integration-project/) guide to set up the Integration Project. 
+
+## Add integration logic
+
+Follow the [Creating a REST API]({{base_path}}/develop/creating-artifacts/creating-an-api/) guide to create a REST API. Specify the API name as `MongoConnector` and the API context as `/mongodbconnector`.
+
+### Configure the API
+
+1. First, create the `/insertmany` resource. For guidance, refer to the [Add new API resources]({{base_path}}/develop/creating-artifacts/creating-an-api/#add-new-api-resources) guide. Use the following details when configuring the resource.
+    - **URI Template**: `/insertmany`
+    - **HTTP Method**: `POST`
+
+2. Set up the **Insert Many** operation.
+    1. Select the **insertmany** resource. Click on the **+** icon on the canvas to open the **Mediator Palette** and search for the **MongoDB** connector.
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/common/add-connector-operation.png&quot; title=&quot;Add connector operation&quot; width=&quot;400&quot; alt=&quot;Add connector operation&quot;/&gt;
+
+    2. Search for the **MongoDB** connector and download the connector if you have not done so already. After downloading, you can see the MongoDB connector in the mediator palette. Click on the **Insert Many** operation under the MongoDB connector.
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/mongodb/mongo-insert-many-add.png&quot; title=&quot;Insert Many Operation&quot; width=&quot;800&quot; alt=&quot;Insert Many Operation&quot;/&gt;
+
+    3. Then, click on **Add new connection** to create a new MongoDB Connection.
+        
+        Following values can be provided when connecting to the MongoDB database. &lt;br/&gt;
+
+        - Connection Name - connectionURI
+        - Connection URI - mongodb+srv://server.example.com/?connectTimeoutMS=300000&amp;amp;authSource=aDifferentAuthDB
+        - Database - TestDatabase
+
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/mongodb/mongo-add-new-connection.png&quot; title=&quot;Add connection&quot; width=&quot;800&quot; alt=&quot;Add connection&quot;/&gt;
+
+    3. Click on **Add** to create the connection. You can see the created connection in the **Connection** drop-down list. Select the created connection from the list.
+
+    4. Configure the **insertMany** operation by providing the following expressions for the properties. These expressions will retrieve the respective values from the JSON request payload.
+
+        - **Collection**: `payload.collection`
+        - **Documents**: `payload.documents`
+
+    5. To store the response of the operation in the message body, select **Overwrite Message Body** in the Output Section. This will allow you to send the response back to the user as a response of the API invocation.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/mongodb/mongo-insert-many-operation.png&quot; title=&quot;Insert Many Operation&quot; width=&quot;800&quot; alt=&quot;Insert Many Operation&quot;/&gt;
+
+3. Send a response to the user.       
+
+    Add [Respond mediator]({{base_path}}/reference/mediators/respond-mediator/) after the above operation.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/mongodb/mongdo-insert-many-resource.png&quot; title=&quot;Insert Many Operation&quot; width=&quot;800&quot; alt=&quot;Insert Many Operation&quot;/&gt;
+
+5. Create the next API resource (which is `/find`) by doing same steps as create `/insertmany`. This API resource will find all the documents matching the find query given by the user. This will also be a `POST` request.
+
+6. Setup the **Find** operation.
+
+    1. Provide expressions for the following two properties. These expressions will retrieve the respective values from the JSON request payload.
+
+        - Collection - payload.collection
+        - Query - payload.query
+
+    2. Select **Overwrite Body** as `true` to overwrite the response body with the response from the operation.
+
+7. Add a [Respond mediator]({{base_path}}/reference/mediators/respond-mediator/) after the above operation.
+
+8. You can find the complete API XML configuration below. Now you can switch to the Source view and check the XML configuration files of the created API and sequences. 
+
+```
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;api context=&quot;/mongodbconnector&quot; name=&quot;MongoConnector&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;resource methods=&quot;POST&quot; uri-template=&quot;/insertmany&quot;&gt;
+        &lt;inSequence&gt;
+            &lt;mongodb.insertMany configKey=&quot;connectionURI&quot;&gt;
+                &lt;collection&gt;{${payload.collection}}&lt;/collection&gt;
+                &lt;documents&gt;{${payload.documents}}&lt;/documents&gt;
+                &lt;ordered&gt;True&lt;/ordered&gt;
+                &lt;responseVariable&gt;mongodb_insertMany_1&lt;/responseVariable&gt;
+                &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+            &lt;/mongodb.insertMany&gt;
+            &lt;respond/&gt;
+        &lt;/inSequence&gt;
+        &lt;faultSequence&gt;
+        &lt;/faultSequence&gt;
+    &lt;/resource&gt;
+    &lt;resource methods=&quot;POST&quot; uri-template=&quot;/find&quot;&gt;
+        &lt;inSequence&gt;
+            &lt;mongodb.find configKey=&quot;connectionURI&quot;&gt;
+                &lt;collection&gt;{${payload.collection}}&lt;/collection&gt;
+                &lt;query&gt;{${payload.query}}&lt;/query&gt;
+                &lt;projection&gt;&lt;/projection&gt;
+                &lt;collation&gt;&lt;/collation&gt;
+                &lt;limit&gt;&lt;/limit&gt;
+                &lt;sort&gt;&lt;/sort&gt;
+                &lt;responseVariable&gt;mongodb_find_1&lt;/responseVariable&gt;
+                &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+            &lt;/mongodb.find&gt;
+            &lt;respond/&gt;
+        &lt;/inSequence&gt;
+        &lt;faultSequence&gt;
+        &lt;/faultSequence&gt;
+    &lt;/resource&gt;
+&lt;/api&gt;
+```
+
+## Get the project
+
+You can download the ZIP file and extract the contents to get the project code.
+
+&lt;a href=&quot;{{base_path}}/assets/attachments/connectors/MongodbConnector3xx.zip&quot;&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+&lt;/a&gt;
+
+## Deployment
+To deploy and run the project, refer to the [Build and Run]({{base_path}}/develop/deploy-artifacts/#build-and-run) guide.
+
+## Test
+
+### Insert Many Operation
+
+1.  Invoke the API `insertmany` resource as shown below using the MI VSCode Extension.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/common/runtime-services.png&quot; title=&quot;Runtime services&quot; width=&quot;600&quot; alt=&quot;Runtime services&quot;/&gt;
+
+    **Sample Request**:
+
+    - Content-Type: `application/json`
+    - Request body:
+        ```json
+        {
+            &quot;collection&quot;: &quot;TestCollection&quot;,
+            &quot;documents&quot;: [
+                {
+                    &quot;name&quot;: &quot;Jane Doe&quot;,
+                    &quot;_id&quot;: &quot;123&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;John Doe&quot;,
+                    &quot;_id&quot;: &quot;1234&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;Jane Doe&quot;,
+                    &quot;_id&quot;: &quot;12345&quot;
+                }
+            ]
+        }
+        ```
+
+    **Expected Response** : You should get a response as given below and the data will be added to the database.
+
+    ```json
+    {
+        &quot;insertedIds&quot;: [
+            &quot;6846963a436675569b109b1a&quot;,
+            &quot;6846963a436675569b109b1b&quot;,
+            &quot;6846963a436675569b109b1c&quot;
+        ],
+        &quot;insertedCount&quot;: 3
+    }
+    ```
+
+### Find Operation
+
+!!! Note
+    In order to find documents by ObjectId, the find query payload should be in the following format:
+
+    ```json
+    {
+        &quot;query&quot;: {
+            &quot;_id&quot;: {
+                &quot;$oid&quot;: &quot;6011b180007ce60ab2ad74a5&quot;
+            }
+        }
+    }
+    ```
+
+1.  Invoke the API `find` resource using the MI VSCode Extension.
+
+    **Sample Request**:
+
+    - Content-Type: `application/json`
+    - Request body:
+        ```json
+        {
+            &quot;collection&quot;: &quot;TestCollection&quot;,
+            &quot;query&quot;: {
+                &quot;name&quot;: &quot;Jane Doe&quot;
+            }
+        }
+        ```
+
+    **Expected Response** : You should get a response as given below and the data will be added to the database.
+
+    ```json
+    {
+        &quot;found&quot;: true,
+        &quot;data&quot;: [
+            {
+                &quot;name&quot;: &quot;Jane Doe&quot;,
+                &quot;_id&quot;: &quot;123&quot;
+            },
+            {
+                &quot;name&quot;: &quot;Jane Doe&quot;,
+                &quot;_id&quot;: &quot;12345&quot;
+            }
+        ],
+        &quot;count&quot;: 2
+    }
+    ```
+
+
+## What&#x27;s next
+
+- To customize this example for your own scenario, see [MongoDB Connector Configuration]({{base_path}}/reference/connectors/mongodb-connector/mongodb-connector-config/) documentation for all operation details of the connector.
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>about-mediators.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># About Mediators
+
+Mediators are individual processing units that perform a specific actions on messages that pass through the WSO2 Integrator: MI. The mediator takes the message received by the REST API or proxy service, carries out predefined actions on it (such as transforming, enriching, filtering), and outputs the modified message. 
+
+For example, the [Scatter Gather]({{base_path}}/reference/mediators/scatter-gather-mediator) mediator splits a message into several clones and aggregates the results, the [Call]({{base_path}}/reference/mediators/call-mediator) mediator calls a backend endpoint with the message and the [Respond]({{base_path}}/reference/mediators/respond-mediator) mediator sends the message back to the client.
+
+## Classification of mediators
+
+Mediators are classified as follows based on whether they access the message&#x27;s content: 
+
+&lt;table&gt;
+  &lt;col width=&quot;140&quot;&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Classification&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Content-aware mediators&lt;/td&gt;
+    &lt;td&gt;
+      These mediators always access the message content when mediating messages.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Content-unaware mediators&lt;/td&gt;
+    &lt;td&gt;
+      These mediators never access the message content when mediating messages.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Conditionally content-aware mediators&lt;/td&gt;
+    &lt;td&gt;
+      These mediators could be either content-aware or content-unaware depending on their usage in the configuration.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+!!! Note
+    When at least one content-aware mediator is added to the mediation sequence, the message payload needs to be fully built and accessible in memory. This is necessary because the mediator needs to examine or modify the message&#x27;s content and hence incurs a performance overhead.
+
+## List of mediators
+
+WSO2 Integrator: MI includes a comprehensive catalog of mediators that provide functionality for implementing widely used [Enterprise Integration Patterns (EIPs)]({{base_path}}/learn/enterprise-integration-patterns/eip-overview/). You can also easily write a custom mediator to provide additional functionality using various technologies such as Java and scripting.
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Category&lt;/th&gt;
+    &lt;th&gt;Mediator&lt;/th&gt;
+    &lt;th&gt;Content aware/unaware&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td rowspan=&quot;12&quot;&gt;Generic mediators&lt;/td&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/call-mediator&quot;&gt;Call mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Conditionally content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/variable-mediator&quot;&gt;Variable mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Conditionally content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/property-mediator&quot;&gt;Property mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Conditionally content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/log-mediator&quot;&gt;Log mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Conditionally content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/respond-mediator&quot;&gt;Respond mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-unaware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/sequence-mediator&quot;&gt;Sequence mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-unaware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/call-template-mediator&quot;&gt;Call Template mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-unaware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/drop-mediator&quot;&gt;Drop mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-unaware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/property-group-mediator&quot;&gt;Property Group mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Conditionally content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/cache-mediator&quot;&gt;Cache mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/throttle-mediator&quot;&gt;Throttle mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-unaware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/store-mediator&quot;&gt;Store mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+
+  &lt;tr&gt;
+    &lt;td rowspan=&quot;5&quot;&gt;Flow control mediators&lt;/td&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/filter-mediator&quot;&gt;If Else mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Conditionally content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/switch-mediator&quot;&gt;Switch mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Conditionally content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/scatter-gather-mediator&quot;&gt;Scatter Gather mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/foreach-mediator&quot;&gt;ForEach mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/validate-mediator&quot;&gt;Validate mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+
+  &lt;tr&gt;
+    &lt;td rowspan=&quot;7&quot;&gt;Transformation mediators&lt;/td&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/enrich-mediator&quot;&gt;Enrich mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/header-mediator&quot;&gt;Header mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Conditionally content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/xslt-mediator&quot;&gt;XSLT mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/json-transform-mediator&quot;&gt;JSON Transform mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/fault-mediator&quot;&gt;Fault mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/payloadfactory-mediator&quot;&gt;Payload mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/data-mapper-mediator&quot;&gt;Data Mapper mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+
+  &lt;tr&gt;
+    &lt;td rowspan=&quot;2&quot;&gt;Extension mediators&lt;/td&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/script-mediator&quot;&gt;Script mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/class-mediator&quot;&gt;Class mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+
+  &lt;tr&gt;
+    &lt;td rowspan=&quot;3&quot;&gt;Security mediators&lt;/td&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/oauth-mediator&quot;&gt;Oauth mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-unaware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/entitlement-mediator&quot;&gt;Entitlement mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/ntlm-mediator&quot;&gt;NTLM mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-unaware&lt;/td&gt;
+  &lt;/tr&gt;
+
+  &lt;tr&gt;
+    &lt;td rowspan=&quot;3&quot;&gt;Database mediators&lt;/td&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/dss-mediator&quot;&gt;Data Service Call mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/dblookup-mediator&quot;&gt;DBLookup mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/db-report-mediator&quot;&gt;DB Report mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+
+  &lt;tr&gt;
+    &lt;td rowspan=&quot;13&quot;&gt;Other mediators&lt;/td&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/send-mediator&quot;&gt;Send mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-unaware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/clone-mediator&quot;&gt;Clone mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/iterate-mediator&quot;&gt;Iterate mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/aggregate-mediator&quot;&gt;Aggregate mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/throw-error-mediator&quot;&gt;ThrowError mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Conditionally content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/callout-mediator&quot;&gt;Callout mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/smooks-mediator&quot;&gt;Smooks mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/transaction-mediator&quot;&gt;Transaction mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/builder-mediator&quot;&gt;Builder mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/loopback-mediator&quot;&gt;Loopback mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-unaware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/fastxslt-mediator&quot;&gt;FastXSLT mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-unaware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/urlrewrite-mediator&quot;&gt;URLRewrite mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/xquery-mediator&quot;&gt;XQuery mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;a href=&quot;{{base_path}}/reference/mediators/ejb-mediator&quot;&gt;EJB mediator&lt;/a&gt;
+    &lt;/td&gt;
+    &lt;td&gt;Content-aware&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>setting-up-ibm-db2.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Setting up an IBM DB2
+
+Follow the steps given below to set up the required IBM databases for your WSO2 Integrator: MI.
+
+!!! Tip
+	WSO2 Integrator: MI requires databases for the following scenarios: 
+
+	-	&lt;a href=&#x27;{{base_path}}/install-and-setup/setup/deployment/deploying-wso2-mi/#cluster-coordination&#x27;&gt;cluster coordination&lt;/a&gt;
+	-	&lt;a href=&#x27;{{base_path}}/install-and-setup/setup/user-stores/setting-up-a-userstore&#x27;&gt;using an RDBMS user store&lt;/a&gt;
+
+## Prerequisites
+
+Download the latest version of [DB2 Express-C](http://www-01.ibm.com/software/data/db2/express/download.html) and install it on your computer.
+
+For instructions on installing DB2 Express-C, see this [ebook](https://www.ibm.com/developerworks/community/wikis/home?lang=en#!/wiki/Big%20Data%20University/page/FREE%20eBook%20-%20Getting%20Started%20with%20DB2%20Express-C).
+
+## Setting up the database and users
+
+The following IBM DB scripts are stored in the `&lt;MI_HOME&gt;/dbscripts/db2` directory of your WSO2 Integrator: MI. First, select the scripts that are required for your deployment.
+
+You can run the scripts on one database instance or set up separate instances for each requirement. For convenience, it is recommended to set up separate databases for each use case.
+
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;th&gt;Script&lt;/th&gt;
+		&lt;th&gt;Description&lt;/th&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;db2_cluster.sql&lt;/td&gt;
+		&lt;td&gt;This script creates the database tables that are required for &lt;a href=&#x27;{{base_path}}/install-and-setup/setup/deployment/deploying-wso2-mi/#cluster-coordination&#x27;&gt;cluster coordination&lt;/a&gt; (i.e., coordinating the server nodes in your VM deployment).This is only applicable if you have stateful integration artifacts deployed in a clustered setup.
+		&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;db2_user.sql&lt;/td&gt;
+		&lt;td&gt;This script creates the database tables that are required for storing users and roles. This is only required if you have configured an &lt;a href=&#x27;{{base_path}}/install-and-setup/setup/user-stores/setting-up-a-userstore&#x27;&gt;RDBMS user store&lt;/a&gt;.&lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+
+Create the databases and then create the DB tables by pointing to the relevant script in the `&lt;MI_HOME&gt;/dbscripts/db2` directory.
+
+Create the database using either [DB2 command processor](#using-the-db2-command-processor) or [DB2 control center](#using-the-db2-control-center) as described below.
+
+### Using the DB2 command processor
+
+1.  Run DB2 console and execute the `          db2start         `
+    command on a CLI to open DB2.
+2.  Create the database using the following command:  
+    `create database clusterdb`
+3.  Before issuing an SQL statement, establish the connection to the
+    database using the following command:  
+    `connect to clusterdb user &lt;USER_ID&gt; using &lt;PASSWORD&gt;`
+4.  Grant required permissions for users as follows:
+
+    ```bash
+    connect to DB_NAME
+    grant &lt;AUTHORITY&gt; on database to user &lt;USER_ID&gt;
+    ```
+
+    For more information on DB2 commands, see the [DB2 Express-C Guide](https://www.ibm.com/developerworks/community/wikis/home?lang=en#!/wiki/Big%20Data%20University/page/FREE%20eBook%20-%20Getting%20Started%20with%20DB2%20Express-C).
+
+### Using the DB2 control center
+
+1.  Open the DB2 control center using the `db2cc` command:  
+
+2.  Right-click **All Databases** in the control center tree (inside the
+    object browser), click **Create Database**, and then click
+    **Standard** and follow the steps in the **Create New Database**
+    wizard.  
+3.  Click **User and Group Objects** in the control center tree to
+    create users for the newly created database.  
+4.  Give the required permissions to the newly created users.  
+
+## Setting up DB2 JDBC drivers
+
+Copy the DB2 JDBC drivers (`db2jcc.jar` and `db2jcc_license_c0u.jar`) from the `&lt;DB2_HOME&gt;/SQLLIB/java/` directory to the `MI_HOME/lib/` directory.
+
+`&lt;DB2_HOME&gt;` refers to the installation directory of DB2 Express-C, and `&lt;MI_HOME&gt;` refers to the directory where you run the WSO2 product instance.
+
+## Connecting the database to the server
+
+Open the `deployment.toml` file in the `&lt;MI_HOME&gt;/conf` directory and add the following sections to create the connection between the WSO2 Integrator: MI and the relevant database. Note that you need separate configurations corresponding to the separate databases (`clusterdb` and `userdb`).
+
+=== &quot;Cluster DB Connection&quot;
+    ```toml 
+    [[datasource]]
+    id = &quot;WSO2_COORDINATION_DB&quot;
+    url=&quot;jdbc:db2://SERVER_NAME:PORT/clusterdb&quot;
+    username=&quot;root&quot;
+    password=&quot;root&quot;
+    driver=&quot;com.ibm.db2.jcc.DB2Driver&quot;
+    pool_options.maxActive=50
+    pool_options.maxWait = 60000
+    pool_options.testOnBorrow = true
+    ```
+=== &quot;User DB Connection&quot;    
+    ```toml 
+    [[datasource]]
+    id = &quot;WSO2CarbonDB&quot;
+    url=&quot;jdbc:db2://SERVER_NAME:PORT/userdb&quot;
+    username=&quot;root&quot;
+    password=&quot;root&quot;
+    driver=&quot;com.ibm.db2.jcc.DB2Driver&quot;
+    pool_options.maxActive=50
+    pool_options.maxWait = 60000
+    pool_options.testOnBorrow = true
+    ```
+
+{!includes/integration/pull-content-user-store-db-id.md!}
+
+See the descriptions of [database connection parameters]({{base_path}}/reference/config-catalog-mi/#database-connection).</body>
+</html>

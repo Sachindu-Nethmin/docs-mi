@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>xslt-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># XSLT Mediator
+
+The **XSLT Mediator** applies a specified XSLT transformation to a
+selected element of the current message payload. In addition, you can:
+
+-   Specify properties already included in the mediation flow to be added to the XSLT script as XSLT parameters.
+-   Specify features to be enabled/disabled in the XSLT transformation.
+-   Import external XSLT scripts to the main XSLT script of the XSLT mediator by adding them as resources.
+
+## Syntax
+
+```xml
+    &lt;xslt key=&quot;string&quot; [source=&quot;xpath&quot;]&gt;
+         &lt;property name=&quot;string&quot; (value=&quot;literal&quot; | expression=&quot;xpath&quot;)/&gt;*
+         &lt;feature name=&quot;string&quot; value=&quot;true| false&quot; /&gt;*
+         &lt;resource location=&quot;string&quot; key=&quot;string&quot;/&gt;*
+    &lt;/xslt&gt;
+```
+
+## Configuration
+
+The parameters available for configuring the XSLT mediator are as follows.
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Source XPath&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;This determines the element to which the given XSLT transformation should be applied via an XPath expression. If the source element is not specified, the XSLT transformation is applied to the first child of the SOAP body.&lt;/p&gt;
+&lt;p&gt;Tip&lt;/p&gt;
+&lt;p&gt;You can click on the &lt;strong&gt;Edit&lt;/strong&gt; button to add &lt;strong&gt;Expression Value&lt;/strong&gt; and click &lt;strong&gt;+ Add Namespace&lt;/strong&gt; to add namespaces if you are providing an expression. Then the &lt;strong&gt;Namespace Editor&lt;/strong&gt; panel would appear where you can provide any number of namespace prefixes and URLs used in the XPath expression.&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;XSLT Schema Key&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;This specifies the registry key to refer the XSLT to. This supports static and dynamic keys. The value can be entered as a dynamic key by toggle the &lt;strong&gt;expression (EX)&lt;/strong&gt; button.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Properties of the&lt;/strong&gt; &lt;strong&gt;XSLT mediator&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;This section is used to inject properties set in the mediation flow to the XSLT script as XSLT parameters. These are referred from the XSLT in transformation using the &lt;code&gt;               get-property(prop-name)              &lt;/code&gt; XPath extension function.&lt;/p&gt;
+&lt;p&gt;Parameters relating to the properties are as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Property Name&lt;/strong&gt; : The name of the property to be passed into the transformations.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Property Type&lt;/strong&gt; : This specifies whether the property is given as a static value or an XPath expression.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Value/Expression&lt;/strong&gt; - This defines the static value or the XPath expression.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For example, define the &lt;code&gt;               transform.xslt.result.disableBuild              &lt;/code&gt; property as shown below, to escape building the message at the XSLT transformation. It avoids replacing encoded values with real characters. E.g., If you do not add this property, &quot; &lt;code&gt;               &amp;amp;#10;              &lt;/code&gt; &quot; in your XML content will be replaced by a new line, when the XML content is built at the XSLT mediator.&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Features of the XSLT mediator&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;This section is used to specify features to be enabled/disabled in the XSLT transformation. For example, adding the &lt;a href=&quot;http://ws.apache.org/ns/synapse/transform/feature/dom&quot;&gt;http://ws.apache.org/ns/synapse/transform/feature/dom&lt;/a&gt; feature turns on DOM-based transformations instead of serializing elements into byte streams and/or temporary files. This approach can improve performance but might not work for all transformations.&lt;/p&gt;
+&lt;p&gt;Parameters relating to the features are as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Feature Name&lt;/strong&gt; : The name of the feature to be enabled/disabled in the XSLT transformation.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Feature Value&lt;/strong&gt; : This specified whether the feature is enabled or not. Select &lt;strong&gt;True&lt;/strong&gt; to enable the feature or &lt;strong&gt;False&lt;/strong&gt; to disable it.&lt;br /&gt;
+&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Resources of the XSLT mediator&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;This section is used to import external XSLT scripts to the main XSLT scripts defined in the XSLT mediator. The XSLT scripts to be imported are first added as resources in the registry.&lt;/p&gt;
+&lt;p&gt;Parameters relating to the resources are as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Location&lt;/strong&gt; : The location where the XSLT script to be imported is saved as a resource.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Key&lt;/strong&gt; : The registry key to which the XSLT should be referred. Browse for the relevant key in the Configuration registry or the Governance registry.&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+
+## Example 1 - Applying an XSLT transformation to a element selected based on an XPath expression
+
+In this example, the XSLT can be picked by the key `transform/example.xslt` and the XSLT would be applied to a part of the message that is specified as an XPath expression. 
+In this case, it is applied to `s11:Body/child` the message.
+
+```xml
+    &lt;xslt xmlns=&quot;http://ws.apache.org/ns/synapse&quot; key=&quot;transform/example.xslt&quot; source=&quot;s11:Body/child&quot; /&gt;
+```
+
+## Example 2 -  Adding properties as XSLT parameters
+
+In this example, a property named `PARAM_NAME` is added to the XSLT script as an XSLT parameter. 
+A XPath expression is used to assign this property the value of the `ORDER_ID` property in the default scope.
+
+```xml
+    &lt;xslt key=&quot;keyToXSLTFile&quot;&gt;
+         &lt;property expression=&quot;$ctx:ORDER_ID&quot; name=&quot;PARAM_NAME&quot;&gt;
+    &lt;/property&gt;&lt;/xslt&gt;
+```
+
+The XSLT script with the `PARAM_NAME` property added would look as follows.
+
+```xml
+    &lt;xsl:stylesheet version=&quot;1.0&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt;
+          &lt;xsl:param name=&quot;PARAM_NAME&quot;&gt;&lt;/xsl:param&gt;
+          &lt;xsl:template match=&quot;/&quot;&gt;
+             &lt;orders xmlns=&quot;http://services.samples&quot;&gt;
+                &lt;xsl:attribute name=&quot;id&quot;&gt;
+                   &lt;xsl:value-of select=&quot;$PARAM_NAME&quot;&gt;
+                &lt;/xsl:value-of&gt;&lt;/xsl:attribute&gt;
+             &lt;/orders&gt;
+          &lt;/xsl:template&gt;
+    &lt;/xsl:stylesheet&gt;
+```
+
+## Example 3 - Adding XSLT imports as resources
+
+In this example, two XSLT files saved in the registry under `conf:/` as resources are imported to the main XSLT script of the XSLT mediator.
+
+xslt1.xslt
+
+```xml
+    &lt;xsl:stylesheet version=&quot;1.0&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt; 
+        &lt;xsl:template match=&quot;//people/person&quot; name=&quot;FILL_PPL&quot;&gt; 
+            &lt;client&gt; 
+                &lt;firstname&gt; 
+                    &lt;xsl:value-of select=&quot;firstname&quot;&gt; 
+                &lt;/xsl:value-of&gt;&lt;/firstname&gt; 
+                &lt;lastname&gt; 
+                    &lt;xsl:value-of select=&quot;lastname&quot;&gt; 
+                &lt;/xsl:value-of&gt;&lt;/lastname&gt; 
+                &lt;age&gt; 
+                    &lt;xsl:value-of select=&quot;age&quot;&gt; 
+                &lt;/xsl:value-of&gt;&lt;/age&gt; 
+                &lt;country&gt; 
+                    &lt;xsl:value-of select=&quot;country&quot;&gt; 
+                &lt;/xsl:value-of&gt;&lt;/country&gt; 
+            &lt;/client&gt; 
+        &lt;/xsl:template&gt; 
+    &lt;/xsl:stylesheet&gt;
+```
+
+xslt2.xslt
+
+```xml
+    &lt;xsl:stylesheet version=&quot;1.0&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt;
+        &lt;xsl:import href=&quot;xslt1.xslt&quot; /&gt;
+        &lt;xsl:template match=&quot;/&quot;&gt;
+            &lt;clients&gt;
+                &lt;xsl:for-each select=&quot;//people/person&quot;&gt;
+                    &lt;xsl:call-template name=&quot;FILL_PPL&quot;&gt;&lt;/xsl:call-template&gt;
+                &lt;/xsl:for-each&gt;
+            &lt;/clients&gt;
+        &lt;/xsl:template&gt;
+    &lt;/xsl:stylesheet&gt;
+```
+
+`&lt;xsl:import href=&quot;xslt1.xslt&quot;\&gt;` element indicates that the `xslt1.xslt` is included in `xslt2.xslt`.
+
+These two files can be imported to the script of the XSLT mediator as follows.
+
+```xml
+    &lt;xslt key=&quot;conf:/xslt2.xslt&quot;&gt; 
+          &lt;resource key=&quot;conf:/xslt1.xslt&quot; location=&quot;xslt1.xslt&quot;&gt; 
+    &lt;/resource&gt;&lt;/xslt&gt;
+```
+
+The following SOAP request can be used to test the above configuration of the XSLT mediator included in a proxy configuration.
+
+```xml
+    &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt; 
+        &lt;soapenv:Header&gt; 
+        &lt;soapenv:Body&gt; 
+            &lt;people&gt; 
+                &lt;person&gt; 
+                    &lt;firstname&gt;Isuru&lt;/firstname&gt; 
+                    &lt;lastname&gt;Udana&lt;/lastname&gt; 
+                    &lt;gender&gt;Male&lt;/gender&gt; 
+                    &lt;age&gt;26&lt;/age&gt; 
+                    &lt;country&gt;SriLanka&lt;/country&gt; 
+                &lt;/person&gt; 
+                &lt;person&gt; 
+                    &lt;firstname&gt;Ishan&lt;/firstname&gt; 
+                    &lt;lastname&gt;Jayawardena&lt;/lastname&gt; 
+                    &lt;gender&gt;Male&lt;/gender&gt; 
+                    &lt;age&gt;26&lt;/age&gt; 
+                    &lt;country&gt;SriLanka&lt;/country&gt; 
+                &lt;/person&gt; 
+            &lt;/people&gt; 
+        &lt;/soapenv:Body&gt; 
+    &lt;/soapenv:Header&gt;&lt;/soapenv:Envelope&gt;
+```
+
+## Example 4 - Adding CDATA to be displayed in the output
+
+Follow the steps below to add CDATA to display them in the output
+without processing them via the XSLT transformation.
+
+1.  Create a file named `XMLInputFactory.properties` inside the `&lt;MI_HOME&gt;` directory, and include the
+    following property in it: `javax.xml.stream.isCoalescing=false`
+2.  Add the `&lt;xsl:output method=&quot;xml&quot; omit-xml-declaration=&quot;yes&quot; indent=&quot;yes&quot;/&gt;` attribute to the XSL stylesheet.
+3.  In the XSL stylesheet, wrap the encoded CDATA within the `&lt;xsl:text&gt;` elements with the `disable-output-escaping=&quot;yes&quot;` parameter as shown below.
+
+    ```java
+            &lt;xsl:text disable-output-escaping=&quot;yes&quot;&gt;&amp;lt;![CDATA[&lt;/xsl:text&gt;
+            &lt;xsl:copy-of select=&quot;*&quot;/&gt;
+            &lt;xsl:text disable-output-escaping=&quot;yes&quot;&gt;]]&amp;gt;&lt;/xsl:text&gt;
+    ```
+
+The following is an example of a XSL stylesheet, which includes CDATA to
+be displayed in the output.
+
+```xml
+    &lt;xsl:stylesheet version=&quot;2.0&quot;
+                    xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt; 
+        &lt;xsl:output method=&quot;xml&quot; omit-xml-declaration=&quot;yes&quot; indent=&quot;yes&quot;/&gt;
+        &lt;xsl:template match=&quot;/&quot;&gt;
+          &lt;root&gt;
+    &lt;xsl:copy&gt;
+    &lt;xsl:text disable-output-escaping=&quot;yes&quot;&gt;&amp;lt;![CDATA[&lt;/xsl:text&gt;
+    &lt;xsl:copy-of select=&quot;*&quot;/&gt;
+    &lt;xsl:text disable-output-escaping=&quot;yes&quot;&gt;]]&amp;gt;&lt;/xsl:text&gt;
+    &lt;/xsl:copy&gt;
+          &lt;/root&gt;
+    &lt;/xsl:template&gt;
+    &lt;/xsl:stylesheet&gt;
+```
+
+You can use the following Synapse configuration to process the above XSL stylesheet via an XSLT mediator. 
+In the above configuration, the XSL stylesheet is defined as a local entry named `XSLTTest`, and it is referred in the XSLT mediator configuration via the `key` attribute within the proxy service named `XSLTProxy`.
+
+=== &quot;Proxy Service&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy name=&quot;XSLTProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;http https&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;xslt key=&quot;XSLTTest&quot;/&gt;
+                &lt;log category=&quot;INFO&quot; level=&quot;full&quot;/&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence/&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;Local Entry&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;localEntry key=&quot;XSLTTest&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;xsl:stylesheet version=&quot;2.0&quot; xmlns:xsl=&quot;http://www.w3.org/1999/XSL/Transform&quot;&gt;
+            &lt;xsl:output method=&quot;xml&quot; omit-xml-declaration=&quot;yes&quot; indent=&quot;yes&quot;/&gt;
+            &lt;xsl:template match=&quot;/&quot;&gt;
+                &lt;root&gt;
+                    &lt;xsl:copy&gt;
+                        &lt;xsl:text disable-output-escaping=&quot;yes&quot;&gt;&amp;lt;![CDATA[&lt;/xsl:text&gt;
+                        &lt;xsl:copy-of select=&quot;*&quot;/&gt;
+                        &lt;xsl:text disable-output-escaping=&quot;yes&quot;&gt;]]&amp;gt;&lt;/xsl:text&gt;
+                    &lt;/xsl:copy&gt;
+                &lt;/root&gt;
+            &lt;/xsl:template&gt;
+        &lt;/xsl:stylesheet&gt;
+    &lt;/localEntry&gt;
+    ```
+
+For example, pass the following payload to the `XSLTProxy` proxy service of the above configuration.
+
+```xml
+    &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+       &lt;soapenv:Header/&gt;
+       &lt;soapenv:Body&gt;
+          &lt;abc&gt;testabc&lt;/abc&gt;
+       &lt;/soapenv:Body&gt;   
+    &lt;/soapenv:Envelope&gt;
+```
+
+You view the output with the CDATA displayed as follows in the Console logs of the WSO2 Integrator: MI.
+
+```text
+INFO - LogMediator To: /services/XSLTProxy.XSLTProxyHttpSoap11Endpoint, WSAction: urn:mediate, SOAPAction: urn:mediate, MessageID: urn:uuid:266d380f-800f-479b-bee9-c30897efe562, Direction: request, Envelope: &lt;?xml version=&#x27;1.0&#x27; encoding=&#x27;utf-8&#x27;?&gt;
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+&lt;soapenv:Body&gt;
+    &lt;root xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;&lt;![CDATA[&lt;abc xmlns=&quot;&quot;&gt;testabc&lt;/abc&gt;]]&gt;&lt;/root&gt;
+&lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
+```
+
+!!! info &quot;Optimize the XSLT mediator&quot;
+
+    In real-world scenarios, you might encounter use cases where you pre-process before doing the XSLT message transformation using the XSLT mediator. In such use cases, you have to use the XSLT mediator instead of the FastXSLT mediator. You can specify the source, properties, features, or resources with the XSLT mediator, but the downside with the XSLT mediator is that it does not perform well when the message size is larger.
+    
+    It is possible to tune the XSLT mediator configuration to perform better for large message sizes. In the XSLT mediator, the following two parameters control the memory usage of the server. These two parameters can be configured in the `&lt;MI_HOME&gt;/conf/deployment.toml` file.
+    
+    ```toml
+    [synapse_properties]
+    &#x27;synapse.temp_data_chunk_size&#x27;=3072
+    &#x27;synapse.temp_data.chunk.threshold&#x27;=8
+    ```
+    
+    These parameters decide when to write to the file system when the message size is large. The default values for the parameters allow WSO2 MI to process messages of size 3072*8 = 24K with the XSLT mediator without writing to the file system. This means that there is no performance drop in the XSLT mediator when the message size is less than 24K, but when the message size is larger than that, you see clear performance degradation.
+    
+    You can improve the performance of the XSLT mediator by allowing the use of more memory when processing large messages with the XSLT mediator.
+    
+    For example, if you know that your message size is going to be less than 512K (such as 16384 * 32), you can set the values of the above parameters as follows:
+    
+    ```toml
+    [synapse_properties]    
+    &#x27;synapse.temp_data_chunk_size&#x27;=16384
+    &#x27;synapse.temp_data.chunk.threshold&#x27;=32
+    ```
+    
+    Then the XSLT transformation happens in memory without writing data to disk. Therefore, performance is increased.
+
+    If the input or transformed message size exceeds the value of `&lt;synapse.temp_data_chunk_size&gt;`, the XSLT Mediator creates temporary files at `&lt;MI_HOME&gt;/tmp`. These files are not explicitly deleted by the WSO2 Integrator: MI. The lifecycle of these files is managed by Java&#x27;s Garbage Collector (GC). When no references to the temporary files remain, they will be expected to be deleted as part of the `java.lang.Object.finalize()` method.</body>
+</html>

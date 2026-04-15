@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>db-report-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># DB Report Mediator
+
+The **DB Report Mediator** is similar to the [DBLookup Mediator]({{base_path}}/reference/mediators/dblookup-mediator). The difference between the two mediators is that the DB Report mediator writes information to a database using the specified insert SQL statement.
+
+!!! Note
+    Currently, the &#x27;DB-Report-mediator&#x27; does not support the &#x27;json-eval&#x27; expression used to extract the parameters.
+
+## Syntax
+
+The syntax of the DB Report mediator changes depending on whether you connect to the database using a connection pool, or using a data source.
+
+-   **Connection Pool**
+    ```xml
+    &lt;dbreport useTransaction=&quot;true | false&quot;&gt;
+       &lt;connection&gt;
+         &lt;pool&gt;
+          (
+            &lt;driver/&gt;
+            &lt;url/&gt;
+            &lt;user/&gt;
+            &lt;password/&gt;
+
+            &lt;dsName/&gt;
+            &lt;icClass/&gt;
+            &lt;url/&gt;
+            &lt;user/&gt;
+            &lt;password/&gt;
+          )
+            &lt;property name=&quot;name&quot; value=&quot;value&quot;/&gt;*
+         &lt;/pool&gt;
+       &lt;/connection&gt;
+       &lt;statement&gt;
+           &lt;sql&gt;insert into something values(?, ?, ?, ?)&lt;/sql&gt;
+          &lt;parameter [value=&quot;&quot; | expression=&quot;&quot;] type=&quot;CHAR|VARCHAR|LONGVARCHAR|NUMERIC|DECIMAL|BIT|TINYINT|SMALLINT|INTEGER|BIGINT|REAL|FLOAT|DOUBLE|DATE|TIME|TIMESTAMP&quot;/&gt;*
+       &lt;/statement&gt;+
+    &lt;/dbreport&gt;
+    ```
+
+-   **Data source**
+    The syntax of the DB Report mediator further differs based on whether the connection to the database is made using an external datasource or a Carbon datasource. Click on the relevant tab to view the required syntax.
+
+    !!! Note
+        You need to use a **Carbon Datasource** with the DBReport mediator for the &lt;a href=&quot;{{base_path}}/reference/mediators/transaction-mediator&quot;&gt;Transaction Mediator&lt;/a&gt; to work correctly. Otherwise, operations like commit, rollback  will not function as expected.
+
+    === &quot;External Datasource&quot;
+        ```xml
+        &lt;dbreport useTransaction=&quot;true | false&quot;&gt;
+           &lt;connection&gt;
+              &lt;pool&gt;
+                &lt;dsName/&gt;
+                &lt;icClass/&gt;
+                &lt;url/&gt;
+                &lt;user/&gt;
+                &lt;password/&gt;
+                &lt;property name=&quot;name&quot; value=&quot;value&quot;/&gt;*
+              &lt;/pool&gt;
+           &lt;/connection&gt;
+           &lt;statement&gt;
+              &lt;sql&gt;select something from table where something_else = ?&lt;/sql&gt;
+              &lt;parameter [value=&quot;&quot; | expression=&quot;&quot;] type=&quot;CHAR|VARCHAR|LONGVARCHAR|NUMERIC|DECIMAL|BIT|TINYINT|SMALLINT|INTEGER|BIGINT|REAL|FLOAT|DOUBLE|DATE|TIME|TIMESTAMP&quot;/&gt;*
+           &lt;/statement&gt;+
+        &lt;/dbreport&gt;
+        ```
+    === &quot;Carbon Datasource&quot;
+        ```xml
+        &lt;dbreport useTransaction=&quot;true | false&quot;&gt;
+           &lt;connection&gt;
+              &lt;pool&gt;
+                &lt;dsName/&gt;
+              &lt;/pool&gt;
+           &lt;/connection&gt;
+           &lt;statement&gt;
+              &lt;sql&gt;select something from table where something_else = ?&lt;/sql&gt;
+              &lt;parameter [value=&quot;&quot; | expression=&quot;&quot;] type=&quot;CHAR|VARCHAR|LONGVARCHAR|NUMERIC|DECIMAL|BIT|TINYINT|SMALLINT|INTEGER|BIGINT|REAL|FLOAT|DOUBLE|DATE|TIME|TIMESTAMP&quot;/&gt;*
+           &lt;/statement&gt;+
+        &lt;/dbreport&gt;
+        ```
+
+## Configurations
+
+### General configurations
+
+The parameters available to configure the DB Report mediator are as follows.
+
+!!! Info
+    When specifying the DB connection using a connection pool, other than specifying parameter values inline, you can also specify following parameter values of the connection information (i.e. Driver, URL, User and password) as registry entries. The advantage of specifying a parameter value as a registry entry is that the same connection information configurations can be used in different environments simply by changing the registry entry value. To do this, give the registry path within the `key` attribute as shown in the example below.
+    ```xml
+    &lt;dblookup xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;connection&gt;
+        &lt;pool&gt;
+            &lt;password key=&quot;conf:/repository/esb/password&quot;/&gt;
+            &lt;driver key=&quot;conf:/repository/esb/driver&quot;/&gt;
+            &lt;url key=&quot;conf:/repository/esb/url&quot;/&gt;
+            &lt;user key=&quot;conf:/repository/esb/username&quot;/&gt;
+        &lt;/pool&gt;
+    &lt;/connection&gt;
+    &lt;/dblookup&gt;
+    ```
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Use Transaction&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;This parameter specifies whether the database operation should be performed within a transaction or not. Click &lt;strong&gt;Yes&lt;/strong&gt; or &lt;strong&gt;No&lt;/strong&gt; as relevant.&lt;/p&gt;
+&lt;p&gt;To include multiple database reports within the same database transaction inside a particular message flow, set the value of this &lt;strong&gt;Use Transaction&lt;/strong&gt; property to &lt;strong&gt;Yes&lt;/strong&gt; .&lt;br /&gt;
+&lt;/p&gt;
+&lt;p&gt;However, when you have more reports it takes more time to complete a transaction and when multiple messages flow in, then multiple transactions can become active at the same time.&lt;/p&gt;
+&lt;p&gt;By default, the maximum number of active transactions is 50 as imposed by the Atomikos JTA implementation. To override this, create a file named &lt;code&gt;                  transaction.properties                 &lt;/code&gt; by including the following property and add it to the &lt;code&gt;                  &amp;lt;MI_HOME&amp;gt;/lib                 &lt;/code&gt; directory:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;com.atomikos.icatch.max_actives=1000&lt;/code&gt;&lt;/pre&gt;
+&lt;div&gt;
+Specifying the value as -1 allows unlimited transactions. Change the value accordingly to limit the number of active transactions based on your environment and the concurrency level of the service.
+&lt;/div&gt;
+&lt;p&gt;If you click &lt;strong&gt;Yes&lt;/strong&gt; to perform the database operation within a transaction, you need to ensure the following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;The DBReport mediator configuration must be preceded by a Transaction Mediator configuration with &lt;code&gt;                   new                  &lt;/code&gt; as the transaction action.&lt;/li&gt;
+&lt;li&gt;The DBReport mediator configuration must be followed by a Transaction Mediator configuration with &lt;code&gt;commit&lt;/code&gt; as the transaction action.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;For detailed information about configuring Transaction mediators, see &lt;a href=&quot;{{base_path}}/reference/mediators/transaction-mediator&quot;&gt;Transaction Mediator&lt;/a&gt; .&lt;/p&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+The configuration of the DBReport mediator varies depending on whether you connect to the database using a connection pool or a datasource. Refer to the following sections accordingly.
+
+### Connection Pool configurations
+
+The parameters available to configure the DB Report mediator are as follows.
+
+!!! Info
+    When specifying the DB connection using a connection pool, other than specifying parameter values inline, you can also specify following parameter values of the connection information (i.e. Driver, URL, User and password) as registry entries. The advantage of specifying a parameter value as a registry entry is that the same connection information configurations can be used in different environments simply by changing the registry entry value. To do this, give the registry path within the `key` attribute as shown in the example below.
+    ```xml
+    &lt;dbreport xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;connection&gt;
+        &lt;pool&gt;
+            &lt;password key=&quot;conf:/repository/esb/password&quot;/&gt;
+            &lt;driver key=&quot;conf:/repository/esb/driver&quot;/&gt;
+            &lt;url key=&quot;conf:/repository/esb/url&quot;/&gt;
+            &lt;user key=&quot;conf:/repository/esb/username&quot;/&gt;
+        &lt;/pool&gt;
+    &lt;/connection&gt;
+    &lt;/dbreport&gt;
+    ```
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Driver&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;The class name of the database driver.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Url&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;The JDBC URL of the database that data will be written to.&lt;/p&gt;
+&lt;p&gt;Set the &lt;code&gt;                 autoReconnect                &lt;/code&gt; parameter to &lt;code&gt;                 true                &lt;/code&gt; to help reconnect to the database when the connection between the client and the database is dropped. For example, &lt;code&gt;                 &amp;lt;url&amp;gt;jdbc:mysql://&amp;lt;ip&amp;gt;:&amp;lt;port&amp;gt;/test?autoReconnect=true&amp;lt;/url&amp;gt;                &lt;/code&gt; .&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;User&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;The user name for connecting to the database.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Password&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;The password used to connect to the database.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+To add properties to the DBReport mediator, start with the following parameters:
+
+| Parameter Name | Description                                      |
+|----------------|--------------------------------------------------|
+| **Name**       | The name of the property.                        |
+| **Value**      | The value of the property.                       |
+| **Action**     | This parameter enables a property to be deleted. |
+
+Once you have defined the above parameters, enter the following properties:
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;&lt;p&gt;Name&lt;/p&gt;&lt;/th&gt;
+&lt;th&gt;&lt;p&gt;Value&lt;/p&gt;&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;p&gt;autocommit&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;true / false&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;The auto-commit state of the connections created by the pool.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;p&gt;isolation&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Connection.TRANSACTION_NONE / Connection.TRANSACTION_READ_COMMITTED / Connection.TRANSACTION_READ_UNCOMMITTED / Connection.TRANSACTION_REPEATABLE_READ / Connection.TRANSACTION_SERIALIZABLE&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;The isolation state of the connections created by the pool.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;p&gt;initialsize&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;int&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;The initial number of connections created when the pool is started.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;p&gt;maxactive&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;int&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;The maximum number of active connections that can be allocated from this pool at a given time. When this maximum limit is reached, no more active connections will be created by the connection pool. Specify 0 or a negative value if you do not want to set a limit.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;p&gt;maxidle&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;int&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;The maximum number of idle connections to be allowed in the connection pool at a given time. Specify 0 or a negative value if you want the pool to wait indefinitely.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;p&gt;maxopenstatements&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;int&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;The maximum number of open statements that can be allocated from the statement pool at a given time. When this maximum limit is reached, no more new statements will be created by the statement pool. Specify 0 or a negative value if you do not want to set a limit.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;p&gt;maxwait&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;long&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;The maximum number of milliseconds that the connection pool will wait for a connection to return before throwing an exception when there are no connections available in the pool. Specify 0 or a negative value if you want the pool to wait indefinitely.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;p&gt;minidle&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;int&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;The minimum number of idle connections to be allowed in the connection pool at a given time. Specify 0 or a negative value if you want the pool to wait indefinitely.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;p&gt;poolstatements&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;true/ false&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;If the value is &lt;code&gt;true&lt;/code&gt;, statement pooling is enabled for the pool.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;p&gt;testonborrow&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;true/ false&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;If the value is &lt;code&gt;                true               &lt;/code&gt; , objects are validated before they are borrowed from the pool. An object which fails the validation test will be dropped from the pool and another object in the pool will be picked instead.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;p&gt;testwhileidle&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;true/ false&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;If the value is &lt;code&gt;                true               &lt;/code&gt; , the objects in the pool will be validated using an idle object evictor (if any exists). Any object which fails this validation test would be dropped from the pool.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;p&gt;validationquery&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;String&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;The SQL query that will be used to validate connections from this pool before returning them to the caller.&lt;/p&gt;
+&lt;p&gt;This property helps to reconnect to the database when the database connection between the client and the database is dropped. For example, &lt;code&gt;                 &amp;lt;property name=&quot;validationquery&quot; value=&quot;select 1&quot;/&amp;gt;                &lt;/code&gt; .&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+### Datasource configurations
+
+The configuration of the DB Report mediator further differs based on whether the connection to the database is made using an external datasource or a Carbon datasource.
+
+#### External Datasource
+The parameters available to configure the DB Report mediator as an external datasource are as follows.
+
+| Parameter Name      | Description                                                                                                                                                                                   |
+|---------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Initial Context** | The initial context factory class. The corresponding `                   Java                  ` environment property is `                   java.naming.factory.initial                  ` . |
+| **Datasource Name** | The naming service provider URL . The corresponding `                   Java                  ` environment property is `                   java.naming.provider.url                  ` .     |
+| **URL**             | The JDBC URL of the database that data will be written to.                                                                                                                                    |
+| **User**            | The user name used to connect to the database.                                                                                                                                                |
+| **Password**        | The password used to connect to the database.                                                                                                                                                 |
+
+To add properties to the DBReport mediator, start with the following parameters:
+
+| Parameter Name | Description                                      |
+|----------------|--------------------------------------------------|
+| **Name**       | The name of the property.                        |
+| **Value**      | The value of the property.                       |
+| **Action**     | This parameter enables a property to be deleted. |
+
+
+Once you have defined the above parameters, enter the following properties:
+
+| Name              | Value                                                                                                                                                                                                | Description                                                                                                                                                                                                                                                             |
+|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| autocommit        | true / false                                                                                                                                                                                         | The auto-commit state of the connections created by the pool.                                                                                                                                                                                                           |
+| isolation         | Connection.TRANSACTION\_NONE / Connection.TRANSACTION\_READ\_COMMITTED / Connection.TRANSACTION\_READ\_UNCOMMITTED / Connection.TRANSACTION\_REPEATABLE\_READ / Connection.TRANSACTION\_SERIALIZABLE | The isolation state of the connections created by the pool.                                                                                                                                                                                                             |
+| initialsize       | int                                                                                                                                                                                                  | The initial number of connections created when the pool is started.                                                                                                                                                                                                     |
+| maxactive         | int                                                                                                                                                                                                  | The maximum number of active connections that can be allocated from this pool at a given time. When this maximum limit is reached, no more active connections will be created by the connection pool. Specify 0 or a negative value if you do not want to set a limit.  |
+| maxidle           | int                                                                                                                                                                                                  | The maximum number of idle connections to be allowed in the connection pool at a given time. Specify 0 or a negative value if you want the pool to wait indefinitely.                                                                                                   |
+| maxopenstatements | int                                                                                                                                                                                                  | The maximum number of open statements that can be allocated from the statement pool at a given time. When this maximum limit is reached, no more new statements will be created by the statement pool. Specify 0 or a negative value if you do not want to set a limit. |
+| maxwait           | long                                                                                                                                                                                                 | The maximum number of milliseconds that the connection pool will wait for a connection to return before throwing an exception when there are no connections available in the pool. Specify 0 or a negative value if you want the pool to wait indefinitely.             |
+| minidle           | int                                                                                                                                                                                                  | The minimum number of idle connections to be allowed in the connection pool at a given time. Specify 0 or a negative value if you want the pool to wait indefinitely.                                                                                                   |
+| poolstatements    | true/ false                                                                                                                                                                                          | If the value is `                   true                  ` , statement pooling is enabled for the pool.                                                                                                                                                                |
+| testonborrow      | true/ false                                                                                                                                                                                          | If the value is `                   true                  ` , objects are validated before they are borrowed from the pool. An object which fails the validation test will be dropped from the pool and another object in the pool will be picked instead.              |
+| testwhileidle     | true/ false                                                                                                                                                                                          | If the value is `                   true                  ` , the objects in the pool will be validated using an idle object evictor (if any exists). Any object which fails this validation test would be dropped from the pool.                                       |
+| validationquery   | String                                                                                                                                                                                               | The SQL query that will be used to validate connections from this pool before returning them to the caller.                                                                                                                                                             |
+
+#### Carbon Datasource
+
+| Parameter Name      | Description                                                                                                                                                                                |
+|---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Datasource**      | This parameter is used to select a specific Carbon datasource you want to use to make the connection. All the Carbon datasources which are currently available are included in the list. |
+
+If you plan to use transactions, you must configure the datasource with an `XADataSource` implementation and set `defaultAutoCommit` to false. This ensures that the &lt;a href=&quot;{{base_path}}/reference/mediators/transaction-mediator&quot;&gt;Transaction Mediator&lt;/a&gt; can correctly manage commit and rollback operations.
+
+The following is a sample datasource configuration for a MySQL database:
+
+```xml
+&lt;datasource&gt;
+    &lt;name&gt;inventoryDB&lt;/name&gt;
+    &lt;jndiConfig useDataSourceFactory=&quot;false&quot;&gt;
+        &lt;name&gt;jdbc/inventoryDB&lt;/name&gt;
+    &lt;/jndiConfig&gt;
+    &lt;definition type=&quot;RDBMS&quot;&gt;
+        &lt;configuration&gt;
+            &lt;testOnBorrow&gt;true&lt;/testOnBorrow&gt;
+            &lt;defaultAutoCommit&gt;false&lt;/defaultAutoCommit&gt;
+            &lt;dataSourceClassName&gt;com.mysql.cj.jdbc.MysqlXADataSource&lt;/dataSourceClassName&gt;
+            &lt;username&gt;USERNAME&lt;/username&gt;
+            &lt;password&gt;PASSWORD&lt;/password&gt;
+            &lt;dataSourceProps&gt;
+                &lt;property name=&quot;url&quot;&gt;jdbc:mysql://localhost:3306/&lt;DB_NAME&gt;&lt;/property&gt;
+            &lt;/dataSourceProps&gt;
+        &lt;/configuration&gt;
+    &lt;/definition&gt;
+&lt;/datasource&gt;
+```
+
+For more information on creating a datasource, see [Create a datasource]({{base_path}}/develop/creating-artifacts/data-services/creating-datasources).
+
+### SQL statements
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;SQL&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;This parameter is used to enter one or more SQL statements.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Parameters&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;This section is used to specify how the values of parameters in the SQL will be determined. A parameter value can be static or calculated at runtime based on a given expression.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Parameter Type&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;The data type of the parameter. Possible values are as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CHAR&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;VARCHAR&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;LONGVARCHAR&lt;br /&gt;
+&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;NUMERIC&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DECIMAL&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;BIT&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TINYINT&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SAMLLINT&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;INTEGER&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;BIGINT&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;REAL&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DOUBLE&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DATE&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TIME&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TIMESTAMP&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Property Type&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;This determines whether the parameter value should be a static value or calculated at run time via an expression.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Value&lt;/strong&gt; : If this is selected, a static value would be considered as the property value and this value should be entered in the &lt;strong&gt;Value/Expression&lt;/strong&gt; parameter.&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Expression:&lt;/strong&gt; If this is selected, the property value will be determined during mediation by evaluating an expression. This expression should be entered in the &lt;strong&gt;Value/Expression&lt;/strong&gt; parameter.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Value/Expression&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;p&gt;This parameter is used to enter the static value or the XPath expression used to determine the property value based on the option you selected for the &lt;strong&gt;Property Type&lt;/strong&gt; parameter.&lt;/p&gt;
+&lt;p&gt;You can click &lt;strong&gt;NameSpaces&lt;/strong&gt; to add namespaces if you are providing an expression. Then the &lt;strong&gt;Namespace Editor&lt;/strong&gt; panel would appear where you can provide any number of namespace prefixes and URLs used in the XPath expression.&lt;/p&gt;
+
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Action&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;This allows you to delete a parameter.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+## Examples
+
+### Simple database write operation
+
+This example demonstrates simple database write operations. The DB Report mediator writes to a table using the details of the message. It updates the stock price of the company using the last quote value, which is calculated by evaluating an XPath expression against the response message.
+
+```xml
+&lt;dbreport xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;connection&gt;
+        &lt;pool&gt;
+            &lt;driver&gt;org.apache.derby.jdbc.ClientDriver&lt;/driver&gt;
+            &lt;url&gt;jdbc:derby://localhost:1527/esbdb;create=false&lt;/url&gt;
+            &lt;user&gt;esb&lt;/user&gt;
+            &lt;password&gt;esb&lt;/password&gt;
+        &lt;/pool&gt;
+    &lt;/connection&gt;
+    &lt;statement&gt;
+        &lt;sql&gt;&lt;![CDATA[update company set price=? where name =?]]&gt;&lt;/sql&gt;
+        &lt;parameter expression=&quot;//m0:return/m1:last/child::text()&quot; type=&quot;DOUBLE&quot; xmlns:m0=&quot;http://services.samples&quot; xmlns:m1=&quot;http://services.samples/xsd&quot;/&gt;
+        &lt;parameter expression=&quot;//m0:return/m1:symbol/child::text()&quot; type=&quot;VARCHAR&quot; xmlns:m0=&quot;http://services.samples&quot; xmlns:m1=&quot;http://services.samples/xsd&quot;/&gt;
+    &lt;/statement&gt;
+&lt;/dbreport&gt;
+```
+
+### Database write operation within a transaction
+
+In this example, `&lt;transaction action=&quot;new&quot;/&gt;` is a Transaction Mediator configuration that starts a new transaction. The DBReport mediator configuration performs a few write operations including deleting records when the name matches a specific value derived via an
+expression as well as a few insertions. Once the database operations are
+complete, they are committed via
+`&lt;transaction action=&quot;commit&quot;/&gt;` , which is another
+Transaction Mediator configuration.
+
+=== &quot;Proxy Service&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy name=&quot;SimpleProxy&quot; transports=&quot;http https&quot; startonload=&quot;true&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;call&gt;
+                    &lt;endpoint key=&quot;SimpleStockQuoteServiceEP&quot;/&gt;
+                &lt;/call&gt;
+                &lt;transaction action=&quot;new&quot;/&gt;
+                &lt;log level=&quot;custom&quot;&gt;
+                    &lt;property name=&quot;text&quot; value=&quot;** Reporting to the Database EIdb**&quot;/&gt;
+                &lt;/log&gt;
+                &lt;dbreport useTransaction=&quot;true&quot;&gt;
+                    &lt;connection&gt;
+                        &lt;pool&gt;
+                            &lt;dsName&gt;jdbc/inventoryDB&lt;/dsName&gt;
+                        &lt;/pool&gt;
+                    &lt;/connection&gt;
+                    &lt;statement&gt;
+                        &lt;sql&gt;delete from company where name =?&lt;/sql&gt;
+                        &lt;parameter expression=&quot;//m0:return/m1:symbol/child::text()&quot; xmlns:m0=&quot;http://services.samples&quot; xmlns:m1=&quot;http://services.samples/xsd&quot; type=&quot;VARCHAR&quot;/&gt;
+                    &lt;/statement&gt;
+                &lt;/dbreport&gt;
+                &lt;log level=&quot;custom&quot;&gt;
+                    &lt;property name=&quot;text&quot; value=&quot;** Reporting to the Database EIdb1**&quot;/&gt;
+                &lt;/log&gt;
+                &lt;dbreport useTransaction=&quot;true&quot;&gt;
+                    &lt;connection&gt;
+                        &lt;pool&gt;
+                            &lt;dsName&gt;jdbc/inventoryDB&lt;/dsName&gt;
+                        &lt;/pool&gt;
+                    &lt;/connection&gt;
+                    &lt;statement&gt;
+                        &lt;sql&gt;INSERT into company values (?,&#x27;c4&#x27;,?)&lt;/sql&gt;
+                        &lt;parameter expression=&quot;//m0:return/m1:symbol/child::text()&quot; xmlns:m1=&quot;http://services.samples/xsd&quot; xmlns:m0=&quot;http://services.samples&quot; type=&quot;VARCHAR&quot;/&gt;
+                        &lt;parameter expression=&quot;//m0:return/m1:last/child::text()&quot; xmlns:m1=&quot;http://services.samples/xsd&quot; xmlns:m0=&quot;http://services.samples&quot; type=&quot;DOUBLE&quot;/&gt;
+                    &lt;/statement&gt;
+                &lt;/dbreport&gt;
+                &lt;transaction action=&quot;commit&quot;/&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence&gt;
+                &lt;sequence key=&quot;myFaultHandler&quot;/&gt;
+            &lt;/faultSequence&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;Fault Sequence&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;sequence xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;myFaultHandler&quot;&gt;
+        &lt;log level=&quot;custom&quot;&gt;
+            &lt;property name=&quot;text&quot; value=&quot;** Rollback Transaction**&quot;/&gt;
+        &lt;/log&gt;
+        &lt;transaction action=&quot;rollback&quot;/&gt;
+        &lt;respond/&gt;
+    &lt;/sequence&gt;
+    ```
+=== &quot;Endpoint&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;endpoint name=&quot;SimpleStockQuoteServiceEP&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;&gt;
+            &lt;suspendOnFailure&gt;
+                &lt;initialDuration&gt;-1&lt;/initialDuration&gt;
+                &lt;progressionFactor&gt;1&lt;/progressionFactor&gt;
+            &lt;/suspendOnFailure&gt;
+            &lt;markForSuspension&gt;
+                &lt;retriesBeforeSuspension&gt;0&lt;/retriesBeforeSuspension&gt;
+            &lt;/markForSuspension&gt;
+        &lt;/address&gt;
+    &lt;/endpoint&gt;
+    ```
+=== &quot;Data Source&quot;
+    ```xml
+    &lt;datasource&gt;
+        &lt;name&gt;inventoryDB&lt;/name&gt;
+        &lt;jndiConfig useDataSourceFactory=&quot;false&quot;&gt;
+            &lt;name&gt;jdbc/inventoryDB&lt;/name&gt;
+        &lt;/jndiConfig&gt;
+        &lt;definition type=&quot;RDBMS&quot;&gt;
+            &lt;configuration&gt;
+                &lt;testOnBorrow&gt;true&lt;/testOnBorrow&gt;
+                &lt;defaultAutoCommit&gt;false&lt;/defaultAutoCommit&gt;
+                &lt;dataSourceClassName&gt;com.mysql.cj.jdbc.MysqlXADataSource&lt;/dataSourceClassName&gt;
+                &lt;username&gt;USERNAME&lt;/username&gt;
+                &lt;password&gt;PASSWORD&lt;/password&gt;
+                &lt;dataSourceProps&gt;
+                    &lt;property name=&quot;url&quot;&gt;jdbc:mysql://localhost:3306/&lt;DB_NAME&gt;&lt;/property&gt;
+                &lt;/dataSourceProps&gt;
+            &lt;/configuration&gt;
+        &lt;/definition&gt;
+    &lt;/datasource&gt;
+    ```
+</body>
+</html>

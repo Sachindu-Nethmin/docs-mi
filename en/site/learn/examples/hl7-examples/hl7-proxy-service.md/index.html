@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>hl7-proxy-service.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Mediate HL7 Messages
+
+You can create a proxy service that uses the HL7 transport to connect to an HL7 server. This proxy service will receive HL7-client connections and send them to the HL7 server. It can also receive XML messages over HTTP/HTTPS and transform them into HL7 before sending them to the server, and it will transform the HL7 responses back into XML.
+
+## Synapse configuration
+
+Given below is an example proxy that receives HL7 messages from a client and relays the message to an HL7 server. See the instructions on how to [build and run](#build-and-run) this example.
+
+=== &quot;Proxy Service&quot;
+    ```xml
+    &lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;hl7testproxy&quot; transports=&quot;https,http,hl7&quot; statistics=&quot;disable&quot; trace=&quot;disable&quot; startOnLoad=&quot;true&quot;&gt;
+    &lt;target&gt;
+       &lt;inSequence&gt;
+         &lt;log category=&quot;INFO&quot; level=&quot;full&quot; /&gt;
+         &lt;call&gt;
+            &lt;endpoint key=&quot;HL7Endpoint&quot; /&gt;
+         &lt;/call&gt;
+         &lt;respond /&gt;
+       &lt;/inSequence&gt;
+    &lt;/target&gt;
+    &lt;parameter name=&quot;transport.hl7.Port&quot;&gt;9292&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;HL7Endpoint&quot;
+    ```xml
+    &lt;endpoint name=&quot;hl7_endpoint&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+      &lt;address uri=&quot;hl7://localhost:9988&quot; /&gt;
+    &lt;/endpoint&gt;
+    ```
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+3. [Create the proxy service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service) with the configurations given above.
+4. [Configure the HL7 transport]({{base_path}}/install-and-setup/setup/transport-configurations/configuring-transports/#configuring-the-hl7-transport) in your WSO2 Integrator: MI.
+5. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+To test this scenario, you need the following:
+
+- An HL7 client that sends messages to the port specified by the `transport.hl7.Port` parameter.
+- An HL7 back-end application that receives messages from the WSO2 Integrator: MI.
+
+You can simulate the HL7 client and back-end application using a tool such as &lt;b&gt;HAPI&lt;/b&gt;.
+
+You can use the following HL7 message to test this scenario when invoking with a HL7 Client.
+   ```bash
+   MSH|^~\&amp;|Abc|Def|Ghi|JKL|20131231000000||ADT^A01|1234567|P|2.6|||NE|NE|CH|
+   ```
+You can use the following xml message to test this scenario when invoking with a HTTP/HTTPS Client.
+   ```xml
+   &lt;hl7:message xmlns:hl7=&quot;http://wso2.org/hl7&quot;&gt;
+      &lt;ADT_A01 xmlns=&quot;urn:hl7-org:v2xml&quot;&gt;
+         &lt;MSH&gt;
+               &lt;MSH.1&gt;|&lt;/MSH.1&gt;
+               &lt;MSH.2&gt;^~\&amp;amp;&lt;/MSH.2&gt;
+               &lt;MSH.3&gt;
+                  &lt;HD.1&gt;Abc&lt;/HD.1&gt;
+               &lt;/MSH.3&gt;
+               &lt;MSH.4&gt;
+                  &lt;HD.1&gt;Def&lt;/HD.1&gt;
+               &lt;/MSH.4&gt;
+               &lt;MSH.5&gt;
+                  &lt;HD.1&gt;Ghi&lt;/HD.1&gt;
+               &lt;/MSH.5&gt;
+               &lt;MSH.6&gt;
+                  &lt;HD.1&gt;JKL&lt;/HD.1&gt;
+               &lt;/MSH.6&gt;
+               &lt;MSH.7&gt;20131231000000&lt;/MSH.7&gt;
+               &lt;MSH.9&gt;
+                  &lt;MSG.1&gt;ADT&lt;/MSG.1&gt;
+                  &lt;MSG.2&gt;A01&lt;/MSG.2&gt;
+               &lt;/MSH.9&gt;
+               &lt;MSH.10&gt;1234567&lt;/MSH.10&gt;
+               &lt;MSH.11&gt;
+                  &lt;PT.1&gt;P&lt;/PT.1&gt;
+               &lt;/MSH.11&gt;
+               &lt;MSH.12&gt;
+                  &lt;VID.1&gt;2.6&lt;/VID.1&gt;
+               &lt;/MSH.12&gt;
+               &lt;MSH.15&gt;NE&lt;/MSH.15&gt;
+               &lt;MSH.16&gt;NE&lt;/MSH.16&gt;
+               &lt;MSH.17&gt;CH&lt;/MSH.17&gt;
+         &lt;/MSH&gt;
+      &lt;/ADT_A01&gt;
+   &lt;/hl7:message&gt;
+   ```
+</body>
+</html>

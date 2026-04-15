@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>selective-consumer.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Selective Consumer
+
+This page explains how you can implement a sample scenario of Selective Consumer EIP using WSO2 Integrator: MI.
+
+## Introduction to Selective Consumer
+
+The Selective Consumer EIP allows a message consumer to select which messages it will receive. It filters the messages delivered by its channel so that it only receives the ones that match its criteria. 
+
+!!! info
+      For more information, see the [Selective Consumer](http://www.eaipatterns.com/MessageSelector.html) documentation.
+
+![Message selector solution]({{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-endpoints/message-selector-solution.gif)
+
+## Sample scenario
+
+This sample scenario demonstrates how a specific receiver only processes messages that are pre-filtered based on certain criteria. We have an Axis2 server as the consumer. The consumer criteria are specified through an XML schema validation, which is stored as a local entry in the registry. We use the Validate mediator to check whether the messages that are sent to the service match the criteria of the schema. The Axis2 server can consume the message only if the message meets the validation criteria.
+
+The diagram below depicts how to simulate the sample scenario using WSO2 MI.
+
+&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-endpoints/selective-consumer.png&quot; style=&quot;width: 70%;&quot; alt=&quot;Selective consumer&quot;&gt;
+
+Before digging into implementation details, let&#x27;s take a look at the relationship between the sample scenario and the Selective Consumer EIP by comparing their core components.
+
+| Selective Consumer EIP            | Selective Consumer Sample Scenario            |
+|-----------------------------------|-----------------------------------------------|
+| Specifying Producer               | Simple Stock Quote Client                     |
+| Messages with Selection Values    | Simple Stock Quote Request                    |
+| Selective Consumer                | Schema Validator (Validate Mediator)          |
+| Receiver                          | Simple Stock Quote Server                     |
+
+## Synapse configuration of the artifacts
+
+=== &quot;Proxy Service&quot;
+      ```xml
+      &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+      &lt;proxy name=&quot;StockQuoteProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;http https&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+         &lt;target&gt;
+            &lt;inSequence&gt;
+                  &lt;validate cache-schema=&quot;true&quot;&gt;
+                  &lt;schema key=&quot;selective_criteria&quot;/&gt;
+                     &lt;on-fail&gt;
+                     &lt;makefault description=&quot;&quot; version=&quot;soap11&quot;&gt;
+                        &lt;code value=&quot;soap11Env:VersionMismatch&quot; xmlns:soap11Env=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;/&gt;
+                        &lt;reason value=&quot;Invalid custom quote request&quot;/&gt;
+                     &lt;/makefault&gt;
+                     &lt;property name=&quot;RESPONSE&quot; value=&quot;true&quot;/&gt;
+                     &lt;header name=&quot;To&quot; expression=&quot;get-property(&#x27;ReplyTo&#x27;)&quot;/&gt;
+                     &lt;respond/&gt;
+                  &lt;/on-fail&gt;
+               &lt;/validate&gt;
+               &lt;call&gt;
+                  &lt;endpoint key=&quot;StockQuoteServiceEP&quot;/&gt;
+               &lt;/call&gt;
+               &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence&gt;
+                  &lt;log level=&quot;full&quot;&gt;
+                     &lt;property name=&quot;MESSAGE&quot; value=&quot;Executing default &amp;#34;fault&amp;#34; sequence&quot;/&gt;
+                     &lt;property name=&quot;ERROR_CODE&quot; expression=&quot;get-property(&#x27;ERROR_CODE&#x27;)&quot;/&gt;
+                     &lt;property name=&quot;ERROR_MESSAGE&quot; expression=&quot;get-property(&#x27;ERROR_MESSAGE&#x27;)&quot;/&gt;
+               &lt;/log&gt;
+                  &lt;drop/&gt;
+            &lt;/faultSequence&gt;
+         &lt;/target&gt;
+      &lt;/proxy&gt;
+      ```
+=== &quot;Local Entry&quot;
+      ```xml
+      &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+      &lt;localEntry key=&quot;selective_criteria&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+         &lt;xs:schema xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns=&quot;http://www.apache-synapse.org/test&quot; elementFormDefault=&quot;qualified&quot; attributeFormDefault=&quot;unqualified&quot; targetNamespace=&quot;http://services.samples&quot;&gt;
+            &lt;xs:element name=&quot;getQuote&quot;&gt;
+                  &lt;xs:complexType&gt;
+                     &lt;xs:sequence&gt;
+                        &lt;xs:element name=&quot;request&quot;&gt;
+                              &lt;xs:complexType&gt;
+                                 &lt;xs:sequence&gt;
+                                    &lt;xs:element name=&quot;symbol&quot; type=&quot;xs:string&quot;&gt;&lt;/xs:element&gt;
+                                 &lt;/xs:sequence&gt;
+                              &lt;/xs:complexType&gt;
+                        &lt;/xs:element&gt;
+                     &lt;/xs:sequence&gt;
+                  &lt;/xs:complexType&gt;
+            &lt;/xs:element&gt;
+         &lt;/xs:schema&gt;
+      &lt;/localEntry&gt;
+      ```
+=== &quot;Endpoint&quot;
+      ```xml
+      &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+      &lt;endpoint name=&quot;StockQuoteServiceEP&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+         &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;&gt;
+         &lt;/address&gt;
+      &lt;/endpoint&gt;
+      ```
+
+### How the implementation works
+
+Let&#x27;s break down the key components of the configuration:
+
+- **Local Entry**: A local registry entry (`selective_criteria`) defines the XML schema used for validating incoming messages.
+- **Validate Mediator**: This mediator validates incoming messages against the specified schema. If validation fails, the `on-fail` sequence is executed.
+- **On-Fail Sequence**: If validation fails, this sequence creates a SOAP fault response, sets the `To` header using the `ReplyTo` property, and sends the response back to the client.
+- **Fault Sequence**: Handles any errors during message processing by logging detailed fault information and then dropping the message.
+
+## Set up the sample scenario
+
+Follow the below instructions to simulate this sample scenario.
+
+{!includes/eip-set-up.md!}
+
+3. Download the [backend service](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/axis2Server.zip).
+
+4. Extract the downloaded zip file.
+
+5. Open a terminal, and navigate to the `axis2Server/bin/` directory inside the extracted folder.
+
+6. Execute the following command to start the axis2server with the SimpleStockQuote backend service:
+
+    === &quot;On MacOS/Linux&quot;   
+          ```bash
+          sh axis2server.sh
+          ```
+    === &quot;On Windows&quot;                
+          ```bash
+          axis2server.bat
+          ``` 
+
+7. Download the artifacts of the sample.
+
+    &lt;a href=&quot;{{base_path}}/assets/attachments/learn/enterprise-integration-patterns/selective-consumer.zip&quot;&gt;
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+    &lt;/a&gt;
+
+8. Import the artifacts to WSO2 MI.
+
+    Click **File** -&gt; **Open Folder** -&gt; Select the extracted ZIP file to import the downloaded ZIP file.
+
+9. Start the project in the WSO2 MI server.
+
+    For instructions, go to [Build and Run]({{base_path}}/develop/deploy-artifacts/#build-and-run) Documentation.
+
+10. Start SoapUI.
+
+    For instructions on downloading and starting, go to [SoapUI Getting Started](https://www.soapui.org/getting-started/) Documentation.
+
+## Execute the sample
+
+Send the following requests to the service using SoapUI (or any other SOAP client):
+
+```xml
+   POST http://localhost:8290/services/StockQuoteProxy
+
+   Accept-Encoding: gzip,deflate
+   Content-Type: text/xml;charset=UTF-8
+   SOAPAction: &quot;urn:getQuote&quot;
+   Connection: Keep-Alive
+      
+   &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+      &lt;soapenv:Header/&gt;
+      &lt;soapenv:Body&gt;
+         &lt;ser:getQuote&gt;
+            &lt;ser:request&gt;
+               &lt;ser:stockvalue&gt;&lt;/ser:stockvalue&gt;
+            &lt;/ser:request&gt;
+         &lt;/ser:getQuote&gt;
+      &lt;/soapenv:Body&gt;
+   &lt;/soapenv:Envelope&gt;
+```
+
+## Analyze the output
+
+Note that the stock quote request is not processed. Send the following message to the service.
+
+```xml
+   POST http://localhost:8290/services/StockQuoteProxy
+
+   Accept-Encoding: gzip,deflate
+   Content-Type: text/xml;charset=UTF-8
+   SOAPAction: &quot;urn:getQuote&quot;
+   Connection: Keep-Alive
+
+
+   &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+      &lt;soapenv:Header/&gt;
+      &lt;soapenv:Body&gt;
+         &lt;ser:getQuote&gt;
+            &lt;ser:request&gt;
+               &lt;ser:symbol&gt;IBM&lt;/ser:symbol&gt;
+            &lt;/ser:request&gt;
+         &lt;/ser:getQuote&gt;
+      &lt;/soapenv:Body&gt;
+   &lt;/soapenv:Envelope&gt;
+```
+
+The consumer has specified the criteria for using schema validation. Only the messages that meet these criteria will be consumed.
+</body>
+</html>

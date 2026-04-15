@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>soap-headers.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># SOAP Headers
+
+!!! Info
+	The following properties are SOAP headers that can be used with the [Property mediator]({{base_path}}/reference/mediators/property-mediator) and the [Property Group mediator]({{base_path}}/reference/mediators/property-group-mediator).
+
+SOAP headers provide information about the message, such as the To and
+From values. You can use the `get-property()` function
+in the [Property mediator]({{base_path}}/reference/mediators/property-mediator) to retrieve these
+headers. You can also add Custom SOAP headers using either the
+[Payload mediator]({{base_path}}/reference/mediators/payloadfactory-mediator)
+or the [Script mediator]({{base_path}}/reference/mediators/script-mediator).
+
+## To
+
+|     Parameter       |           Value               |
+|---------------------|-------------------------------|
+| **Header Name**     | To                            |
+| **Possible Values** | Any URI                       |
+| **Description**     | The To header of the message. |
+| **Example**         | get-property(&quot;To&quot;)            |
+
+## From
+
+|     Parameter       |           Value               |
+|---------------------|---------------------------------|
+| **Header Name**     | From                            |
+| **Possible Values** | Any URI                         |
+| **Description**     | The From header of the message. |
+| **Example**         | get-property(&quot;From&quot;)            |
+
+## Action
+
+|     Parameter       |           Value               |
+|---------------------|---------------------------------------|
+| **Header Name**     | Action                                |
+| **Possible Values** | Any URI                               |
+| **Description**     | The SOAPAction header of the message. |
+| **Example**         | get-property(&quot;Action&quot;)                |
+
+## ReplyTo
+
+|     Parameter       |           Value               |
+|---------------------|--------------------------------------------|
+| **Header Name**     | ReplyTo                                    |
+| **Possible Values** | Any URI                                    |
+| **Description**     | The ReplyTo header of the message.         |
+| **Example**         | \&lt;header name=&quot;ReplyTo&quot; action=&quot;remove&quot;/\&gt; |
+
+## MessageID
+
+|     Parameter       |           Value               |
+|---------------------|----------------------------------------------------------------------------------------------------------------|
+| **Header Name**     | MessageID                                                                                                      |
+| **Possible Values** | UUID                                                                                                           |
+| **Description**     | The unique message ID of the message. It is not recommended to make alterations to this property of a message. |
+| **Example**         | get-property(&quot;MessageID&quot;)                                                                                      |
+
+## RelatesTo
+
+|     Parameter       |           Value               |
+|---------------------|--------------------------------------------------------------------------------------------------------------|
+| **Header Name**     | RelatesTo                                                                                                    |
+| **Possible Values** | UUID                                                                                                         |
+| **Description**     | The unique ID of the request to which the current message is related. It is not recommended to make changes. |
+| **Example**         | get-property(&quot;RelatesTo&quot;)                                                                                    |
+
+## FaultTo
+
+&lt;table&gt;
+&lt;colgroup&gt;
+&lt;col style=&quot;width: 50%&quot; /&gt;
+&lt;col style=&quot;width: 50%&quot; /&gt;
+&lt;/colgroup&gt;
+&lt;tr&gt;
+	&lt;th&gt;Parameter&lt;/th&gt;
+	&lt;th&gt;Value&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;p&gt;&lt;strong&gt;Header Name&lt;/strong&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;FaultTo&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;p&gt;&lt;strong&gt;Possible Values&lt;/strong&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Any URI&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;p&gt;&lt;strong&gt;Description&lt;/strong&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;The FaultTo header of the message.&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;p&gt;&lt;strong&gt;Example&lt;/strong&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class=&quot;content-wrapper&quot;&gt;
+&lt;div class=&quot;code panel pdl&quot; style=&quot;border-width: 1px;&quot;&gt;
+&lt;div class=&quot;codeContent panelContent pdl&quot;&gt;
+&lt;div class=&quot;sourceCode&quot; id=&quot;cb1&quot; data-syntaxhighlighter-params=&quot;brush: java; gutter: false; theme: Confluence&quot; data-theme=&quot;Confluence&quot; style=&quot;brush: java; gutter: false; theme: Confluence&quot;&gt;&lt;pre class=&quot;sourceCode java&quot;&gt;&lt;code class=&quot;sourceCode java&quot;&gt;&lt;span id=&quot;cb1-1&quot;&gt;&lt;a href=&quot;#cb1-1&quot;&gt;&lt;/a&gt;&amp;lt;header name=&lt;span class=&quot;st&quot;&gt;&amp;quot;FaultTo&amp;quot;&lt;/span&gt; value=&lt;span class=&quot;st&quot;&gt;&amp;quot;http://localhost:9000&amp;quot;&lt;/span&gt;/&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+</body>
+</html>

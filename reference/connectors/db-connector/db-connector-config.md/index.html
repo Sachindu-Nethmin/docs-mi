@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>db-connector-config.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># DB Connector Reference
+
+This documentation provides a reference guide for the DB Connector.
+The DB Connector allows you to connect to relational databases via JDBC and perform various operations including executing queries, modifying data, calling stored procedures, and managing transactions.
+
+## Connection configurations
+
+The DB Connector utilizes connection pooling for efficient database interaction. You need to configure a connection before using the connector operations.
+
+### Connection parameters
+Common parameters for configuring a database connection:
+
+??? note &quot;Connection Parameters&quot;
+    
+    &lt;table&gt;
+    &lt;tr&gt;
+    &lt;th&gt;Parameter Name&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+    &lt;th&gt;Required&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;Connection Name&lt;/td&gt;
+    &lt;td&gt;A unique name to identify this connection configuration.&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;JDBC Driver Class&lt;/td&gt;
+    &lt;td&gt;The fully qualified name of the JDBC driver class (e.g., &lt;code&gt;com.mysql.cj.jdbc.Driver&lt;/code&gt;, &lt;code&gt;org.postgresql.Driver&lt;/code&gt;). Standard driver classes are supported.&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;Database URL&lt;/td&gt;
+    &lt;td&gt;The JDBC URL for connecting to the database (e.g., &lt;code&gt;jdbc:mysql://localhost:3306/mydatabase&lt;/code&gt;, &lt;code&gt;jdbc:postgresql://localhost:5432/mydatabase&lt;/code&gt;).&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;Database Username&lt;/td&gt;
+    &lt;td&gt;The username for database authentication.&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;Database Password&lt;/td&gt;
+    &lt;td&gt;The password for database authentication.&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;JDBC Driver Select Options&lt;/td&gt;
+    &lt;td&gt;Choose &quot;Use Default Driver&quot; to use the default driver for the connection else you can add your own driver with the options &quot;Select Local Driver&quot; or &quot;Add Maven Dependency&quot;. All the standard drivers are supported.&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;Allow access to database metadata&lt;/td&gt;
+    &lt;td&gt;If this option is enabled, the VS Code extension will connect to the database during development and display the available tables and columns. This enhances the overall developer experience by providing easier access to database metadata.&lt;/td&gt;
+    &lt;td&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    ####Additional parameters for connection
+    
+    &lt;table&gt;
+    &lt;tr&gt;
+    &lt;th&gt;Parameter Name&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+    &lt;th&gt;Required&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;maxActiveConnections&lt;/td&gt;
+    &lt;td&gt;Maximum number of active connections that can be allocated from this pool at the same time.&lt;/td&gt;
+    &lt;td&gt;Optional&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;maxIdleConnections&lt;/td&gt;
+    &lt;td&gt;Maximum number of connections that can remain idle in the pool, without extra ones being released.&lt;/td&gt;
+    &lt;td&gt;Optional&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;minIdleConnections&lt;/td&gt;
+    &lt;td&gt;Minimum number of connections that can remain idle in the pool, without extra ones being created.&lt;/td&gt;
+    &lt;td&gt;Optional&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;poolConnectionAgedTimeout&lt;/td&gt;
+    &lt;td&gt;The time in milliseconds after which an aged connection should be removed from the pool.&lt;/td&gt;
+    &lt;td&gt;Optional&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;maxWaitTime&lt;/td&gt;
+    &lt;td&gt;The maximum number of milliseconds that the pool will wait (when no connections are available) for a connection to be returned before throwing an exception.&lt;/td&gt;
+    &lt;td&gt;Optional&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;evictionCheckInterval&lt;/td&gt;
+    &lt;td&gt;The interval in milliseconds between runs of the idle object evictor thread.&lt;/td&gt;
+    &lt;td&gt;Optional&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;minEvictionTime&lt;/td&gt;
+    &lt;td&gt;The minimum amount of time in milliseconds an object may sit idle in the pool before it is eligible for eviction by the idle object evictor.&lt;/td&gt;
+    &lt;td&gt;Optional&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+    &lt;td&gt;exhaustedAction&lt;/td&gt;
+    &lt;td&gt;Specifies the behavior when the pool is exhausted (e.g., &#x27;FAIL&#x27;, &#x27;BLOCK&#x27;, &#x27;GROW&#x27;).&lt;/td&gt;
+    &lt;td&gt;Optional&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+??? note &quot;Example: MySQL Connection&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;localEntry key=&quot;DBCon11&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;db.init&gt;
+            &lt;connectionType&gt;MYSQL&lt;/connectionType&gt;
+            &lt;dbUrl&gt;jdbc:mysql://localhost:3306/supermarket&lt;/dbUrl&gt;
+            &lt;dbUser&gt;user1&lt;/dbUser&gt;
+            &lt;dbPassword&gt;password&lt;/dbPassword&gt;
+            &lt;driverClass&gt;com.mysql.cj.jdbc.Driver&lt;/driverClass&gt;
+            &lt;userConsent&gt;true&lt;/userConsent&gt;
+            &lt;dbDriver&gt;MySQL&lt;/dbDriver&gt;
+            &lt;exhaustedAction&gt;WHEN_EXHAUSTED_BLOCK&lt;/exhaustedAction&gt;
+            &lt;name&gt;DBCon11&lt;/name&gt;
+        &lt;/db.init&gt;
+    &lt;/localEntry&gt;            
+    ```
+
+??? note &quot;Example: PostgreSQL Connection&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;localEntry key=&quot;PostgreSQLCon&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;db.init&gt;
+            &lt;connectionType&gt;POSTGRESQL&lt;/connectionType&gt;
+            &lt;dbUrl&gt;jdbc:postgresql://localhost:5432/supermarket&lt;/dbUrl&gt;
+            &lt;dbUser&gt;user1&lt;/dbUser&gt;
+            &lt;dbPassword&gt;password&lt;/dbPassword&gt;
+            &lt;driverClass&gt;org.postgresql.Driver&lt;/driverClass&gt;
+            &lt;userConsent&gt;true&lt;/userConsent&gt;
+            &lt;dbDriver&gt;PostgreSQL&lt;/dbDriver&gt;
+            &lt;exhaustedAction&gt;WHEN_EXHAUSTED_BLOCK&lt;/exhaustedAction&gt;
+            &lt;name&gt;PostgreSQLCon&lt;/name&gt;
+        &lt;/db.init&gt;
+    &lt;/localEntry&gt;        
+    ```
+
+## Operations
+
+Operations use the `configKey` attribute to reference a pre-defined connection configuration.
+
+??? note &quot;select&quot;
+    
+    Executes a SQL SELECT query using prepared statements.
+    &lt;table&gt;
+    &lt;tr&gt;&lt;th&gt;Parameter Name&lt;/th&gt;&lt;th&gt;Description&lt;/th&gt;&lt;th&gt;Required&lt;/th&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Query&lt;/td&gt;&lt;td&gt;The Raw SQL SELECT statement&lt;/td&gt;&lt;td&gt;Yes&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Table Name&lt;/td&gt;&lt;td&gt;The name of the table to be queried.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Table Columns&lt;/td&gt;&lt;td&gt;A comma-separated list of column names to be returned in the result set.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Response Columns&lt;/td&gt;&lt;td&gt;A comma-separated list of data types for the columns (e.g., VARCHAR, INTEGER, DOUBLE).&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Order By&lt;/td&gt;&lt;td&gt;The column name to order the result set by.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Limit&lt;/td&gt;&lt;td&gt;The maximum number of rows to return from the result set.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Offset&lt;/td&gt;&lt;td&gt;The number of rows to skip before starting to return results.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Fetch Size&lt;/td&gt;&lt;td&gt;The number of rows to fetch at a time from the database.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Max Rows&lt;/td&gt;&lt;td&gt;The upper limit on the number of rows returned/affected by a query, regardless of the total number of rows in the table.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Query Timeout&lt;/td&gt;&lt;td&gt;The maximum time in milliseconds to wait for the query to execute.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Output Variable Name&lt;/td&gt;&lt;td&gt;If specified, the result set is stored in this context variable.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Overwrite Message Body&lt;/td&gt;&lt;td&gt;If &#x27;true&#x27; (default), the result set overwrites the payload. Set to &#x27;false&#x27; if using &#x27;responseVariable&#x27;.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+
+
+    **Sample configuration**
+
+    ```xml
+    &lt;db.select configKey=&quot;DBCon1&quot;&gt;
+        &lt;query&gt;SELECT * FROM `Products` WHERE `product_id` = &#x27;${params.queryParams.productId}&#x27;&lt;/query&gt;
+        &lt;columnNames&gt;product_id&lt;/columnNames&gt;
+        &lt;columnTypes&gt;VARCHAR&lt;/columnTypes&gt;
+        &lt;format&gt;json&lt;/format&gt;
+        &lt;table&gt;Products&lt;/table&gt;
+        &lt;columns&gt;[]&lt;/columns&gt;
+        &lt;queryType&gt;online&lt;/queryType&gt;
+        &lt;orderBy&gt;&lt;/orderBy&gt;
+        &lt;limit&gt;&lt;/limit&gt;
+        &lt;offset&gt;&lt;/offset&gt;
+        &lt;queryTimeout&gt;&lt;/queryTimeout&gt;
+        &lt;fetchSize&gt;&lt;/fetchSize&gt;
+        &lt;maxRows&gt;&lt;/maxRows&gt;
+        &lt;responseVariable&gt;db_select_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/db.select&gt;
+    ```
+
+    **Sample response (JSON in `db_select_1` variable)**
+
+    ```json
+    [
+        {
+            &quot;product_id&quot;: &quot;PROD001&quot;,
+            &quot;name&quot;: &quot;Super Widget&quot;,
+            &quot;price&quot;: 19.99,
+            &quot;stock_quantity&quot;: 148
+        },
+        {
+            &quot;product_id&quot;: &quot;PROD002&quot;,
+            &quot;name&quot;: &quot;Mega Widget&quot;,
+            &quot;price&quot;: 29.99,
+            &quot;stock_quantity&quot;: 75
+        },
+        {
+            &quot;product_id&quot;: &quot;PROD003&quot;,
+            &quot;name&quot;: &quot;Ultra Widget&quot;,
+            &quot;price&quot;: 39.99,
+            &quot;stock_quantity&quot;: 50
+        }
+    ]
+    ```
+    *(Note: The exact JSON structure might vary based on the database schema and query.)*
+
+??? note &quot;insert&quot;
+    
+    Executes a SQL INSERT statement using prepared statements. Can retrieve auto-generated keys.
+    &lt;table&gt;
+    &lt;tr&gt;&lt;th&gt;Parameter Name&lt;/th&gt;&lt;th&gt;Description&lt;/th&gt;&lt;th&gt;Required&lt;/th&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Query&lt;/td&gt;&lt;td&gt;The Raw SQL INSERT statement&lt;/td&gt;&lt;td&gt;Yes&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Table Name&lt;/td&gt;&lt;td&gt;The name of the table to be inserted into.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Table Columns&lt;/td&gt;&lt;td&gt;A comma-separated list of column names to be inserted.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Query Timeout&lt;/td&gt;&lt;td&gt;The maximum time in milliseconds to wait for the query to execute.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Output Variable Name&lt;/td&gt;&lt;td&gt;If specified, the result set is stored in this context variable.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Overwrite Message Body&lt;/td&gt;&lt;td&gt;If &#x27;true&#x27; (default), the result set overwrites the payload. Set to &#x27;false&#x27; if using &#x27;responseVariable&#x27;.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;     
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;db.insert configKey=&quot;DBCon11&quot;&gt;
+        &lt;query&gt;INSERT INTO `orders` (`customer_id`, `total_amount`) VALUES (${params.queryParams.customerId}, ${vars.db_select_1.payload.rows[0].price * params.queryParams.quantity})&lt;/query&gt;
+        &lt;columnNames&gt;customerid, totalamount&lt;/columnNames&gt;
+        &lt;columnTypes&gt;INT, DECIMAL&lt;/columnTypes&gt;
+        &lt;format&gt;json&lt;/format&gt;
+        &lt;table&gt;orders&lt;/table&gt;
+        &lt;columns&gt;[]&lt;/columns&gt;
+        &lt;queryType&gt;online&lt;/queryType&gt;
+        &lt;queryTimeout&gt;&lt;/queryTimeout&gt;
+        &lt;responseVariable&gt;db_insert_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/db.insert&gt;
+    ```
+
+    **Sample result (in `insertResult` variable)**
+    ```json
+    {
+        &quot;generatedKeys&quot;: [
+            { &quot;GENERATED_KEY&quot;: 12345 }
+        ],
+        &quot;affectedRows&quot;: 1
+    }
+    ```
+
+??? note &quot;delete&quot;
+
+    Executes a SQL DELETE statement using prepared statements.
+
+    &lt;table&gt;
+    &lt;tr&gt;&lt;th&gt;Parameter Name&lt;/th&gt;&lt;th&gt;Description&lt;/th&gt;&lt;th&gt;Required&lt;/th&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Query&lt;/td&gt;&lt;td&gt;The Raw SQL DELETE statement&lt;/td&gt;&lt;td&gt;Yes&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Table Name&lt;/td&gt;&lt;td&gt;The name of the table to be deleted from.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Table Columns&lt;/td&gt;&lt;td&gt;A comma-separated list of column names involved in the WHERE clause.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Query Timeout&lt;/td&gt;&lt;td&gt;The maximum time in milliseconds to wait for the query to execute.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Output Variable Name&lt;/td&gt;&lt;td&gt;If specified, the result set is stored in this context variable.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Overwrite Message Body&lt;/td&gt;&lt;td&gt;If &#x27;true&#x27; (default), the result set overwrites the payload. Set to &#x27;false&#x27; if using &#x27;responseVariable&#x27;.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+    ```xml
+    &lt;db.delete configKey=&quot;DBCon22&quot;&gt;
+        &lt;query&gt;DELETE FROM `OrderItems` WHERE `order_item_id` = 1 AND `product_id` = &#x27;PROD001&#x27;&lt;/query&gt;
+        &lt;columnNames&gt;order_item_id, productid&lt;/columnNames&gt;
+        &lt;columnTypes&gt;INT, VARCHAR&lt;/columnTypes&gt;
+        &lt;format&gt;json&lt;/format&gt;
+        &lt;table&gt;OrderItems&lt;/table&gt;
+        &lt;columns&gt;[]&lt;/columns&gt;
+        &lt;queryType&gt;online&lt;/queryType&gt;
+        &lt;queryTimeout&gt;&lt;/queryTimeout&gt;
+        &lt;responseVariable&gt;db_delete_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/db.delete&gt;
+    ```
+    **Sample result (in `db_delete_1` variable)**
+    ```json
+    {
+        &quot;affectedRows&quot;: 1 // Number of rows affected by the delete operation
+    }
+    ```
+
+??? note &quot;callProcedure&quot;
+
+    Calls a database stored procedure or function.
+
+    &lt;table&gt;
+    &lt;tr&gt;&lt;th&gt;Parameter Name&lt;/th&gt;&lt;th&gt;Description&lt;/th&gt;&lt;th&gt;Required&lt;/th&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Query&lt;/td&gt;&lt;td&gt;The Raw SQL CALL statement&lt;/td&gt;&lt;td&gt;Yes&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Stored Procedure Name&lt;/td&gt;&lt;td&gt;The name of the table to be queried.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Parameters&lt;/td&gt;&lt;td&gt;A comma-separated list of column names to be returned in the result set.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Fetch Size&lt;/td&gt;&lt;td&gt;The maximum time in milliseconds to wait for the query to execute.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Max Rows&lt;/td&gt;&lt;td&gt;The maximum time in milliseconds to wait for the query to execute.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Query Timeout&lt;/td&gt;&lt;td&gt;The maximum time in milliseconds to wait for the query to execute.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Output Variable Name&lt;/td&gt;&lt;td&gt;If specified, the result set is stored in this context variable.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Overwrite Message Body&lt;/td&gt;&lt;td&gt;If &#x27;true&#x27; (default), the result set overwrites the payload. Set to &#x27;false&#x27; if using &#x27;responseVariable&#x27;.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+
+    &lt;/table&gt;
+
+    **Sample configuration (Conceptual)**
+    ```xml
+    &lt;db.call configKey=&quot;DBCon33&quot;&gt;
+        &lt;query&gt;CALL `GetEmployeesByDepartment`(2, &#x27;3&#x27;)&lt;/query&gt;
+        &lt;columnNames&gt;deptID, deptName&lt;/columnNames&gt;
+        &lt;columnTypes&gt;INT, VARCHAR&lt;/columnTypes&gt;
+        &lt;format&gt;json&lt;/format&gt;
+        &lt;table&gt;GetEmployeesByDepartment&lt;/table&gt;
+        &lt;columns&gt;[]&lt;/columns&gt;
+        &lt;queryType&gt;online&lt;/queryType&gt;
+        &lt;queryTimeout&gt;&lt;/queryTimeout&gt;
+        &lt;fetchSize&gt;&lt;/fetchSize&gt;
+        &lt;maxRows&gt;&lt;/maxRows&gt;
+        &lt;responseVariable&gt;db_call_51&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/db.call&gt;
+    ```
+        **Sample result (in `db_call_51` variable)**
+        ```json
+        {
+            &quot;outputParameters&quot;: {
+                &quot;deptID&quot;: 2,
+                &quot;deptName&quot;: &quot;Sales&quot;
+            },
+            &quot;resultSets&quot;: [ /* Optional: if procedure returns result sets */ ]
+        }
+        ```
+
+??? note &quot;executeQuery&quot;
+
+    Executes an arbitrary SQL statement. Use when you need to execute complex queries. Parameters can be passed in the SQL statement using the `?` placeholder. The parameters are passed in the order they appear in the SQL statement.
+    Prepared statement support is currently available only for executeQuery operation.
+    &lt;table&gt;
+    &lt;tr&gt;&lt;th&gt;Parameter Name&lt;/th&gt;&lt;th&gt;Description&lt;/th&gt;&lt;th&gt;Required&lt;/th&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Query&lt;/td&gt;&lt;td&gt;The SQL statement to execute.&lt;/td&gt;&lt;td&gt;Yes&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Prepared Statement&lt;/td&gt;&lt;td&gt;If &#x27;true&#x27;, the SQL statement is treated as a prepared statement. If &#x27;false&#x27;, it is treated as a regular SQL statement.&lt;/td&gt;&lt;td&gt;Yes&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Result Set&lt;/td&gt;&lt;td&gt;If &#x27;true&#x27;, the result is treated as a result set. If &#x27;false&#x27;, it is treated as an update count.&lt;/td&gt;&lt;td&gt;Yes&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Fetch Size&lt;/td&gt;&lt;td&gt;The maximum time in milliseconds to wait for the query to execute.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Transaction Isolation&lt;/td&gt;&lt;td&gt;The maximum time in milliseconds to wait for the query to execute.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Max Rows&lt;/td&gt;&lt;td&gt;The maximum time in milliseconds to wait for the query to execute.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Query Timeout&lt;/td&gt;&lt;td&gt;The maximum time in milliseconds to wait for the query to execute.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Output Variable Name&lt;/td&gt;&lt;td&gt;If specified, the result set is stored in this context variable.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Overwrite Message Body&lt;/td&gt;&lt;td&gt;If &#x27;true&#x27; (default), the result set overwrites the payload. Set to &#x27;false&#x27; if using &#x27;responseVariable&#x27;.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+    ```xml
+    &lt;db.executeQuery configKey=&quot;DBCon1&quot;&gt;
+        &lt;sql&gt;SELECT o.order_id, o.order_date, o.status, o.total_amount, c.customer_name, c.email, oi.product_id, p.name AS product_name, oi.quantity, oi.unit_price FROM Orders o JOIN Customers c ON o.customer_id = c.customer_id JOIN Order_Items oi ON o.order_id = oi.order_id JOIN Products p ON oi.product_id = p.product_id WHERE o.order_id = ?&lt;/sql&gt;
+        &lt;columns&gt;[[1,&quot;INTEGER&quot;]]&lt;/columns&gt;  
+        &lt;isPreparedStatement&gt;true&lt;/isPreparedStatement&gt;
+        &lt;isResultSet&gt;true&lt;/isResultSet&gt; 
+        &lt;resultType&gt;JSON&lt;/resultType&gt;
+        &lt;responseVariable&gt;db_execute_query_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/db.executeQuery&gt;
+    ```
+
+    **Sample result (in `db_execute_query_1` variable)**
+    ```json
+    [{
+        &quot;order_id&quot;: 101,
+        &quot;order_date&quot;: &quot;2025-04-30 14:23:45&quot;,
+        &quot;status&quot;: &quot;Shipped&quot;,
+        &quot;total_amount&quot;: 199.99,
+        &quot;customer_name&quot;: &quot;John Doe&quot;,
+        &quot;email&quot;: &quot;john@mail.com&quot;,
+        &quot;product_id&quot;: &quot;PROD001&quot;,
+        &quot;product_name&quot;: &quot;Super Widget&quot;,
+        &quot;quantity&quot;: 2,
+        &quot;unit_price&quot;: 19.99
+    }]
+    ```
+
+??? note &quot;beginTransaction&quot;
+
+    Starts a new database transaction associated with the current message context. Subsequent DB operations within the same flow (until commit or rollback) will participate in this transaction.
+
+    &lt;table&gt;
+    &lt;tr&gt;&lt;th&gt;Parameter Name&lt;/th&gt;&lt;th&gt;Description&lt;/th&gt;&lt;th&gt;Required&lt;/th&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;isolationLevel&lt;/td&gt;&lt;td&gt;Specifies the transaction isolation level (e.g., TRANSACTION_READ_COMMITTED, TRANSACTION_REPEATABLE_READ, TRANSACTION_SERIALIZABLE). Default depends on the database.&lt;/td&gt;&lt;td&gt;Optional&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+
+    The `isolationLevel` parameter can take one of the following values: &lt;/br&gt;
+    - `TRANSACTION_READ_UNCOMMITTED`: Allows reading uncommitted changes (dirty reads). &lt;/br&gt;
+    - `TRANSACTION_READ_COMMITTED`: Prevents dirty reads; allows non-repeatable reads. &lt;/br&gt;
+    - `TRANSACTION_REPEATABLE_READ`: Prevents dirty reads and non-repeatable reads; allows phantom reads. &lt;/br&gt;
+    - `TRANSACTION_SERIALIZABLE`: Prevents dirty reads, non-repeatable reads, and phantom reads. This is the highest isolation level.
+
+    **Sample configuration**
+    ```xml
+    &lt;db.beginTransaction configKey=&quot;DBCon1&quot;&gt;
+        &lt;timeout&gt;300&lt;/timeout&gt;
+        &lt;isolationLevel&gt;TRANSACTION_READ_COMMITTED&lt;/isolationLevel&gt;
+    &lt;/db.beginTransaction&gt;
+    ```
+
+??? note &quot;commitTransaction&quot;
+
+    Commits the database transaction associated with the current message context.
+
+    **Sample configuration**
+    ```xml
+    &lt;db.commitTransaction configKey=&quot;DBCon1&quot;&gt;
+        &lt;enable&gt;true&lt;/enable&gt;
+    &lt;/db.commitTransaction&gt;
+    ```
+
+??? note &quot;rollbackTransaction&quot;
+
+    Rolls back the database transaction associated with the current message context.
+
+    **Sample configuration**
+    ```xml
+    &lt;db.rollbackTransaction configKey=&quot;DBCon1&quot;&gt;
+        &lt;enable&gt;true&lt;/enable&gt;
+    &lt;/db.rollbackTransaction&gt;
+    ```
+
+**Note**: For a practical example demonstrating transaction management and various operations, see [DB Connector Example]({{base_path}}/reference/connectors/db-connector/db-connector-example/).</body>
+</html>

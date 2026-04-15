@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>configure-with-multiple-brokers.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Connecting to Multiple Brokers
+
+If your system uses more than one broker, you need to add multiple broker configurations to the deployment.toml file (stored in the `MI_HOME/conf` directory. In such situations, each transport receiver should have a separate name.
+
+## Configuring multiple broker types
+
+The following example illustrates how to configure WSO2 Integrator: MI to listen to
+both ActiveMQ and WSO2 MB messages.
+
+1.  Download ActiveMQ (version 5.8.0 or later) from the [Apache ActiveMQ](http://activemq.apache.org/) site. 
+2.  Download the WSO2 Message Broker from the [WSO2 Message Broker](https://wso2.com/products/message-broker/) site.
+3.  Copy the following client libraries from `AMQ_HOME/lib` directory to `MI_HOME/lib` directory.  
+    -   `            activemq-broker-5.8.0.jar           `
+    -   `            activemq-client-5.8.0.jar           `
+    -   `            geronimo-jms_1.1_spec-1.1.1.jar           `
+    -   `            geronimo-j2ee-management_1.1_spec-1.0.1.jar           `
+    -   `            hawtbuf-1.9.jar           `
+4.  Copy the andes-client-0.13.wso2v10.jar from &lt;MB_HOME&gt;/client-lib directory to &lt;EI_HOME&gt;/lib directory.
+5.  Add two JMS listener configurations to the deployment.toml file as shown below. Update connection parameters for the ActiveMQ and WSO2 MB brokers respectively.
+
+    ```toml
+    [[transport.jms.listener]]
+    name = &quot;mbQueueListener&quot;
+    parameter.initial_naming_factory = &quot;org.wso2.andes.jndi.PropertiesFileInitialContextFactory&quot;
+    parameter.provider_url = &quot;conf/jndi.properties&quot;
+    parameter.connection_factory_name = &quot;QueueConnectionFactoryMB&quot;
+    parameter.connection_factory_type = &quot;queue&quot;
+    parameter.cache_level = &quot;consumer&quot;
+
+    [[transport.jms.listener]]
+    name = &quot;myQueueListener&quot;
+    parameter.initial_naming_factory = &quot;org.apache.activemq.jndi.ActiveMQInitialContextFactory&quot;
+    parameter.provider_url = &quot;tcp://localhost:61616&quot;
+    parameter.connection_factory_name = &quot;QueueConnectionFactory&quot;
+    parameter.connection_factory_type = &quot;queue&quot;
+    parameter.cache_level = &quot;consumer&quot;
+
+    [transport.jndi.connection_factories]
+    &#x27;connectionfactory.QueueConnectionFactoryMB&#x27; = &quot;amqp://admin:admin@clientID/carbon?brokerlist=&#x27;tcp://localhost:5675&#x27;&quot;
+
+    [transport.jndi.queue]
+    queue_jndi_name = &quot;Queue1&quot;
+    ```
+
+    !!! Info
+        Note that the transport receiver name is different in each configuration.
+
+7.  Start both ActiveMQ and WSO2 MB.
+8.  Start WSO2 Integrator: MI.
+
+Now ActiveMQ proxy service can be configured as follows to read messages from ActiveMQ server.
+
+```xml
+&lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;JMStoHTTPStockQuoteProxy&quot; transports=&quot;jms&quot;&gt;
+      &lt;target&gt;
+          &lt;inSequence&gt;
+              &lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+              &lt;send&gt;
+                  &lt;endpoint&gt;
+                      &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+                  &lt;/endpoint&gt;
+              &lt;/send&gt;
+          &lt;/inSequence&gt;
+          &lt;outSequence&gt;
+            &lt;send/&gt;
+          &lt;/outSequence&gt;
+      &lt;/target&gt;
+      &lt;parameter name=&quot;transport.jms.ContentType&quot;&gt;
+          &lt;rules&gt;
+              &lt;jmsProperty&gt;contentType&lt;/jmsProperty&gt;
+              &lt;default&gt;text/xml&lt;/default&gt;
+          &lt;/rules&gt;
+      &lt;/parameter&gt;
+      &lt;parameter name=&quot;transport.jms.Destination&quot;&gt;Queue1&lt;/parameter&gt;
+      &lt;parameter name=&quot;transport.jms.ConnectionFactory&quot;&gt;myQueueListener&lt;/parameter&gt;
+  &lt;/proxy&gt;
+```
+
+WSO2 MB proxy service can be configured as follows to read messages from WSO2 MB server.
+
+```xml
+&lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;JMStoHTTPStockQuoteProxyMB&quot; transports=&quot;jms&quot;&gt;
+      &lt;target&gt;
+          &lt;inSequence&gt;
+               &lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+               &lt;send&gt;
+                    &lt;endpoint&gt;
+                        &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+                    &lt;/endpoint&gt;
+                &lt;/send&gt;
+          &lt;/inSequence&gt;
+          &lt;outSequence&gt;
+            &lt;send/&gt;
+          &lt;/outSequence&gt;
+      &lt;/target&gt;
+      &lt;parameter name=&quot;transport.jms.ContentType&quot;&gt;
+          &lt;rules&gt;
+              &lt;jmsProperty&gt;contentType&lt;/jmsProperty&gt;
+              &lt;default&gt;application/json&lt;/default&gt;
+          &lt;/rules&gt;
+      &lt;/parameter&gt;
+      &lt;parameter name=&quot;transport.jms.Destination&quot;&gt;Queue1&lt;/parameter&gt;
+      &lt;parameter name=&quot;transport.jms.ConnectionFactory&quot;&gt;mbQueueListener&lt;/parameter&gt;
+  &lt;/proxy&gt;
+```
+
+## Connecting multiple ActiveMQ brokers
+
+WSO2 Integrator: MI can be configured as described below to work with two ActiveMQ brokers. In this example, port 61616 is used for one
+ActiveMQ instance and port 61617 is used for another ActiveMQ instance.
+ 
+=== &quot;ActiveMQ Broker 1&quot;
+    ```toml 
+    [[transport.jms.listener]]
+    name = &quot;jms1&quot;
+    parameter.initial_naming_factory = &quot;org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory&quot;
+    parameter.provider_url = &quot;tcp://localhost:61616&quot;
+    parameter.connection_factory_name = &quot;TopicConnectionFactory&quot;
+    parameter.connection_factory_type = &quot;topic&quot;
+    ```
+=== &quot;ActiveMQ Broker 2&quot;     
+    ```toml 
+    [[transport.jms.listener]]
+    name = &quot;jms2&quot;
+    parameter.initial_naming_factory = &quot;org.apache.activemq.artemis.jndi.ActiveMQInitialContextFactory&quot;
+    parameter.provider_url = &quot;tcp://localhost:61617&quot;
+    parameter.connection_factory_name = &quot;TopicConnectionFactory&quot;
+    parameter.connection_factory_type = &quot;topic&quot;
+    ```
+
+!!! Note 
+    The name of the transport receivers as well as the ports are different in the two configurations.
+</body>
+</html>

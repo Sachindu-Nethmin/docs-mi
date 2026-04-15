@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>message.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Message
+
+In an enterprise that uses Message Channels to connect between two different applications, you must package information as a message. Messages facilitate information transmission from one application to another. 
+
+!!! info
+    For more information, see the [Message](https://www.enterpriseintegrationpatterns.com/patterns/messaging/Message.html) documentation.
+
+## Sample message
+
+For example, the following code segment illustrates a SOAP message of a typical request that is transformed by the service based on its mediation flow, which contains a header and a body. The header holds information about the data being transmitted, its origin, and its destination, and the body holds the actual data.
+
+!!! info
+    When the message below is sent as a request, ensure that the **Content-Type** header is set to `text/xml`.
+
+```xml
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+  &lt;soapenv:Header /&gt;
+   &lt;soapenv:Body&gt;
+      &lt;ser:getQuote&gt;       
+         &lt;ser:request&gt;
+             &lt;ser:symbol&gt;foo&lt;/ser:symbol&gt;
+         &lt;/ser:request&gt;     
+      &lt;/ser:getQuote&gt;
+    &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+```
+</body>
+</html>

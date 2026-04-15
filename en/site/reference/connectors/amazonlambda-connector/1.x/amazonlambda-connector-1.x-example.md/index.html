@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>amazonlambda-connector-1.x-example.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Amazon Lambda Connector Example 
+
+Given below is a sample scenario that demonstrates how to create an Amazon Lambda function in the AWS Lambda Service using the WSO2 Amazon Lambda Connector.
+
+## What you&#x27;ll build
+To use the Amazon Lambda connector, add the &lt;amazonlambda.init&gt; element in your configuration before carrying out any Amazon Lambda operations. This Amazon Lambda configuration authenticates with Amazon Lambda by specifying the AWS access key ID and secret access key ID, which are used for every operation. The signature is used with every request and thus differs based on the user&#x27;s request.
+
+This example demonstrates how to use Amazon Lambda Connector to use `createFunction` operation.
+
+Here we exposed the `createFunction` operation via an API. The API has one resource with the context `/createFunction`.
+
+* `/createFunction` : The `createFunction` operation creates a Lambda function. 
+
+To create a function, you need a deployment package and an execution role. The deployment package contains your function code. The execution role grants the function permission to use AWS services.
+
+The following diagram illustrates all the required functionality of the Amazon Lambda Service that you are going to build.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/amazonlambdaconnectorsample.png&quot; title=&quot;Amazon Lambda Connector&quot; width=&quot;800&quot; alt=&quot;Amazon Lambda Connector&quot;/&gt;
+
+This example demonstrates, how to create an Amazon Lambda function easily using the WSO2 Amazon Lambda Connector. Before creating an Amazon Lambda function inside the AWS Lambda service, you need to implement the required deployment package (ZIP Archive) locally.
+
+As a next step, simply create an AWS S3 bucket and the deployment package should be uploaded into that bucket. This sample API contains a service that can be invoked through an HTTP POST request. Once the service is invoked, it creates a Lambda function inside the AWS Lambda service. When the created Lambda function is invoked, it is able to run without provisioning or managing servers.
+
+If you do not want to configure this yourself, you can simply [get the project](#get-the-project) and run it.
+
+## Setup the Integration Project
+
+{!includes/build-and-run.md!}
+
+1. First let&#x27;s create a connection to the AWS lambda service. Navigate to **MI Project Explorer** &gt; **Local Entries** &gt; **Connections** and click on the **+** sign next to **Connections** to open the **Add New Connection** view.
+
+2. Select the **Amazonlambda** connector.
+   Configure the below values.
+
+       - Connection Name - `AMAZON_LAMBDA_CONNECTION`
+       - Access Key ID - `$ctx:accessKeyId`
+       - Secret Access Key - `$ctx:secretAccessKey`
+       - Region - `$ctx:region`
+       - Blocking - `$ctx:blocking`
+
+    The created connection is saved as a **Local Entry** as below.
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;localEntry key=&quot;AMAZON_LAMBDA_CONNECTION&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;amazonlambda.init&gt;
+            &lt;name&gt;AMAZON_LAMBDA_CONNECTION&lt;/name&gt;
+            &lt;region&gt;{$ctx:region}&lt;/region&gt;
+            &lt;accessKeyId&gt;{$ctx:accessKeyId}&lt;/accessKeyId&gt;
+            &lt;secretAccessKey&gt;{$ctx:secretAccessKey}&lt;/secretAccessKey&gt;
+            &lt;blocking&gt;{$ctx:blocking}&lt;/blocking&gt;
+        &lt;/amazonlambda.init&gt;
+    &lt;/localEntry&gt;
+    ```
+
+3. Navigate to **MI Project Explorer** &gt; **APIs** and click on the **+** sign next to APIs to open the **Synapse API Artifact** creation form.
+
+4. Specify the API name as `createFunction` and the API context as `/createFunction`. You can go to the XML configuration of the API (source view) and copy the following configuration.
+
+    ```
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;api context=&quot;/createFunction&quot; name=&quot;createFunction&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;resource methods=&quot;POST&quot;&gt;
+            &lt;inSequence&gt;
+                &lt;property expression=&quot;json-eval($.secretAccessKey)&quot; name=&quot;secretAccessKey&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.accessKeyId)&quot; name=&quot;accessKeyId&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.region)&quot; name=&quot;region&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.blocking)&quot; name=&quot;blocking&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.functionName)&quot; name=&quot;functionName&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.functionDescription)&quot; name=&quot;functionDescription&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.apiVersionCreateFunction)&quot; name=&quot;apiVersionCreateFunction&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.s3Bucket)&quot; name=&quot;s3Bucket&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.s3Key)&quot; name=&quot;s3Key&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.s3ObjectVersion)&quot; name=&quot;s3ObjectVersion&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.zipFile)&quot; name=&quot;zipFile&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.targetArn)&quot; name=&quot;targetArn&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.environmentVariables)&quot; name=&quot;environmentVariables&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.handler)&quot; name=&quot;handler&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.kmsKeyArn)&quot; name=&quot;kmsKeyArn&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.layers)&quot; name=&quot;layers&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.memorySize)&quot; name=&quot;memorySize&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.publish)&quot; name=&quot;publish&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.role)&quot; name=&quot;role&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.runtime)&quot; name=&quot;runtime&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.tags)&quot; name=&quot;tags&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.timeout)&quot; name=&quot;timeout&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.mode)&quot; name=&quot;mode&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.securityGroupIds)&quot; name=&quot;securityGroupIds&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;property expression=&quot;json-eval($.subnetIds)&quot; name=&quot;subnetIds&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+                &lt;amazonlambda.createFunction configKey=&quot;AMAZON_LAMBDA_CONNECTION&quot;&gt;
+                    &lt;functionName&gt;{$ctx:functionName}&lt;/functionName&gt;
+                    &lt;functionDescription&gt;{$ctx:functionDescription}&lt;/functionDescription&gt;
+                    &lt;apiVersionCreateFunction&gt;{$ctx:apiVersionCreateFunction}&lt;/apiVersionCreateFunction&gt;
+                    &lt;s3Bucket&gt;{$ctx:s3Bucket}&lt;/s3Bucket&gt;
+                    &lt;s3Key&gt;{$ctx:s3Key}&lt;/s3Key&gt;
+                    &lt;s3ObjectVersion&gt;{$ctx:s3ObjectVersion}&lt;/s3ObjectVersion&gt;
+                    &lt;zipFile&gt;{$ctx:zipFile}&lt;/zipFile&gt;
+                    &lt;targetArn&gt;{$ctx:targetArn}&lt;/targetArn&gt;
+                    &lt;environmentVariables&gt;{$ctx:environmentVariables}&lt;/environmentVariables&gt;
+                    &lt;handler&gt;{$ctx:handler}&lt;/handler&gt;
+                    &lt;kmsKeyArn&gt;{$ctx:kmsKeyArn}&lt;/kmsKeyArn&gt;
+                    &lt;layers&gt;{$ctx:layers}&lt;/layers&gt;
+                    &lt;memorySize&gt;{$ctx:memorySize}&lt;/memorySize&gt;
+                    &lt;publish&gt;{$ctx:publish}&lt;/publish&gt;
+                    &lt;role&gt;{$ctx:role}&lt;/role&gt;
+                    &lt;runtime&gt;{$ctx:runtime}&lt;/runtime&gt;
+                    &lt;tags&gt;{$ctx:tags}&lt;/tags&gt;
+                    &lt;timeout&gt;{$ctx:timeout}&lt;/timeout&gt;
+                    &lt;mode&gt;{$ctx:mode}&lt;/mode&gt;
+                    &lt;securityGroupIds&gt;{$ctx:securityGroupIds}&lt;/securityGroupIds&gt;
+                    &lt;subnetIds&gt;{$ctx:subnetIds}&lt;/subnetIds&gt;
+                &lt;/amazonlambda.createFunction&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence/&gt;
+        &lt;/resource&gt;
+    &lt;/api&gt; 
+    ```
+5. Now we can export the imported connector and the API into a single CAR application. The CAR application is what we are going to deploy during server runtime.
+
+## Create Amazon Lambda Deployment Package (Lambda function) 
+In this scenario, we created a sample AWS Deployment Package (Lambda function) in Python.
+
+1. Our sample Deployment Package would look similar to the following (source view : addingNumbers.py).
+    ```
+    import json
+       
+       print(&#x27;Loading function&#x27;)
+       
+       def addingNumbers(event, context):
+           #print(&quot;Received event: &quot; + json.dumps(event, indent=2))
+           value1 = event[&#x27;key1&#x27;]
+           value2 = event[&#x27;key2&#x27;]
+           print(&quot;value1 = &quot; + value1)
+           print(&quot;value2 = &quot; + value2)
+           return float(value1) + float(value2) # Echo back the addition of two keys
+           #raise Exception(&#x27;Something went wrong&#x27;)
+    ```
+
+2. Create a ZIP archive.
+
+Please use the command line terminal or shell to run the following commands. Commands are shown in listings preceded by a prompt symbol ($) and the name of the current directory, when appropriate:
+
+```
+~/Documents$ zip addingNumbers.zip addingNumbers.py
+ adding: addingNumbers.py.py (deflated 17%)
+```
+
+## Upload Amazon Lambda Deployment Package (ZIP archive) into the AWS S3 bucket
+
+1. Log in to the AWS Management Console.
+2. Navigate to the created S3 bucket (e.g., eiconnectortest).
+3. Click **Upload**.
+4. Select created Amazon Lambda Deployment Package (ZIP archive) and Upload.
+
+## Create Execution Role
+
+You need to create an Execution Role by referring to the [Setting up the Amazon Lambda Environment]({{base_path}}/reference/connectors/amazonlambda-connector/setting-up-amazonlambda/) documentation.  
+
+## Get the project
+
+You can download the ZIP file and extract the contents to get the project code.
+
+&lt;a href=&quot;{{base_path}}/assets/attachments/connectors/amazon-lambda-connector-example.zip&quot;&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+&lt;/a&gt;
+
+!!! tip
+    You may need to update the value of the access key and make other such changes before deploying and running this project.
+
+## Deployment
+
+Follow these steps to deploy the exported Carbon Application (CApp) in the integration runtime. For more info on deploying artifacts, refer to the [Deploying Artifacts]({{base_path}}/develop/deploy-artifacts).
+
+**Deploying on WSO2 Integrator: MI**
+
+You can copy the composite application to the `&lt;PRODUCT-HOME&gt;/repository/deployment/server/carbonapps` folder and start the server.WSO2 Integrator: MI will be started and the composite application will be deployed.
+
+You can further refer to the application deployed through the CLI tool. See the instructions on [managing integrations from the CLI]({{base_path}}/observe-and-manage/managing-integrations-with-micli).
+
+??? note &quot;Click here for instructions on deploying on WSO2 Enterprise Integrator 6&quot;
+    1. You can copy the composite application to the `&lt;PRODUCT-HOME&gt;/repository/deployment/server/carbonapps` folder and start the server.
+
+    2. WSO2 EI server starts and you can login to the Management Console via the `https://localhost:9443/carbon/` URL. Provide login credentials. The default credentials will be admin/admin. 
+
+    3. You can see that the API is deployed under the API section. 
+
+## Testing
+
+1. Invoke the API using a CURL command or sample client.
+   ``` 
+   curl -v POST -d 
+   &#x27;{
+     &quot;secretAccessKey&quot;:&quot;xxxx&quot;,
+     &quot;accessKeyId&quot;:&quot;xxxx&quot;,
+     &quot;region&quot;:&quot;us-east-2&quot;,
+     &quot;blocking&quot;:&quot;false&quot;,
+     &quot;s3Bucket&quot;:&quot;eiconnectortest&quot;,
+     &quot;s3Key&quot;:&quot;addingNumbers.zip&quot;,
+     &quot;s3ObjectVersion&quot;:&quot;null&quot;,
+     &quot;functionName&quot;:&quot;eiLambdaConnector&quot;,
+     &quot;handler&quot;:&quot;addingNumbers.addingNumbers&quot;,
+     &quot;role&quot;:&quot;arn:aws:iam::610968236798:role/EIConnectorTestRole&quot;,
+     &quot;runtime&quot;:&quot;python3.12&quot;,
+     &quot;apiVersionCreateFunction&quot;:&quot;2015-03-31&quot;
+    }&#x27; &quot;http://localhost:8290/createFunction&quot; -H &quot;Content-Type:application/json&quot;  
+   ```
+2. See the following message content.
+   ```
+   {
+        &quot;Description&quot;: &quot;&quot;,
+        &quot;TracingConfig&quot;: {
+            &quot;Mode&quot;: &quot;PassThrough&quot;
+   },
+   {
+        &quot;VpcConfig&quot;: null,
+        &quot;RevisionId&quot;: &quot;4b6e5fdd-cbfa-4ba2-9f6e-528cccdb333f&quot;,
+        &quot;LastModified&quot;: &quot;2020-03-13T05:33:54.900+0000&quot;,
+        &quot;FunctionName&quot;: &quot;eiLambdaConnector&quot;,
+        &quot;Runtime&quot;: &quot;python3.7&quot;,
+        &quot;Version&quot;: &quot;$LATEST&quot;,
+        &quot;LastUpdateStatus&quot;: &quot;Successful&quot;,
+        &quot;Layers&quot;: null,
+        &quot;FunctionArn&quot;: &quot;arn:aws:lambda:us-east-2:610968236798:function:eiLambdaConnector&quot;,
+        &quot;KMSKeyArn&quot;: null,
+        &quot;MemorySize&quot;: 128,
+        &quot;LastUpdateStatusReason&quot;: null,
+        &quot;DeadLetterConfig&quot;: null,
+        &quot;Timeout&quot;: 3,
+        &quot;Handler&quot;: &quot;addingNumbers.addingNumbers&quot;,
+        &quot;CodeSha256&quot;: &quot;VAISY9lY/a7DvxZNOSKCj+q/fsbfUaJjKhCsCVG3yzU=&quot;,
+        &quot;Role&quot;: &quot;arn:aws:iam::610968236798:role/EIConnectorTestRole&quot;,
+        &quot;MasterArn&quot;: null,
+        &quot;CodeSize&quot;: 405,
+        &quot;State&quot;: &quot;Active&quot;,
+        &quot;StateReason&quot;: null,
+        &quot;Environment&quot;: null,
+        &quot;StateReasonCode&quot;: null,
+        &quot;LastUpdateStatusReasonCode&quot;: null
+   }
+   ```
+3. Log in to the AWS Management Console.
+
+4. Navigate to the AWS Lambda and Functions tab.
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/awslambdafunction.png&quot; title=&quot;Amazon Lambda Function&quot; width=&quot;800&quot; alt=&quot;Amazon Lambda Function&quot;/&gt;
+   
+5. Next you need to execute the function. Navigate to **Configure test events**. &lt;br&gt;
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/configuretestevent.png&quot; title=&quot;Configure Test Event&quot; width=&quot;800&quot; alt=&quot;Configure Test Event&quot;/&gt;
+   
+6. Click **Create new test event**.
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/createtestevent.png&quot; title=&quot;Create Test Event&quot; width=&quot;800&quot; alt=&quot;Create Test Event&quot;/&gt;
+   
+7. Navigate and select the created test event from the dropdown in the top right corner. Click the **Test** button and execute the test event.
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/executecreatedevent.png&quot; title=&quot;Execute Test Event&quot; width=&quot;800&quot; alt=&quot;Execute Test Event&quot;/&gt;
+ 
+## What&#x27;s next
+
+* To customize this example for your own scenario, see [Amazon Lambda Connector Configuration]({{base_path}}/reference/connectors/amazonlambda-connector/amazonlambda-connector-config/) documentation.</body>
+</html>

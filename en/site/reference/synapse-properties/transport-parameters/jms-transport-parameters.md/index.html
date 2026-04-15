@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>jms-transport-parameters.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># JMS parameters
+
+When you implement an integration use case that requires a JMS connection, you can use the following JMS parameters in your [proxy service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service) artifact.
+
+!!! Info
+    The WSO2 Integrator: MI can listen to a JMS instance or send messages to a JMS instance only if the JMS transport listener and sender are enabled and configured at the server level. Read about the [JMS transport]({{base_path}}/install-and-setup/setup/transport-configurations/configuring-transports/#configuring-the-jms-transport).
+
+{!reference/synapse-properties/pull/proxy-service-add-properties-pull.md!}
+
+See [Creating a Proxy Service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service) for instructions.
+
+## Service-Level JMS parameters
+
+&lt;table&gt;
+      &lt;tr&gt;
+         &lt;th&gt;
+            Parameter Name
+         &lt;/th&gt;
+         &lt;th&gt;
+            Description
+         &lt;/th&gt;
+      &lt;/tr&gt;
+   &lt;tbody&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            transport.jms.ConnectionFactory
+         &lt;/td&gt;
+         &lt;td&gt;
+            Name of the JMS connection factory the service should use. You can specify the name of an already defined connection factory.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            transport.jms.PublishEPR
+         &lt;/td&gt;
+         &lt;td&gt;
+            JMS EPR to be published in the WSDL. Specify a JMS EPR.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;transport.jms.ContentType&lt;/td&gt;
+         &lt;td&gt;Specifies how the transport listener should determine the content type of received messages. Specify a simple string value, in which case the transport listener assumes that the received messages always have the specified content type, or a set of rules. For more information, see &lt;a href=&quot;http://axis.apache.org/axis2/java/transports/jms.html#Service_configuration&quot;&gt;http://axis.apache.org/axis2/java/transports/jms.html#Service_configuration&lt;/a&gt;.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            &lt;code&gt;transport.jms.MessagePropertyHyphens&lt;/code&gt;
+         &lt;/td&gt;
+         &lt;td&gt;Specifies the action to be taken when there are JMS Message property names that contain hyphens. The possible values are as follows:
+            &lt;ul&gt;
+               &lt;li&gt;&lt;b&gt;none&lt;/b&gt;: No action will be taken. This is the default value.&lt;/li&gt;
+               &lt;li&gt;&lt;b&gt;replace&lt;/b&gt;: Transport headers with hyphens will be replaced before adding them as JMS message properties, and if the WSO2 Integrator: MI is the consumer, hyphens will be reintroduced on message retrieval.&lt;/li&gt;
+               &lt;li&gt;
+                  &lt;b&gt;delete&lt;/b&gt;: Transport headers with hyphens will be deleted.
+               &lt;/li&gt;
+            &lt;/ul&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+   &lt;/tbody&gt;
+&lt;/table&gt;
+
+**JMS connection factory parameters**
+
+The JMS connection factory parameters can be specified at the server level or the service level. Given below is the complete list of connection factory parameters (with a comparison of service-level and server-level parameter names).
+
+!!! Tip
+    To define the parameters at the server level, you need to update the **JMS configurations** in the `deployment.toml` file. See the [configuration catalog]({{base_path}}/reference/config-catalog-mi) for details on how to apply server configurations.
+
+&lt;table&gt;
+      &lt;tr&gt;
+         &lt;th&gt;
+            &lt;p&gt;Service-Level Parameter&lt;/p&gt;
+         &lt;/th&gt;
+         &lt;th&gt;
+            &lt;p&gt;Server Parameter&lt;/p&gt;
+         &lt;/th&gt;
+         &lt;th&gt;
+            &lt;p&gt;Description&lt;/p&gt;
+         &lt;/th&gt;
+      &lt;/tr&gt;
+   &lt;tbody&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+           java.naming.factory.initial
+        &lt;/td&gt;
+         &lt;td&gt;
+            parameter.initial_naming_factory  
+         &lt;/td&gt;
+         &lt;td&gt;
+            JNDI initial context factory class. The class must implement the &lt;code&gt;java.naming.spi.InitialContextFactory&lt;/code&gt; interface. The default value is &lt;code&gt;org.apache.activemq.jndi.ActiveMQInitialContextFactory&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+           java.naming.provider.url
+        &lt;/td&gt;
+         &lt;td&gt;
+            parameter.provider_url
+         &lt;/td&gt;
+         &lt;td&gt;
+            URL of the JNDI provider. By default, the value is &lt;code&gt;tcp://localhost:61616&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+           java.naming.security.principal
+         &lt;/td&gt;
+         &lt;td&gt;
+            parameter.naming_security_principal
+         &lt;/td&gt;
+         &lt;td&gt;
+            &lt;p&gt;JNDI Username.&lt;/p&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+           java.naming.security.credentials
+         &lt;/td&gt;
+         &lt;td&gt;
+            parameter.naming_security_credential
+         &lt;/td&gt;
+         &lt;td&gt;
+            &lt;p&gt;JNDI password.&lt;/p&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+           transport.Transactionality
+         &lt;/td&gt;
+         &lt;td&gt;
+            parameter.transactionality
+         &lt;/td&gt;
+         &lt;td&gt;
+            Preferred mode of transactionality.&lt;/br&gt;
+            &lt;b&gt;Note&lt;/b&gt;: In the WSO2 Integrator: MI, JMS transactions only work with either the Callout mediator or the Call mediator in blocking mode. The possible values are as follows:
+            &lt;ul&gt;
+               &lt;li&gt;&lt;b&gt;none&lt;/b&gt;: Disables transactions in the JMS transport.&lt;/li&gt;
+               &lt;li&gt;&lt;b&gt;local&lt;/b&gt;: Enables local JMS session transactions.&lt;/li&gt;
+               &lt;li&gt;&lt;b&gt;jta&lt;/b&gt;: Enables global JTA transactions.&lt;/li&gt;
+            &lt;/ul&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.UserTxnJNDIName
+          &lt;/td&gt;
+         &lt;td&gt;
+            parameter.transaction_jndi_name
+         &lt;/td&gt;
+         &lt;td&gt;
+           JNDI name to be used to require user transaction. The default value is &lt;code&gt;java:comp/UserTransaction&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.CacheUserTxn
+          &lt;/td&gt;
+         &lt;td&gt;
+            parameter.cache_user_transaction
+         &lt;/td&gt;
+         &lt;td&gt;
+            Whether caching for user transactions should be enabled or not. By default, this setting is &lt;code&gt;true&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.SessionTransacted
+          &lt;/td&gt;
+         &lt;td&gt;
+            parameter.session_transaction
+         &lt;/td&gt;
+         &lt;td&gt;
+            Whether the JMS session should be transacted or not. By default, this setting is &lt;code&gt;true&lt;/code&gt; (if transactionality is &#x27;local&#x27;).
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+          transport.jms.SessionAcknowledgement
+        &lt;/td&gt;
+        &lt;td&gt;
+           parameter.session_acknowledgement
+         &lt;/td&gt;
+         &lt;td&gt;
+           JMS session acknowledgment mode. The possible values are, as follows:
+           &lt;ul&gt;
+               &lt;li&gt;&lt;em&gt;AUTO_ACKNOWLEDGE:&lt;/em&gt; The session automatically acknowledges the consumer receipt of messages when message processing has finished.&lt;/li&gt;
+               &lt;li&gt;&lt;em&gt;CLIENT_ACKNOWLEDGE:&lt;/em&gt; The consumer acknowledges all messages delivered so far by the session. If the consumer falls behind in its processing, a large number of unacknowledged messages can build up.&lt;/li&gt;
+               &lt;li&gt;&lt;em&gt;DUPS_OK_ACKNOWLEDGE:&lt;/em&gt; The session lazily acknowledges the delivery of messages to the consumer. Lazy means that the consumer can delay acknowledgement to the server until a convenient time. During a delay, the server might redeliver messages. This mode reduces session overhead but the consumer can receive duplicate messages should JMS fail,&lt;/li&gt;
+               &lt;li&gt;&lt;em&gt;SESSION_TRANSACTED:&lt;/em&gt; The session is a related group of consumed or produced messages that are treated as a single unit of work.&lt;/li&gt;
+            &lt;/ul&gt;
+            Also see &lt;a href=&quot;https://wso2.com/library/articles/2013/01/jms-message-delivery-reliability-acknowledgement-patterns/&quot;&gt;JMS Message Delivery Reliability and Acknowledgement Patterns&lt;/a&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+           transport.jms.ConnectionFactoryJNDIName
+        &lt;/td&gt;
+         &lt;td&gt;
+            parameter.connection_factory_name
+         &lt;/td&gt;
+         &lt;td&gt;
+            The JNDI name of the connection factory.&lt;/br&gt;&lt;/br&gt;
+            The possible values are as follows:
+            &lt;ul&gt;
+               &lt;li&gt;QueueConnectionFactory&lt;/li&gt;
+               &lt;li&gt;TopicConnectionFactory&lt;/li&gt;
+            &lt;/ul&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.ConnectionFactoryType
+          &lt;/td&gt;
+         &lt;td&gt;
+            parameter.connection_factory_type
+         &lt;/td&gt;
+         &lt;td&gt;
+           Type of the connection factory. The possible values are &lt;code&gt;queue&lt;/code&gt;, or &lt;code&gt;topic&lt;/code&gt;. The default value is &lt;code&gt;queue&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.JMSSpecVersion
+          &lt;/td&gt;
+         &lt;td&gt;
+            parameter.jms_spec_version
+         &lt;/td&gt;
+         &lt;td&gt;
+            JMS API version. Possible values are &lt;code&gt;1.1&lt;/code&gt;, &lt;code&gt;1.0.2b&lt;/code&gt; or &lt;code&gt;3.1&lt;/code&gt;. The default value is &lt;code&gt;1.1&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+           transport.jms.UserName
+         &lt;/td&gt;
+         &lt;td&gt;
+            parameter.username
+         &lt;/td&gt;
+         &lt;td&gt;
+            The JMS connection username.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.Password
+          &lt;/td&gt;
+         &lt;td&gt;
+            parameter.password
+         &lt;/td&gt;
+         &lt;td&gt;
+            The JMS connection password.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+           transport.jms.Destination
+         &lt;/td&gt;    
+         &lt;td&gt;
+           parameter.destination
+         &lt;/td&gt;
+         &lt;td&gt;
+            The JNDI name of the destination.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.DestinationType
+          &lt;/td&gt;
+         &lt;td&gt;
+            parameter.destination_type
+         &lt;/td&gt;
+         &lt;td&gt;
+            Type of the destination. Possible values are &lt;code&gt;queue&lt;/code&gt;, or &lt;code&gt;topic&lt;/code&gt;. The default setting is &lt;code&gt;queue&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.DefaultReplyDestination
+          &lt;/td&gt;
+         &lt;td&gt;
+            parameter.default_reply_destination
+         &lt;/td&gt;
+         &lt;td&gt;
+            JNDI name of the default reply destination.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.DefaultReplyDestinationType
+          &lt;/td&gt;
+         &lt;td&gt;
+            parameter.default_destination_type
+         &lt;/td&gt;
+         &lt;td&gt;
+            Type of the reply destination. Possible values are &lt;code&gt;queue&lt;/code&gt;, or &lt;code&gt;topic&lt;/code&gt;. Defaults to the type of the destination.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.MessageSelector
+          &lt;/td&gt;
+         &lt;td&gt;
+            parameter.message_selector
+         &lt;/td&gt;
+         &lt;td&gt;
+            Message selector implementation.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.SubscriptionDurable
+          &lt;/td&gt;
+         &lt;td&gt;
+            parameter.subscription_durable
+         &lt;/td&gt;
+         &lt;td&gt;
+            Whether the connection factory is subscription durable or not. By default, this parameter is set to &lt;code&gt;false&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.DurableSubscriberClientID
+          &lt;/td&gt;
+         &lt;td&gt;
+            parameter.durable_subscriber_client_id
+         &lt;/td&gt;
+         &lt;td&gt;
+            The &lt;code&gt;ClientId&lt;/code&gt; parameter when using durable subscriptions. This parameter is required if the value specified as &lt;code&gt;transport.jms.ubscriptionDurable&lt;/code&gt; is &lt;code&gt;true&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.DurableSubscriberName
+          &lt;/td&gt;
+         &lt;td&gt;
+            parameter.durable_subscriber_name
+         &lt;/td&gt;
+         &lt;td&gt;
+            The name of the durable subscriber. This parameter is required if the value specified as &lt;code&gt;transport.jms.SubscriptionDurable&lt;/code&gt; is &lt;code&gt;true&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+           transport.jms.PubSubNoLocal
+        &lt;/td&gt;
+         &lt;td&gt;parameter.pub_sub_local&lt;/td&gt;
+         &lt;td&gt;
+            Whether the messages should be published by the same connection through which they were received. The default setting is &lt;code&gt;false&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.CacheLevel
+          &lt;/td&gt;
+         &lt;td&gt;parameter.cache_level&lt;/td&gt;
+         &lt;td&gt;
+            The cache level with which JMS objects should be cached at start up. You can configure this in the ei.toml file if WSO2 Integrator: MI acts as a JMS producer. Example:
+            &lt;div class=&quot;code panel pdl&quot; style=&quot;border-width: 1px;&quot;&gt;
+                  &lt;div class=&quot;codeContent panelContent pdl&quot;&gt;
+                     &lt;div class=&quot;sourceCode&quot; id=&quot;cb1&quot; data-syntaxhighlighter-params=&quot;brush: java; gutter: false; theme: Confluence&quot; data-theme=&quot;Confluence&quot; style=&quot;brush: java; gutter: false; theme: Confluence&quot;&gt;
+                        &lt;pre class=&quot;sourceCode java&quot;&gt;&lt;code class=&quot;sourceCode java&quot;&gt;&lt;span id=&quot;cb1-1&quot;&gt;&lt;a href=&quot;#cb1-1&quot;&gt;&lt;/a&gt;&amp;lt;endpoint&amp;gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-2&quot;&gt;&lt;a href=&quot;#cb1-2&quot;&gt;&lt;/a&gt;   &amp;lt;address uri=&lt;span class=&quot;st&quot;&gt;&amp;quot;jms:/example.MyQueue?transport.jms.ConnectionFactoryJNDIName=QueueConnectionFactory&amp;amp;java.naming.factory.initial=org.wso2.andes.jndi.PropertiesFileInitialContextFactory&amp;amp;java.naming.provider.url=repository/conf/jndi.properties&amp;amp;transport.jms.DestinationType=queue&amp;amp;transport.jms.CacheLevel=producer&amp;quot;&lt;/span&gt;/&amp;gt;&lt;/span&gt;
+&lt;span id=&quot;cb1-3&quot;&gt;&lt;a href=&quot;#cb1-3&quot;&gt;&lt;/a&gt;&amp;lt;/endpoint&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+                     &lt;/div&gt;
+                  &lt;/div&gt;
+            &lt;/div&gt;
+            If the WSO2 Integrator: MI is a JMS consumer, you can configure a proxy service. Following are the possible values for this parameter:
+            &lt;ul&gt;
+               &lt;li&gt;&lt;strong&gt;none&lt;/strong&gt;: None of the JMS objects will be cached.&lt;/li&gt;
+               &lt;li&gt;&lt;strong&gt;connection&lt;/strong&gt;: JMS connection objects will be cached.&lt;/li&gt;
+               &lt;li&gt;&lt;strong&gt;session&lt;/strong&gt;: JMS connection and session objects will be cached.&lt;/li&gt;
+               &lt;li&gt;&lt;strong&gt;consumer&lt;/strong&gt;: JMS connection, session, and consumer objects will be cached.&lt;/li&gt;
+               &lt;li&gt;&lt;strong&gt;producer&lt;/strong&gt;: JMS connection, session, and producer objects will be cached.&lt;/li&gt;
+               &lt;li&gt;&lt;strong&gt;auto&lt;/strong&gt;: An appropriate cache level will be used based on the transaction strategy.&lt;/li&gt;
+            &lt;/ul&gt;
+            &lt;/div&gt;
+         By default, this parameter is set to &lt;code&gt;auto&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.ReceiveTimeout
+          &lt;/td&gt;
+         &lt;td&gt;
+            parameter.receive_timeout
+         &lt;/td&gt;
+         &lt;td&gt;
+            Time to wait for a JMS message during polling. Set this parameter value to a negative integer to wait indefinitely. Set to zero to prevent waiting. The default value is &lt;code&gt;1000&lt;/code&gt; milliseconds.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.ConcurrentConsumers
+          &lt;/td&gt;
+         &lt;td&gt;parameter.concurrent_consumer&lt;/td&gt;
+         &lt;td&gt;
+            Number of concurrent threads to be started to consume messages when polling. You can specify any positive integer. However, for topics, this parameters should always be set to &lt;code&gt;1&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.MaxConcurrentConsumers
+          &lt;/td&gt;
+         &lt;td&gt;parameter.max_concurrent_consumer&lt;/td&gt;
+         &lt;td&gt;
+            Maximum number of concurrent threads to use during polling. You can specify any positive integer. The default value is &lt;code&gt;1&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.IdleTaskLimit
+          &lt;/td&gt;
+         &lt;td&gt;parameter.idle_task_limit&lt;/td&gt;
+         &lt;td&gt;
+            The number of idle runs per thread before it dies out. You can specify any positive integer. The default value is &lt;code&gt;10&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.MaxMessagesPerTask
+          &lt;/td&gt;
+         &lt;td&gt;parameter.max_message_per_task&lt;/td&gt;
+         &lt;td&gt;
+            &lt;p&gt;The maximum number of successful message receipts per thread. You can specify any positive integer. The default value is &lt;code&gt;-1&lt;/code&gt;. Use &lt;code&gt;-1&lt;/code&gt; to indicate infinity.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.InitialReconnectDuration
+          &lt;/td&gt;
+         &lt;td&gt;parameter.initial_reconnection_duration&lt;/td&gt;
+         &lt;td&gt;
+           Initial reconnection attempts duration in milliseconds. You can specify any positive integer. The default value is &lt;code&gt;10000&lt;/code&gt; milliseconds.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.ReconnectProgressFactor
+          &lt;/td&gt;
+         &lt;td&gt;parameter.reconnect_progress_factor&lt;/td&gt;
+         &lt;td&gt;
+            Factor by which the reconnection duration will be increased. You can specify any positive integer. The default value is &lt;code&gt;2&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.MaxReconnectDuration
+         &lt;/td&gt;
+         &lt;td&gt;parameter.max_reconnect_duration&lt;/td&gt;
+         &lt;td&gt;
+            Maximum reconnection duration in milliseconds. The default value is &lt;code&gt;3600000&lt;/code&gt; milliseconds (1 hour).
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;transport.jms.ReconnectInterval&lt;/td&gt;
+         &lt;td&gt;parameter.reconnect_interval&lt;/td&gt;
+         &lt;td&gt;Reconnection interval in milliseconds. The default value is &lt;code&gt;3600000&lt;/code&gt; milliseconds (1 hour).
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.MaxJMSConnections
+          &lt;/td&gt;
+         &lt;td&gt;parameter.max_jsm_connection&lt;/td&gt;
+         &lt;td&gt;
+            Maximum cached JMS connections in the producer level. You can specify any positive integer. The default value is &lt;code&gt;10&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.MaxConsumeErrorRetriesBeforeDelay
+          &lt;/td&gt;
+         &lt;td&gt;parameter.max_consumer_error_retrieve_before_delay&lt;/td&gt;
+         &lt;td&gt;
+            Number of retries on consume errors before sleep delay kicks in. You can specify any positive integer. The default value is &lt;code&gt;20&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.ConsumeErrorDelay
+          &lt;/td&gt;
+         &lt;td&gt;parameter.consume_error_delay&lt;/td&gt;
+         &lt;td&gt;
+            Sleep delay when a consume error is encountered (in milliseconds). You can specify any positive integer. The default value is &lt;code&gt;100&lt;/code&gt; milliseconds.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;
+             transport.jms.ConsumeErrorProgression
+          &lt;/td&gt;
+         &lt;td&gt;parameter.consume_error_progression&lt;/td&gt;
+         &lt;td&gt;
+           Factor by which the consume error retry sleep will be increased. You can specify any positive integer. The default value is &lt;code&gt;2.0&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;transport.jms.MaxConsumeErrorRetryCount&lt;/td&gt;
+         &lt;td&gt;MaxConsumeErrorRetryCount&lt;/td&gt;
+         &lt;td&gt;
+            The maximum number of times the consumer should retry upon receiving a consumer error. You need to introduce this parameter only if the broker has issues notifying the Exception Listeners about the exceptions that occurred. You can specify any positive integer. The default value is &lt;code&gt;1&lt;/code&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+   &lt;/tbody&gt;
+&lt;/table&gt;
+</body>
+</html>

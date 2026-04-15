@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>message-context-properties.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Synapse Message Context Properties
+
+!!! Info
+	The following are message context properties that can be used with the [Property mediator]({{base_path}}/reference/mediators/property-mediator) and the [Property Group mediator]({{base_path}}/reference/mediators/property-group-mediator).
+
+The Synapse message context properties allow you to get information
+about the message, such as the date/time it was sent, the message
+format, and the message operation. You can use the
+`         get-property()        ` function in the [Property mediator]({{base_path}}/reference/mediators/property-mediator) with the scope set to
+`         Synapse        ` to retrieve these properties.
+
+## SYSTEM_DATE
+
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;th&gt;Parameter&lt;/th&gt;
+		&lt;th&gt;Description&lt;/th&gt;
+	&lt;/tr&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;p&gt;&lt;strong&gt;Name&lt;/strong&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;SYSTEM_DATE&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;p&gt;&lt;strong&gt;Possible Values&lt;/strong&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;-&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;p&gt;&lt;strong&gt;Default Behavior&lt;/strong&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;-&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;p&gt;&lt;strong&gt;Scope&lt;/strong&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;-&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;p&gt;&lt;strong&gt;Description&lt;/strong&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Returns the current date as a String.&lt;/p&gt;
+Optionally, a date format as per the standard date format may be supplied by entering the following in the Namespaced Property Editor: &lt;code&gt;                  get-property(&quot;SYSTEM_DATE&quot;, &quot;yyyy-MM-dd&#x27;T&#x27;HH:mm:ss.SSSXXX&quot;)&lt;/code&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+## SYSTEM_TIME
+
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;th&gt;Parameter&lt;/th&gt;
+		&lt;th&gt;Description&lt;/th&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;&lt;b&gt;Name&lt;/b&gt;&lt;/td&gt;
+		&lt;td&gt;&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;&lt;b&gt;Possible Values&lt;/b&gt;&lt;/td&gt;
+		&lt;td&gt;&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;&lt;b&gt;Default Behavior&lt;/b&gt;&lt;/td&gt;
+		&lt;td&gt;&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;&lt;b&gt;Scope&lt;/b&gt;&lt;/td&gt;
+		&lt;td&gt;&lt;/td&gt;
+	&lt;/tr&gt;
+	&lt;tr&gt;
+		&lt;td&gt;&lt;b&gt;Description&lt;/b&gt;&lt;/td&gt;
+		&lt;td&gt;
+			Returns the current time in milliseconds, i.e. the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC.
+		&lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;
+
+
+## To, From, Action, FaultTo, ReplyTo, MessageID
+
+|     Parameter       |           Description              |
+|----------------------|------------------------------------------------------|
+| **Names**            | To, From, Action, FaultTo, ReplyTo, MessageID        |
+| **Possible Values**  | \-                                                   |
+| **Default Behavior** | \-                                                   |
+| **Scope**            | \-                                                   |
+| **Description**      | The message To, Action and WS-Addressing properties. |
+
+
+## MESSAGE_FORMAT
+
+
+|     Parameter       |           Description              |
+|----------------------|----------------------------------------------------------------------|
+| **Names**            | MESSAGE\_FORMAT                                                      |
+| **Possible Values**  | \-                                                                   |
+| **Default Behavior** | \-                                                                   |
+| **Scope**            | \-                                                                   |
+| **Description**      | Returns the message format, i.e. returns pox, get, soap11 or soap12. |
+
+
+## OperationName
+
+|     Parameter       |           Description              |
+|----------------------|---------------------------------------------|
+| **Names**            | OperationName                               |
+| **Possible Values**  | \-                                          |
+| **Default Behavior** | \-                                          |
+| **Scope**            | \-                                          |
+| **Description**      | Returns the operation name for the message. |
+</body>
+</html>

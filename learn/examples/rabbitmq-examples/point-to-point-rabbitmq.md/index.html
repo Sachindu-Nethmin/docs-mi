@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>point-to-point-rabbitmq.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Implement Point to Point Messaging Using RabbitMQ
+
+This example demonstrates how WSO2 Integrator: MI can be used to implement an asynchronous point-to-point messaging scenario using queues in a RabbitMQ broker instance.
+
+As shown below, a proxy service configured in the WSO2 Integrator: MI sends messages to the RabbitMQ queue, which are then consumed by another proxy service in the WSO2 Integrator: MI.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/rabbitmq/rabbitmq-point-to-point.png&quot;&gt;
+
+## Synapse configurations
+
+See the instructions on how to [build and run](#build-and-run) this example.
+
+=== &quot;RabbitMQ Consumer&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;QueueConsumer&quot; transports=&quot;rabbitmq&quot; startOnLoad=&quot;true&quot;&gt;
+      &lt;description/&gt;
+      &lt;target&gt;
+          &lt;inSequence&gt;
+              &lt;log level=&quot;custom&quot;&gt;
+                   &lt;property name=&quot;Message Received&quot; expression=&quot;//Message&quot;/&gt;
+              &lt;/log&gt;
+          &lt;/inSequence&gt;
+      &lt;/target&gt;
+      &lt;parameter name=&quot;rabbitmq.queue.name&quot;&gt;queue1&lt;/parameter&gt;
+      &lt;parameter name=&quot;rabbitmq.connection.factory&quot;&gt;AMQPConnectionFactory&lt;/parameter&gt;
+      &lt;parameter name=&quot;rabbitmq.message.content.type&quot;&gt;application/xml&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;RabbitMQ Producer&quot;    
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
+        name=&quot;QueueProducer&quot;
+        transports=&quot;http https&quot;
+        startOnLoad=&quot;true&quot;&gt;
+       &lt;description/&gt;
+       &lt;target&gt;
+        &lt;inSequence&gt;
+          &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+          &lt;property name=&quot;FORCE_SC_ACCEPTED&quot; value=&quot;true&quot; scope=&quot;axis2&quot;/&gt;
+          &lt;send&gt;
+              &lt;endpoint&gt;
+                &lt;address uri=&quot;rabbitmq:/queue1?rabbitmq.server.host.name=localhost&amp;amp;rabbitmq.server.port=5672&amp;amp;rabbitmq.server.user.name=guest&amp;amp;rabbitmq.server.password=guest&quot;/&gt;
+              &lt;/endpoint&gt;
+          &lt;/send&gt;
+        &lt;/inSequence&gt;
+      &lt;/target&gt;
+    &lt;/proxy&gt;
+    ```
+    
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+3. Create the [proxy service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service) with the configurations given above.
+4. Enable the RabbitMQ sender and receiver in the Micro-Integrator from the deployment.toml. Refer the 
+ [configuring RabbitMQ documentation]({{base_path}}/install-and-setup/setup/brokers/configure-with-rabbitmq) for more information.
+5. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+6. Make sure you have a RabbitMQ broker instance running.
+7. Configure a queue named `queue1` with required exchanges and routing keys.
+8. Send the following payload to the RabbitMQ publisher proxy (QueueProducer).
+
+    ```xml
+    &lt;Message&gt;
+    &lt;Name&gt;John Doe&lt;/Name&gt;
+    &lt;Age&gt;27&lt;/Age&gt;
+    &lt;/Message&gt;
+    ```
+</body>
+</html>

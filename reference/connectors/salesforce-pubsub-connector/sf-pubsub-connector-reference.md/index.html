@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>sf-pubsub-connector-reference.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Salesforce Pub/Sub Connector Reference
+
+
+The following operations allow you to work with the Salesforce Pub/Sub Connector. Click an operation name to see parameter details and samples on how to use it.
+
+
+### Connection configuration
+
+
+The Salesforce Pub/Sub Connector uses  Basic Authentication or Authorization headers. For more information on authentication, go to [Set up Salesforce Pub/Sub Connector Connection]({{base_path}}/reference/connectors/salesforce-pubsub-connector/sf-pubsub-configuration/).
+
+
+??? note &quot;Salesforce Pub/Sub Connection&quot;
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;server&lt;/td&gt;
+            &lt;td&gt;The service root URL.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;port&lt;/td&gt;
+            &lt;td&gt;The port for the root URL.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Tls Enabled&lt;/td&gt;
+            &lt;td&gt;Enabling the secure channel using TLS&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+    ```xml
+    &lt;salesforcePubSub.init&gt;
+        &lt;connectionType&gt;SALESFORCEPUBSUB&lt;/connectionType&gt;
+        &lt;server&gt;{$ctx:server}&lt;/server&gt;
+        &lt;port&gt;{$ctx:port}&lt;/port&gt;
+        &lt;tlsEnabled&gt;true&lt;/tlsEnabled&gt;
+        &lt;authType&gt;Basic Auth&lt;/authType&gt;
+        &lt;username&gt;{$ctx:username}&lt;/username&gt;
+        &lt;password&gt;{$ctx:password}&lt;/password&gt;
+        &lt;securityToken&gt;{$ctx:securityToken}&lt;/securityToken&gt;
+        &lt;name&gt;sfpubsub&lt;/name&gt;
+    &lt;/salesforcePubSub.init&gt;
+    ```
+    **Sample request**
+    ```json
+     {
+        &quot;server&quot;: &quot;api.pubsub.salesforce.com&quot;,
+        &quot;port&quot;: 7443,
+        &quot;tlsEnabled&quot;: true,
+        &quot;username&quot;: XXXXXXXXXXXX,
+        &quot;password&quot;: XXXXXXXXXXXX,
+        &quot;securityToken&quot;: XXXXXXXXXXXX
+     }
+    ```
+
+### Publish Events
+
+
+The **publish** operation allows you to publish events to a Salesforce topic. The event data must be in JSON format and must match the schema of the topic.
+
+
+??? note &quot;Salesforce Pub/Sub publish&quot;
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;topic_name&lt;/td&gt;
+            &lt;td&gt;Topic to publish on&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;events&lt;/td&gt;
+            &lt;td&gt;Batch of ProducerEvent(s) to send&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforcePubSub.publish configKey=&quot;sfpubsub&quot;&gt;
+        &lt;topic_name&gt;{$ctx:topic_name}&lt;/topic_name&gt;
+        &lt;events&gt;{$ctx:events}&lt;/events&gt;
+        &lt;auth_refresh&gt;&lt;/auth_refresh&gt;
+        &lt;responseVariable&gt;salesforcePubSub_publish_229&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+    &lt;/salesforcePubSub.publish&gt;
+    ```
+    **Sample request**
+    ```json
+     {
+        &quot;topic_name&quot;: &quot;/event/order__e&quot;,
+        &quot;events&quot;: [
+            {
+                &quot;schema_id&quot;: &quot;Cj6--yRyVY72q2Wfo0Fs1w&quot;,
+                &quot;payload&quot;: &quot;2uqVkNRlJDAwNWdMMDAwMDAwZHN3YlFBQQIA&quot;
+            },
+            {
+                &quot;schema_id&quot;: &quot;Cj6--yRyVY72q2Wfo0Fs1w&quot;,
+                &quot;payload&quot;: &quot;2uqVkNRlJDAwNWdMMDAwMDAwZHN3YlFBQQIA&quot;
+            }
+            ]
+     }
+    ```
+
+### Get Topic
+
+The **getTopic** operation allows you to retrieve the metadata of a Salesforce topic. This includes information such as the topic name, description, and schema.
+
+??? note &quot;Salesforce Pub/Sub getTopic&quot;
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;topic_name&lt;/td&gt;
+            &lt;td&gt;Topic to retrieve metadata for&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    ```xml
+    &lt;salesforcePubSub.getTopic configKey=&quot;sfpubsub&quot;&gt;
+        &lt;topic_name&gt;{$ctx:topic_name}&lt;/topic_name&gt;
+        &lt;responseVariable&gt;salesforcePubSub_getTopic_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+    &lt;/salesforcePubSub.getTopic&gt;
+    ```
+    **Sample request**
+    ```json
+     {
+        &quot;topic_name&quot;: &quot;/event/order__e&quot;
+     }
+    ```
+### Get Schema
+
+The **getSchema** operation allows you to retrieve the JSON schema of a Salesforce topic. This schema defines the structure of the events that can be published to the topic.
+
+
+??? note &quot;Salesforce Pub/Sub getSchema&quot;
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;schema_id&lt;/td&gt;
+            &lt;td&gt;Schema fingerprint for this event, which is a hash of the schema.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;salesforcePubSub.getSchema configKey=&quot;sfpubsub&quot;&gt;
+        &lt;schema_id&gt;{$ctx:schema_id}&lt;/schema_id&gt;
+        &lt;responseVariable&gt;salesforcePubSub_getSchema_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+    &lt;/salesforcePubSub.getSchema&gt;
+    ```
+    **Sample request**
+    ```json
+     { 
+        &quot;schema_id&quot;: &quot;Cj6--yRyVY72q2Wfo0Fs1w&quot;
+     }
+    ```
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>using-address-endpoints.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Use an Address Endpoint
+
+This sample demonstrates how you can convert a POX message to a SOAP request using an &lt;b&gt;Address&lt;/b&gt; endpoint.
+
+## Synapse configuration
+
+Following is a sample REST API configuration that we can used to implement this scenario. See the instructions on how to [build and run](#build-and-run) this example.
+
+```xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+ &lt;proxy name=&quot;SimpleStockQuoteProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;http https&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+     &lt;target&gt;
+         &lt;inSequence&gt;
+             &lt;!-- filtering of messages with XPath and regex matches --&gt;
+             &lt;filter regex=&quot;.*StockQuote.*&quot; source=&quot;get-property(&#x27;To&#x27;)&quot;&gt;
+                 &lt;then&gt;
+                     &lt;header name=&quot;Action&quot; scope=&quot;default&quot; value=&quot;urn:getQuote&quot;/&gt;
+                     &lt;call&gt;
+                         &lt;endpoint&gt;
+                             &lt;address format=&quot;soap11&quot; uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+                         &lt;/endpoint&gt;
+                     &lt;/call&gt;
+                     &lt;respond/&gt;
+                 &lt;/then&gt;
+                 &lt;else/&gt;
+             &lt;/filter&gt;
+         &lt;/inSequence&gt;
+         &lt;outSequence/&gt;
+         &lt;faultSequence/&gt;
+     &lt;/target&gt;
+&lt;/proxy&gt;
+```
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+3. [Create a proxy service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service) with the configurations given above.
+4. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+Set up the back-end service:
+
+1. Download the [back-end service](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/axis2Server.zip).
+2. Extract the downloaded zip file.
+3. Open a terminal, navigate to the `axis2Server/bin/` directory inside the extracted folder.
+4. Execute the following command to start the axis2server with the SimpleStockQuote back-end service:
+
+    === &quot;On MacOS/Linux&quot;   
+          ```bash
+          sh axis2server.sh
+          ```
+    === &quot;On Windows&quot;               
+          ```bash
+          axis2server.bat
+          ```
+
+Send the following request:
+
+```curl
+curl -X POST \
+     -H &quot;Content-Type: application/xml; charset=UTF-8;action=\&quot;urn:getQuote\&quot;&quot; \
+     -H &quot;SOAPAction: urn:getQuote&quot; \
+     -H &quot;User-Agent: Axis2&quot; \
+     -H &quot;Host: 127.0.0.1&quot; \
+     -H &quot;Transfer-Encoding: chunked&quot; \
+     -d &#x27;&lt;m0:getQuote xmlns:m0=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+            &lt;m0:request&gt;
+               &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+            &lt;/m0:request&gt;
+          &lt;/m0:getQuote&gt;&#x27; \
+     http://localhost:8290/services/SimpleStockQuoteProxy/StockQuote
+```
+
+This HTTP REST request will be transformed into a SOAP request and forwarded to the stock quote service.</body>
+</html>

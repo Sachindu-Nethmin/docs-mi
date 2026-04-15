@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>rabbitmq-msg-store-properties.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># RabbitMQ Message Store
+## Introduction
+Persists messages in a RabbitMQ queue inside a RabbitMQ broker. The RabbitMQ message store can be configured by specifying the class as &lt;code&gt;org.apache.synapse.message.store.impl.rabbitmq.RabbitmqStore&lt;/code&gt;.
+
+## Properties
+
+Listed below are the properties used for [creating a RabbitMQ Message Store]({{base_path}}/develop/creating-artifacts/creating-a-message-store/).
+
+###  Required Properties
+
+The following optional properties can be configured when [creating a RabbitMQ Message Store]({{base_path}}/develop/creating-artifacts/creating-a-message-store/).
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Property&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Name&lt;/td&gt;
+    &lt;td&gt;A unique name for the RabbitMQ message store.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;RabbitMQ Server Host Name&lt;/td&gt;
+    &lt;td&gt;The address of the RabbitMQ broker.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;RabbitMQ Server Host Port&lt;/td&gt;
+    &lt;td&gt;The port number of the RabbitMQ message broker.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;SSL Enabled&lt;/td&gt;
+    &lt;td&gt;
+      Whether or not SSL is enabled on the message store. When SSL Enabled is set to true, you can set the parameters relating to the SSL configuration. For descriptions of each of these parameters you can set, see SSL enabled RabbitMQ message store parameters.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+### Optional Properties
+
+The following optional properties can be configured when [creating a RabbitMQ Message Store]({{base_path}}/develop/creating-artifacts/creating-a-message-store/).
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Property&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;RabbitMQ Queue Name (store.rabbitmq.queue.name)&lt;/td&gt;
+    &lt;td&gt;
+      The message store queue name. Though this is not a required parameter, we recommend specifying a value for this.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;RabbitMQ Exchange Name (store.rabbitmq.exchange.name)&lt;/td&gt;
+    &lt;td&gt;
+      The name of the RabbitMQ exchange to which the queue is bound (If the ESB profile has to declare this exchange it will be declared as a direct exchange).
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Routing key (store.rabbitmq.route.key)&lt;/td&gt;
+    &lt;td&gt;
+      The exchange and queue binding value. Messages will be routed using this. This is considered only when both the exchange name and type are provided. Else messages will be routed using the default exchange and queue name as the routing key.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;User Name (store.rabbitmq.username)&lt;/td&gt;
+    &lt;td&gt;
+      The user name to connect to the broker.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Password (store.rabbitmq.password)&lt;/td&gt;
+    &lt;td&gt;
+      The password to connect to the broker.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Virtual Host (store.rabbitmq.virtual.host)&lt;/td&gt;
+    &lt;td&gt;
+      The virtual host name of the broker.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Enable Producer Guaranteed Delivery&lt;/td&gt;
+    &lt;td&gt;
+      See the &lt;a href=&quot;#properties-guaranteed-delivery-of-messages&quot;&gt;Properties for Guaranteed Delivery of Messages&lt;/a&gt;.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Failover Message Store&lt;/td&gt;
+    &lt;td&gt;
+      See the &lt;a href=&quot;#properties-guaranteed-delivery-of-messages&quot;&gt;Properties for Guaranteed Delivery of Messages&lt;/a&gt;.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+### SSL Properties
+
+!!! Note
+    Configuring parameters that provide information related to keystores and truststores can be optional based on your broker configuration. For example, if `         fail_if_no_peer_cert        ` is set to `         false        ` in the RabbitMQ broker configuration, then you only need to specify `         &lt;parameter name=&quot;rabbitmq.connection.ssl.enabled&quot; locked=&quot;false&quot;&gt;true&lt;/parameter&gt;        `. Additionally, you can also set `         &lt;parameter name=&quot;rabbitmq.connection.ssl.version&quot; locked=&quot;false&quot;&gt;true&lt;/parameter&gt;        ` parameter to specify the SSL version. If `         fail_if_no_peer_cert        ` is set to `         true        ` , you need to provide keystore and truststore information.
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Property&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;SSL Key Store Location&lt;/td&gt;
+    &lt;td&gt;The location of the keystore file.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;SSL Key Store Type&lt;/td&gt;
+    &lt;td&gt;
+      The type of the keystore used (e.g., JKS, PKCS12).
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;SSL Key Store Password&lt;/td&gt;
+    &lt;td&gt;
+      The password to access the keystore.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;SSL Trust Store Location&lt;/td&gt;
+    &lt;td&gt;
+      The location of the Java keystore file containing the collection of CA certificates trusted by this application process (truststore).
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;SSL Trust Store Type&lt;/td&gt;
+    &lt;td&gt;
+      The type of the truststore used.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;SSL Trust Store Password&lt;/td&gt;
+    &lt;td&gt;
+      The password to unlock the trust store file specified in rabbitmq.connection.ssl.truststore.location.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;SSL Version&lt;/td&gt;
+    &lt;td&gt;
+      SSL protocol version (e.g., SSL, TLSV1, TLSV1.2).
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+### Properties: Guaranteed Delivery of Messages
+
+If you need to ensure guaranteed delivery of your messages, specify values for the following parameters:
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Property&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Enable Producer Guaranteed Delivery&lt;/td&gt;
+    &lt;td&gt;
+      This flag specifies whether guaranteed delivery is enabled on the producer side. The value is set to &lt;code&gt;false&lt;/code&gt; by default.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Failover Message Store&lt;/td&gt;
+    &lt;td&gt;
+      The message store to which the store mediator should send messages when the original message store fails.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt; </body>
+</html>

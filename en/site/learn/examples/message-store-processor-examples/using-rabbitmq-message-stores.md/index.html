@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>using-rabbitmq-message-stores.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Use a RabbitMQ Message Store
+
+In this example, the client sends requests to a **proxy service**, which stores the messages in a **RabbitMQ message store**. The **message forwarding processor** then picks the stored messages from the RabbitMQ message store and invokes the back-end service.
+
+### Synapse configurations
+
+Following are the artifact configurations that we can use to implement this scenario. See the instructions on how to [build and run](#build-and-run-example-1) this example.
+
+=== &quot;Message Store&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;messageStore class=&quot;org.apache.synapse.message.store.impl.rabbitmq.RabbitMQStore&quot; name=&quot;rabbitmq&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;parameter name=&quot;store.rabbitmq.host.name&quot;&gt;localhost&lt;/parameter&gt;
+        &lt;parameter name=&quot;store.producer.guaranteed.delivery.enable&quot;&gt;false&lt;/parameter&gt;
+        &lt;parameter name=&quot;store.rabbitmq.host.port&quot;&gt;5672&lt;/parameter&gt;
+        &lt;parameter name=&quot;store.rabbitmq.route.key&quot;/&gt;
+        &lt;parameter name=&quot;store.rabbitmq.username&quot;/&gt;
+        &lt;parameter name=&quot;store.rabbitmq.virtual.host&quot;/&gt;
+        &lt;parameter name=&quot;rabbitmq.connection.ssl.enabled&quot;&gt;false&lt;/parameter&gt;
+        &lt;parameter name=&quot;store.rabbitmq.exchange.name&quot;/&gt;
+        &lt;parameter name=&quot;store.rabbitmq.queue.name&quot;&gt;xyz&lt;/parameter&gt;
+        &lt;parameter name=&quot;store.rabbitmq.password&quot;/&gt;
+    &lt;/messageStore&gt;
+    ```
+=== &quot;Endpoint&quot;    
+    ```xml
+    &lt;endpoint xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;SimpleStockQuoteService&quot;&gt; 
+        &lt;address uri=&quot;http://127.0.0.1:9000/services/SimpleStockQuoteService&quot;/&gt;
+    &lt;/endpoint&gt;
+    ```
+=== &quot;Proxy Service&quot;    
+    ```xml
+    &lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;Proxy1&quot; transports=&quot;https http&quot; startOnLoad=&quot;true&quot; trace=&quot;disable&quot;&gt;   
+      &lt;target&gt;
+        &lt;inSequence&gt;
+          &lt;property name=&quot;FORCE_SC_ACCEPTED&quot; value=&quot;true&quot; scope=&quot;axis2&quot;/&gt;
+          &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+          &lt;log level=&quot;full&quot;/&gt;
+          &lt;store messageStore=&quot;rabbitmq&quot;/&gt;
+        &lt;/inSequence&gt;
+      &lt;/target&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;Message Processor&quot;    
+    ```xml
+    &lt;messageProcessor xmlns=&quot;http://ws.apache.org/ns/synapse&quot; class=&quot;org.apache.synapse.message.processor.impl.forwarder.ScheduledMessageForwardingProcessor&quot; name=&quot;Processor1&quot; targetEndpoint=&quot;SimpleStockQuoteService&quot; messageStore=&quot;rabbitmq&quot;&gt;
+           &lt;parameter name=&quot;max.delivery.attempts&quot;&gt;4&lt;/parameter&gt;
+           &lt;parameter name=&quot;interval&quot;&gt;4000&lt;/parameter&gt;
+           &lt;parameter name=&quot;is.active&quot;&gt;true&lt;/parameter&gt;
+    &lt;/messageProcessor&gt;
+    ```
+
+See the descriptions of the above configurations:
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Artifact&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Message Store&lt;/td&gt;
+    &lt;td&gt;
+      The &lt;b&gt;RabbitMQ message store&lt;/b&gt;.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Endpoint&lt;/td&gt;
+    &lt;td&gt;
+      Define an endpoint which is used to send the message to the back-end service.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Proxy Service&lt;/td&gt;
+    &lt;td&gt;
+      Create a proxy service which stores messages to the created Message Store. Note that you can use the FORCE_SC_ACCEPTED property in the message flow to send an Http 202 status to the client after the WSO2 Integrator: MI accepts a message. If this property is not specified, the client that sends the request to the proxy service will timeout since it isbnot getting any response back from the proxy.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Message Processor&lt;/td&gt;
+    &lt;td&gt;
+      Create a message forwarding processor using the below configuration. Message forwarding processor consumes the messages stored in the message store.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+### Build and run
+
+[Configure the RabbitMQ broker]({{base_path}}/install-and-setup/setup/brokers/configure-with-rabbitmq) with the WSO2 Integrator: MI.
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+3. Create the [proxy service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service), [endpoint]({{base_path}}/develop/creating-artifacts/creating-endpoints), and [message processor]({{base_path}}/develop/creating-artifacts/creating-a-message-processor) with the configurations given above.
+4. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+Set up the back-end service:
+
+1. Download the [back-end service](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/axis2Server.zip).
+2. Extract the downloaded zip file.
+3. Open a terminal, navigate to the `axis2Server/bin/` directory inside the extracted folder.
+4. Execute the following command to start the axis2server with the SimpleStockQuote back-end service:
+
+    === &quot;On MacOS/Linux&quot;   
+          ```bash 
+          sh axis2server.sh
+          ```
+    === &quot;On Windows&quot;                
+          ```bash
+          axis2server.bat
+          ```
+
+Invoke the service:
+
+```bash
+POST http://localhost:8290/services/Proxy1 HTTP/1.1
+Accept-Encoding: gzip,deflate
+Content-Type: text/xml;charset=UTF-8
+SOAPAction: &quot;urn:getQuote&quot;
+Content-Length: 492
+Host: localhost:8290
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.1.1 (java 1.5)
+
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+   &lt;soapenv:Header/&gt;
+   &lt;soapenv:Body&gt;
+      &lt;ser:getQuote xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+         &lt;ser:request&gt;
+            &lt;xsd:symbol&gt;IBM&lt;/xsd:symbol&gt;
+         &lt;/ser:request&gt;
+      &lt;/ser:getQuote&gt;
+   &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+```
+
+Note a message similar to the following example:  
+
+```bash
+SimpleStockQuoteService :: Accepted order for : 7482 stocks of IBM at $ 169.27205579038733
+```</body>
+</html>

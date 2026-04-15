@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>proxying-soap-service.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Proxying a SOAP Service Sample
+
+This sample features a service that acts as a proxy for an existing service exposed via a SOAP API. When a client invokes this service, it simply forwards the message to the backend service without altering its content.
+
+Specifically, the sample includes a simple proxy service called ‘ProxyForEchoService,’ which serves as the intermediary. Additionally, it contains an endpoint representing the actual backend service within the MI context.
+
+## Deploying the sample
+
+1.  Open the sample by clicking on the **Proxying a SOAP Service** card.
+2.  Give a folder location to save the sample.
+3.  [Build and run]({{base_path}}/develop/deploy-artifacts#build-and-run) the sample in your WSO2 Integrator: MI.
+
+## Running the sample
+
+1.  Open a terminal and run the following commands to invoke the Service.
+
+    ```bash
+    curl --location &#x27;http://localhost:8290/services/ProxyForEchoService&#x27; \
+    --header &#x27;Content-Type: text/xml&#x27; \
+    --data &#x27;&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+        &lt;soapenv:Header/&gt;
+        &lt;soapenv:Body&gt;
+            &lt;echo:echoString xmlns:echo=&quot;http://echo.services.core.carbon.wso2.org&quot;&gt;
+              &lt;in&gt;Hello&lt;/in&gt;
+            &lt;/echo:echoString&gt;
+        &lt;/soapenv:Body&gt;
+    &lt;/soapenv:Envelope&gt;&#x27; 
+    ```
+
+    You will receive a response like following.
+
+    ```
+    &lt;ns:echoStringResponse xmlns:ns=&quot;http://echo.services.core.carbon.wso2.org&quot;&gt;
+        &lt;return&gt;Hello&lt;/return&gt;
+    &lt;/ns:echoStringResponse&gt;
+    ```
+
+2.  You can also [run the unit test case]({{base_path}}/develop/creating-unit-test-suite/#run-unit-test-suite) defined for this sample.
+</body>
+</html>

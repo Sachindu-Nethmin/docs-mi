@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>opentelemetry-metrics.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Exporting Metrics with OpenTelemetry
+
+WSO2 MI can export metrics over the [OpenTelemetry Protocol (OTLP)](https://opentelemetry.io/docs/specs/otlp/), which lets you send structured metric data to any compatible observability backend.
+
+The setup involves three steps: enabling OpenTelemetry in MI, registering the metrics handler, and configuring the metric reporter.
+
+### Step 1 - Enable OpenTelemetry in WSO2 MI
+
+Enable the OpenTelemetry publisher and point it to the gRPC endpoint of your OpenTelemetry Collector.
+
+Add the following to your `deployment.toml` file:
+
+=== &quot;Format&quot;
+    ```toml
+    [opentelemetry]
+    enable = true
+    type = &quot;otlp&quot;
+    host = &quot;&lt;hostname-of-otel-collector&gt;&quot;
+    port = &quot;&lt;port-of-otel-collector&gt;&quot;
+
+    # Instead of &#x27;host&#x27; and &#x27;port&#x27;, you can use &#x27;url&#x27; directly.
+    url = &quot;&lt;url-of-otel-collector&gt;&quot;
+    ```
+=== &quot;Example&quot;
+    ```toml
+    [opentelemetry]
+    enable = true
+    type = &quot;otlp&quot;
+    host = &quot;localhost&quot;
+    port = 4317
+
+    # or
+
+    url = &quot;http://localhost:4317&quot;
+    ```
+
+### Step 2 - Register the metrics handler
+
+Register the Synapse handler that intercepts messages and collects metrics.
+
+Add the following to your `deployment.toml` file:
+
+```toml
+[[synapse_handlers]]
+name = &quot;CustomObservabilityHandler&quot;
+class = &quot;org.wso2.micro.integrator.observability.metric.handler.MetricHandler&quot;
+```
+
+### Step 3 - Configure the metric reporter
+
+Configure the Metric Handler to use the OpenTelemetry reporter when formatting and sending metrics.
+
+Add the following to your `deployment.toml` file:
+
+```toml
+[metric_handler]
+metric_reporter = &quot;org.wso2.micro.integrator.observability.metric.handler.opentelemetry.reporter.OpenTelemetryReporter&quot;
+```
+
+Restart your WSO2 MI server. Metrics will now be collected and exported to your observability backend automatically.</body>
+</html>

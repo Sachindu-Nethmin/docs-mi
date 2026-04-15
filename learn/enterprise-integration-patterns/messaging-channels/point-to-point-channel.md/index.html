@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>point-to-point-channel.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Point-to-Point Channel
+
+This page explains how you can implement a sample scenario of Point-to-Point Channel EIP using WSO2 Integrator: MI.
+
+## Introduction to Point-to-Point Channel
+
+The Point-to-Point Channel EIP allows only a single receiver to consume a sent message when multiple receivers are waiting to consume it.
+
+!!! info
+    For more information, go to [Point-to-Point Channel](http://www.eaipatterns.com/PointToPointChannel.html). 
+
+## Sample scenario
+
+The sample scenario is an inventory for stocks. It illustrates how a stock quote is generated, which only a single consumer receives at a given time. The diagram below depicts how to simulate the sample scenario.
+
+![Point-to-Point Channel]({{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-channels/point-to-point.png)
+
+## Synapse configurations of the artifacts
+
+When you unzip the ZIP file you downloaded below in step 9 when simulating the sample scenario, you can find the below configurations in the `&lt;UNZIPPED_FILE&gt;/src/main/wso2mi/artifacts` directory. For more information about these artifacts, go to [Develop Integration Solutions]({{base_path}}/develop/intro-integration-development/) Documentation.
+
+=== &quot;Proxy Service&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy name=&quot;PointToPointProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;http https&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;call&gt;
+                    &lt;endpoint key=&quot;LoadBalanceEp&quot;/&gt;
+                &lt;/call&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence/&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;Load Balance Endpoint&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;endpoint name=&quot;LoadBalanceEp&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;loadbalance algorithm=&quot;org.apache.synapse.endpoints.algorithms.RoundRobin&quot;&gt;
+            &lt;endpoint key=&quot;SimpleStockEp1&quot;/&gt;
+            &lt;endpoint key=&quot;SimpleStockEp2&quot;/&gt;
+            &lt;endpoint key=&quot;SimpleStockEp3&quot;/&gt;
+        &lt;/loadbalance&gt;
+        &lt;description&gt;&lt;/description&gt;
+    &lt;/endpoint&gt;
+    ```
+=== &quot;Endpoint 1&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;endpoint name=&quot;SimpleStockEp1&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;address uri=&quot;http://localhost:9001/services/SimpleStockQuoteService/&quot;&gt;
+            &lt;suspendOnFailure&gt;
+                &lt;initialDuration&gt;-1&lt;/initialDuration&gt;
+                &lt;progressionFactor&gt;1&lt;/progressionFactor&gt;
+            &lt;/suspendOnFailure&gt;
+            &lt;markForSuspension&gt;
+                &lt;retriesBeforeSuspension&gt;0&lt;/retriesBeforeSuspension&gt;
+            &lt;/markForSuspension&gt;
+        &lt;/address&gt;
+    &lt;/endpoint&gt;
+    ```
+=== &quot;Endpoint 2&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;endpoint name=&quot;SimpleStockEp2&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;address uri=&quot;http://localhost:9002/services/SimpleStockQuoteService/&quot;&gt;
+            &lt;suspendOnFailure&gt;
+                &lt;initialDuration&gt;-1&lt;/initialDuration&gt;
+                &lt;progressionFactor&gt;1&lt;/progressionFactor&gt;
+            &lt;/suspendOnFailure&gt;
+            &lt;markForSuspension&gt;
+                &lt;retriesBeforeSuspension&gt;0&lt;/retriesBeforeSuspension&gt;
+            &lt;/markForSuspension&gt;
+        &lt;/address&gt;
+    &lt;/endpoint&gt;
+    ```
+=== &quot;Endpoint 3&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;endpoint name=&quot;SimpleStockEp3&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;address uri=&quot;http://localhost:9003/services/SimpleStockQuoteService/&quot;&gt;
+            &lt;suspendOnFailure&gt;
+                &lt;initialDuration&gt;-1&lt;/initialDuration&gt;
+                &lt;progressionFactor&gt;1&lt;/progressionFactor&gt;
+            &lt;/suspendOnFailure&gt;
+            &lt;markForSuspension&gt;
+                &lt;retriesBeforeSuspension&gt;0&lt;/retriesBeforeSuspension&gt;
+            &lt;/markForSuspension&gt;
+        &lt;/address&gt;
+    &lt;/endpoint&gt;
+    ```
+
+## Set up the sample scenario
+
+Follow the below instructions to simulate this sample scenario.
+
+{!includes/eip-set-up.md!}
+
+3. Download the [backend service](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/axis2Server.zip).
+
+4. Extract the downloaded zip file.
+
+5. Open a terminal, and navigate to the `axis2Server/bin/` directory inside the extracted folder.
+
+6. Execute the following command to start the axis2server with the SimpleStockQuote backend service:
+
+    === &quot;On MacOS/Linux&quot;   
+          ```bash
+          sh axis2server.sh
+          ```
+    === &quot;On Windows&quot;                
+          ```bash
+          axis2server.bat
+          ```
+
+7. Navigate to the `MI_HOME/bin/` directory and start the `tcpmon` application. 
+
+    For instructions, go to [Starting TCPMon]({{base_path}}/observe-and-manage/classic-observability-tcp/starting-tcp-mon/) Documentation.
+
+8. In the `tcpmon` application, navigate to the **Admin** tab. Add listeners to ports `9001`, `9002`, and `9003`. For each listener set the **target hostname** to `localhost` and **target port** to `9000` in each instance.
+
+9. Download the artifacts of the sample.
+
+    &lt;a href=&quot;{{base_path}}/assets/attachments/learn/enterprise-integration-patterns/PointToPointChannel.zip&quot;&gt;
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+    &lt;/a&gt;
+
+10. Import the artifacts to WSO2 MI.
+
+    Click **File** -&gt; **Open Folder** -&gt; Select the extracted ZIP file to import the downloaded ZIP file.
+
+11. Start the project in the WSO2 MI server.
+
+    For instructions, go to [Build and Run]({{base_path}}/develop/deploy-artifacts/#build-and-run) Documentation.
+
+## Execute the sample
+
+Send the following request **3 or more times**. Make sure to include a `simpleClientSession` in the header.
+
+```
+POST http://localhost:8290/services/PointToPointProxy
+Content-Type: text/xml;charset=UTF-8
+simpleClientSession: 123
+
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+   &lt;soapenv:Header/&gt;
+   &lt;soapenv:Body&gt;
+   &lt;m0:placeOrder xmlns:m0=&quot;http://services.samples&quot;&gt;
+            &lt;m0:order&gt;
+                &lt;m0:price&gt;172.23182849731984&lt;/m0:price&gt;
+                &lt;m0:quantity&gt;18398&lt;/m0:quantity&gt;
+                &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+            &lt;/m0:order&gt;
+        &lt;/m0:placeOrder&gt;
+   &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+```
+
+## Analyze the output
+
+Out of the three instances of the Stock Quote service (Axis2 server), only one server acquires the sent request at a given time. When you send the requests, the WSO2 MI first receives the message and then routes it to the backend service (StockQuoteService). The following output will be printed on the Axis2 Server Console: 
+
+```
+Wed Aug 07 11:03:15 IST 2024 samples.services.SimpleStockQuoteService  :: Accepted order #1 for : 18398 stocks of IBM at $ 172.23182849731984
+Wed Aug 07 11:03:17 IST 2024 samples.services.SimpleStockQuoteService  :: Accepted order #2 for : 18398 stocks of IBM at $ 172.23182849731984
+Wed Aug 07 11:03:19 IST 2024 samples.services.SimpleStockQuoteService  :: Accepted order #3 for : 18398 stocks of IBM at $ 172.23182849731984
+```
+
+When inspecting the `tcpmon`, you will see that each listener has received a request (If you have only sent 3 requests, otherwise more than 1). This is because, when multiple requests are sent with the same session ID, they are distributed across the three endpoints in a round-robin manner.
+</body>
+</html>

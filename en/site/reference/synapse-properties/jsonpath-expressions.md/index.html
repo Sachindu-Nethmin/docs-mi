@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>jsonpath-expressions.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>---
+search:
+  boost: 0.4
+---
+
+# JSONPath Expressions
+
+!!! Note
+    WSO2 Integrator: MI will continue to support existing JSONPath expressions. However, it is recommended to use the new [Synapse Expressions]({{base_path}}/reference/synapse-properties/synapse-expressions), as they simplify data extraction and provide a rich set of functions.
+
+[JSONPath](http://goessner.net/articles/JsonPath/) expressions are used for navigating and querying JSON data. JSONPath allows you to extract specific data from JSON documents.
+
+JSONPath expressions are used within mediators like Log, Filter, Property, and Switch mediators to extract JSON data.
+`json-eval` function in expressions is used to specify JSONPath.
+
+- The syntax usually starts with `$` to represent the root of the JSON document.
+- Dots (.) and brackets ([]) are used to traverse different levels of the JSON hierarchy.
+
+## JSONPath syntax
+
+Suppose we have the following payload:
+
+```
+{
+  &quot;id&quot;: 12345,
+  &quot;id_str&quot;: &quot;12345&quot;,
+  &quot;array&quot;: [ 1, 2, [ [], [{&quot;inner_id&quot;: 6789}] ] ],
+  &quot;name&quot;: null,
+  &quot;object&quot;: {},
+  &quot;$schema_location&quot;: &quot;unknown&quot;,
+  &quot;12X12&quot;: &quot;image12x12.png&quot;
+}
+```
+
+The following table summarizes sample JSONPath expressions and their outputs:
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Expression&lt;/th&gt;
+&lt;th&gt;Result&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;$.&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;{ &amp;quot;id&amp;quot;:12345, &amp;quot;id_str&amp;quot;:&amp;quot;12345&amp;quot;, &amp;quot;array&amp;quot;:[1, 2, [[],[{&amp;quot;inner_id&amp;quot;:6789}]]], &amp;quot;name&amp;quot;:null, &amp;quot;object&amp;quot;:{}, &amp;quot;$schema_location&amp;quot;:&amp;quot;unknown&amp;quot;, &amp;quot;12X12&amp;quot;:&amp;quot;image12x12.png&amp;quot;}&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;$.id&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;12345&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;$.name&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;null&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;$.object&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;{}&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;$.[&amp;#39;$schema_location&amp;#39;]&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;unknown&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;$.12X12&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;image12x12.png&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;$.array&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;[1, 2, [[],[{&amp;quot;inner_id&amp;quot;:6789}]]]&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;$.array[2][1][0].inner_id&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td&gt;&lt;pre&gt;&lt;code&gt;6789&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+You can evaluate a JSONPath expression against a property that contains a JSON payload using [Variables]({{base_path}}/reference/synapse-properties/expressions/#variables).
+
+To evaluate a JSONPath expression against a property, use the following syntax.
+
+```json
+json-eval(&lt;scope_of_the_property&gt;:&lt;property_name&gt;.&lt;JSONPath_expression&gt;)
+```
+
+Example 1: When the property is in the default scope you can use [$ctx]({{base_path}}/reference/synapse-properties/expressions/#ctx).
+
+```json
+json-eval($ctx:propertyName.student.name)
+```
+
+Example 2: When the property is in the Axis2 scope you can use [$axis2]({{base_path}}/reference/synapse-properties/expressions/#axis2).
+
+```json
+json-eval($axis2:propertyName.student.name)
+```
+
+Example 3: When the property is in the transport scope you can use [$trp]({{base_path}}/reference/synapse-properties/expressions/#trp).
+
+```json
+json-eval($trp:propertyName.student.name)
+```
+</body>
+</html>

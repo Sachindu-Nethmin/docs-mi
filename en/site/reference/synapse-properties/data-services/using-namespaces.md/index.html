@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>using-namespaces.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Using Namespaces
+
+Data services are implemented using XML, which means that there can be
+conflicting element names. Therefore, we use namespaces to uniquely
+identify the elements defined within a specific web service. Using
+namespaces for a data service is optional. However, in certain data
+services, namespaces become necessary. Read below for more information.
+
+## Namespace inheritance in a data service
+
+Namespaces can be defined at different levels of a data service, which
+means that you can have multiple namespaces applicable to your data
+service at the same time. In such a scenario, the top-level namespaces
+will be inherited by the lower level as explained below.
+
+1.  The [namespace at the data service level](#setting-the-namespace-for-a-data-service) applies
+    to all aspects of the data service, i.e., to all elements in the
+    results of all the queries (output mapping).
+2.  The [namespace at the query result level (row namespace)](#setting-the-namespace-for-a-data-service-query)
+    overrides the service namespace and applies a given namespace to all
+    the result elements (output mapping elements) of that query.
+3.  The [namespace specified for a result element (output mapping)](#setting-namespaces-for-specific-elements-in-the-query-result)
+    overrides the query-level row namespace.
+4.  If you have a [complex element with child elements nested](#setting-namespaces-for-complex-results) :
+    1.  The namespace for the complex element overrides the result row
+        namespace and assigns the namespace to all its child elements.
+    2.  The namespace specifically assigned to a child element overrides
+        the parent element&#x27;s namespace.
+
+See the following topics for instructions on setting namespaces at
+different levels of a data service:
+
+## Setting the namespace for a data service
+
+The service namespace is used to uniquely identify a web service, which
+means that this namespace applies to all elements in the data service.
+In the WSDL that represents the service, the namespace is indicated by
+the &quot;targetNamespace&quot; attribute.
+
+## Setting the namespace for a data service query
+
+When you define a query for your data service, you can set a namespace
+for the elements in the query result (output mapping). That is, the
+**Row Namespace** applies to all the result rows that you define as
+output mappings for that query. For example, the row
+namespace can be set for the query result element: *Customers* .
+
+After setting the row namespace, the data type of the **Customers**
+element falls under the given namespace.
+
+!!! Info
+    If you have multiple queries with the same element wrapper but different
+    element rows, be sure to use separate namespaces for each query. The
+    example below illustrates two queries in a data service (.dbs file) with
+    the following qualities:
+    
+    -   The element wrapper is the same for both queries, which is
+        `           &lt;result element=&quot;employees&quot; rowName=&quot;employee&quot;&gt;          `
+        .
+    -   The two queries contain two unique element rows: &#x27;
+        `           salary          ` &#x27; and &#x27; `           phone          `
+        &#x27;.
+
+Therefore, since we are using the same element wrapper for both queries,
+we need to use two separate namespaces to identify the two conflicting
+elements (&#x27;salary&#x27; and &#x27;phone&#x27;) in the two queries as shown below.
+
+```xml
+&lt;query id=&quot;employeesByNumberSQL&quot; useConfig=&quot;default&quot;&gt;
+      &lt;sql&gt;select * from Employees where employeeNumber = ?&lt;/sql&gt;
+      &lt;result defaultNamespace=&quot;http://abc.com/empNamespace1&quot; element=&quot;employees&quot; rowName=&quot;employee&quot;&gt;
+         &lt;element column=&quot;lastName&quot; name=&quot;last-name&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;firstName&quot; name=&quot;first-name&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;email&quot; name=&quot;email&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;salary&quot; name=&quot;salary&quot; xsdType=&quot;double&quot;/&gt;
+      &lt;/result&gt;
+      &lt;param name=&quot;employeeNumber&quot; ordinal=&quot;1&quot; sqlType=&quot;INTEGER&quot;/&gt;
+&lt;/query&gt;
+&lt;query id=&quot;employeesByIDSQL&quot; useConfig=&quot;default&quot;&gt;
+      &lt;sql&gt;select * from Employees where employeesID = ?&lt;/sql&gt;
+      &lt;result defaultNamespace=&quot;http://abc.com/empNamespace2&quot; element=&quot;employees&quot; rowName=&quot;employee&quot;&gt;
+         &lt;element column=&quot;lastName&quot; name=&quot;last-name&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;firstName&quot; name=&quot;first-name&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;email&quot; name=&quot;email&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;phone&quot; name=&quot;phone&quot; xsdType=&quot;string&quot;/&gt;
+      &lt;/result&gt;
+      &lt;param name=&quot;employeeID&quot; ordinal=&quot;1&quot; sqlType=&quot;INTEGER&quot;/&gt;
+&lt;/query&gt;
+```
+
+## Setting namespaces for specific elements in the query result
+
+The row namespace applies to all elements in the query result.
+Alternatively, you can specify namespaces for selected elements (output
+mapping elements) in the query result as shown below.
+
+!!! Info
+    If you have a data service query using the same result element multiple times, be sure to use separate namespaces for each element to avoid conflicts. The example below illustrates a single query in a data service (.dbs file) that has the same element defined twice. In this situation, we have to use separate namespaces for the two elements in order to distinguish them separately.  
+
+```xml
+&lt;query id=&quot;getProductByIDSQL&quot; useConfig=&quot;default&quot;&gt;
+      &lt;sql&gt;select * from Products where productID = ?&lt;/sql&gt;
+      &lt;result defaultNamespace=&quot;http://abc.com/productIDNamespace&quot; element=&quot;products&quot; rowName=&quot;product&quot;&gt;
+         &lt;element column=&quot;productID&quot; name=&quot;productID&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;productID&quot; name=&quot;productID&quot; xsdType=&quot;INTEGER&quot;/&gt;
+         &lt;element column=&quot;productName&quot; name=&quot;productName&quot; xsdType=&quot;string&quot;/&gt;
+      &lt;/result&gt;
+&lt;/query&gt;
+```  
+
+## Setting namespaces for complex results
+
+In complex results, the result elements can be arbitrarily nested. These
+nested elements can have their own namespaces. The example given below
+illustrates a query with a complex result (nested elements). As shown
+below, the namespace specified for the &#x27;contact&#x27; element is inherited by
+the child elements that are nested within. However, if you assign
+specific namespaces to the child elements, the namespace inherited by
+the parent element will be overridden.
+
+```xml
+&lt;query id=&quot;customersInBostonSQL&quot; useConfig=&quot;default&quot;&gt;
+      &lt;sql&gt;select  * from Customers where city = &#x27;Boston&#x27; and country = &#x27;USA&#x27;&lt;/sql&gt;
+      &lt;result defaultNamespace=&quot;http://abc.com/nsb&quot; element=&quot;customers&quot; rowName=&quot;customer&quot;&gt;
+         &lt;element column=&quot;customerName&quot; name=&quot;customer-name&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element namespace=&quot;http://abc.com/nsb&quot; name=&quot;contact&quot;&gt;
+            &lt;element column=&quot;contactLastName&quot; name=&quot;contact-last-name&quot; xsdType=&quot;string&quot;/&gt;
+            &lt;element column=&quot;contactFirstName&quot; name=&quot;contact-first-name&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;/element&gt;
+         &lt;element column=&quot;phone&quot; name=&quot;phone&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;city&quot; name=&quot;city&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;country&quot; name=&quot;country&quot; xsdType=&quot;string&quot;/&gt;
+      &lt;/result&gt;
+&lt;/query&gt;
+```
+
+## Allowing an empty result namespace
+
+By default, if a `&lt;result&gt;` element&#x27;s `defaultNamespace` is omitted or
+set to an empty string, the data service applies the default namespace
+`http://ws.wso2.org/dataservice` to the result elements. To explicitly
+allow an empty (no) namespace for a query result, use the
+`enableSettingEmptyDefaultNamespace` attribute and set it to
+`&quot;true&quot;` on the `&lt;result&gt;` element. For example:
+
+```xml
+&lt;query id=&quot;getEmployees&quot; useConfig=&quot;default&quot;&gt;
+    &lt;sql&gt;SELECT * FROM Employees&lt;/sql&gt;
+    &lt;result element=&quot;Employees&quot; rowName=&quot;Employee&quot; defaultNamespace=&quot;&quot; enableSettingEmptyDefaultNamespace=&quot;true&quot;&gt;
+        &lt;element column=&quot;lastName&quot; name=&quot;last-name&quot; xsdType=&quot;string&quot;/&gt;
+        &lt;element column=&quot;firstName&quot; name=&quot;first-name&quot; xsdType=&quot;string&quot;/&gt;
+    &lt;/result&gt;
+&lt;/query&gt;
+```
+</body>
+</html>

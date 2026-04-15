@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>opening-projects.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Open a Project
+
+If you have an already created Integration project, you can open it using the Visual Studio Code. 
+
+Follow the steps below to open your existing integration project:
+
+1. Launch Visual Studio Code with the WSO2 Integrator: MI extension installed.
+
+    !!! info
+        Follow the [Install WSO2 Integrator: MI for VS Code]({{base_path}}/develop/mi-for-vscode/install-wso2-mi-for-vscode) documentation for a complete installation guide.
+
+2. Navigate to **WSO2 Integrator: MI Project Explorer**.
+
+3. Select **Open MI Project**.  
+
+4. Select the folder containing your integration project.
+
+5. Click **Open MI Project**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/open-project/open-project.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/open-project/open-project.png&quot; alt=&quot;Open MI Project&quot;&gt;&lt;/a&gt;
+
+    !!! Note
+
+        Select the **Import from CApp** option if you want to create a project using an existing Composite Application (CApp).
+
+        &lt;a href=&quot;{{base_path}}/assets/img/develop/open-project/import-from-capp.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/open-project/import-from-capp.png&quot; alt=&quot;Import from CApp&quot;&gt;&lt;/a&gt;
+
+    !!! warning &quot;If you have an integration project created by WSO2 Integration Studio...&quot;
+    
+        MI for VS Code offers limited support for projects created by the WSO2 Integration Studio. To ensure compatibility, you need to migrate your project or workspace to a supported project structure.
+
+        &lt;u&gt;Migrating a Project&lt;/u&gt;
+
+        If you open an integration project created using WSO2 Integration Studio, you will be prompted with the following interface.
+    
+        Click **Migrate Project** to automatically migrate your project using the migration tool provided in the MI for VS Code extension. 
+
+        For a maven multi module project, **each composite exporter** will have its own project created, and **only the files selected within the composite exporter** will be added to the respective project. If multiple projects are created during migration, they will be opened in a workspace. 
+    
+        The `.backup` folder is created to preserve a copy of the original Integration Studio project prior to migration.        
+
+        Within the `.backup` folder, a file named `skipped-files-during-migration.txt` is generated, which contains the file paths of artifacts that were available to be selected in a composite exporter but were not selected in any composite exporter. 
+        
+        &lt;a href=&quot;{{base_path}}/assets/img/develop/create-projects/importing-projects/migrate-project.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-projects/importing-projects/migrate-project.png&quot; alt=&quot;Migrate project&quot;&gt;&lt;/a&gt;
+
+        &lt;u&gt;Migrating a Workspace&lt;/u&gt;
+
+        If you open a workspace created using WSO2 Integration Studio, you will be prompted with the following interface:
+        
+        Click **Migrate Workspace** to automatically migrate the entire workspace using the migration tool provided in the MI for VS Code extension.
+
+        Each integration project within the workspace will be migrated separately. This process is similar to migrating a single project. If multiple projects are created during migration, they will be opened in a workspace.
+    
+        &lt;a href=&quot;{{base_path}}/assets/img/develop/create-projects/importing-projects/migrate-workspace.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-projects/importing-projects/migrate-workspace.png&quot; alt=&quot;Migrate workspace&quot;&gt;&lt;/a&gt;         
+
+You will see that the integration artifacts are imported into **WSO2 Integrator: MI Project Explorer**, and the project files are imported into **Explorer**.
+</body>
+</html>

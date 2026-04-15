@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>csv-data-service.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Expose a CSV Datasource
+
+This example demonstrates how CSV data can be exposed as a data service.
+
+## Prerequisites
+
+!!! Info
+    Note that you can only read data from CSV files. The WSO2 Integrator: MI does not support inserting, updating, or modifying data in a CSV file.
+
+[Download](https://github.com/wso2-docs/WSO2_EI/blob/master/data-service-resources/Products.csv) the `Products.csv` file.
+
+This file contains data about products (cars/motorcycles) that are
+manufactured in an automobile company. The data table has the following
+columns: `ID` , `Name` ,
+`Classification` , and `Price`.
+
+## Synapse configuration
+Given below is the data service configuration you need to build. See the instructions on how to [build and run](#build-and-run) this example.
+
+**Be sure** to update the CSV datasource path.
+
+```xml
+&lt;data name=&quot;CSV&quot; transports=&quot;http https local&quot;&gt;
+   &lt;config enableOData=&quot;false&quot; id=&quot;CSV&quot;&gt;
+      &lt;property name=&quot;csv_datasource&quot;&gt;/path/to/csv/Products.csv&lt;/property&gt;
+      &lt;property name=&quot;csv_columnseperator&quot;&gt;,&lt;/property&gt;
+      &lt;property name=&quot;csv_startingrow&quot;&gt;2&lt;/property&gt;
+      &lt;property name=&quot;csv_hasheader&quot;&gt;true&lt;/property&gt;
+      &lt;property name=&quot;csv_headerrow&quot;&gt;1&lt;/property&gt;
+   &lt;/config&gt;
+   &lt;query id=&quot;Q1&quot; useConfig=&quot;CSV&quot;&gt;
+      &lt;result element=&quot;Products&quot; rowName=&quot;Product&quot;&gt;
+         &lt;element column=&quot;ID&quot; name=&quot;ID&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;Classification&quot; name=&quot;Classification&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;Price&quot; name=&quot;Price&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;Name&quot; name=&quot;Name&quot; xsdType=&quot;string&quot;/&gt;
+      &lt;/result&gt;
+   &lt;/query&gt;
+   &lt;operation name=&quot;GetProductsOp&quot;&gt;
+      &lt;call-query href=&quot;Q1&quot;/&gt;
+   &lt;/operation&gt;
+   &lt;resource method=&quot;GET&quot; path=&quot;Products&quot;&gt;
+      &lt;call-query href=&quot;Q1&quot;/&gt;
+   &lt;/resource&gt;
+&lt;/data&gt;
+```
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+
+2. [Create the data service]({{base_path}}/develop/creating-artifacts/data-services/creating-data-services) with the configurations given above.
+   **Be sure** to update the CSV datasource path.
+3. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI. 
+
+You can send an HTTP GET request to invoke the data service using cURL
+as shown below.
+
+```bash
+curl -X GET http://localhost:8290/services/CSV.HTTPEndpoint/Products
+```
+
+This will return the response in XML.
+
+Example:
+
+```xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;Products xmlns=&quot;http://ws.wso2.org/dataservice&quot;&gt;
+   &lt;Product&gt;
+      &lt;ID&gt;S10_1678&lt;/ID&gt;
+      &lt;Category&gt;Motorcycles&lt;/Category&gt;
+      &lt;Price&gt;1000&lt;/Price&gt;
+      &lt;Name&gt;1969 Harley Davidson
+ Ultimate Chopper&lt;/Name&gt;
+   &lt;/Product&gt;
+   &lt;Product&gt;
+      &lt;ID&gt;S10_1949&lt;/ID&gt;
+      &lt;Category&gt;Classic Cars&lt;/Category&gt;
+      &lt;Price&gt;600&lt;/Price&gt;
+      &lt;Name&gt;1952 Alpine Renault 1300&lt;/Name&gt;
+   &lt;/Product&gt;
+   &lt;Product&gt;
+      &lt;ID&gt;S10_2016&lt;/ID&gt;
+      &lt;Category&gt;Motorcycles&lt;/Category&gt;
+      &lt;Price&gt;456&lt;/Price&gt;
+      &lt;Name&gt;1996 Moto Guzzi 1100i&lt;/Name&gt;
+   &lt;/Product&gt;
+   &lt;Product&gt;
+      &lt;ID&gt;S10_4698&lt;/ID&gt;
+      &lt;Category&gt;Motorcycles&lt;/Category&gt;
+      &lt;Price&gt;345&lt;/Price&gt;
+      &lt;Name&gt;2003 Harley-Davidson Eagle Drag Bike&lt;/Name&gt;
+   &lt;/Product&gt;
+   &lt;Product&gt;
+      &lt;ID&gt;S10_4757&lt;/ID&gt;
+      &lt;Category&gt;Classic Cars&lt;/Category&gt;
+      &lt;Price&gt;230&lt;/Price&gt;
+      &lt;Name&gt;1972 Alfa Romeo GTA&lt;/Name&gt;
+   &lt;/Product&gt;
+   &lt;Product&gt;
+      &lt;ID&gt;S10_4962&lt;/ID&gt;
+      &lt;Category&gt;Classic Cars&lt;/Category&gt;
+      &lt;Price&gt;890&lt;/Price&gt;
+      &lt;Name&gt;1962 LanciaA Delta 16V&lt;/Name&gt;
+   &lt;/Product&gt;
+   &lt;Product&gt;
+      &lt;ID&gt;S12_1099&lt;/ID&gt;
+      &lt;Category&gt;Classic Cars&lt;/Category&gt;
+      &lt;Price&gt;560&lt;/Price&gt;
+      &lt;Name&gt;1968 Ford Mustang&lt;/Name&gt;
+   &lt;/Product&gt;
+   &lt;Product&gt;
+      &lt;ID&gt;S12_1108&lt;/ID&gt;
+      &lt;Category&gt;Classic Cars&lt;/Category&gt;
+      &lt;Price&gt;900&lt;/Price&gt;
+      &lt;Name&gt;2001 Ferrari Enzo&lt;/Name&gt;
+   &lt;/Product&gt;
+&lt;/Products&gt;
+```
+</body>
+</html>

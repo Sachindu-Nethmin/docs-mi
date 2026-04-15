@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>email-connector-config.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>---
+search:
+  boost: 2
+---
+
+# Email Connector Reference
+
+This documentation provides a reference guide for the Email Connector.
+The Email Connector allows you to list, send emails and perform other actions such as get body, get attachment,mark email as read, mark email as deleted, delete email and expunge folder on different mailboxes using protocols IMAP, POP3 and SMTP.
+
+## Connection Configurations
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/email-2.x/email-conn.png&quot; title=&quot;Email Connector Configuration&quot; width=&quot;700&quot; alt=&quot;Email Connector Configuration&quot;/&gt;
+
+The WSO2 MI Email Connector supports multiple email protocols, allowing seamless integration with mail servers.
+
+- **SMTP (Simple Mail Transfer Protocol)**  
+  SMTP is a standard communication protocol used for sending emails between mail servers. It is primarily responsible for the transmission of outgoing messages from email clients to mail servers and between mail servers.  
+
+- **SMTPS (Secure SMTP)**  
+  SMTPS is the secure version of SMTP that encrypts email communication using SSL/TLS to enhance security and protect sensitive information from interception during transmission.  
+
+- **POP3 (Post Office Protocol v3)**  
+  POP3 is a protocol used to retrieve emails from a mail server. It downloads messages to the local device and typically removes them from the server, making it suitable for single-device email access.  
+
+- **POP3S (Secure POP3)**  
+  POP3S is the secure version of POP3, where email retrieval is encrypted using SSL/TLS, ensuring that email data remains protected during transmission.  
+
+- **IMAP (Internet Message Access Protocol)**  
+  IMAP is a protocol used for retrieving emails while keeping them stored on the mail server. It allows users to manage emails across multiple devices, providing synchronization between the client and server.  
+
+- **IMAPS (Secure IMAP)**  
+  IMAPS is the secure version of IMAP, where email communication is encrypted using SSL/TLS, ensuring that sensitive data remains protected while being accessed or synchronized.  
+
+### Connection Configuration Parameters
+The connection configuration parameters are used to establish a connection with the email server. These parameters are needed to provide based on the protocol you are using.
+
+??? note &quot;SMTP&quot;
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionName&lt;/td&gt;
+            &lt;td&gt;Name of the connection.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;host&lt;/td&gt;
+            &lt;td&gt;Hostname of the SMTP server.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;port&lt;/td&gt;
+            &lt;td&gt;Port number of the SMTP server.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requireAuthentication&lt;/td&gt;
+            &lt;td&gt;Specifies if authentication is required.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;username&lt;/td&gt;
+            &lt;td&gt;Username for authentication.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;password&lt;/td&gt;
+            &lt;td&gt;Password for authentication.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th colspan=&quot;3&quot;&gt;Additional parameters for connection&lt;/td&gt;
+        &lt;/tr&gt;
+            &lt;td&gt;Read Timeout&lt;/td&gt;
+            &lt;td&gt;Timeout for reading the response from the server.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionTimeout&lt;/td&gt;
+            &lt;td&gt;Timeout for establishing the connection.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;writeTimeout&lt;/td&gt;
+            &lt;td&gt;Timeout for writing the request to the server.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Active Connections&lt;/td&gt;
+            &lt;td&gt;Maximum number of active connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Idle Connections&lt;/td&gt;
+            &lt;td&gt;Maximum number of idle connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Wait Time&lt;/td&gt;
+            &lt;td&gt;Maximum wait time for a connection.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Min Eviction Time&lt;/td&gt;
+            &lt;td&gt;Minimum time before an idle connection is evicted.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Eviction Check Interval&lt;/td&gt;
+            &lt;td&gt;Interval for checking idle connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Exhausted Action &lt;/td&gt;
+            &lt;td&gt;Action to take when the connection pool is exhausted.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+??? note &quot;SMTPS&quot;
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionName&lt;/td&gt;
+            &lt;td&gt;Name of the connection.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;host&lt;/td&gt;
+            &lt;td&gt;Hostname of the SMTPS server.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;port&lt;/td&gt;
+            &lt;td&gt;Port number of the SMTPS server.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;username&lt;/td&gt;
+            &lt;td&gt;Username for authentication.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;password&lt;/td&gt;
+            &lt;td&gt;Password for authentication.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requireTLS&lt;/td&gt;
+            &lt;td&gt;Specifies if TLS is required.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th colspan=&quot;3&quot;&gt;Additional parameters for connection&lt;/td&gt;
+        &lt;/tr&gt;
+            &lt;td&gt;Read Timeout&lt;/td&gt;
+            &lt;td&gt;Timeout for reading the response from the server.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionTimeout&lt;/td&gt;
+            &lt;td&gt;Timeout for establishing the connection.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;writeTimeout&lt;/td&gt;
+            &lt;td&gt;Timeout for writing the request to the server.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Active Connections&lt;/td&gt;
+            &lt;td&gt;Maximum number of active connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Idle Connections&lt;/td&gt;
+            &lt;td&gt;Maximum number of idle connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Wait Time&lt;/td&gt;
+            &lt;td&gt;Maximum wait time for a connection.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Min Eviction Time&lt;/td&gt;
+            &lt;td&gt;Minimum time before an idle connection is evicted.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Eviction Check Interval&lt;/td&gt;
+            &lt;td&gt;Interval for checking idle connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Exhausted Action &lt;/td&gt;
+            &lt;td&gt;Action to take when the connection pool is exhausted.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+??? note &quot;POP3&quot;
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionName&lt;/td&gt;
+            &lt;td&gt;Name of the connection.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;host&lt;/td&gt;
+            &lt;td&gt;Hostname of the POP3 server.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;port&lt;/td&gt;
+            &lt;td&gt;Port number of the POP3 server.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;username&lt;/td&gt;
+            &lt;td&gt;Username for authentication.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;password&lt;/td&gt;
+            &lt;td&gt;Password for authentication.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th colspan=&quot;3&quot;&gt;Additional parameters for connection&lt;/td&gt;
+        &lt;/tr&gt;
+            &lt;td&gt;Read Timeout&lt;/td&gt;
+            &lt;td&gt;Timeout for reading the response from the server.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionTimeout&lt;/td&gt;
+            &lt;td&gt;Timeout for establishing the connection.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;writeTimeout&lt;/td&gt;
+            &lt;td&gt;Timeout for writing the request to the server.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Active Connections&lt;/td&gt;
+            &lt;td&gt;Maximum number of active connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Idle Connections&lt;/td&gt;
+            &lt;td&gt;Maximum number of idle connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Wait Time&lt;/td&gt;
+            &lt;td&gt;Maximum wait time for a connection.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Min Eviction Time&lt;/td&gt;
+            &lt;td&gt;Minimum time before an idle connection is evicted.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Eviction Check Interval&lt;/td&gt;
+            &lt;td&gt;Interval for checking idle connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Exhausted Action &lt;/td&gt;
+            &lt;td&gt;Action to take when the connection pool is exhausted.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+??? note &quot;POP3S&quot;
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionName&lt;/td&gt;
+            &lt;td&gt;Name of the connection.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;host&lt;/td&gt;
+            &lt;td&gt;Hostname of the POP3S server.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;port&lt;/td&gt;
+            &lt;td&gt;Port number of the POP3S server.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;username&lt;/td&gt;
+            &lt;td&gt;Username for authentication.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;password&lt;/td&gt;
+            &lt;td&gt;Password for authentication.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th colspan=&quot;3&quot;&gt;Additional parameters for connection&lt;/td&gt;
+        &lt;/tr&gt;
+            &lt;td&gt;Read Timeout&lt;/td&gt;
+            &lt;td&gt;Timeout for reading the response from the server.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionTimeout&lt;/td&gt;
+            &lt;td&gt;Timeout for establishing the connection.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;writeTimeout&lt;/td&gt;
+            &lt;td&gt;Timeout for writing the request to the server.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Active Connections&lt;/td&gt;
+            &lt;td&gt;Maximum number of active connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Idle Connections&lt;/td&gt;
+            &lt;td&gt;Maximum number of idle connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Wait Time&lt;/td&gt;
+            &lt;td&gt;Maximum wait time for a connection.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Min Eviction Time&lt;/td&gt;
+            &lt;td&gt;Minimum time before an idle connection is evicted.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Eviction Check Interval&lt;/td&gt;
+            &lt;td&gt;Interval for checking idle connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Exhausted Action &lt;/td&gt;
+            &lt;td&gt;Action to take when the connection pool is exhausted.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+??? note &quot;IMAP&quot;
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionName&lt;/td&gt;
+            &lt;td&gt;Name of the connection.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;host&lt;/td&gt;
+            &lt;td&gt;Hostname of the IMAP server.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;port&lt;/td&gt;
+            &lt;td&gt;Port number of the IMAP server.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;username&lt;/td&gt;
+            &lt;td&gt;Username for authentication.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;password&lt;/td&gt;
+            &lt;td&gt;Password for authentication.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th colspan=&quot;3&quot;&gt;Additional parameters for connection&lt;/td&gt;
+        &lt;/tr&gt;
+            &lt;td&gt;Read Timeout&lt;/td&gt;
+            &lt;td&gt;Timeout for reading the response from the server.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionTimeout&lt;/td&gt;
+            &lt;td&gt;Timeout for establishing the connection.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;writeTimeout&lt;/td&gt;
+            &lt;td&gt;Timeout for writing the request to the server.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Active Connections&lt;/td&gt;
+            &lt;td&gt;Maximum number of active connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Idle Connections&lt;/td&gt;
+            &lt;td&gt;Maximum number of idle connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Wait Time&lt;/td&gt;
+            &lt;td&gt;Maximum wait time for a connection.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Min Eviction Time&lt;/td&gt;
+            &lt;td&gt;Minimum time before an idle connection is evicted.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Eviction Check Interval&lt;/td&gt;
+            &lt;td&gt;Interval for checking idle connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Exhausted Action &lt;/td&gt;
+            &lt;td&gt;Action to take when the connection pool is exhausted.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+??? note &quot;IMAPS&quot;
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionName&lt;/td&gt;
+            &lt;td&gt;Name of the connection.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;host&lt;/td&gt;
+            &lt;td&gt;Hostname of the IMAPS server.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;port&lt;/td&gt;
+            &lt;td&gt;Port number of the IMAPS server.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;username&lt;/td&gt;
+            &lt;td&gt;Username for authentication.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;password&lt;/td&gt;
+            &lt;td&gt;Password for authentication.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requireTLS&lt;/td&gt;
+            &lt;td&gt;Specifies if TLS is required.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th colspan=&quot;3&quot;&gt;Oauth2 Authentication&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Enable OAuth2&lt;/td&gt;
+            &lt;td&gt;Specifies if OAuth2 authentication is required.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Grant Type&lt;/td&gt;
+            &lt;td&gt;Type of OAuth2 grant to be used.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Client Id&lt;/td&gt;
+            &lt;td&gt;Client ID for OAuth2 authentication.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Client Secret&lt;/td&gt;
+            &lt;td&gt;Client Secret for OAuth2 authentication.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Refresh Token&lt;/td&gt;
+            &lt;td&gt;Refresh Token for OAuth2 authentication.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Token URL&lt;/td&gt;
+            &lt;td&gt;URL to obtain the OAuth2 token.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Scope&lt;/td&gt;
+            &lt;td&gt;Scope for OAuth2 authentication.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th colspan=&quot;3&quot;&gt;Additional parameters for connection&lt;/td&gt;
+        &lt;/tr&gt;
+            &lt;td&gt;Read Timeout&lt;/td&gt;
+            &lt;td&gt;Timeout for reading the response from the server.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionTimeout&lt;/td&gt;
+            &lt;td&gt;Timeout for establishing the connection.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;writeTimeout&lt;/td&gt;
+            &lt;td&gt;Timeout for writing the request to the server.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Active Connections&lt;/td&gt;
+            &lt;td&gt;Maximum number of active connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Idle Connections&lt;/td&gt;
+            &lt;td&gt;Maximum number of idle connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Max Wait Time&lt;/td&gt;
+            &lt;td&gt;Maximum wait time for a connection.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Min Eviction Time&lt;/td&gt;
+            &lt;td&gt;Minimum time before an idle connection is evicted.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Eviction Check Interval&lt;/td&gt;
+            &lt;td&gt;Interval for checking idle connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Exhausted Action &lt;/td&gt;
+            &lt;td&gt;Action to take when the connection pool is exhausted.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+## Operations
+    
+    
+??? note &quot;list&quot;
+    The list operation retrieves emails matching the specified filters.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;deleteAfterRetrieve&lt;/td&gt;
+            &lt;td&gt;Whether the email should be deleted after retrieving.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;receivedSince&lt;/td&gt;
+            &lt;td&gt;The date after which to retrieve received emails.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;receivedUntil&lt;/td&gt;
+            &lt;td&gt;The date until which to retrieve received emails.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sentSince&lt;/td&gt;
+            &lt;td&gt;The date after which to retrieve sent emails.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sentUntil&lt;/td&gt;
+            &lt;td&gt;The date until which to retrieve sent emails.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;subjectRegex&lt;/td&gt;
+            &lt;td&gt;Subject Regex to match with the wanted emails.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fromRegex&lt;/td&gt;
+            &lt;td&gt;From email address to match with the wanted emails.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;seen&lt;/td&gt;
+            &lt;td&gt;Whether to retrieve &#x27;seen&#x27; or &#x27;not seen&#x27; emails.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;answered&lt;/td&gt;
+            &lt;td&gt;Whether to retrieve &#x27;answered&#x27; or &#x27;unanswered&#x27; emails.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;deleted&lt;/td&gt;
+            &lt;td&gt;Whether to retrieve &#x27;deleted&#x27; or &#x27;not deleted&#x27; emails.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;recent&lt;/td&gt;
+            &lt;td&gt;Whether to retrieve &#x27;recent&#x27; or &#x27;past&#x27; emails.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;offset&lt;/td&gt;
+            &lt;td&gt;The index from which to retrieve emails.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;limit&lt;/td&gt;
+            &lt;td&gt;The number of emails to be retrieved.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;folder&lt;/td&gt;
+            &lt;td&gt;Name of the Mailbox folder to retrieve emails from. Default is `INBOX`.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+    
+    ```xml
+    &lt;email.list configKey=&quot;IMAPS_CONN&quot;&gt;
+        &lt;deleteAfterRetrieve&gt;false&lt;/deleteAfterRetrieve&gt;
+        &lt;receivedSince&gt;&lt;/receivedSince&gt;
+        &lt;receivedUntil&gt;&lt;/receivedUntil&gt;
+        &lt;sentSince&gt;&lt;/sentSince&gt;
+        &lt;sentUntil&gt;&lt;/sentUntil&gt;
+        &lt;subjectRegex&gt;&lt;/subjectRegex&gt;
+        &lt;fromRegex&gt;&lt;/fromRegex&gt;
+        &lt;seen&gt;&lt;/seen&gt;
+        &lt;answered&gt;&lt;/answered&gt;
+        &lt;deleted&gt;&lt;/deleted&gt;
+        &lt;recent&gt;true&lt;/recent&gt;
+        &lt;offset&gt;0&lt;/offset&gt;
+        &lt;limit&gt;10&lt;/limit&gt;
+        &lt;folder&gt;Inbox&lt;/folder&gt;
+        &lt;responseVariable&gt;email_list_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/email.list&gt;
+    ```
+    
+    **Sample response**
+    
+    The response received will be stored in the variable `email_list_1` as a JSON object. The following is a sample response.
+    
+    ```json
+    {
+        &quot;emails&quot;: {
+            &quot;email&quot;: [
+                {
+                    &quot;index&quot;: 0,
+                    &quot;emailId&quot;: &quot;&lt;1623446944.0.152334336343@localhost&gt;&quot;,
+                    &quot;to&quot;: &quot;&lt;your-email&gt;@gmail.com&quot;,
+                    &quot;from&quot;: &quot;&lt;your-email&gt;@gmail.com&quot;,
+                    &quot;replyTo&quot;: &quot;&lt;your-email&gt;@gmail.com&quot;,
+                    &quot;subject&quot;: &quot;Sample email&quot;,
+                    &quot;attachments&quot;: {
+                        &quot;index&quot;: &quot;0&quot;,
+                        &quot;name&quot;: &quot;contacts.csv&quot;,
+                        &quot;contentType&quot;: &quot;TEXT/CSV&quot;
+                    }
+                }
+            ]
+        }
+    }
+    ```
+        
+    &gt; **Note:** The emailId of the email can be used to retrieve the email content and attachment content using below operations.
+    
+??? note &quot;getEmailBody&quot;
+
+    The getEmailBody operation retrieves the email content.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;emailId&lt;/td&gt;
+            &lt;td&gt;Email Id of the email to retrieve the content.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;folder&lt;/td&gt;
+            &lt;td&gt;Name of the mailbox folder from which to retrieve the email. Default is `INBOX`.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;email.getEmailBody configKey=&quot;IMAPS_CONN&quot;&gt;
+        &lt;emailId &gt;&amp;lt;CAJDNsXYtN9_QnACnZP=MRp5E2u3_StvQ0SO4QQu5THxSA=mAXg@mail.wso2.com&amp;gt;&lt;/emailId&gt;
+        &lt;folder &gt;Inbox&lt;/folder&gt;
+        &lt;responseVariable &gt;email_getEmailBody_1&lt;/responseVariable&gt;
+        &lt;overwriteBody &gt;false&lt;/overwriteBody&gt;
+    &lt;/email.getEmailBody&gt;
+    ```
+
+    Following properties will be set in the message context or to a new variable if the `overwriteBody` parameter is set to `false`.
+
+    ```
+    {
+        &quot;email&quot;: {
+            &quot;emailId&quot;: &quot;&lt;email@mail.wso2.com&gt;&quot;,
+            &quot;to&quot;: &quot;toemail@email.com&quot;,
+            &quot;from&quot;: &quot;fromemail@email.com&quot;,
+            &quot;cc&quot;: &quot;&quot;,
+            &quot;bcc&quot;: &quot;&quot;,
+            &quot;subject&quot;: &quot;Subject&quot;,
+            &quot;replyTo&quot;: &quot;email@email.com&quot;,
+            &quot;htmlContent&quot;: &quot;&lt;div dir=\&quot;auto\&quot;&gt;&lt;/div&gt;\r\n&quot;,
+            &quot;textContent&quot;: &quot;\r\n&quot;
+        }
+    }
+    ```
+
+??? note &quot;getEmailAttachment&quot;
+
+    The getEmailAttachment operation retrieves the email content.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;emailId&lt;/td&gt;
+            &lt;td&gt;Email Id of the email to retrieve the content.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;folder&lt;/td&gt;
+            &lt;td&gt;Name of the mailbox folder from which to retrieve the email. Default is `INBOX`.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+            &lt;td&gt;attachmentIndex&lt;/td&gt;
+            &lt;td&gt;Index of the attachment as per above response of which to retrieve the attachment content.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;email.getEmailAttachment configKey=&quot;IMAPS_CONN&quot;&gt;
+        &lt;emailId&gt;emailId&lt;/emailId&gt;
+        &lt;folder&gt;Inbox&lt;/folder&gt;
+        &lt;attachmentIndex&gt;0&lt;/attachmentIndex&gt;
+        &lt;responseVariable&gt;email_getEmailAttachment_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+    &lt;/email.getEmailAttachment&gt;
+    ```
+
+    Following properties will be set as attributes.
+
+    * ATTACHMENT_TYPE: Content Type of the attachment.
+    * ATTACHMENT_NAME: Name of the attachment.
+
+    This operation will set the content of the attachment in the message context according to its content type or assign it to a new variable if the `overwriteBody` parameter is set to `false`. The content will be set in the variable context as a base64 encoded string.
+
+??? note &quot;send&quot;
+    The send operation sends an email to specified recipients with the specified content.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;from&lt;/td&gt;
+            &lt;td&gt;The &#x27;From&#x27; address of the message sender.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;to&lt;/td&gt;
+            &lt;td&gt;The recipient addresses of &#x27;To&#x27; (primary) type.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;personalName&lt;/td&gt;
+            &lt;td&gt;The personal name of the message sender. This is available from Email Connector version 1.1.2 onwards.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;cc&lt;/td&gt;
+            &lt;td&gt;The recipient addresses of &#x27;CC&#x27; (carbon copy) type.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;bcc&lt;/td&gt;
+            &lt;td&gt;The recipient addresses of &#x27;BCC&#x27; (blind carbon copy) type.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;replyTo&lt;/td&gt;
+            &lt;td&gt;The email addresses to which to reply to this email.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;subject&lt;/td&gt;
+            &lt;td&gt;The subject of the email.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;content&lt;/td&gt;
+            &lt;td&gt;Body of the message in any format.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentType&lt;/td&gt;
+            &lt;td&gt;Content Type of the body text.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;encoding&lt;/td&gt;
+            &lt;td&gt;The character encoding of the body.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;attachments&lt;/td&gt;
+            &lt;td&gt;The attachments that are sent along with the email body.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentTransferEncoding&lt;/td&gt;
+            &lt;td&gt;Encoding used to indicate the type of transformation that is used to represent the body in an acceptable manner for transport.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;inlineImages&lt;/td&gt;
+            &lt;td&gt;
+            A JSONArray that enables the insertion of inline image details. This can be used to specify the image properties, such as the image URL, size, and alignment, among others. By including inline images in the JSONArray, developers can create more visually appealing and engaging content within their application. Note that this feature is available from Email connector version 1.1.1 onwards.
+            &lt;div class=&quot;admonition note&quot;&gt;
+            &lt;p class=&quot;admonition-title&quot;&gt;Note&lt;/p&gt;
+            There are 2 methods you can follow to add images, as listed below.&lt;br&gt;
+            **1. Providing file path**
+            ```json
+            {
+                &quot;from&quot;: &quot;abc@wso2.com&quot;,
+                &quot;to&quot;: &quot;xyz@wso2.com&quot;,
+                &quot;subject&quot;: &quot;Sample email subject&quot;,
+                &quot;content&quot;: &quot;&lt;H1&gt;Image1&lt;/H1&gt;&lt;img src=\&quot;cid:image1\&quot; alt=\&quot;this is image of image1\&quot;&gt;&lt;br/&gt;&lt;H1&gt;Image2&lt;/H1&gt;&lt;img src=\&quot;cid:image2\&quot; alt=\&quot;this is image of image2\&quot;&gt;&quot;,
+                &quot;inlineImages&quot;: [
+                    {
+                        &quot;contentID&quot;: &quot;image1&quot;,
+                        &quot;filePath&quot;: &quot;/Users/user/Documents/images/image1.jpeg&quot;
+                    },
+                    {
+                        &quot;contentID&quot;: &quot;image2&quot;,
+                        &quot;filePath&quot;: &quot;/Users/user/Documents/images/image2.jpeg&quot;
+                    }
+                ],
+                &quot;contentType&quot;: &quot;text/html&quot;
+            }   
+            ``` 
+            **2. Base64Content**
+            ```json
+            {
+                &quot;from&quot;: &quot;abc@wso2com&quot;,
+                &quot;to&quot;: &quot;xyz@wso2.com&quot;,
+                &quot;subject&quot;: &quot;Sample email subject&quot;,
+                &quot;content&quot;: &quot;&lt;H1&gt;Image1&lt;/H1&gt;&lt;img src=\&quot;cid:image1\&quot; alt=\&quot;this is image of a image1\&quot;&gt;&lt;br/&gt;&lt;H1&gt;Image2&lt;/H1&gt;&lt;img src=\&quot;cid:image2\&quot; alt=\&quot;this is a image2\&quot;&gt;&quot;,
+                &quot;inlineImages&quot;: [
+                    {
+                        &quot;contentID&quot;: &quot;image1&quot;,
+                        &quot;fileName&quot;: &quot;image1.jpeg&quot;,
+                        &quot;base64Content&quot;: &quot;/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAY......&quot;
+                    },
+                    {
+                        &quot;contentID&quot;: &quot;image2&quot;,
+                        &quot;fileName&quot;: &quot;image2.jpeg&quot;,
+                        &quot;base64Content&quot;: &quot;/9j/4AAQSkZJRgABAQEBLAEsAAD/4QBbRXhp....&quot;
+                    }
+                ],
+                &quot;contentType&quot;: &quot;text/html&quot;
+            }
+            ```
+            &lt;/div&gt;  
+            &lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    &gt; NOTE: If there are any custom headers to be added to the email they can be set as Axis2 properties in the context with the prefix &quot;EMAIL-HEADER:&quot; as the property name similar to below.
+    ```
+    &lt;property name=&quot;EMAIL-HEADER:myProperty&quot; value=&quot;testValue&quot;/&gt;
+    ```
+
+    **Sample configuration**
+
+    ```xml
+    &lt;email.send configKey=&quot;SMTP_CONN&quot;&gt;
+        &lt;from&gt;email1@wso2.com&lt;/from&gt;
+        &lt;personalName&gt;&lt;/personalName&gt;
+        &lt;to&gt;email2@wso2.com&lt;/to&gt;
+        &lt;cc&gt;&lt;/cc&gt;
+        &lt;bcc&gt;&lt;/bcc&gt;
+        &lt;replyTo&gt;&lt;/replyTo&gt;
+        &lt;subject&gt;WSO2 MI Email Connector Test&lt;/subject&gt;
+        &lt;content&gt;Sample Email&lt;/content&gt;
+        &lt;contentType&gt;text/html&lt;/contentType&gt;
+        &lt;encoding&gt;UTF-8&lt;/encoding&gt;
+        &lt;attachments&gt;&lt;/attachments&gt;
+        &lt;inlineImages&gt;[]&lt;/inlineImages&gt;
+        &lt;contentTransferEncoding&gt;Base64&lt;/contentTransferEncoding&gt;
+        &lt;responseVariable&gt;email_send_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/email.send&gt;
+    ```
+
+    **Sample response**
+    The response received will be stored in the variable `email_send_1` as a JSON object. The following is a sample response.
+    
+    ```json
+    {
+        &quot;success&quot;:true
+    }
+    ```
+    &gt; **Note:** The response will be set in the message context or to a new variable if the `overwriteBody` parameter is set to `false`.
+
+??? note &quot;delete&quot;
+    The delete operation deletes an email.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;emailId&lt;/td&gt;
+            &lt;td&gt;Email Id of the email to delete.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;folder&lt;/td&gt;
+            &lt;td&gt;Name of the mailbox folder from which to delete the emails. Default is `INBOX`.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;email.delete configKey=&quot;IMAPS_CONN&quot;&gt;
+        &lt;folder&gt;INBOX&lt;/folder&gt;
+        &lt;emailId&gt;sampleId&lt;/emailId&gt;
+        &lt;responseVariable&gt;email_delete_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/email.delete&gt;
+    ```
+
+    **Sample response**
+    The response received will be stored in the variable `email_delete_1` as a JSON object. The following is a sample response.
+    
+    ```json
+    {
+        &quot;success&quot;:true
+    }
+    ```
+
+??? note &quot;markAsDeleted&quot;
+    The markAsDeleted operation marks an email as deleted.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;emailId&lt;/td&gt;
+            &lt;td&gt;Email Id of the email to mark as deleted.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;folder&lt;/td&gt;
+            &lt;td&gt;Name of the mailbox folder where the email is. Default is `INBOX`.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+    
+    ```xml
+    &lt;email.markAsRead configKey=&quot;IMAPCONN&quot;&gt;
+        &lt;folder&gt;INBOX&lt;/folder&gt;
+        &lt;emailId&gt;sampleId&lt;/emailId&gt;
+        &lt;responseVariable&gt;email_markAsDelete_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/email.markAsRead&gt;
+    ```
+
+    **Sample response**
+    The response received will be stored in the variable `email_markAsDelete_1` as a JSON object. The following is a sample response.
+    
+    ```json
+    {
+        &quot;success&quot;:true
+    }
+    ```
+
+
+??? note &quot;markAsRead&quot;
+    The markAsRead marks an email as read.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;emailId&lt;/td&gt;
+            &lt;td&gt;Email Id of the email to mark as read.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;folder&lt;/td&gt;
+            &lt;td&gt;Name of the mailbox folder where the email is. Default is `INBOX`.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+    
+    ```xml
+    &lt;email.markAsRead configKey=&quot;IMAPCONN&quot;&gt;
+        &lt;folder&gt;INBOX&lt;/folder&gt;
+        &lt;emailId&gt;sampleId&lt;/emailId&gt;
+        &lt;responseVariable&gt;email_markAsRead_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/email.markAsRead&gt;
+    ```
+
+    **Sample response**
+    The response received will be stored in the variable `email_markAsRead_1` as a JSON object. The following is a sample response.
+    
+    ```json
+    {
+        &quot;success&quot;:true
+    }
+    ```
+
+
+??? note &quot;expungeFolder&quot;
+    The expungeFolder operation permanently deletes the emails marked for deletion.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;folder&lt;/td&gt;
+            &lt;td&gt;Name of the mailbox folder where the email is. Default is `INBOX`.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+    
+    ```xml
+    &lt;email.expungeFolder configKey=&quot;IMAPCONN&quot;&gt;
+        &lt;folder&gt;INBOX&lt;/folder&gt;
+    &lt;/email.expungeFolder&gt;
+    ```
+
+**Note**: For more information on how this works in an actual scenario, see [Email Connector Example]({{base_path}}/reference/connectors/email-connector/email-connector-example/).
+</body>
+</html>

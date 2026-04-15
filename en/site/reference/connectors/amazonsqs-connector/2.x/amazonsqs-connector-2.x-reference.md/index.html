@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>amazonsqs-connector-2.x-reference.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Amazon SQS Connector Reference
+
+The following operations allow you to work with the Amazon SQS Connector. Click an operation name to see parameter details and samples on how to use it.
+
+---
+
+## Initialize the connector
+
+To use the Amazon SQS connector, first create the connection with your configuration. When calling an Amazon SQS operation, ensure the connection is referenced using the `configKey` attribute.
+
+??? note &quot;init&quot;  
+    The init operation is used to initialize the connection to Amazon SQS.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;name&lt;/td&gt;
+            &lt;td&gt;Unique name to identify the connection by.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;region&lt;/td&gt;
+            &lt;td&gt;The regional endpoint to make your requests (e.g., us-east-1).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;accessKeyId&lt;/td&gt;
+            &lt;td&gt;The access key ID associated with your AWS account.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;secretAccessKey&lt;/td&gt;
+            &lt;td&gt;The secret access key associated with your AWS access key.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionMaxIdleTime&lt;/td&gt;
+            &lt;td&gt;The maximum amount of time(in seconds) that a connection should be allowed to remain open while idle.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait when initially establishing a connection before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionTimeToLive&lt;/td&gt;
+            &lt;td&gt;The maximum amount of time(in seconds) that a connection should be allowed to remain open, regardless of usage frequency.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionAcquisitionTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait when acquiring a connection from the pool before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;socketTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for data to be transferred over an established, open connection before the connection is timed out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    !!! note
+        If you want to define any timeout configuration in milliseconds, use the decimal format in seconds. For example, 350 milliseconds can be expressed as 0.35 seconds. 
+
+    !!! note
+        You can either pass credentials within init configuration or set the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` as environment variables. The AWS SDK uses provider chains to look for AWS credentials in system/user environment variables.
+        To set these environment variables follow the below steps based on your operating system: 
+    
+        === &quot;Linux, macOS, or Unix&quot;
+            ```    
+            export AWS_ACCESS_KEY_ID=AKIXXXXXXXXXXA
+            export AWS_SECRET_ACCESS_KEY=qHZXXXXXXQc4oMQMnAOj+340XXxO2s
+            ```  
+    
+        === &quot;Windows&quot;
+            ```    
+            set AWS_ACCESS_KEY_ID=AKIXXXXXXXXXXA
+            set AWS_SECRET_ACCESS_KEY=qHZXXXXXXQc4oMQMnAOj+340XXxO2s
+            ```
+    
+    !!! note 
+        If the application is running in an EC2 instance and credentials are not defined in the init configuration, the credentials will be obtained from the [IAM role](https://docs.amazonaws.cn/en_us/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html) assigned for the Amazon EC2 instance. This option is available only with Amazon SQS connector v2.0.0 and above.
+
+    **Sample configuration**
+    ```xml
+        &lt;amazonsqs.init&gt;
+            &lt;accessKeyId&gt;&lt;!-- AWS access key id--&gt;&lt;/accessKeyId&gt;
+            &lt;secretAccessKey&gt;&lt;!-- AWS secret access key--&gt;&lt;/secretAccessKey&gt;
+            &lt;name&gt;AMAZON_SQS_CONNECTION&lt;/name&gt;
+            &lt;region&gt;us-east-1&lt;/region&gt;
+        &lt;/amazonsqs.init&gt;
+    ```
+---
+
+### Messages
+
+??? note &quot;receiveMessage&quot;
+    This operation retrieves one or more messages, with a maximum limit of 10 messages, from the specified queue. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueUrl&lt;/td&gt;
+            &lt;td&gt;The URL of the queue to which a message is sent.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;messageSystemAttributeNames&lt;/td&gt;
+            &lt;td&gt;A list of attributes that need to be returned along with each message. The attribute should be separated by &#x27;,&#x27;. `Eg:  &#x27;SenderId, SentTimestamp&#x27;`.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxNumberOfMessages&lt;/td&gt;
+            &lt;td&gt;The maximum number of messages to return.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;messageAttributeNames&lt;/td&gt;
+            &lt;td&gt;The names of the message attributes. The attributes should be separated by &#x27;,&#x27;. `Eg:  &#x27;attributeName1, attributeName2&#x27;`&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;visibilityTimeout&lt;/td&gt;
+            &lt;td&gt;The duration (in seconds) that the received messages are hidden from subsequent retrieve requests after being retrieved by a ReceiveMessage request.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;waitTimeSeconds&lt;/td&gt;
+            &lt;td&gt;The duration (in seconds) for which the call will wait for a message to arrive in the queue before returning.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.receiveMessage configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueUrl&gt;{$ctx:queueUrl}&lt;/queueUrl&gt;
+        &lt;maxNumberOfMessages&gt;{$ctx:maxNumberOfMessages}&lt;/maxNumberOfMessages&gt;
+        &lt;waitTimeSeconds&gt;{$ctx:waitTimeSeconds}&lt;/waitTimeSeconds&gt;
+        &lt;messageAttributeNames&gt;{$ctx:messageAttributeNames}&lt;/messageAttributeNames&gt;
+        &lt;messageSystemAttributeNames&gt;{$ctx:messageSystemAttributeNames}&lt;/messageSystemAttributeNames&gt;
+        &lt;visibilityTimeout&gt;{$ctx:visibilityTimeout}&lt;/visibilityTimeout&gt;
+        &lt;attributes&gt;{$ctx:attributes}&lt;/attributes&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.receiveMessage&gt;
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.receiveMessage configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+        &lt;queueUrl&gt;https://sqs.us-west-2.amazonaws.com/844234390511/Queue&lt;/queueUrl&gt;
+        &lt;maxNumberOfMessages&gt;5&lt;/maxNumberOfMessages&gt;
+        &lt;waitTimeSeconds&gt;5&lt;/waitTimeSeconds&gt;
+        &lt;messageAttributeNames&gt;attributeName1, attributeName2&lt;/messageAttributeNames&gt;
+        &lt;messageSystemAttributeNames&gt;SenderId, SentTimestamp&lt;/messageSystemAttributeNames&gt;
+    &lt;/amazonsqs.receiveMessage&gt;
+    ```
+---
+
+??? note &quot;sendMessage&quot;
+    This operation delivers a message to the specified queue. You can send payload messages up to 256 KB (262,144 bytes) in size. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueUrl&lt;/td&gt;
+            &lt;td&gt;The URL of the queue to which a message is sent.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;messageBody&lt;/td&gt;
+            &lt;td&gt;The message to be sent, a String that is a maximum of 256 KB in size.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;delaySeconds&lt;/td&gt;
+            &lt;td&gt;The number of seconds (0 to 900, which is 15 minutes) to delay a specific message.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;messageAttributes&lt;/td&gt;
+            &lt;td&gt;The message attributes to send. The value should be a string in JSON format.` Eg: { &#x27;attributeName&#x27; : { &#x27;DataType&#x27;: &#x27;value&#x27;, &#x27;StringValue&#x27;: &#x27;value&#x27; }}`&quot;&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;messageDeduplicationId&lt;/td&gt;
+            &lt;td&gt;The ID of the message deduplication. This parameter applies only to FIFO (first-in-first-out) queues&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;messageGroupId&lt;/td&gt;
+            &lt;td&gt;The ID of the message group. This parameter applies only to FIFO (first-in-first-out) queues&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;messageSystemAttributes&lt;/td&gt;
+            &lt;td&gt;The message system attributes to send. The value should be a string in JSON format.`Eg:{ &#x27;systemAttributeName&#x27; :{ &#x27;DataType&#x27;: &#x27;value&#x27;, &#x27;StringValue&#x27;: &#x27;value&#x27; } }`&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.sendMessage configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueUrl&gt;{$ctx:queueUrl}&lt;/queueUrl&gt;
+        &lt;messageBody&gt;{$ctx:messageBody}&lt;/messageBody&gt;
+        &lt;delaySeconds&gt;{$ctx:delaySeconds}&lt;/delaySeconds&gt;
+        &lt;messageAttributes&gt;{$ctx:messageAttributes}&lt;/messageAttributes&gt;
+        &lt;messageSystemAttributes&gt;{$ctx:messageSystemAttributes}&lt;/messageSystemAttributes&gt;
+        &lt;messageDeduplicationId&gt;{$ctx:messageDeduplicationId}&lt;/messageDeduplicationId&gt;
+        &lt;messageGroupId&gt;{$ctx:messageGroupId}&lt;/messageGroupId&gt;  
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.sendMessage&gt; 
+    ```
+    
+    **Sample request for sendMessage**
+
+    ```xml
+    &lt;amazonsqs.sendMessage&gt;
+        &lt;queueUrl&gt;https://sqs.us-west-2.amazonaws.com/882234390511/Queue&lt;/queueUrl&gt;
+        &lt;messageBody&gt;Hi&lt;/messageBody&gt;
+        &lt;delaySeconds&gt;5&lt;/delaySeconds&gt;
+        &lt;messageAttributes&gt;&quot;{ &#x27;attributeName&#x27; : { &#x27;DataType&#x27;: &#x27;value&#x27;, &#x27;StringValue&#x27;: &#x27;value&#x27; }}&quot;&lt;/messageAttributes&gt;
+        &lt;messageSystemAttributes&gt;&quot;{ &#x27;systemAttributeName&#x27; :{ &#x27;DataType&#x27;: &#x27;value&#x27;, &#x27;StringValue&#x27;: &#x27;value&#x27; } }&quot;&lt;/messageSystemAttributes&gt;
+    &lt;/amazonsqs.sendMessage&gt;
+    ```
+---
+
+??? note &quot;sendMessageBatch&quot;
+    This operation delivers batch messages to the specified queue. You can send payload messages up to 256 KB (262,144 bytes) in size. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessageBatch.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueUrl&lt;/td&gt;
+            &lt;td&gt;The URL of the queue to which a message is sent.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;messageRequestEntries&lt;/td&gt;
+            &lt;td&gt;The list of messages to be sent, a String that is a maximum of 256 KB in size. `Eg: [{&#x27;delaySeconds&#x27;: 0, &#x27;id&#x27;: &#x27;id1&#x27;, &#x27;messageBody&#x27;: &#x27;hi&#x27;, &#x27;messageAttributes&#x27;: {&#x27;my_attribute_name_1&#x27;: {&#x27;DataType&#x27;: &#x27;String&#x27;,&#x27;StringValue&#x27;: &#x27;my_attribute_value_1&#x27;}}, messageSystemAttributes: {&#x27;AWSTraceHeader&#x27;: {&#x27;DataType&#x27;: &#x27;String&#x27;,&#x27;StringValue&#x27;: &#x27;AWS X-Ray&#x27;}}}]`&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.sendMessageBatch configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueUrl&gt;{$ctx:queueUrl}&lt;/queueUrl&gt;
+        &lt;messageRequestEntries&gt;{$ctx:messageRequestEntries}&lt;/messageRequestEntries&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.sendMessageBatch&gt; 
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.sendMessageBatch configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+        &lt;queueUrl&gt;https://sqs.us-west-2.amazonaws.com/882234390511/Queue&lt;/queueUrl&gt;
+        &lt;messageRequestEntries&gt;[{delaySeconds: 0, id: id1, messageBody: hi, messageAttributes: {&quot;my_attribute_name_1&quot;: {&quot;DataType&quot;: &quot;String&quot;,&quot;StringValue&quot;: &quot;my_attribute_value_1&quot;}}, messageSystemAttributes: {&quot;AWSTraceHeader&quot;: {&quot;DataType&quot;: &quot;String&quot;,&quot;StringValue&quot;: &quot;AWS X-Ray&quot;}}}]&lt;/messageRequestEntries&gt;
+    &lt;/amazonsqs.sendMessageBatch&gt;
+    ```
+---
+
+??? note &quot;deleteMessage&quot;
+    This operation deletes the specified message from the specified queue. You specify the message by using the message&#x27;s receipt handle and not the message ID you received when you sent the message. Even if the message is locked by another reader due to the visibility timeout setting, it is still deleted from the queue. If you leave a message in the queue for longer than the queue&#x27;s configured retention period, Amazon SQS automatically deletes it. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_DeleteMessage.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueUrl&lt;/td&gt;
+            &lt;td&gt;The URL of the queue from which messages are deleted.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;receiptHandle&lt;/td&gt;
+            &lt;td&gt;The receipt handle associated with the message to be deleted.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.deleteMessage configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueUrl&gt;{$ctx:queueUrl}&lt;/queueUrl&gt;
+        &lt;receiptHandle&gt;{$ctx:receiptHandle}&lt;/receiptHandle&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.deleteMessage&gt; 
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.deleteMessage configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+        &lt;queueUrl&gt;https://sqs.us-west-2.amazonaws.com/882234390511/Queue&lt;/queueUrl&gt;
+        &lt;receiptHandle&gt;2432435435645654656567&lt;/receiptHandle&gt;
+    &lt;/amazonsqs.deleteMessage&gt; 
+    ```
+---
+??? note &quot;deleteMessageBatch&quot;
+    This operation deletes multiple messages from the specified queue. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_DeleteMessageBatch.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueUrl&lt;/td&gt;
+            &lt;td&gt;The URL of the queue from which messages are deleted.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;messageRequestEntries&lt;/td&gt;
+            &lt;td&gt;A list of receipt handles for the messages to be deleted.`Eg: [{&#x27;receiptHandle&#x27;: &#x27;122324343&#x27;, &#x27;id&#x27;: &#x27;id1&#x27; }]`&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.deleteMessageBatch configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueUrl&gt;{$ctx:queueUrl}&lt;/queueUrl&gt;
+        &lt;messageRequestEntries&gt;{$ctx:messageRequestEntries}&lt;/messageRequestEntries&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.deleteMessageBatch&gt; 
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.deleteMessageBatch configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+        &lt;queueUrl&gt;https://sqs.us-west-2.amazonaws.com/882234390511/Queue&lt;/queueUrl&gt;
+        &lt;messageRequestEntries&gt;{$ctx:messageRequestEntries}&lt;/messageRequestEntries&gt;
+    &lt;/amazonsqs.deleteMessageBatch&gt;   
+    ```
+---
+
+??? note &quot;changeMessageVisibility&quot;
+    This operation changes the visibility timeout of a specified message in a queue to a new value. See the [Visibility Timeout in the Amazon SQS Developer Guide](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/AboutVT.html)).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueUrl&lt;/td&gt;
+            &lt;td&gt;The URL of the queue whose message&#x27;s visibility is changed&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;receiptHandle&lt;/td&gt;
+            &lt;td&gt;The receipt handle associated with the message, whose visibility timeout is changed.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;visibilityTimeout&lt;/td&gt;
+            &lt;td&gt;The new value (in seconds - from 0 to 43200 - maximum 12 hours) for the message&#x27;s visibility timeout.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.changeMessageVisibility configKey=&quot;CONNECTION_NAME&quot;&gt;  
+        &lt;queueUrl&gt;{$ctx:queueUrl}&lt;/queueUrl&gt;
+        &lt;receiptHandle&gt;{$ctx:receiptHandle}&lt;/receiptHandle&gt;
+        &lt;visibilityTimeout&gt;{$ctx:visibilityTimeout}&lt;/visibilityTimeout&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.changeMessageVisibility&gt; 
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.changeMessageVisibility configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;  
+        &lt;queueUrl&gt;https://sqs.us-west-2.amazonaws.com/882234390511/Queue&lt;/queueUrl&gt;
+        &lt;receiptHandle&gt;21321423453543556&lt;/receiptHandle&gt;
+        &lt;visibilityTimeout&gt;15&lt;/visibilityTimeout&gt;
+    &lt;/amazonsqs.changeMessageVisibility&gt;   
+    ```
+---
+
+??? note &quot;changeMessageVisibilityBatch&quot;
+    This operation changes the visibility timeout of multiple messages. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ChangeMessageVisibilityBatch.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueUrl&lt;/td&gt;
+            &lt;td&gt;The URL of the queue whose messages&#x27; visibility is changed&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;messageRequestEntries&lt;/td&gt;
+            &lt;td&gt;A list of receipt handles of the messages for which the visibility timeout must be changed. `Eg: [{&#x27;receiptHandle&#x27;: &#x27;123234343434454&#x27;, &#x27;id&#x27;: &#x27;id1&#x27;&#x27;, &#x27;VisibilityTimeout&#x27;: 5}]`&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.changeMessageVisibilityBatch configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueUrl&gt;{$ctx:queueUrl}&lt;/queueUrl&gt;
+        &lt;messageRequestEntries&gt;{$ctx:messageRequestEntries}&lt;/messageRequestEntries&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.changeMessageVisibilityBatch&gt; 
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.changeMessageVisibilityBatch configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+        &lt;queueUrl&gt;https://sqs.us-west-2.amazonaws.com/882234390511/Queue&lt;/queueUrl&gt;
+        &lt;messageRequestEntries&gt;[{&#x27;receiptHandle&#x27;: &#x27;122324343&#x27;, &#x27;id&#x27;: &#x27;id1&#x27;, &#x27;VisibilityTimeout&#x27;: 5 }]&lt;/messageRequestEntries&gt;
+    &lt;/amazonsqs.changeMessageVisibilityBatch&gt; 
+    ```
+---
+
+### Permissions
+
+??? note &quot;addPermission&quot;
+    This operation adds a permission to a queue for a specific principal. This allows sharing access to the queue. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_AddPermission.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueUrl&lt;/td&gt;
+            &lt;td&gt;The URL of the queue to which permissions are added.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;awsAccountNumbers&lt;/td&gt;
+            &lt;td&gt;The AWS account numbers of the principal who will be given permission. The account ids should be separated by &#x27;,&#x27;. `Eg: 111111111234, 111111111111`&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;actionNames&lt;/td&gt;
+            &lt;td&gt;The actions the client wants to allow for the specified principal. The actions should be separated by &#x27;,&#x27;. `Eg: SendMessage, DeleteMessage`&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;label&lt;/td&gt;
+            &lt;td&gt;The unique identification of the permission you&#x27;re setting.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.addPermission configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueUrl&gt;{$ctx:queueUrl}&lt;/queueUrl&gt;
+        &lt;awsAccountNumbers&gt;{$ctx:awsAccountNumbers}&lt;/awsAccountNumbers&gt;
+        &lt;actionNames&gt;{$ctx:actionNames}&lt;/actionNames&gt;
+        &lt;label&gt;{$ctx:label}&lt;/label&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.addPermission&gt;
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.addPermission configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+        &lt;queueUrl&gt;https://sqs.us-west-2.amazonaws.com/882234390511/Queue&lt;/queueUrl&gt;
+        &lt;awsAccountNumbers&gt;844783390511, 111111111111&lt;/awsAccountNumbers&gt;
+        &lt;actionNames&gt;SendMessage, DeleteMessage&lt;/actionNames&gt;
+        &lt;label&gt;test&lt;/label&gt;
+    &lt;/amazonsqs.addPermission&gt;
+    ```
+---
+
+??? note &quot;removePermission&quot;
+    This operation revokes any permissions in the queue policy that matches the specified label. This allows sharing access to the queue. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_RemovePermission.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueUrl&lt;/td&gt;
+            &lt;td&gt;The URL of the queue from which permissions are removed.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;label&lt;/td&gt;
+            &lt;td&gt;The identification of the permission to remove&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.removePermission configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueUrl&gt;{$ctx:queueUrl}&lt;/queueUrl&gt;
+        &lt;label&gt;{$ctx:label}&lt;/label&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.removePermission&gt;
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.removePermission configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+        &lt;queueUrl&gt;https://sqs.us-west-2.amazonaws.com/882234390511/Queue&lt;/queueUrl&gt;
+        &lt;label&gt;test&lt;/label&gt;
+    &lt;/amazonsqs.removePermission&gt;
+    ```
+---
+
+### Queue
+
+??? note &quot;createQueue&quot;
+    This operation creates a new standard or FIFO queue. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_CreateQueue.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueName&lt;/td&gt;
+            &lt;td&gt;The name of the new queue.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;attributeEntries&lt;/td&gt;
+            &lt;td&gt;A map of attributes with their corresponding values. The value should be a string in JSON format. `Eg: {&#x27;my_attribute_name_1&#x27;: {&#x27;DataType&#x27;: &#x27;String&#x27;,&#x27;StringValue&#x27;: &#x27;my_attribute_value_1&#x27; }}`&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tags&lt;/td&gt;
+            &lt;td&gt;The cost allocation tags to the specified Amazon SQS queue. `Eg: {QueueType: Testing}`&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.createQueue configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueName&gt;{$ctx:queueName}&lt;/queueName&gt;
+        &lt;attributeEntries&gt;{$ctx:attributeEntries}&lt;/attributeEntries&gt;
+        &lt;tags&gt;{$ctx:tags}&lt;/tags&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.createQueue&gt;
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.createQueue configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+        &lt;queueName&gt;Queue&lt;/queueName&gt;
+        &lt;attributeEntries&gt;&quot;{&#x27;my_attribute_name_1&#x27;: {&#x27;DataType&#x27;: &#x27;String&#x27;,&#x27;StringValue&#x27;: &#x27;my_attribute_value_1&#x27; }}&quot;&lt;/attributeEntries&gt;
+        &lt;tags&gt;&quot;{QueueType: Testing}&quot;&lt;/tags&gt;
+    &lt;/amazonsqs.createQueue&gt;
+    ```
+---
+
+??? note &quot;deleteQueue&quot;
+    This operation deletes the queue specified by `QueueUrl`. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_DeleteQueue.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueUrl&lt;/td&gt;
+            &lt;td&gt;The URL of the queue to delete.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.deleteQueue configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueUrl&gt;{$ctx:queueUrl}&lt;/queueUrl&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.deleteQueue&gt;
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.deleteQueue configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+        &lt;queueUrl&gt;https://sqs.us-west-2.amazonaws.com/882234390511/Queue&lt;/queueUrl&gt;
+    &lt;/amazonsqs.deleteQueue&gt;
+    ```
+---
+
+??? note &quot;setQueueAttributes&quot;
+    This operation sets the value of one or more queue attributes, like a policy. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SetQueueAttributes.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueUrl&lt;/td&gt;
+            &lt;td&gt;The URL of the queue whose attributes are set.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;attributeEntries&lt;/td&gt;
+            &lt;td&gt;A map of attributes with their corresponding values. The value should be a string in JSON format. `Eg: {&#x27;RedrivePolicy&#x27;: {&#x27;deadLetterTargetArn&#x27;: &#x27;arn:aws:sqs:us-east-1:884783870511:TestQueue&#x27;, &#x27;maxReceiveCount&#x27;: 10}}`&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.setQueueAttributes configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueUrl&gt;{$ctx:queueUrl}&lt;/queueUrl&gt;
+        &lt;attributeEntries&gt;{$ctx:queueUrl}&lt;/attributeEntries&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.setQueueAttributes&gt;
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.setQueueAttributes configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+        &lt;queueUrl&gt;https://sqs.us-west-2.amazonaws.com/882234390511/Queue&lt;/queueUrl&gt;
+        &lt;attributeEntries&gt;&quot;{&#x27;RedrivePolicy&#x27;: {&#x27;deadLetterTargetArn&#x27;: &#x27;arn:aws:sqs:us-east-1:884783870511:TestQueue&#x27;, &#x27;maxReceiveCount&#x27;: 10}}&quot;&lt;/attributeEntries&gt;
+    &lt;/amazonsqs.setQueueAttributes&gt;
+    ```
+---
+
+??? note &quot;getQueueAttributes&quot;
+    This operation gets attributes for the specified queue. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_GetQueueAttributes.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueUrl&lt;/td&gt;
+            &lt;td&gt;The URL of the queue whose attribute information is retrieved.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;attributes&lt;/td&gt;
+            &lt;td&gt;A list of attributes to retrieve information for. Default value is `All`. Each attribute must be listed in the string in a comma-separated format. `Eg: &#x27;Policy&#x27;, &#x27;DelaySeconds&#x27;`&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.getQueueAttributes configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueUrl&gt;{$ctx:queueUrl}&lt;/queueUrl&gt;
+        &lt;attributes&gt;{$ctx:attributes}&lt;/attributes&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.getQueueAttributes&gt;
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.getQueueAttributes configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+        &lt;queueUrl&gt;https://sqs.us-west-2.amazonaws.com/882234390511/Queue&lt;/queueUrl&gt;
+    &lt;/amazonsqs.getQueueAttributes&gt;
+    ```
+---
+
+??? note &quot;getQueueUrl&quot;
+    This operation returns the URL of an existing queue. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_GetQueueUrl.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueName&lt;/td&gt;
+            &lt;td&gt;The name of the queue.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;accountId&lt;/td&gt;
+            &lt;td&gt;The AWS account ID without hyphens of the account that created the queue.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.getQueueUrl configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueName&gt;{$ctx:queueName}&lt;/queueName&gt;
+        &lt;accountId&gt;{$ctx:accountId}&lt;/accountId&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.getQueueUrl&gt;
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.getQueueUrl configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+        &lt;queueName&gt;Queue&lt;/queueName&gt;
+        &lt;accountId&gt;882234390511&lt;/accountId&gt;
+    &lt;/amazonsqs.getQueueUrl&gt;
+    ```
+---
+
+??? note &quot;listDeadLetterSourceQueues&quot;
+    This operation returns a list of the queues that have the `RedrivePolicy` queue attribute configured with a dead-letter queue. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ListDeadLetterSourceQueues.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueUrl&lt;/td&gt;
+            &lt;td&gt;The URL of a dead-letter queue.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxResults&lt;/td&gt;
+            &lt;td&gt;Maximum number of results to include in the response.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;nextToken&lt;/td&gt;
+            &lt;td&gt;Pagination token to request the next set of results.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.listDeadLetterSourceQueues configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueUrl&gt;{$ctx:queueUrl}&lt;/queueUrl&gt;
+        &lt;maxResults&gt;{$ctx:maxResults}&lt;/maxResults&gt;
+        &lt;nextToken&gt;{$ctx:nextToken}&lt;/nextToken&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.listDeadLetterSourceQueues&gt;
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.listDeadLetterSourceQueues configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+        &lt;queueUrl&gt;https://sqs.us-west-2.amazonaws.com/882234390511/TestQueue&lt;/queueUrl&gt;
+    &lt;/amazonsqs.listDeadLetterSourceQueues&gt;
+    ```
+---
+
+??? note &quot;listQueues&quot;
+    This operation returns a list of the queues in the current region. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ListQueues.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueNamePrefix&lt;/td&gt;
+            &lt;td&gt;A string to use for filtering the list results.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxResults&lt;/td&gt;
+            &lt;td&gt;Maximum number of results to include in the response.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;nextToken&lt;/td&gt;
+            &lt;td&gt;Pagination token to request the next set of results.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.listQueues configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueNamePrefix&gt;{$ctx:queueNamePrefix}&lt;/queueNamePrefix&gt;
+        &lt;maxResults&gt;{$ctx:maxResults}&lt;/maxResults&gt;
+        &lt;nextToken&gt;{$ctx:nextToken}&lt;/nextToken&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.listQueues&gt;
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.listQueues configKey=&quot;AMAZON_SQS_CONNECTION&quot;/&gt;
+    ```
+---
+
+??? note &quot;purgeQueue&quot;
+    This operation deletes available messages in a queue specified by the QueueURL parameter. See the [related API documentation](http://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_DeleteQueue.html) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;queueUrl&lt;/td&gt;
+            &lt;td&gt;The URL of the queue from which the PurgeQueue action deletes messages.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to allow the client to complete the execution of an API call.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiCallAttemptTimeout&lt;/td&gt;
+            &lt;td&gt;The amount of time(in seconds) to wait for the http request to complete before giving up and timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.purgeQueue configKey=&quot;CONNECTION_NAME&quot;&gt;
+        &lt;queueUrl&gt;{$ctx:queueUrl}&lt;/queueUrl&gt;
+        &lt;apiCallTimeout&gt;{$ctx:apiCallTimeout}&lt;/apiCallTimeout&gt;
+        &lt;apiCallAttemptTimeout&gt;{$ctx:apiCallAttemptTimeout}&lt;/apiCallAttemptTimeout&gt;
+    &lt;/amazonsqs.purgeQueue&gt;
+    ```
+    
+    **Sample request**
+
+    ```xml
+    &lt;amazonsqs.purgeQueue configKey=&quot;AMAZON_SQS_CONNECTION&quot;&gt;
+        &lt;queueUrl&gt;https://sqs.us-west-2.amazonaws.com/882234390511/Queue&lt;/queueUrl&gt;
+    &lt;/amazonsqs.purgeQueue&gt;
+    ```
+---
+
+## Handle errors 
+
+The connector may encounter errors during operation execution. When an error occurs, the `ERROR_DETAIL` property will contain detailed information about the error. You can handle these errors using a `Fault Sequence` in your integration. For more information, refer to [Using Fault Sequences]({{base_path}}/learn/examples/sequence-examples/using-fault-sequences/).
+
+??? note &quot;Error Details&quot;
+
+    | Error code | Error message |
+    | -------- | ------- |
+    | 700901 | AWS_SQS:CLIENT_SDK_ERROR |
+    | 700902 | AWS_SQS:INVALID_CONFIGURATION |
+    | 700903 | AWS_SQS:GENERAL_ERROR |
+</body>
+</html>

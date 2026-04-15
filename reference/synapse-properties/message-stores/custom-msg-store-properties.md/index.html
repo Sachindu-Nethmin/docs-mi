@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>custom-msg-store-properties.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Custom Message Store
+## Introduction
+Users can create a message store with their own message store implementation. Custom message stores are configured by giving the fully qualified class name of the message store implementation as the class value. Any configuration parameter that is needed by the message store implementation class can be passed.
+
+## Properties
+
+The following properties can be configured when [creating a Custom Message Store]({{base_path}}/develop/creating-artifacts/creating-a-message-store/).
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Property&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Name&lt;/td&gt;
+    &lt;td&gt;A unique name for the message store.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Provider Class&lt;/td&gt;
+    &lt;td&gt;
+      Fully qualified name of the message store implementation class.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+</body>
+</html>

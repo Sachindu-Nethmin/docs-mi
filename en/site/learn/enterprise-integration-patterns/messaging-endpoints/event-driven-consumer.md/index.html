@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>event-driven-consumer.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Event-Driven Consumer
+
+This page explains how you can implement a sample scenario of the Event-Driven Consumer EIP using WSO2 Integrator: MI.
+
+## Introduction to Event-Driven Consumer
+
+The Event-Driven Consumer EIP allows an application to asynchronously consume messages as they become available. 
+
+!!! info
+    For more information, see the [Event-Driven Consumer](http://www.eaipatterns.com/EventDrivenConsumer.html) documentation.
+
+![Event-driven consumer]({{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-endpoints/event-driven-consumer-solution.gif)
+
+## Sample scenario
+
+This EIP is also referred to as an asynchronous receiver. This sample scenario demonstrates how an event will be triggered based on the availability of the receiver and a message will be consumed by the receiver.
+
+The diagram below depicts how to simulate the sample scenario using the WSO2 MI.
+
+&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-endpoints/event-driven-consumer.png&quot; style=&quot;width: 70%;&quot; alt=&quot;Event-driven consumer&quot;&gt;
+
+Before digging into implementation details, let&#x27;s take a look at the relationship between the sample scenario and the Event-Driven Consumer EIP by comparing their core components.
+
+| Event-Driven Consumer EIP            | Event-Driven Consumer Sample Scenario            |
+|--------------------------------------|--------------------------------------------------|
+| Sender                               | Simple Stock Quote Client                        |
+| Message                              | Simple Stock Quote Request                       |
+| Event Driven Consumer                | Message Processor                                |
+| Receiver                             | Simple Stock Quote Service                       |
+
+## Synapse configuration of the artifacts
+
+Given below is the synapse configuration of this sample. 
+
+=== &quot;Proxy Service&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy name=&quot;EventDrivenConsumerProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;http https&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;property name=&quot;FORCE_SC_ACCEPTED&quot; value=&quot;true&quot; scope=&quot;axis2&quot;/&gt;
+                &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+                &lt;store messageStore=&quot;EventDrivenConsumerStore&quot;/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence/&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;Message Store&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;messageStore name=&quot;EventDrivenConsumerStore&quot; class=&quot;org.apache.synapse.message.store.impl.memory.InMemoryStore&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;/messageStore&gt;
+    ```
+=== &quot;Message Processor&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;messageProcessor class=&quot;org.apache.synapse.message.processor.impl.sampler.SamplingProcessor&quot; name=&quot;EventDrivenConsumerProcessor&quot; messageStore=&quot;EventDrivenConsumerStore&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;parameter name=&quot;sequence&quot;&gt;SendSeq&lt;/parameter&gt;
+        &lt;parameter name=&quot;interval&quot;&gt;1000&lt;/parameter&gt;
+        &lt;parameter name=&quot;is.active&quot;&gt;true&lt;/parameter&gt;
+        &lt;parameter name=&quot;concurrency&quot;&gt;1&lt;/parameter&gt;
+    &lt;/messageProcessor&gt;
+    ```
+=== &quot;Endpoint&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;endpoint name=&quot;SimpleStockEp&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;&gt;
+            &lt;suspendOnFailure&gt;
+                &lt;initialDuration&gt;-1&lt;/initialDuration&gt;
+                &lt;progressionFactor&gt;1&lt;/progressionFactor&gt;
+            &lt;/suspendOnFailure&gt;
+            &lt;markForSuspension&gt;
+                &lt;retriesBeforeSuspension&gt;0&lt;/retriesBeforeSuspension&gt;
+            &lt;/markForSuspension&gt;
+        &lt;/address&gt;
+    &lt;/endpoint&gt;
+    ```
+=== &quot;Sequence&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;sequence name=&quot;SendSeq&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;call&gt;
+            &lt;endpoint key=&quot;SimpleStockEp&quot;/&gt;
+        &lt;/call&gt;
+    &lt;/sequence&gt;
+    ```
+
+Let&#x27;s investigate the elements of the configuration in detail. 
+
+- **store** - The store mediator loads the message store. 
+- **messageStore** - Defines the message store to use. 
+- **messageProcessor** - Defines the processing algorithm for stored messages. 
+
+## Set up the sample scenario
+
+{!includes/eip-set-up.md!}
+
+3. Download the [backend service](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/axis2Server.zip).
+
+4. Extract the downloaded zip file.
+
+5. Open a terminal, and navigate to the `axis2Server/bin/` directory inside the extracted folder.
+
+6. Execute the following command to start the axis2server with the SimpleStockQuote backend service:
+
+    === &quot;On MacOS/Linux&quot;   
+          ```bash
+          sh axis2server.sh
+          ```
+    === &quot;On Windows&quot;                
+          ```bash
+          axis2server.bat
+          ```
+
+7. Download the artifacts of the sample.
+
+    &lt;a href=&quot;{{base_path}}/assets/attachments/learn/enterprise-integration-patterns/EventDrivenConsumer.zip&quot;&gt;
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+    &lt;/a&gt;
+
+8. Import the artifacts to WSO2 MI.
+
+    Click **File** -&gt; **Open Folder** -&gt; Select the extracted ZIP file to import the downloaded ZIP file.
+
+9. Start the project in the WSO2 MI server.
+
+    For instructions, go to [Build and Run]({{base_path}}/develop/deploy-artifacts/#build-and-run) Documentation.
+
+## Execute the sample
+
+Send the following request to the `EventDrivenConsumerProxy` service.
+
+```
+POST /services/EventDrivenConsumerProxy HTTP/1.1
+Host: localhost:8290
+Content-Type: text/xml
+soapAction: urn:getQuote
+
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+   &lt;soapenv:Header/&gt;
+   &lt;soapenv:Body&gt;
+      &lt;ser:getQuote&gt;
+         &lt;ser:request&gt;
+            &lt;xsd:symbol&gt;foo&lt;/xsd:symbol&gt;
+         &lt;/ser:request&gt;
+      &lt;/ser:getQuote&gt;
+   &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+```
+
+## Analyze the output
+
+After the request is sent, it will be stored in the configured [Message Store]({{base_path}}/learn/examples/message-store-processor-examples/intro-message-stores-processors/). The [Sampling Message Processor]({{base_path}}/learn/examples/message-store-processor-examples/using-message-sampling-processor/) will then retrieve the request from the store and send it to the axis2server. A message similar to the one shown below will appear in the axis2server, indicating that the request has been accepted.
+
+```
+Fri Aug 16 14:02:22 IST 2024 samples.services.SimpleStockQuoteService :: Generating quote for : foo
+```
+</body>
+</html>

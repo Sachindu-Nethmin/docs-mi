@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>microsoft-azure-storage-reference.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>---
+search:
+  boost: 2
+---
+
+# Microsoft Azure Storage Connector Reference
+
+The following operations allow you to work with the Microsoft Azure Storage Connector. Click an operation name to see parameter details and samples on how to use it.
+
+---
+
+## Initialize the connector
+
+To use the Microsoft Azure Storage connector, you need to initialize the configuration before carrying out any other Microsoft Azure Storage operations.
+
+To use the Microsoft Azure Storage connector, add the element in your configuration before carrying out any Azure Storage operations. This Microsoft Azure Storage configuration authenticates with Microsoft Azure Storage by Account access key or Client Credentials, which are used for every operation.
+
+&gt; **Note**: To work with the Microsoft Azure Storage connector, you need to have a Microsoft Azure account. If you do not have a Microsoft Azure account, go to [https://azure.microsoft.com/en-in/free/](https://azure.microsoft.com/en-in/free/) and create a Microsoft Azure account.
+
+### Initialize using Account name and Access key
+
+??? note &quot;init&quot;
+    The init operation is used to initialize the connection to Microsoft Azure.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;accountName&lt;/td&gt;
+            &lt;td&gt;The name of the Azure storage account.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;accountKey&lt;/td&gt;
+            &lt;td&gt;The access key for the storage account.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;defaultEndpointsProtocol&lt;/td&gt;
+            &lt;td&gt;Type of the protocol(HTTP/HTTPS) to connect.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;msazurestorage.init&gt;
+        &lt;accountName&gt;{$ctx:accountName}&lt;/accountName&gt;
+        &lt;accountKey&gt;{$ctx:accountKey}&lt;/accountKey&gt;
+        &lt;defaultEndpointsProtocol&gt;{$ctx:defaultEndpointsProtocol}&lt;/defaultEndpointsProtocol&gt;
+    &lt;/msazurestorage.init&gt;
+    ```
+    
+---
+
+### Initialize using Client Credentials
+
+??? note &quot;init&quot;
+    The init operation is used to initialize the connection to Microsoft Azure.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;accountName&lt;/td&gt;
+            &lt;td&gt;The name of the Azure storage account.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;clientId&lt;/td&gt;
+            &lt;td&gt;The client ID of the application.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;clientSecret&lt;/td&gt;
+            &lt;td&gt;The client secret of the application.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tenantId&lt;/td&gt;
+            &lt;td&gt;The tenant ID of the application.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;msazurestorage.init&gt;
+        &lt;accountName&gt;{$ctx:accountName}&lt;/accountName&gt;
+        &lt;clientId&gt;{$ctx:clientId}&lt;/clientId&gt;
+        &lt;clientSecret&gt;{$ctx:clientSecret}&lt;/clientSecret&gt;
+        &lt;tenantId&gt;{$ctx:tenantId}&lt;/tenantId&gt;
+    &lt;/msazurestorage.init&gt;
+    ```
+    
+---
+
+## Blobs
+
+??? note &quot;uploadBlob&quot;
+    The uploadBlob operation uploads a Blob file into the storage. See the [related API documentation](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-java) for more information.
+
+    **Note**: Either `filePath` or `textContent` parameter is mandatory.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;containerName&lt;/td&gt;
+            &lt;td&gt;The name of the container.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fileName&lt;/td&gt;
+            &lt;td&gt;The name of the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;filePath&lt;/td&gt;
+            &lt;td&gt;The path to a local file to be uploaded.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;textContent&lt;/td&gt;
+            &lt;td&gt;Text content to be uploaded (without using a file).&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;blobContentType&lt;/td&gt;
+            &lt;td&gt;The Content-type of the file to be uploaded.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;metadata&lt;/td&gt;
+            &lt;td&gt;The metadata of the blob.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;msazurestorage.uploadBlob&gt;
+        &lt;containerName&gt;{$ctx:containerName}&lt;/containerName&gt;
+        &lt;fileName&gt;{$ctx:fileName}&lt;/fileName&gt;
+        &lt;filePath&gt;{$ctx:filePath}&lt;/filePath&gt;
+        &lt;blobContentType&gt;{$ctx:fileContentType}&lt;/blobContentType&gt;
+        &lt;metadata&gt;{$ctx:metadata}&lt;/metadata&gt;
+    &lt;/msazurestorage.uploadBlob&gt;
+    ```
+    
+    **Sample request**
+
+    ```json
+    {
+        &quot;containerName&quot;: &quot;sales&quot;,
+        &quot;fileName&quot;: &quot;sample.json&quot;,
+        &quot;filePath&quot;: &quot;/home/user/Pictures/a.json&quot;,
+        &quot;blobContentType&quot;: &quot;application/json&quot;,
+        &quot;metadata&quot;: {
+            &quot;key1&quot;:&quot;value1&quot;
+        }
+    }
+    ```
+
+??? note &quot;downloadBlob&quot;
+    The downloadBlob operation download the Blob content. See the [related API documentation](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-java) for more information.
+
+    **Note**: By default, the content of the blob will be written to the HTTP response. The `destinationFilePath` parameter can be used to download it to local storage.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;containerName&lt;/td&gt;
+            &lt;td&gt;The name of the container.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fileName&lt;/td&gt;
+            &lt;td&gt;The name of the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;destinationFilePath&lt;/td&gt;
+            &lt;td&gt;The local file path to download the blob. If the destination file already exists or if the file is not writable by the current user, an exception will be thrown.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;msazurestorage.downloadBlob&gt;
+        &lt;containerName&gt;{$ctx:containerName}&lt;/containerName&gt;
+        &lt;fileName&gt;{$ctx:fileName}&lt;/fileName&gt;
+    &lt;/msazurestorage.downloadBlob&gt;
+    ```
+    
+    **Sample request**
+
+    ```json
+    {
+        &quot;containerName&quot;: &quot;sales&quot;,
+        &quot;fileName&quot;: &quot;sample.txt&quot;
+    }
+    ```
+
+??? note &quot;deleteBlob&quot;
+    The deleteBlob operation deletes a Blob file from the storage. See the [related API documentation](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-java) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;containerName&lt;/td&gt;
+            &lt;td&gt;The name of the container.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fileName&lt;/td&gt;
+            &lt;td&gt;The name of the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;msazurestorage.deleteBlob&gt;
+        &lt;containerName&gt;{$ctx:containerName}&lt;/containerName&gt;
+        &lt;fileName&gt;{$ctx:fileName}&lt;/fileName&gt;
+    &lt;/msazurestorage.deleteBlob&gt;
+    ```
+    
+    **Sample request**
+
+    ```json
+    {
+        &quot;containerName&quot;: &quot;sales&quot;,
+        &quot;fileName&quot;: &quot;sample.txt&quot;
+    }
+    ```
+
+??? note &quot;listBlobs&quot;
+    The listBlobs operation retrieves information about all Blobs in a container. See the [related API documentation](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-java) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;containerName&lt;/td&gt;
+            &lt;td&gt;The name of the container.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;msazurestorage.listBlobs&gt;
+        &lt;containerName&gt;{$ctx:containerName}&lt;/containerName&gt;
+    &lt;/msazurestorage.listBlobs&gt;
+    ```
+    
+    **Sample request**
+
+    ```json
+    {
+        &quot;containerName&quot;: &quot;sales&quot;
+    }
+    ```
+
+---
+
+## Containers
+
+??? note &quot;createContainer&quot;
+    The createContainer operation creates a container in the storage. See the [related API documentation](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-java) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;containerName&lt;/td&gt;
+            &lt;td&gt;The name of the container.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;msazurestorage.createContainer&gt;
+        &lt;containerName&gt;{$ctx:containerName}&lt;/containerName&gt;
+    &lt;/msazurestorage.createContainer&gt;
+    ```
+    
+    **Sample request**
+
+    ```json
+    {
+        &quot;containerName&quot;: &quot;sales&quot;
+    }
+    ```
+
+??? note &quot;deleteContainer&quot;
+    The deleteContainer operation deletes a container from the storage. See the [related API documentation](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-java) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;containerName&lt;/td&gt;
+            &lt;td&gt;The name of the container.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;msazurestorage.deleteContainer&gt;
+        &lt;containerName&gt;{$ctx:containerName}&lt;/containerName&gt;
+    &lt;/msazurestorage.deleteContainer&gt;
+    ```
+    
+    **Sample request**
+
+    ```json
+    {
+        &quot;containerName&quot;: &quot;sales&quot;
+    }
+    ```
+
+??? note &quot;listContainers&quot;
+    The listContainers operation retrieves information about all containers in the storage. See the [related API documentation](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-java) for more information.
+
+    **Sample configuration**
+
+    ```xml
+    &lt;msazurestorage.listContainers/&gt;
+    ```
+
+## Metadata
+
+??? note &quot;listMetadata&quot;
+    The listMetadata operation list metadata for a given blob. See the [related API documentation](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-java) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;containerName&lt;/td&gt;
+            &lt;td&gt;The name of the container.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fileName&lt;/td&gt;
+            &lt;td&gt;The name of the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;msazurestorage.listMetadata&gt;
+        &lt;containerName&gt;{$ctx:containerName}&lt;/containerName&gt;
+        &lt;fileName&gt;{$ctx:fileName}&lt;/fileName&gt;
+    &lt;/msazurestorage.listMetadata&gt;
+    ```
+    
+    **Sample request**
+
+    ```json
+    {
+        &quot;containerName&quot;: &quot;sales&quot;,
+        &quot;fileName&quot;: &quot;sample.txt&quot;
+    }
+    ```
+
+??? note &quot;uploadMetadata&quot;
+    The uploadMetadata operation uploads a list of metadata for a given blob. See the [related API documentation](https://learn.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-java) for more information.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;containerName&lt;/td&gt;
+            &lt;td&gt;The name of the container.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fileName&lt;/td&gt;
+            &lt;td&gt;The name of the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;metadata&lt;/td&gt;
+            &lt;td&gt;The metadata of the blob.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;msazurestorage.uploadMetadata&gt;
+        &lt;containerName&gt;{$ctx:containerName}&lt;/containerName&gt;
+        &lt;fileName&gt;{$ctx:fileName}&lt;/fileName&gt;
+        &lt;metadata&gt;{$ctx:metadata}&lt;/metadata&gt;
+    &lt;/msazurestorage.uploadMetadata&gt;
+    ```
+    
+    **Sample request**
+
+    ```json
+    {
+        &quot;containerName&quot;: &quot;sales&quot;,
+        &quot;fileName&quot;: &quot;sample.json&quot;,
+        &quot;metadata&quot;: {
+            &quot;key1&quot;:&quot;value1&quot;
+        }
+    }
+    ```
+
+## Error codes related to Microsoft Azure Storage Connector
+
+| Error code | Error message |
+| -------- | ------- |
+| 700701 | MS_AZURE_BLOB:CONNECTION_ERROR |
+| 700702 | MS_AZURE_BLOB:INVALID_CONFIGURATION |
+| 700703 | MS_AZURE_BLOB:MISSING_PARAMETERS |
+| 700704 | MS_AZURE_BLOB:AUTHENTICATION_ERROR |
+| 700705 | MS_AZURE_BLOB:FILE_ALREADY_EXISTS_ERROR |
+| 700706 | MS_AZURE_BLOB:FILE_IO_ERROR |
+| 700707 | MS_AZURE_BLOB:BLOB_STORAGE_ERROR |
+| 700708 | MS_AZURE_BLOB:FILE_PERMISSION_ERROR |
+| 700709 | MS_AZURE_BLOB:GENERAL_ERROR |
+
+In addition to the above `ERROR_DETAIL` property will contain detail information about the error. For more information refer [Using Fault Sequences]({{base_path}}/learn/examples/sequence-examples/using-fault-sequences/).</body>
+</html>

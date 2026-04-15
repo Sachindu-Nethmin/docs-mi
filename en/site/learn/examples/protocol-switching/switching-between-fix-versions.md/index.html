@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>switching-between-fix-versions.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Switch between FIX Versions
+
+This sample demonstrates how you can use WSO2 Integrator: MI to accept FIX input via the FIX transport layer and dispatch to another FIX acceptor that accept messages in a different FIX version. Here you will see how the WSO2 Integrator: MI receives FIX 4.0 messages and simply forwards it to the FIX 4.1 endpoint.
+
+## Synapse configuration
+
+Following are the integration artifacts (proxy service) that we can used to implement this scenario.
+
+```xml
+ &lt;proxy name=&quot;OrderProcesserProxy41&quot; transports=&quot;fix&quot;&gt;
+    &lt;target&gt;
+       &lt;endpoint&gt;
+          &lt;address uri=&quot;fix://localhost:19877?BeginString=FIX.4.1&amp;SenderCompID=SYNAPSE&amp;TargetCompID=EXEC&quot;/&gt;
+       &lt;/endpoint&gt;
+       &lt;inSequence&gt;
+            &lt;log level=&quot;full&quot;/&gt;
+       &lt;/inSequence&gt;
+       &lt;outSequence&gt;
+            &lt;log level=&quot;full&quot;/&gt;
+            &lt;send/&gt;
+       &lt;/outSequence&gt;
+    &lt;/target&gt;
+    &lt;parameter name=&quot;transport.fix.AcceptorConfigURL&quot;&gt;file:repository/samples/resources/fix/fix-synapse-m40.cfg&lt;/parameter&gt;
+    &lt;parameter name=&quot;transport.fix.AcceptorMessageStore&quot;&gt;file&lt;/parameter&gt;
+    &lt;parameter name=&quot;transport.fix.InitiatorConfigURL&quot;&gt;file:repository/samples/resources/fix/synapse-sender-m.cfg&lt;/parameter&gt;
+    &lt;parameter name=&quot;transport.fix.InitiatorMessageStore&quot;&gt;file&lt;/parameter&gt;
+ &lt;/proxy&gt;
+```
+
+&lt;!--
+## Build and run
+
+-   To configure the WSO2 Integrator: MI to use the FIX transport, see [Configure the ESB to use the FIX transport](https://docs.wso2.com/display/EI650/Setting+Up+the+ESB+Samples#SettingUptheESBSamples-FIX).
+-   You will need the two sample FIX applications (*Banzai* and *Executor*) that are provided with Quickfix/J. Configure the two applications to establish sessions with the WSO2 Integrator: MI.
+-   Add the following line to the `fix-synapse-m40.cfg` and `synapse-sender-m.cfg` configuration files.
+
+    ```java
+    DataDictionary=~/etc/spec/FIX40-synapse.xml
+    ```
+
+    !!! Note
+        The `FIX40-synapse.xml` file can be found in the `MI_HOME/repository/samples/resources/fix` directory. This is a custom FIX data dictionary file that adds the tag 150 and 151 to the execution message(35=8) of FIX4.0. Make sure the `DataDictionary` property in the `banzai.cfg` file points to this data dictionary file.
+
+-   Add the following lines to `executor.cfg` , which is the *Executor* configuration file:
+
+    ```java
+    [session]
+    BeginString=FIX.4.1
+    SocketAcceptPort=19877
+    ```
+
+-   Start *Banzai* and *Executor* using the custom configuration files.
+-   You need to use two custom configuration files for the ESB in this
+    sample. The two custom configuration files can be found in the \&lt;
+    `ESB_HOME/repository/samples/resources/fix`
+    directory. The two files are
+    `fix-synapse-m40.cfg` and
+    `synapse-sender-m.cfg` . You need to point your
+    ESB configuration to these two files (this is already done in the
+    provided `          synapse_sample_261.xml         ` file) or you
+    should create copies of them and point the ESB configuration to the
+    copies. In either case, make sure that the properties
+    `          FileStorePath         ` and
+    `          FileLogPath         ` in the two files point to valid
+    locations in your local file system.
+-   Open the \&lt;
+    `           ESB_HOME&gt;/repository/samples/synapse_sample_261.xml          `
+    file and make sure that the
+    `           transport.fix.AcceptorConfigURL          ` property
+    points to the `           fix-synapse-m40.cfg          ` file and
+    the `           transport.fix.InitiatorConfigURL          ` property
+    points to the `           synapse-sender-m.cfg          ` file.
+
+    !!! Note
+        The WSO2 Integrator: MI creates a new FIX session with *Banzai* at this point.
+
+
+Send an order request from *Banzai* to the WSO2 Integrator: MI. For example, Buy DELL 1000 @ MKT.
+
+You will see that the WSO2 Integrator: MI forwards the FIX4.0 order request to the *Executor* that accepts FIX4.1 messages, and that the *Executor* processes the request and sends a response back to *Banzai*.
+--&gt;</body>
+</html>

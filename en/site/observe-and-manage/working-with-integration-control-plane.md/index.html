@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>working-with-integration-control-plane.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Monitoring MI Artifacts and Logs
+
+The WSO2 Integration Control Plane (ICP) monitors the MI instances in a deployment. This can be a single MI instance or multiple MI instances in a group (cluster). It provides a graphical view of the integration artifacts that are deployed in the MI instances. You can also perform various management 
+and administration tasks using the ICP server. 
+
+The ICP server communicates with the management APIs of each WSO2 Integrator: MI instance in the group (cluster) to get and manipulate data.
+
+## Capabilities of the ICP server
+
+You can use the ICP server to perform the following administration tasks related to your WSO2 Integrator: MI deployment:
+
+!!! tip
+    You can search for certain artifacts using the specific name of the artifact if there are many such items in the list.
+
+    ![search in integration control plane]({{base_path}}/assets/img/integrate/monitoring-dashboard/search.png)    
+
+-   &lt;b&gt;View the MI servers in the deployment&lt;/b&gt;
+
+    View basic information of each server node.
+
+-   &lt;b&gt;View integration artifacts deployed in a group&lt;/b&gt;
+
+    View details of the artifacts deployed in a cluster or group of WSO2 Integrator: MI instances.
+
+-   &lt;b&gt;Identify the MI servers where a specified artifact is deployed&lt;/b&gt;
+
+    View the MI server instances where each artifact is deployed.
+
+-   &lt;b&gt;Update deployed artifacts&lt;/b&gt;
+
+    !!! Note
+        When you update an artifact, only the specified MI instance will be updated. Cluster-wide updates are not available with the ICP server.
+
+    You can activate/deactivate the following artifacts from the ICP server: &lt;i&gt;Proxy Services&lt;/i&gt;, &lt;i&gt;Endpoints&lt;/i&gt;, and &lt;i&gt;Message Processors&lt;/i&gt;.
+
+    You can enable/disable tracing for the following artifacts: &lt;i&gt;Proxy Services&lt;/i&gt;, &lt;i&gt;Endpoints&lt;/i&gt;, &lt;i&gt;APIs&lt;/i&gt; &lt;i&gt;Sequences&lt;/i&gt; and &lt;i&gt;Inbound Endpoints&lt;/i&gt;.
+
+-   &lt;b&gt;View registry resources&lt;/b&gt;
+
+    You can view content, properties, and metadata of each registry resource.
+
+-   &lt;b&gt;View logs&lt;/b&gt;
+
+    You can view the log files generated for each WSO2 Integrator: MI instance of the cluster/group.
+
+-   &lt;b&gt;View, update, and add loggers&lt;/b&gt;
+
+    This page can be accessed by users with admin rights only. You can view log configurations of each instance and update the log level. You can update the log levels on a single node or apply the change to the entire cluster/group as well. Furthermore, you can add new loggers, which will be applied to the entire cluster/group.
+
+-   &lt;b&gt;Manage users&lt;/b&gt;
+
+    This page can be accessed by users with admin rights only. You can view details of users stored in the [external user store]({{base_path}}/install-and-setup/setup/user-stores/managing-users). You can also add new users to the specified cluster/group.
+
+## Using the Integration Control Plane
+
+Follow the steps given below to get started with the WSO2 Integration Control Plane.
+
+### Step 1 - Download the Integration Control Plane
+
+Download the binary distribution of the product, and then follow the instructions to start the WSO2 Integrator: MI and the ICP server.
+
+-   [Install the WSO2 Integrator: MI]({{base_path}}/install-and-setup/install/installing-mi).
+-   [Install the Integration Control Plane]({{base_path}}/install-and-setup/install/installing-integration-control-plane).
+
+### Step 2 - Configure the MI servers
+
+Follow the steps given below to configure the MI servers to publish data to the ICP server.
+
+1.  To connect the MI servers with the ICP server, add the following configuration to the `deployment.toml` file (stored in the `&lt;MI_HOME&gt;/conf/` folder) of each server instance.
+
+    ```toml
+    [dashboard_config]
+    dashboard_url = &quot;https://{hostname/ip}:{port}/dashboard/api/&quot;
+    heartbeat_interval = &quot;&lt;HEARTBEAT_INTERVAL&gt;&quot;
+    group_id = &quot;&lt;GROUP_ID&gt;&quot;
+    node_id = &quot;&lt;NODE_ID&gt;&quot;
+    ```
+    For example: 
+    ```toml
+    [dashboard_config]
+     dashboard_url = &quot;https://localhost:9743/dashboard/api/&quot;
+     heartbeat_interval = 5
+     group_id = &quot;mi_dev&quot;
+     node_id = &quot;dev_node_2&quot;
+    ```
+    
+    If the WSO2 Integrator: MI server is deployed in a Kubernetes environment, add the following configuration to the `deployment.toml` file. 
+
+    **Limitation**: When there are replicas in the deployment, the write operations will not work properly.
+
+    If communicating via Ingress, use the following configuration:
+    ```toml
+    dashboard_url = &quot;https://{hostname/ip}:{port}/dashboard/api/&quot;
+    management_hostname = &quot;&lt;INGRESS_HOSTNAME&gt;&quot;
+    ```
+    
+    If communicating via Service instead, use the following configuration:
+    ```toml
+    dashboard_url = &quot;https://{hostname/ip}:{port}/dashboard/api/&quot;
+    management_hostname = &quot;&lt;SERVICE_NAME&gt;&quot;
+    management_port = &lt;SERVICE_PORT&gt;
+    ```
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;
+                dashboard_url
+            &lt;/th&gt;
+            &lt;td&gt;
+                &lt;b&gt;Required&lt;/b&gt;. This is the URL to access ICP server. Replace the hostname/IP and port (default - 9743) with relevant values from your environment.
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th&gt;
+                heartbeat_interval
+            &lt;/th&gt;
+            &lt;td&gt;
+                &lt;b&gt;Optional&lt;/b&gt;. The time interval (in seconds) between two heartbeats sent from the WSO2 Integrator: MI to the ICP server. By default, the heartbeat_interval is set to `5`. 
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th&gt;
+                group_id
+            &lt;/th&gt;
+            &lt;td&gt;
+                &lt;b&gt;Optional&lt;/b&gt;. In a clustered deployment, the group ID should be the same in all WSO2 Integrator: MI Instances. 
+                The ICP server displays information from one group at a time. By default, the group_id is set to `default`. 
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th&gt;
+                node_id
+            &lt;/th&gt;
+            &lt;td&gt;
+                &lt;b&gt;Optional&lt;/b&gt;. By default, in a clustered deployment, the relevant `node_id` is used as this configuration. For more information about the cluster node ID, see the instructions on &lt;a href=&quot;{{base_path}}/install-and-setup/setup/deployment/deploying-wso2-mi/#node-id&quot;&gt;configuring an MI cluster&lt;/a&gt;. In a non-clustered deployment, a random UUID is used if the `node_id` is not set for this configuration.
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th&gt;
+                management_hostname
+            &lt;/th&gt;
+            &lt;td&gt;
+                &lt;b&gt;Required if MI server is deployed in a Kubernetes environment&lt;/b&gt;. Hostname for the WSO2 Integrator: MI management endpoint.
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th&gt;
+                management_port
+            &lt;/th&gt;
+            &lt;td&gt;
+                &lt;b&gt;Optional&lt;/b&gt;. Port of the WSO2 Integrator: MI management endpoint.
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt; 
+
+2.  **Optionally**, configure the [WSO2 Integrator: MI user store]({{base_path}}/install-and-setup/setup/user-stores/setting-up-a-userstore).
+
+    !!! Tip
+        Note the following about your user store configurations.
+
+        -   The user credentials for signing in to the ICP server should be stored in your user store. This can be the default **file-based user store** or an **external LDAP/RDBMS** user store.
+        -   [User management]({{base_path}}/install-and-setup/setup/user-stores/managing-users) is possible only if you have an RDBMS or LDAP user store for your WSO2 Integrator: MI.
+        -   If you have an [external RDBMS user store]({{base_path}}/install-and-setup/setup/user-stores/setting-up-a-userstore/#configuring-an-rdbms-user-store), be sure that the RDBMS driver is correctly added to the `&lt;MI_HOME&gt;/lib` folder. You will not be able to sign in without the driver.
+
+3.  Regardless of the user who logs in, the ICP server uses the user configured in its `deployment.toml` to fetch the data to the ICP server. Then the ICP server renders these data in the UI according to logged-in user. Hence, configure the super admin user credentials in the user store as mentioned below in the `deployment.toml` file (stored in the `&lt;ICP_HOME&gt;/conf/` folder).
+
+    ```toml
+    [mi_super_admin]
+    username = &quot;admin&quot;
+    password = &quot;admin&quot;
+    ```
+    
+### Step 3 - Start the ICP server
+
+Follow the steps given below.
+
+1. Open a terminal and navigate to the `&lt;ICP_HOME&gt;/bin` folder.
+2. Execute one of the commands given below.
+      
+    === &quot;On MacOS/Linux&quot;
+        ```bash 
+        ./dashboard.sh
+        ```
+    === &quot;On Windows&quot;
+        ```bash 
+        dashboard.bat
+        ```
+      
+### Step 4 - Start the MI servers
+
+Follow the steps given below.
+
+1. Open a terminal and navigate to the `&lt;MI_HOME&gt;/bin` folder.
+2. Execute one of the commands given below.
+      
+    === &quot;On MacOS/Linux&quot;
+        ```bash 
+        ./micro-integrator.sh
+        ```
+    === &quot;On Windows&quot;           
+        ```bash 
+        micro-integrator.bat
+        ```
+      
+### Step 5 - Sign in to the ICP server
+
+Once you have [set up and started the ICP server](#using-the-integration-control-plane), you can access the ICP server URL.
+
+!!! Note &quot;Before you begin&quot;
+    Be sure to have at least one WSO2 Integrator: MI server connected to the ICP server before attempting to sign in to it. This can be verified by checking the presence of the following log.
+    ```
+    New node &lt;node_id&gt; in group : &lt;group_id&gt; is registered. Inserting heartbeat information
+    ```
+  
+1.  Copy the following ICP server URL to your browser:
+
+    ```bash
+    https://localhost:9743/login
+    ```
+
+2.  Enter the following details to sign in.
+
+    ![login form for integration control plane]({{base_path}}/assets/img/integrate/monitoring-dashboard/login.png)
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;
+                Username
+            &lt;/th&gt;
+            &lt;td&gt;
+                The user name to sign in.&lt;/br&gt;&lt;/br&gt;
+                &lt;b&gt;Note&lt;/b&gt;: This should be a valid username that is saved in the WSO2 Integrator: MI server&#x27;s user store. By default, the &#x27;admin&#x27; user name is configured in the default user store.&lt;/br&gt;&lt;/br&gt; 
+                See &lt;a href=&quot;{{base_path}}/install-and-setup/setup/user-stores/setting-up-a-userstore&quot;&gt;configuring user stores&lt;/a&gt; for information.
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th&gt;
+                Password
+            &lt;/th&gt;
+            &lt;td&gt;
+                The password of the user name. By default, &#x27;admin&#x27; is the user name and password. 
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt; 
+
+3.  Click &lt;b&gt;Sign In&lt;/b&gt;.
+
+You are redirected to the home page of the Integration Control Plane. 
+     
+&lt;a href=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-artifact-home.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-artifact-home.png&quot; width=&quot;1000&quot;&gt;&lt;/a&gt;
+
+### Step 6 - Monitor MI artifacts and logs
+
+Follow the steps given below.
+
+1.  Select the group ID that you want to view from the upper left menu.  
+    
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-select-group.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-select-group.png&quot; width=&quot;1000&quot;&gt;&lt;/a&gt;
+
+    You can see the list of server nodes in each group, as shown in the above diagram.
+
+2.  Click a node ID, and a side navigational panel opens to display the server information.
+    
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-server-sidepanal.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-server-sidepanal.png&quot; width=&quot;1000&quot;&gt;&lt;/a&gt;
+
+Now you can view details of artifacts, update artifacts, and perform various other administration tasks. Select the required option from the left-hand navigator.
+
+&lt;a href=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-artifact-list.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-artifact-list.png&quot; width=&quot;300&quot;&gt;&lt;/a&gt;
+
+## Monitoring health of ICP server
+
+The Integration Control Plane provides a health check endpoint that can be used to monitor the status of the ICP server. The following API format can be used to invoke the health API.
+
+```
+https://localhost:9743/dashboard/api/healthz
+```
+
+If the ICP server is up and running properly, the following response will appear.
+
+```
+{&quot;status&quot;:&quot;ready&quot;}
+```
+
+&lt;!--
+### Proxy Services
+
+Select this option to manage proxy services deployed in the environment.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-proxy-service-1.png&quot;&gt;
+
+You can view details, and update the &lt;b&gt;status&lt;/b&gt; and enable &lt;b&gt;tracing&lt;/b&gt;/&lt;b&gt;statistics&lt;/b&gt; for each proxy service.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-proxy-service-2.png&quot;&gt;
+
+### Endpoints
+
+Select this option to manage endpoint artifacts deployed in the WSO2 Integrator: MI instance.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-endpoint-1.png&quot;&gt;
+
+You can view details, update the &lt;b&gt;status&lt;/b&gt;, and enable &lt;b&gt;tracing&lt;/b&gt;/&lt;b&gt;statistics&lt;/b&gt; for each endpoint.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-endpoint-2.png&quot;&gt;
+
+### Inbound Endpoints
+
+Select this option to manage inbound endpoint artifacts deployed in the WSO2 Integrator: MI instance.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-inbound-endpoint-1.png&quot;&gt;
+
+You can view details of each inbound endpoint as shown below.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-inbound-endpoint-2.png&quot;&gt;
+
+### Message Processors
+
+Select this option to manage message processor artifacts deployed in the WSO2 Integrator: MI instance.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-message-processor-1.png&quot;&gt;
+
+You can view details, update the &lt;b&gt;status&lt;/b&gt;, and enable &lt;b&gt;tracing&lt;/b&gt;/&lt;b&gt;statistics&lt;/b&gt; for each message processor.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-message-processor-1.png&quot;&gt;
+
+### Message Stores
+
+Select this option to manage message store artifacts deployed in the WSO2 Integrator: MI instance.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-message-store-1.png&quot;&gt;
+
+You can view details of each message store as shown below.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-message-store-2.png&quot;&gt;
+
+### API
+
+Select this option to manage REST API artifacts deployed in the WSO2 Integrator: MI instance.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-api-1.png&quot;&gt;
+
+You can view details and update &lt;b&gt;tracing&lt;/b&gt; for each API as shown below.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-api-2.png&quot;&gt;
+
+### Templates
+
+Select this option to manage template artifacts deployed in the WSO2 Integrator: MI instance.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-template-1.png&quot;&gt;
+
+You can view details for each template as shown below.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-template-2.png&quot;&gt;
+
+### Sequences
+
+Select this option to manage sequence artifacts deployed in the WSO2 Integrator: MI instance.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-sequence-1.png&quot;&gt;
+
+You can view details and update &lt;b&gt;tracing&lt;/b&gt; for each sequence as shown below.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-template-2.png&quot;&gt;
+
+### Tasks
+
+Select this option to manage Scheduled triggers deployed in the WSO2 Integrator: MI instance.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-task-1.png&quot;&gt;
+
+You can view details for each task as shown below.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-task-2.png&quot;&gt;
+
+### Local Entries
+
+Select this option to manage local entries deployed in the WSO2 Integrator: MI instance.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-localentry-1.png&quot;&gt;
+
+You can view details for each local entry as shown below.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-localentry-2.png&quot;&gt;
+
+### Data Services
+
+Select this option to manage data services deployed in the WSO2 Integrator: MI instance.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-dataservice-1.png&quot;&gt;
+
+You can view details for each data service as shown below.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-dataservice-2.png&quot;&gt;
+
+### Connectors
+
+Select this option to manage connector artifacts deployed in the WSO2 Integrator: MI instance.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-connector-1.png&quot;&gt;
+
+You can view details for each connector as shown below.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-connector-2.png&quot;&gt;
+
+### Carbon Applications
+
+Select this option to see the list of composite applications deployed in the WSO2 Integrator: MI instance.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-capp.png&quot;&gt;
+
+### Log Files
+
+Select this option to view and download log files of the WSO2 Integrator: MI instance.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-view-logs.png&quot;&gt;
+
+### Log Configs
+
+Select this option to manage the log4j loggers of the WSO2 Integrator: MI instance.
+
+To view log configs and update log levels:
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-logger-1.png&quot;&gt;
+
+To add new loggers:
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-logger-2.png&quot;&gt;
+
+### Users
+
+Select this option to manage the users of the WSO2 Integrator: MI instance. These users are stored in the external user store connected to the WSO2 Integrator: MI.
+
+To view and remove users:
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-users-1.png&quot; width=&quot;700&quot;&gt;
+
+To add new users:
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/monitoring-dashboard/dashboard-users-2.png&quot; width=&quot;700&quot;&gt;
+--&gt;
+</body>
+</html>

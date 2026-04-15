@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>installation-prerequisites.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># WSO2 Integrator: MI Installation Prerequisites
+
+Prior to installing WSO2 Integrator: MI, make sure that the appropriate prerequisites are fulfilled.
+
+## System requirements
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;b&gt;Centralized (ESB Style) Deployment&lt;/b&gt;
+    &lt;/td&gt;
+    &lt;td&gt;
+      &lt;ul&gt;
+        &lt;li&gt;
+          Minimum 2 core (compute units) (1.0-1.2 GHz Opteron/Xeon processor).
+        &lt;/li&gt;
+        &lt;li&gt;
+          2 GB RAM.
+        &lt;/li&gt;
+        &lt;li&gt;
+          &lt;code&gt;~512&lt;/code&gt; MB heap size. This is generally sufficient for processing smaller messages. However, the requirements vary with larger message sizes and the number of messages processed concurrently.
+        &lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;b&gt;Decentralized (Microservices Style) Deployment&lt;/b&gt;
+    &lt;/td&gt;
+    &lt;td&gt;
+      &lt;ul&gt;
+      &lt;li&gt;
+          Minimum 0.5 core (compute units) per WSO2 Integrator: MI instance.
+          &lt;div class=&quot;admonition note&quot;&gt;
+          &lt;p class=&quot;admonition-title&quot;&gt;Note&lt;/p&gt;
+          &lt;p&gt;WSO2 Integrator: MI can run on a minimum of 0.5 cores per instance, suitable for lightweight integrations. For more complex integrations, it is recommended to allocate a minimum of 2 cores per instance.&lt;/p&gt;
+          &lt;/div&gt;  
+        &lt;/li&gt;
+        &lt;li&gt;
+          1 GB memory for the container/pod.
+        &lt;/li&gt;
+        &lt;li&gt;
+          &lt;code&gt;~512&lt;/code&gt; MB heap size for one WSO2 Integrator: MI instance. This is generally sufficient for processing smaller messages. However, the requirements vary with larger message sizes and the number of messages processed concurrently.
+        &lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+!!! Tip
+    See [Resource Allocation and Performance]({{base_path}}/install-and-setup/setup/deployment-best-practices/resource-allocation-and-performance/) for guidance on allocating resources for your integrations to achieve the desired throughput (requests per second) and average response times.
+
+## Environment compatibility
+
+- Install a JDK version that is compatible with this product version. See [Tested JDKs](#tested-jdks).
+- It is not recommended to use Apache DS in a production environment due to scalability issues. Instead, use an LDAP like OpenLDAP as your user store.
+- If you have difficulty in setting up the WSO2 Integrator: MI in a specific platform or database, [contact us](https://wso2.com/contact/).
+
+## Tested environments
+
+The details of the tested environments for the WSO2 Integrator: MI 4.6.0 runtimes are given below.
+
+### Tested operating systems
+
+The WSO2 Integrator: MI runtime is tested with the following operating systems:
+
+| Operating System         | Versions |
+|--------------------------|----------|
+| Windows                  | 2025     |
+| Ubuntu                   | 24.04    |
+| Red Hat Enterprise Linux | 9.7, 10  |
+| Rocky Linux              | 10       |
+| MacOS                    | 26.3     |
+| SUSE Linux               | 16       |
+
+### Tested JDKs
+
+The WSO2 Integrator: MI runtime is tested with the following JDKs:
+
+| JDK          | Versions |
+|--------------|----------|
+| CorrettoJDK  | 21, 25   |
+| AdoptOpenJDK | 21, 25   |
+| OpenJDK      | 21, 25   |
+| Oracle JDK   | 21, 25   |
+
+### Tested DBMSs
+
+The WSO2 Integrator: MI runtime is tested with the following databases:
+
+| DBMS                 | Versions           |
+|----------------------|--------------------|
+| MySQL                | 8, 9               |
+| Oracle               | 19c, 26ai          |
+| Microsoft SQL Server | 2025               |
+| PostgreSQL           | 17.2, 18.3         |
+| MariaDB              | 10.5, 12.2         |
+| DB2                  | 11.5               |
+
+### ARM compatibility
+
+WSO2 Integrator: MI is compatible with ARM processors. It can run on ARM-based systems, such as those with Apple Silicon or ARM-based Linux distributions.
+</body>
+</html>

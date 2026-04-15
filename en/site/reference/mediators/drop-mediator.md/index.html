@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>drop-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Drop Mediator
+
+The Drop mediator stops the processing of the current message. This mediator can be used to ensure that the message is sent only once and then dropped by the WSO2 Integrator: MI. If you have any mediators defined after the `&lt;drop/&gt;` mediator, they will not be executed, because `&lt;drop/&gt;` is considered to be the end of the message flow.
+
+## Syntax
+
+```xml
+&lt;drop/&gt;
+```
+
+## Example
+
+You can use the drop mediator for messages that do not meet the filter criteria in case the client is waiting for a response to ensure the message was received by the WSO2 Integrator: MI. For example:
+
+=== &quot;Proxy Service&quot;
+    ```xml
+    &lt;proxy name=&quot;SimpleProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;http https&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;!-- filtering of messages with XPath and regex matches --&gt;
+                &lt;filter regex=&quot;/StockQuote.*&quot; source=&quot;get-property(&#x27;To&#x27;)&quot;&gt;
+                    &lt;then&gt;
+                        &lt;call&gt;
+                            &lt;endpoint key=&quot;SimpleStockEp&quot;/&gt;
+                        &lt;/call&gt;
+                    &lt;/then&gt;
+                    &lt;else&gt;
+                        &lt;drop/&gt;
+                    &lt;/else&gt;
+                &lt;/filter&gt;
+                ...
+    ```
+=== &quot;Endpoint&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;endpoint name=&quot;SimpleStockEp&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;&gt;
+            &lt;suspendOnFailure&gt;
+                &lt;initialDuration&gt;-1&lt;/initialDuration&gt;
+                &lt;progressionFactor&gt;1&lt;/progressionFactor&gt;
+            &lt;/suspendOnFailure&gt;
+            &lt;markForSuspension&gt;
+                &lt;retriesBeforeSuspension&gt;0&lt;/retriesBeforeSuspension&gt;
+            &lt;/markForSuspension&gt;
+        &lt;/address&gt;
+    &lt;/endpoint&gt;
+    ```
+
+In this scenario, if the message doesn&#x27;t meet the filter condition, it is dropped, and the HTTP 202 Accepted response is sent to the client. If you did not include the drop mediator, the client would not receive any response.
+</body>
+</html>

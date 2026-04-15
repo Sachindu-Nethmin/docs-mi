@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>opening-artifacts.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Opening Artifacts
+
+Follow the instructions given below to open an already-created integration artifact from the MI for VS Code extension.
+
+1. Create an [integration project]({{base_path}}/develop/create-integration-project). 
+
+    !!! note
+        Hereafter, the above-mentioned integration project directory will be referred to as `&lt;PROJECT_NAME&gt;`, and the existing project directory from which you want to import the integration artifacts will be referred to as `&lt;OLD_PROJECT_NAME&gt;`.
+
+2. Open the `&lt;OLD_PROJECT_NAME&gt;/src/main/wso2mi/artifacts/&lt;ARTIFACT_TYPE&gt;` directory.
+
+3. Copy the respective XML file of the artifact you want to import to your new integration project.
+
+    For example, if you want to import an API, copy the `&lt;OLD_PROJECT_NAME&gt;/src/main/wso2mi/artifacts/apis/&lt;API_NAME.xml&gt;` file
+
+4. Open the `&lt;PROJECT_NAME&gt;/src/main/wso2mi/artifacts/&lt;ARTIFACT_TYPE&gt;` directory.
+
+5. Paste the XML file that you have copied.
+
+    For example, if you want to import an API, paste the copied XML file in the `&lt;PROJECT_NAME&gt;/src/main/wso2mi/artifacts/apis/` directory.
+
+6. Refresh the **WSO2 Integrator: MI Project Explorer** to ensure that the files are visible in the project structure.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/refresh-project-explorer.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/refresh-project-explorer.png&quot; alt=&quot;refresh project explorer&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+!!! note
+
+	When importing artifacts with custom mediators, make sure the custom mediator name starts with the &quot;CUSTOM_&quot; prefix. 
+
+	!!! example 
+		```xml
+			&lt;proxy name=&quot;example_proxy&quot; startOnLoad=&quot;true&quot; transports=&quot;http&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+				&lt;target&gt;
+					&lt;inSequence&gt;
+						&lt;log level=&quot;custom&quot;/&gt;
+						&lt;CUSTOM_mymediator&gt;
+							...
+						&lt;/CUSTOM_mymediator&gt;
+						&lt;log level=&quot;full&quot;/&gt;
+					&lt;/inSequence&gt;
+					&lt;faultSequence/&gt;
+				&lt;/target&gt;
+			&lt;/proxy&gt; 
+		```
+		
+</body>
+</html>

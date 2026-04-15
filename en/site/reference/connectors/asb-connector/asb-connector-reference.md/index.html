@@ -1,0 +1,3311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>asb-connector-reference.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Azure Service Bus Connector Reference
+
+This documentation provides a reference guide for the Azure Service Bus Connector. The Azure Service Bus connector enables you to connect to an Azure Service Bus namespace and perform administration, message sending, and message receiving operations. Click an operation name to see parameter details and samples on how to use it.
+
+## Connection Configurations
+
+The Azure Service Bus Connector supports three connection types, each corresponding to a different client: **Administrator**, **MessageSender**, and **MessageReceiver**. Each connection type requires its own initialization configuration.
+
+---
+
+### Administrator Connection
+
+??? note &quot;Administrator&quot;
+    The Administrator connection allows you to manage Azure Service Bus resources such as queues, topics, subscriptions, and rules.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;connectionName&lt;/td&gt;
+        &lt;td&gt;Connection Name&lt;/td&gt;
+        &lt;td&gt;A unique name to identify this connection.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;connectionString&lt;/td&gt;
+        &lt;td&gt;Connection String&lt;/td&gt;
+        &lt;td&gt;The connection string for the Azure Service Bus namespace. Obtain this from the Azure portal under Shared Access Policies.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.init&gt;
+        &lt;connectionType&gt;ADMINISTRATOR&lt;/connectionType&gt;
+        &lt;name&gt;asbAdminConnection&lt;/name&gt;
+        &lt;connectionString&gt;Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=xxxxxxxx&lt;/connectionString&gt;
+    &lt;/asb.init&gt;
+    ```
+
+---
+
+### MessageSender Connection
+
+??? note &quot;MessageSender&quot;
+    The MessageSender connection allows you to send messages to a specific queue or topic.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;connectionName&lt;/td&gt;
+        &lt;td&gt;Connection Name&lt;/td&gt;
+        &lt;td&gt;A unique name to identify this connection.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;connectionString&lt;/td&gt;
+        &lt;td&gt;Connection String&lt;/td&gt;
+        &lt;td&gt;The connection string for the Azure Service Bus namespace.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;entityType&lt;/td&gt;
+        &lt;td&gt;Entity Type&lt;/td&gt;
+        &lt;td&gt;The type of Service Bus entity to send messages to. &lt;b&gt;Possible values&lt;/b&gt;: &lt;code&gt;QUEUE&lt;/code&gt;, &lt;code&gt;TOPIC&lt;/code&gt;.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicOrQueueName&lt;/td&gt;
+        &lt;td&gt;Topic or Queue Name&lt;/td&gt;
+        &lt;td&gt;The name of the queue or topic to send messages to.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;AMQP Retry Options&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;amqpRetryOptions_maxRetries&lt;/td&gt;
+        &lt;td&gt;Max Retries&lt;/td&gt;
+        &lt;td&gt;The maximum number of retry attempts.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;amqpRetryOptions_delay&lt;/td&gt;
+        &lt;td&gt;Delay&lt;/td&gt;
+        &lt;td&gt;The initial delay between retry attempts in seconds.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;amqpRetryOptions_maxDelay&lt;/td&gt;
+        &lt;td&gt;Max Delay&lt;/td&gt;
+        &lt;td&gt;The maximum delay between retry attempts in seconds.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;amqpRetryOptions_tryTimeout&lt;/td&gt;
+        &lt;td&gt;Try Timeout&lt;/td&gt;
+        &lt;td&gt;The timeout per retry attempt in seconds.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;amqpRetryOptions_retryMode&lt;/td&gt;
+        &lt;td&gt;Retry Mode&lt;/td&gt;
+        &lt;td&gt;The retry mode to use. &lt;b&gt;Possible values&lt;/b&gt;: &lt;code&gt;EXPONENTIAL&lt;/code&gt;, &lt;code&gt;FIXED&lt;/code&gt;.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.init&gt;
+        &lt;connectionType&gt;MESSAGE_SENDER&lt;/connectionType&gt;
+        &lt;name&gt;asbSenderConnection&lt;/name&gt;
+        &lt;connectionString&gt;Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=xxxxxxxx&lt;/connectionString&gt;
+        &lt;entityType&gt;QUEUE&lt;/entityType&gt;
+        &lt;topicOrQueueName&gt;myQueue&lt;/topicOrQueueName&gt;
+    &lt;/asb.init&gt;
+    ```
+
+---
+
+### MessageReceiver Connection
+
+??? note &quot;MessageReceiver&quot;
+    The MessageReceiver connection allows you to receive messages from a specific queue or topic subscription.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;connectionName&lt;/td&gt;
+        &lt;td&gt;Connection Name&lt;/td&gt;
+        &lt;td&gt;A unique name to identify this connection.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;connectionString&lt;/td&gt;
+        &lt;td&gt;Connection String&lt;/td&gt;
+        &lt;td&gt;The connection string for the Azure Service Bus namespace.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;entityConfigDataType&lt;/td&gt;
+        &lt;td&gt;Entity Config Type&lt;/td&gt;
+        &lt;td&gt;The type of entity to receive messages from. &lt;b&gt;Possible values&lt;/b&gt;: &lt;code&gt;TopicSubsConfig&lt;/code&gt; (for topic subscriptions), &lt;code&gt;QueueConfig&lt;/code&gt; (for queues).&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Topic Subscription Configuration (when entityConfigDataType is TopicSubsConfig)&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;entityConfig_topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic to receive messages from.&lt;/td&gt;
+        &lt;td&gt;Yes (for TopicSubsConfig)&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;entityConfig_subscriptionName&lt;/td&gt;
+        &lt;td&gt;Subscription Name&lt;/td&gt;
+        &lt;td&gt;The name of the subscription to receive messages from.&lt;/td&gt;
+        &lt;td&gt;Yes (for TopicSubsConfig)&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Queue Configuration (when entityConfigDataType is QueueConfig)&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;entityConfig_queueName&lt;/td&gt;
+        &lt;td&gt;Queue Name&lt;/td&gt;
+        &lt;td&gt;The name of the queue to receive messages from.&lt;/td&gt;
+        &lt;td&gt;Yes (for QueueConfig)&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Receive Options&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;receiveMode&lt;/td&gt;
+        &lt;td&gt;Receive Mode&lt;/td&gt;
+        &lt;td&gt;The mode for receiving messages. &lt;b&gt;Possible values&lt;/b&gt;:
+        &lt;ul&gt;
+            &lt;li&gt;&lt;b&gt;PEEK_LOCK&lt;/b&gt;: Messages are locked for the receiver but not removed from the queue. The receiver must complete, abandon, defer, or dead-letter the message.&lt;/li&gt;
+            &lt;li&gt;&lt;b&gt;RECEIVE_AND_DELETE&lt;/b&gt;: Messages are immediately removed from the queue upon receipt.&lt;/li&gt;
+        &lt;/ul&gt;
+        &lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;PEEK_LOCK&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxAutoLockRenewDuration&lt;/td&gt;
+        &lt;td&gt;Max Auto Lock Renew Duration&lt;/td&gt;
+        &lt;td&gt;The maximum duration (in seconds) for automatically renewing message locks.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;AMQP Retry Options&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;amqpRetryOptions_maxRetries&lt;/td&gt;
+        &lt;td&gt;Max Retries&lt;/td&gt;
+        &lt;td&gt;The maximum number of retry attempts.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;amqpRetryOptions_delay&lt;/td&gt;
+        &lt;td&gt;Delay&lt;/td&gt;
+        &lt;td&gt;The initial delay between retry attempts in seconds.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;amqpRetryOptions_maxDelay&lt;/td&gt;
+        &lt;td&gt;Max Delay&lt;/td&gt;
+        &lt;td&gt;The maximum delay between retry attempts in seconds.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;amqpRetryOptions_tryTimeout&lt;/td&gt;
+        &lt;td&gt;Try Timeout&lt;/td&gt;
+        &lt;td&gt;The timeout per retry attempt in seconds.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;amqpRetryOptions_retryMode&lt;/td&gt;
+        &lt;td&gt;Retry Mode&lt;/td&gt;
+        &lt;td&gt;The retry mode to use. &lt;b&gt;Possible values&lt;/b&gt;: &lt;code&gt;EXPONENTIAL&lt;/code&gt;, &lt;code&gt;FIXED&lt;/code&gt;.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration (Queue)**
+
+    ```xml
+    &lt;asb.init&gt;
+        &lt;connectionType&gt;MESSAGE_RECEIVER&lt;/connectionType&gt;
+        &lt;name&gt;asbReceiverConnection&lt;/name&gt;
+        &lt;connectionString&gt;Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=xxxxxxxx&lt;/connectionString&gt;
+        &lt;entityConfigDataType&gt;QueueConfig&lt;/entityConfigDataType&gt;
+        &lt;entityConfig_queueName&gt;myQueue&lt;/entityConfig_queueName&gt;
+        &lt;receiveMode&gt;PEEK_LOCK&lt;/receiveMode&gt;
+    &lt;/asb.init&gt;
+    ```
+
+    **Sample configuration (Topic Subscription)**
+
+    ```xml
+    &lt;asb.init&gt;
+        &lt;connectionType&gt;MESSAGE_RECEIVER&lt;/connectionType&gt;
+        &lt;name&gt;asbReceiverConnection&lt;/name&gt;
+        &lt;connectionString&gt;Endpoint=sb://my-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=xxxxxxxx&lt;/connectionString&gt;
+        &lt;entityConfigDataType&gt;TopicSubsConfig&lt;/entityConfigDataType&gt;
+        &lt;entityConfig_topicName&gt;myTopic&lt;/entityConfig_topicName&gt;
+        &lt;entityConfig_subscriptionName&gt;mySubscription&lt;/entityConfig_subscriptionName&gt;
+        &lt;receiveMode&gt;PEEK_LOCK&lt;/receiveMode&gt;
+    &lt;/asb.init&gt;
+    ```
+
+---
+
+## Operations
+
+The following operations allow you to work with the Azure Service Bus Connector. Click an operation name to see parameter details and samples on how to use it.
+
+### Administrator Operations
+
+The following operations require an **Administrator** connection.
+
+#### Queue Operations
+
+??? note &quot;createQueue&quot;
+    Creates a new queue in the Azure Service Bus namespace.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;queueName&lt;/td&gt;
+        &lt;td&gt;Queue Name&lt;/td&gt;
+        &lt;td&gt;The name of the queue to create.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Queue Options&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;autoDeleteOnIdle_seconds&lt;/td&gt;
+        &lt;td&gt;Auto Delete On Idle (Seconds)&lt;/td&gt;
+        &lt;td&gt;The idle interval after which the queue is automatically deleted (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;autoDeleteOnIdle_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Auto Delete On Idle (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The idle interval after which the queue is automatically deleted (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;defaultMessageTimeToLive_seconds&lt;/td&gt;
+        &lt;td&gt;Default Message TTL (Seconds)&lt;/td&gt;
+        &lt;td&gt;The default time-to-live for messages in the queue (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;defaultMessageTimeToLive_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Default Message TTL (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The default time-to-live for messages in the queue (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;duplicateDetectionHistoryTimeWindow_seconds&lt;/td&gt;
+        &lt;td&gt;Duplicate Detection Window (Seconds)&lt;/td&gt;
+        &lt;td&gt;The duration of the duplicate detection history (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;duplicateDetectionHistoryTimeWindow_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Duplicate Detection Window (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The duration of the duplicate detection history (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;lockDuration_seconds&lt;/td&gt;
+        &lt;td&gt;Lock Duration (Seconds)&lt;/td&gt;
+        &lt;td&gt;The lock duration for messages received from the queue (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;lockDuration_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Lock Duration (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The lock duration for messages received from the queue (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxDeliveryCount&lt;/td&gt;
+        &lt;td&gt;Max Delivery Count&lt;/td&gt;
+        &lt;td&gt;The maximum number of delivery attempts before a message is dead-lettered.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxMessageSizeInKilobytes&lt;/td&gt;
+        &lt;td&gt;Max Message Size (KB)&lt;/td&gt;
+        &lt;td&gt;The maximum message size in kilobytes.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxSizeInMegabytes&lt;/td&gt;
+        &lt;td&gt;Max Size (MB)&lt;/td&gt;
+        &lt;td&gt;The maximum size of the queue in megabytes.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;status&lt;/td&gt;
+        &lt;td&gt;Status&lt;/td&gt;
+        &lt;td&gt;The status of the queue. &lt;b&gt;Possible values&lt;/b&gt;: &lt;code&gt;Active&lt;/code&gt;, &lt;code&gt;Disabled&lt;/code&gt;, &lt;code&gt;SendDisabled&lt;/code&gt;, &lt;code&gt;ReceiveDisabled&lt;/code&gt;, &lt;code&gt;Creating&lt;/code&gt;, &lt;code&gt;Deleting&lt;/code&gt;, &lt;code&gt;Renaming&lt;/code&gt;, &lt;code&gt;Restoring&lt;/code&gt;, &lt;code&gt;Unknown&lt;/code&gt;.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;userMetadata&lt;/td&gt;
+        &lt;td&gt;User Metadata&lt;/td&gt;
+        &lt;td&gt;Custom metadata associated with the queue.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;enableBatchedOperations&lt;/td&gt;
+        &lt;td&gt;Enable Batched Operations&lt;/td&gt;
+        &lt;td&gt;Whether to enable batched operations on the queue.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;deadLetteringOnMessageExpiration&lt;/td&gt;
+        &lt;td&gt;Dead Lettering On Message Expiration&lt;/td&gt;
+        &lt;td&gt;Whether to move expired messages to the dead-letter sub-queue.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;requiresDuplicateDetection&lt;/td&gt;
+        &lt;td&gt;Requires Duplicate Detection&lt;/td&gt;
+        &lt;td&gt;Whether the queue requires duplicate detection.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;enablePartitioning&lt;/td&gt;
+        &lt;td&gt;Enable Partitioning&lt;/td&gt;
+        &lt;td&gt;Whether to partition the queue across multiple message brokers.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;requiresSession&lt;/td&gt;
+        &lt;td&gt;Requires Session&lt;/td&gt;
+        &lt;td&gt;Whether the queue requires sessions for message processing.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;forwardTo&lt;/td&gt;
+        &lt;td&gt;Forward To&lt;/td&gt;
+        &lt;td&gt;The name of the queue or topic to forward messages to.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;forwardDeadLetteredMessagesTo&lt;/td&gt;
+        &lt;td&gt;Forward Dead Lettered Messages To&lt;/td&gt;
+        &lt;td&gt;The name of the queue or topic to forward dead-lettered messages to.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.createQueue configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;queueName&gt;myQueue&lt;/queueName&gt;
+        &lt;maxDeliveryCount&gt;10&lt;/maxDeliveryCount&gt;
+        &lt;defaultMessageTimeToLive_seconds&gt;3600&lt;/defaultMessageTimeToLive_seconds&gt;
+        &lt;enableBatchedOperations&gt;true&lt;/enableBatchedOperations&gt;
+        &lt;responseVariable&gt;asb_createQueue_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.createQueue&gt;
+    ```
+
+??? note &quot;getQueue&quot;
+    Retrieves the properties of a queue.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;queueName&lt;/td&gt;
+        &lt;td&gt;Queue Name&lt;/td&gt;
+        &lt;td&gt;The name of the queue to retrieve.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.getQueue configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;queueName&gt;myQueue&lt;/queueName&gt;
+        &lt;responseVariable&gt;asb_getQueue_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.getQueue&gt;
+    ```
+
+??? note &quot;updateQueue&quot;
+    Updates the properties of an existing queue.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;queueName&lt;/td&gt;
+        &lt;td&gt;Queue Name&lt;/td&gt;
+        &lt;td&gt;The name of the queue to update.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Update Options&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;autoDeleteOnIdle_seconds&lt;/td&gt;
+        &lt;td&gt;Auto Delete On Idle (Seconds)&lt;/td&gt;
+        &lt;td&gt;The idle interval after which the queue is automatically deleted (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;autoDeleteOnIdle_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Auto Delete On Idle (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The idle interval after which the queue is automatically deleted (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;defaultMessageTimeToLive_seconds&lt;/td&gt;
+        &lt;td&gt;Default Message TTL (Seconds)&lt;/td&gt;
+        &lt;td&gt;The default time-to-live for messages (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;defaultMessageTimeToLive_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Default Message TTL (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The default time-to-live for messages (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;duplicateDetectionHistoryTimeWindow_seconds&lt;/td&gt;
+        &lt;td&gt;Duplicate Detection Window (Seconds)&lt;/td&gt;
+        &lt;td&gt;The duration of the duplicate detection history (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;duplicateDetectionHistoryTimeWindow_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Duplicate Detection Window (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The duration of the duplicate detection history (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;lockDuration_seconds&lt;/td&gt;
+        &lt;td&gt;Lock Duration (Seconds)&lt;/td&gt;
+        &lt;td&gt;The lock duration for messages (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;lockDuration_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Lock Duration (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The lock duration for messages (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxDeliveryCount&lt;/td&gt;
+        &lt;td&gt;Max Delivery Count&lt;/td&gt;
+        &lt;td&gt;The maximum number of delivery attempts before a message is dead-lettered.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxMessageSizeInKilobytes&lt;/td&gt;
+        &lt;td&gt;Max Message Size (KB)&lt;/td&gt;
+        &lt;td&gt;The maximum message size in kilobytes.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxSizeInMegabytes&lt;/td&gt;
+        &lt;td&gt;Max Size (MB)&lt;/td&gt;
+        &lt;td&gt;The maximum size of the queue in megabytes.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;status&lt;/td&gt;
+        &lt;td&gt;Status&lt;/td&gt;
+        &lt;td&gt;The status of the queue. &lt;b&gt;Possible values&lt;/b&gt;: &lt;code&gt;Active&lt;/code&gt;, &lt;code&gt;Disabled&lt;/code&gt;, &lt;code&gt;SendDisabled&lt;/code&gt;, &lt;code&gt;ReceiveDisabled&lt;/code&gt;, &lt;code&gt;Creating&lt;/code&gt;, &lt;code&gt;Deleting&lt;/code&gt;, &lt;code&gt;Renaming&lt;/code&gt;, &lt;code&gt;Restoring&lt;/code&gt;, &lt;code&gt;Unknown&lt;/code&gt;.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;userMetadata&lt;/td&gt;
+        &lt;td&gt;User Metadata&lt;/td&gt;
+        &lt;td&gt;Custom metadata associated with the queue.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;enableBatchedOperations&lt;/td&gt;
+        &lt;td&gt;Enable Batched Operations&lt;/td&gt;
+        &lt;td&gt;Whether to enable batched operations on the queue.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;deadLetteringOnMessageExpiration&lt;/td&gt;
+        &lt;td&gt;Dead Lettering On Message Expiration&lt;/td&gt;
+        &lt;td&gt;Whether to move expired messages to the dead-letter sub-queue.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;requiresDuplicateDetection&lt;/td&gt;
+        &lt;td&gt;Requires Duplicate Detection&lt;/td&gt;
+        &lt;td&gt;Whether the queue requires duplicate detection.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;enablePartitioning&lt;/td&gt;
+        &lt;td&gt;Enable Partitioning&lt;/td&gt;
+        &lt;td&gt;Whether to partition the queue across multiple message brokers.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;requiresSession&lt;/td&gt;
+        &lt;td&gt;Requires Session&lt;/td&gt;
+        &lt;td&gt;Whether the queue requires sessions for message processing.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;forwardTo&lt;/td&gt;
+        &lt;td&gt;Forward To&lt;/td&gt;
+        &lt;td&gt;The name of the queue or topic to forward messages to.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;forwardDeadLetteredMessagesTo&lt;/td&gt;
+        &lt;td&gt;Forward Dead Lettered Messages To&lt;/td&gt;
+        &lt;td&gt;The name of the queue or topic to forward dead-lettered messages to.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.updateQueue configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;queueName&gt;myQueue&lt;/queueName&gt;
+        &lt;maxDeliveryCount&gt;15&lt;/maxDeliveryCount&gt;
+        &lt;status&gt;Active&lt;/status&gt;
+        &lt;responseVariable&gt;asb_updateQueue_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.updateQueue&gt;
+    ```
+
+??? note &quot;deleteQueue&quot;
+    Deletes a queue from the Azure Service Bus namespace.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;queueName&lt;/td&gt;
+        &lt;td&gt;Queue Name&lt;/td&gt;
+        &lt;td&gt;The name of the queue to delete.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.deleteQueue configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;queueName&gt;myQueue&lt;/queueName&gt;
+        &lt;responseVariable&gt;asb_deleteQueue_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.deleteQueue&gt;
+    ```
+
+??? note &quot;listQueues&quot;
+    Lists all queues in the Azure Service Bus namespace.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.listQueues configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;responseVariable&gt;asb_listQueues_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.listQueues&gt;
+    ```
+
+??? note &quot;queueExists&quot;
+    Checks whether a queue exists in the Azure Service Bus namespace.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;queueName&lt;/td&gt;
+        &lt;td&gt;Queue Name&lt;/td&gt;
+        &lt;td&gt;The name of the queue to check.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.queueExists configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;queueName&gt;myQueue&lt;/queueName&gt;
+        &lt;responseVariable&gt;asb_queueExists_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.queueExists&gt;
+    ```
+
+#### Topic Operations
+
+??? note &quot;createTopic&quot;
+    Creates a new topic in the Azure Service Bus namespace.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic to create.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Topic Options&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;autoDeleteOnIdle_seconds&lt;/td&gt;
+        &lt;td&gt;Auto Delete On Idle (Seconds)&lt;/td&gt;
+        &lt;td&gt;The idle interval after which the topic is automatically deleted (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;autoDeleteOnIdle_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Auto Delete On Idle (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The idle interval after which the topic is automatically deleted (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;defaultMessageTimeToLive_seconds&lt;/td&gt;
+        &lt;td&gt;Default Message TTL (Seconds)&lt;/td&gt;
+        &lt;td&gt;The default time-to-live for messages sent to the topic (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;defaultMessageTimeToLive_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Default Message TTL (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The default time-to-live for messages sent to the topic (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;duplicateDetectionHistoryTimeWindow_seconds&lt;/td&gt;
+        &lt;td&gt;Duplicate Detection Window (Seconds)&lt;/td&gt;
+        &lt;td&gt;The duration of the duplicate detection history (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;duplicateDetectionHistoryTimeWindow_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Duplicate Detection Window (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The duration of the duplicate detection history (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;lockDuration_seconds&lt;/td&gt;
+        &lt;td&gt;Lock Duration (Seconds)&lt;/td&gt;
+        &lt;td&gt;The lock duration for messages (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;lockDuration_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Lock Duration (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The lock duration for messages (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxDeliveryCount&lt;/td&gt;
+        &lt;td&gt;Max Delivery Count&lt;/td&gt;
+        &lt;td&gt;The maximum number of delivery attempts.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxMessageSizeInKilobytes&lt;/td&gt;
+        &lt;td&gt;Max Message Size (KB)&lt;/td&gt;
+        &lt;td&gt;The maximum message size in kilobytes.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxSizeInMegabytes&lt;/td&gt;
+        &lt;td&gt;Max Size (MB)&lt;/td&gt;
+        &lt;td&gt;The maximum size of the topic in megabytes.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;status&lt;/td&gt;
+        &lt;td&gt;Status&lt;/td&gt;
+        &lt;td&gt;The status of the topic. &lt;b&gt;Possible values&lt;/b&gt;: &lt;code&gt;Active&lt;/code&gt;, &lt;code&gt;Disabled&lt;/code&gt;, &lt;code&gt;SendDisabled&lt;/code&gt;, &lt;code&gt;ReceiveDisabled&lt;/code&gt;, &lt;code&gt;Creating&lt;/code&gt;, &lt;code&gt;Deleting&lt;/code&gt;, &lt;code&gt;Renaming&lt;/code&gt;, &lt;code&gt;Restoring&lt;/code&gt;, &lt;code&gt;Unknown&lt;/code&gt;.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;userMetadata&lt;/td&gt;
+        &lt;td&gt;User Metadata&lt;/td&gt;
+        &lt;td&gt;Custom metadata associated with the topic.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;enableBatchedOperations&lt;/td&gt;
+        &lt;td&gt;Enable Batched Operations&lt;/td&gt;
+        &lt;td&gt;Whether to enable batched operations on the topic.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;deadLetteringOnMessageExpiration&lt;/td&gt;
+        &lt;td&gt;Dead Lettering On Message Expiration&lt;/td&gt;
+        &lt;td&gt;Whether to move expired messages to the dead-letter sub-queue.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;requiresDuplicateDetection&lt;/td&gt;
+        &lt;td&gt;Requires Duplicate Detection&lt;/td&gt;
+        &lt;td&gt;Whether the topic requires duplicate detection.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;enablePartitioning&lt;/td&gt;
+        &lt;td&gt;Enable Partitioning&lt;/td&gt;
+        &lt;td&gt;Whether to partition the topic across multiple message brokers.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;requiresSession&lt;/td&gt;
+        &lt;td&gt;Requires Session&lt;/td&gt;
+        &lt;td&gt;Whether the topic requires sessions.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;supportOrdering&lt;/td&gt;
+        &lt;td&gt;Support Ordering&lt;/td&gt;
+        &lt;td&gt;Whether the topic supports message ordering.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.createTopic configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;enableBatchedOperations&gt;true&lt;/enableBatchedOperations&gt;
+        &lt;supportOrdering&gt;true&lt;/supportOrdering&gt;
+        &lt;responseVariable&gt;asb_createTopic_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.createTopic&gt;
+    ```
+
+??? note &quot;getTopic&quot;
+    Retrieves the properties of a topic.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic to retrieve.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.getTopic configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;responseVariable&gt;asb_getTopic_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.getTopic&gt;
+    ```
+
+??? note &quot;updateTopic&quot;
+    Updates the properties of an existing topic.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic to update.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Update Options&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;autoDeleteOnIdle_seconds&lt;/td&gt;
+        &lt;td&gt;Auto Delete On Idle (Seconds)&lt;/td&gt;
+        &lt;td&gt;The idle interval after which the topic is automatically deleted (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;autoDeleteOnIdle_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Auto Delete On Idle (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The idle interval after which the topic is automatically deleted (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;defaultMessageTimeToLive_seconds&lt;/td&gt;
+        &lt;td&gt;Default Message TTL (Seconds)&lt;/td&gt;
+        &lt;td&gt;The default time-to-live for messages (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;defaultMessageTimeToLive_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Default Message TTL (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The default time-to-live for messages (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;duplicateDetectionHistoryTimeWindow_seconds&lt;/td&gt;
+        &lt;td&gt;Duplicate Detection Window (Seconds)&lt;/td&gt;
+        &lt;td&gt;The duration of the duplicate detection history (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;duplicateDetectionHistoryTimeWindow_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Duplicate Detection Window (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The duration of the duplicate detection history (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxDeliveryCount&lt;/td&gt;
+        &lt;td&gt;Max Delivery Count&lt;/td&gt;
+        &lt;td&gt;The maximum number of delivery attempts.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxMessageSizeInKilobytes&lt;/td&gt;
+        &lt;td&gt;Max Message Size (KB)&lt;/td&gt;
+        &lt;td&gt;The maximum message size in kilobytes.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxSizeInMegabytes&lt;/td&gt;
+        &lt;td&gt;Max Size (MB)&lt;/td&gt;
+        &lt;td&gt;The maximum size of the topic in megabytes.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;status&lt;/td&gt;
+        &lt;td&gt;Status&lt;/td&gt;
+        &lt;td&gt;The status of the topic. &lt;b&gt;Possible values&lt;/b&gt;: &lt;code&gt;Active&lt;/code&gt;, &lt;code&gt;Disabled&lt;/code&gt;, &lt;code&gt;SendDisabled&lt;/code&gt;, &lt;code&gt;ReceiveDisabled&lt;/code&gt;, &lt;code&gt;Creating&lt;/code&gt;, &lt;code&gt;Deleting&lt;/code&gt;, &lt;code&gt;Renaming&lt;/code&gt;, &lt;code&gt;Restoring&lt;/code&gt;, &lt;code&gt;Unknown&lt;/code&gt;.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;userMetadata&lt;/td&gt;
+        &lt;td&gt;User Metadata&lt;/td&gt;
+        &lt;td&gt;Custom metadata associated with the topic.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;enableBatchedOperations&lt;/td&gt;
+        &lt;td&gt;Enable Batched Operations&lt;/td&gt;
+        &lt;td&gt;Whether to enable batched operations.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;deadLetteringOnMessageExpiration&lt;/td&gt;
+        &lt;td&gt;Dead Lettering On Message Expiration&lt;/td&gt;
+        &lt;td&gt;Whether to move expired messages to the dead-letter sub-queue.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;requiresDuplicateDetection&lt;/td&gt;
+        &lt;td&gt;Requires Duplicate Detection&lt;/td&gt;
+        &lt;td&gt;Whether the topic requires duplicate detection.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;enablePartitioning&lt;/td&gt;
+        &lt;td&gt;Enable Partitioning&lt;/td&gt;
+        &lt;td&gt;Whether to partition the topic across multiple message brokers.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;requiresSession&lt;/td&gt;
+        &lt;td&gt;Requires Session&lt;/td&gt;
+        &lt;td&gt;Whether the topic requires sessions.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;supportOrdering&lt;/td&gt;
+        &lt;td&gt;Support Ordering&lt;/td&gt;
+        &lt;td&gt;Whether the topic supports message ordering.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.updateTopic configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;supportOrdering&gt;true&lt;/supportOrdering&gt;
+        &lt;status&gt;Active&lt;/status&gt;
+        &lt;responseVariable&gt;asb_updateTopic_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.updateTopic&gt;
+    ```
+
+??? note &quot;deleteTopic&quot;
+    Deletes a topic from the Azure Service Bus namespace.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic to delete.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.deleteTopic configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;responseVariable&gt;asb_deleteTopic_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.deleteTopic&gt;
+    ```
+
+??? note &quot;listTopics&quot;
+    Lists all topics in the Azure Service Bus namespace.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.listTopics configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;responseVariable&gt;asb_listTopics_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.listTopics&gt;
+    ```
+
+??? note &quot;topicExists&quot;
+    Checks whether a topic exists in the Azure Service Bus namespace.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic to check.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.topicExists configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;responseVariable&gt;asb_topicExists_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.topicExists&gt;
+    ```
+
+#### Subscription Operations
+
+??? note &quot;createSubscription&quot;
+    Creates a new subscription for a topic.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic to create the subscription for.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;subscriptionName&lt;/td&gt;
+        &lt;td&gt;Subscription Name&lt;/td&gt;
+        &lt;td&gt;The name of the subscription to create.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Subscription Options&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;autoDeleteOnIdle_seconds&lt;/td&gt;
+        &lt;td&gt;Auto Delete On Idle (Seconds)&lt;/td&gt;
+        &lt;td&gt;The idle interval after which the subscription is automatically deleted (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;autoDeleteOnIdle_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Auto Delete On Idle (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The idle interval after which the subscription is automatically deleted (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;defaultMessageTimeToLive_seconds&lt;/td&gt;
+        &lt;td&gt;Default Message TTL (Seconds)&lt;/td&gt;
+        &lt;td&gt;The default time-to-live for messages (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;defaultMessageTimeToLive_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Default Message TTL (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The default time-to-live for messages (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;lockDuration_seconds&lt;/td&gt;
+        &lt;td&gt;Lock Duration (Seconds)&lt;/td&gt;
+        &lt;td&gt;The lock duration for messages (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;lockDuration_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Lock Duration (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The lock duration for messages (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxDeliveryCount&lt;/td&gt;
+        &lt;td&gt;Max Delivery Count&lt;/td&gt;
+        &lt;td&gt;The maximum number of delivery attempts before a message is dead-lettered.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;status&lt;/td&gt;
+        &lt;td&gt;Status&lt;/td&gt;
+        &lt;td&gt;The status of the subscription. &lt;b&gt;Possible values&lt;/b&gt;: &lt;code&gt;Active&lt;/code&gt;, &lt;code&gt;Disabled&lt;/code&gt;, &lt;code&gt;SendDisabled&lt;/code&gt;, &lt;code&gt;ReceiveDisabled&lt;/code&gt;, &lt;code&gt;Creating&lt;/code&gt;, &lt;code&gt;Deleting&lt;/code&gt;, &lt;code&gt;Renaming&lt;/code&gt;, &lt;code&gt;Restoring&lt;/code&gt;, &lt;code&gt;Unknown&lt;/code&gt;.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;userMetadata&lt;/td&gt;
+        &lt;td&gt;User Metadata&lt;/td&gt;
+        &lt;td&gt;Custom metadata associated with the subscription.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;enableBatchedOperations&lt;/td&gt;
+        &lt;td&gt;Enable Batched Operations&lt;/td&gt;
+        &lt;td&gt;Whether to enable batched operations.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;deadLetteringOnMessageExpiration&lt;/td&gt;
+        &lt;td&gt;Dead Lettering On Message Expiration&lt;/td&gt;
+        &lt;td&gt;Whether to move expired messages to the dead-letter sub-queue.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;deadLetteringOnFilterEvaluationExceptions&lt;/td&gt;
+        &lt;td&gt;Dead Lettering On Filter Evaluation Exceptions&lt;/td&gt;
+        &lt;td&gt;Whether to move messages to the dead-letter sub-queue when filter evaluation fails.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;requiresSession&lt;/td&gt;
+        &lt;td&gt;Requires Session&lt;/td&gt;
+        &lt;td&gt;Whether the subscription requires sessions.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;forwardTo&lt;/td&gt;
+        &lt;td&gt;Forward To&lt;/td&gt;
+        &lt;td&gt;The name of the queue or topic to forward messages to.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;forwardDeadLetteredMessagesTo&lt;/td&gt;
+        &lt;td&gt;Forward Dead Lettered Messages To&lt;/td&gt;
+        &lt;td&gt;The name of the queue or topic to forward dead-lettered messages to.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.createSubscription configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;subscriptionName&gt;mySubscription&lt;/subscriptionName&gt;
+        &lt;maxDeliveryCount&gt;10&lt;/maxDeliveryCount&gt;
+        &lt;responseVariable&gt;asb_createSubscription_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.createSubscription&gt;
+    ```
+
+??? note &quot;getSubscription&quot;
+    Retrieves the properties of a subscription.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;subscriptionName&lt;/td&gt;
+        &lt;td&gt;Subscription Name&lt;/td&gt;
+        &lt;td&gt;The name of the subscription to retrieve.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.getSubscription configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;subscriptionName&gt;mySubscription&lt;/subscriptionName&gt;
+        &lt;responseVariable&gt;asb_getSubscription_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.getSubscription&gt;
+    ```
+
+??? note &quot;updateSubscription&quot;
+    Updates the properties of an existing subscription.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;subscriptionName&lt;/td&gt;
+        &lt;td&gt;Subscription Name&lt;/td&gt;
+        &lt;td&gt;The name of the subscription to update.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Update Options&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;autoDeleteOnIdle_seconds&lt;/td&gt;
+        &lt;td&gt;Auto Delete On Idle (Seconds)&lt;/td&gt;
+        &lt;td&gt;The idle interval after which the subscription is automatically deleted (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;autoDeleteOnIdle_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Auto Delete On Idle (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The idle interval after which the subscription is automatically deleted (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;defaultMessageTimeToLive_seconds&lt;/td&gt;
+        &lt;td&gt;Default Message TTL (Seconds)&lt;/td&gt;
+        &lt;td&gt;The default time-to-live for messages (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;defaultMessageTimeToLive_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Default Message TTL (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The default time-to-live for messages (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;lockDuration_seconds&lt;/td&gt;
+        &lt;td&gt;Lock Duration (Seconds)&lt;/td&gt;
+        &lt;td&gt;The lock duration for messages (seconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;lockDuration_nanoseconds&lt;/td&gt;
+        &lt;td&gt;Lock Duration (Nanoseconds)&lt;/td&gt;
+        &lt;td&gt;The lock duration for messages (nanoseconds component).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxDeliveryCount&lt;/td&gt;
+        &lt;td&gt;Max Delivery Count&lt;/td&gt;
+        &lt;td&gt;The maximum number of delivery attempts.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;status&lt;/td&gt;
+        &lt;td&gt;Status&lt;/td&gt;
+        &lt;td&gt;The status of the subscription.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;userMetadata&lt;/td&gt;
+        &lt;td&gt;User Metadata&lt;/td&gt;
+        &lt;td&gt;Custom metadata associated with the subscription.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;enableBatchedOperations&lt;/td&gt;
+        &lt;td&gt;Enable Batched Operations&lt;/td&gt;
+        &lt;td&gt;Whether to enable batched operations.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;deadLetteringOnMessageExpiration&lt;/td&gt;
+        &lt;td&gt;Dead Lettering On Message Expiration&lt;/td&gt;
+        &lt;td&gt;Whether to move expired messages to the dead-letter sub-queue.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;deadLetteringOnFilterEvaluationExceptions&lt;/td&gt;
+        &lt;td&gt;Dead Lettering On Filter Evaluation Exceptions&lt;/td&gt;
+        &lt;td&gt;Whether to move messages to the dead-letter sub-queue when filter evaluation fails.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;forwardTo&lt;/td&gt;
+        &lt;td&gt;Forward To&lt;/td&gt;
+        &lt;td&gt;The name of the queue or topic to forward messages to.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;forwardDeadLetteredMessagesTo&lt;/td&gt;
+        &lt;td&gt;Forward Dead Lettered Messages To&lt;/td&gt;
+        &lt;td&gt;The name of the queue or topic to forward dead-lettered messages to.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.updateSubscription configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;subscriptionName&gt;mySubscription&lt;/subscriptionName&gt;
+        &lt;maxDeliveryCount&gt;15&lt;/maxDeliveryCount&gt;
+        &lt;responseVariable&gt;asb_updateSubscription_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.updateSubscription&gt;
+    ```
+
+??? note &quot;deleteSubscription&quot;
+    Deletes a subscription from a topic.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;subscriptionName&lt;/td&gt;
+        &lt;td&gt;Subscription Name&lt;/td&gt;
+        &lt;td&gt;The name of the subscription to delete.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.deleteSubscription configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;subscriptionName&gt;mySubscription&lt;/subscriptionName&gt;
+        &lt;responseVariable&gt;asb_deleteSubscription_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.deleteSubscription&gt;
+    ```
+
+??? note &quot;listSubscriptions&quot;
+    Lists all subscriptions for a topic.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic to list subscriptions for.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.listSubscriptions configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;responseVariable&gt;asb_listSubscriptions_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.listSubscriptions&gt;
+    ```
+
+??? note &quot;subscriptionExists&quot;
+    Checks whether a subscription exists for a topic.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;subscriptionName&lt;/td&gt;
+        &lt;td&gt;Subscription Name&lt;/td&gt;
+        &lt;td&gt;The name of the subscription to check.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.subscriptionExists configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;subscriptionName&gt;mySubscription&lt;/subscriptionName&gt;
+        &lt;responseVariable&gt;asb_subscriptionExists_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.subscriptionExists&gt;
+    ```
+
+#### Rule Operations
+
+??? note &quot;createRule&quot;
+    Creates a new rule for a subscription to filter messages.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;subscriptionName&lt;/td&gt;
+        &lt;td&gt;Subscription Name&lt;/td&gt;
+        &lt;td&gt;The name of the subscription.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;ruleName&lt;/td&gt;
+        &lt;td&gt;Rule Name&lt;/td&gt;
+        &lt;td&gt;The name of the rule to create.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Rule Options&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;rule_filter&lt;/td&gt;
+        &lt;td&gt;Filter&lt;/td&gt;
+        &lt;td&gt;The SQL filter expression for the rule (e.g., &lt;code&gt;priority = &#x27;high&#x27;&lt;/code&gt;).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;rule_action&lt;/td&gt;
+        &lt;td&gt;Action&lt;/td&gt;
+        &lt;td&gt;The SQL action expression for the rule (e.g., &lt;code&gt;SET sys.label = &#x27;important&#x27;&lt;/code&gt;).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.createRule configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;subscriptionName&gt;mySubscription&lt;/subscriptionName&gt;
+        &lt;ruleName&gt;highPriorityRule&lt;/ruleName&gt;
+        &lt;rule_filter&gt;priority = &#x27;high&#x27;&lt;/rule_filter&gt;
+        &lt;rule_action&gt;SET sys.label = &#x27;important&#x27;&lt;/rule_action&gt;
+        &lt;responseVariable&gt;asb_createRule_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.createRule&gt;
+    ```
+
+??? note &quot;getRule&quot;
+    Retrieves the properties of a rule.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;subscriptionName&lt;/td&gt;
+        &lt;td&gt;Subscription Name&lt;/td&gt;
+        &lt;td&gt;The name of the subscription.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;ruleName&lt;/td&gt;
+        &lt;td&gt;Rule Name&lt;/td&gt;
+        &lt;td&gt;The name of the rule to retrieve.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.getRule configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;subscriptionName&gt;mySubscription&lt;/subscriptionName&gt;
+        &lt;ruleName&gt;highPriorityRule&lt;/ruleName&gt;
+        &lt;responseVariable&gt;asb_getRule_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.getRule&gt;
+    ```
+
+??? note &quot;updateRule&quot;
+    Updates the properties of an existing rule.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;subscriptionName&lt;/td&gt;
+        &lt;td&gt;Subscription Name&lt;/td&gt;
+        &lt;td&gt;The name of the subscription.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;ruleName&lt;/td&gt;
+        &lt;td&gt;Rule Name&lt;/td&gt;
+        &lt;td&gt;The name of the rule to update.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Rule Options&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;rule_filter&lt;/td&gt;
+        &lt;td&gt;Filter&lt;/td&gt;
+        &lt;td&gt;The SQL filter expression for the rule.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;rule_action&lt;/td&gt;
+        &lt;td&gt;Action&lt;/td&gt;
+        &lt;td&gt;The SQL action expression for the rule.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.updateRule configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;subscriptionName&gt;mySubscription&lt;/subscriptionName&gt;
+        &lt;ruleName&gt;highPriorityRule&lt;/ruleName&gt;
+        &lt;rule_filter&gt;priority = &#x27;critical&#x27;&lt;/rule_filter&gt;
+        &lt;responseVariable&gt;asb_updateRule_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.updateRule&gt;
+    ```
+
+??? note &quot;deleteRule&quot;
+    Deletes a rule from a subscription.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;subscriptionName&lt;/td&gt;
+        &lt;td&gt;Subscription Name&lt;/td&gt;
+        &lt;td&gt;The name of the subscription.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;ruleName&lt;/td&gt;
+        &lt;td&gt;Rule Name&lt;/td&gt;
+        &lt;td&gt;The name of the rule to delete.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.deleteRule configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;subscriptionName&gt;mySubscription&lt;/subscriptionName&gt;
+        &lt;ruleName&gt;highPriorityRule&lt;/ruleName&gt;
+        &lt;responseVariable&gt;asb_deleteRule_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.deleteRule&gt;
+    ```
+
+??? note &quot;listRules&quot;
+    Lists all rules for a subscription.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;topicName&lt;/td&gt;
+        &lt;td&gt;Topic Name&lt;/td&gt;
+        &lt;td&gt;The name of the topic.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;subscriptionName&lt;/td&gt;
+        &lt;td&gt;Subscription Name&lt;/td&gt;
+        &lt;td&gt;The name of the subscription to list rules for.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.listRules configKey=&quot;asbAdminConnection&quot;&gt;
+        &lt;topicName&gt;myTopic&lt;/topicName&gt;
+        &lt;subscriptionName&gt;mySubscription&lt;/subscriptionName&gt;
+        &lt;responseVariable&gt;asb_listRules_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.listRules&gt;
+    ```
+
+---
+
+### MessageSender Operations
+
+The following operations require a **MessageSender** connection.
+
+??? note &quot;send&quot;
+    Sends a single message to the configured queue or topic with full message properties.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Message Properties&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;body&lt;/td&gt;
+        &lt;td&gt;Body&lt;/td&gt;
+        &lt;td&gt;The message body content.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;contentType&lt;/td&gt;
+        &lt;td&gt;Content Type&lt;/td&gt;
+        &lt;td&gt;The content type of the message (e.g., &lt;code&gt;application/json&lt;/code&gt;, &lt;code&gt;text/plain&lt;/code&gt;).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;messageId&lt;/td&gt;
+        &lt;td&gt;Message ID&lt;/td&gt;
+        &lt;td&gt;A unique identifier for the message.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;to&lt;/td&gt;
+        &lt;td&gt;To&lt;/td&gt;
+        &lt;td&gt;The destination address of the message.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;replyTo&lt;/td&gt;
+        &lt;td&gt;Reply To&lt;/td&gt;
+        &lt;td&gt;The address to reply to.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;replyToSessionId&lt;/td&gt;
+        &lt;td&gt;Reply To Session ID&lt;/td&gt;
+        &lt;td&gt;The session ID for reply messages.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;label&lt;/td&gt;
+        &lt;td&gt;Label&lt;/td&gt;
+        &lt;td&gt;An application-specific label for the message.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;sessionId&lt;/td&gt;
+        &lt;td&gt;Session ID&lt;/td&gt;
+        &lt;td&gt;The session identifier for session-aware entities.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;correlationId&lt;/td&gt;
+        &lt;td&gt;Correlation ID&lt;/td&gt;
+        &lt;td&gt;The correlation identifier for correlating messages.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;partitionKey&lt;/td&gt;
+        &lt;td&gt;Partition Key&lt;/td&gt;
+        &lt;td&gt;The partition key for routing messages to specific partitions.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;timeToLive&lt;/td&gt;
+        &lt;td&gt;Time To Live&lt;/td&gt;
+        &lt;td&gt;The message time-to-live in seconds.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;applicationProperties_properties&lt;/td&gt;
+        &lt;td&gt;Application Properties&lt;/td&gt;
+        &lt;td&gt;Custom application properties as key-value pairs.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.send configKey=&quot;asbSenderConnection&quot;&gt;
+        &lt;body&gt;Hello, Azure Service Bus!&lt;/body&gt;
+        &lt;contentType&gt;text/plain&lt;/contentType&gt;
+        &lt;timeToLive&gt;3600&lt;/timeToLive&gt;
+        &lt;responseVariable&gt;asb_send_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.send&gt;
+    ```
+
+??? note &quot;sendPayload&quot;
+    Sends a message with just the payload content to the configured queue or topic.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;messagePayload&lt;/td&gt;
+        &lt;td&gt;Message Payload&lt;/td&gt;
+        &lt;td&gt;The payload content to send.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.sendPayload configKey=&quot;asbSenderConnection&quot;&gt;
+        &lt;messagePayload&gt;${payload.message}&lt;/messagePayload&gt;
+        &lt;responseVariable&gt;asb_sendPayload_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.sendPayload&gt;
+    ```
+
+??? note &quot;sendBatch&quot;
+    Sends a batch of messages to the configured queue or topic.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;messageCount&lt;/td&gt;
+        &lt;td&gt;Message Count&lt;/td&gt;
+        &lt;td&gt;The number of messages in the batch.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;messages&lt;/td&gt;
+        &lt;td&gt;Messages&lt;/td&gt;
+        &lt;td&gt;The array of messages to send. Each message can include body, contentType, messageId, and other message properties.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.sendBatch configKey=&quot;asbSenderConnection&quot;&gt;
+        &lt;messageCount&gt;2&lt;/messageCount&gt;
+        &lt;messages&gt;[{&quot;body&quot;: &quot;Message 1&quot;}, {&quot;body&quot;: &quot;Message 2&quot;}]&lt;/messages&gt;
+        &lt;responseVariable&gt;asb_sendBatch_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.sendBatch&gt;
+    ```
+
+??? note &quot;schedule&quot;
+    Sends a message to be enqueued at a scheduled time.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Message Properties&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;body&lt;/td&gt;
+        &lt;td&gt;Body&lt;/td&gt;
+        &lt;td&gt;The message body content.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;contentType&lt;/td&gt;
+        &lt;td&gt;Content Type&lt;/td&gt;
+        &lt;td&gt;The content type of the message.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;messageId&lt;/td&gt;
+        &lt;td&gt;Message ID&lt;/td&gt;
+        &lt;td&gt;A unique identifier for the message.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;timeToLive&lt;/td&gt;
+        &lt;td&gt;Time To Live&lt;/td&gt;
+        &lt;td&gt;The message time-to-live in seconds.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;applicationProperties_properties&lt;/td&gt;
+        &lt;td&gt;Application Properties&lt;/td&gt;
+        &lt;td&gt;Custom application properties as key-value pairs.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Scheduled Enqueue Time&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;year&lt;/td&gt;
+        &lt;td&gt;Year&lt;/td&gt;
+        &lt;td&gt;The year of the scheduled enqueue time.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;month&lt;/td&gt;
+        &lt;td&gt;Month&lt;/td&gt;
+        &lt;td&gt;The month of the scheduled enqueue time (1-12).&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;day&lt;/td&gt;
+        &lt;td&gt;Day&lt;/td&gt;
+        &lt;td&gt;The day of the scheduled enqueue time.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;hour&lt;/td&gt;
+        &lt;td&gt;Hour&lt;/td&gt;
+        &lt;td&gt;The hour of the scheduled enqueue time (0-23).&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;minute&lt;/td&gt;
+        &lt;td&gt;Minute&lt;/td&gt;
+        &lt;td&gt;The minute of the scheduled enqueue time (0-59).&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;second&lt;/td&gt;
+        &lt;td&gt;Second&lt;/td&gt;
+        &lt;td&gt;The second of the scheduled enqueue time.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;timeAbbrev&lt;/td&gt;
+        &lt;td&gt;Time Zone&lt;/td&gt;
+        &lt;td&gt;The time zone abbreviation (e.g., &lt;code&gt;UTC&lt;/code&gt;, &lt;code&gt;Z&lt;/code&gt;).&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output. Returns the sequence number of the scheduled message.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.schedule configKey=&quot;asbSenderConnection&quot;&gt;
+        &lt;body&gt;Scheduled message&lt;/body&gt;
+        &lt;contentType&gt;text/plain&lt;/contentType&gt;
+        &lt;year&gt;2026&lt;/year&gt;
+        &lt;month&gt;4&lt;/month&gt;
+        &lt;day&gt;1&lt;/day&gt;
+        &lt;hour&gt;10&lt;/hour&gt;
+        &lt;minute&gt;30&lt;/minute&gt;
+        &lt;second&gt;0&lt;/second&gt;
+        &lt;timeAbbrev&gt;UTC&lt;/timeAbbrev&gt;
+        &lt;responseVariable&gt;asb_schedule_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.schedule&gt;
+    ```
+
+??? note &quot;cancel&quot;
+    Cancels a previously scheduled message using its sequence number.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;sequenceNumber&lt;/td&gt;
+        &lt;td&gt;Sequence Number&lt;/td&gt;
+        &lt;td&gt;The sequence number of the scheduled message to cancel.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.cancel configKey=&quot;asbSenderConnection&quot;&gt;
+        &lt;sequenceNumber&gt;12345&lt;/sequenceNumber&gt;
+        &lt;responseVariable&gt;asb_cancel_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.cancel&gt;
+    ```
+
+??? note &quot;close (Sender)&quot;
+    Closes the MessageSender connection.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.close configKey=&quot;asbSenderConnection&quot;&gt;
+        &lt;responseVariable&gt;asb_close_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.close&gt;
+    ```
+
+---
+
+### MessageReceiver Operations
+
+The following operations require a **MessageReceiver** connection.
+
+#### Receive Operations
+
+??? note &quot;receive&quot;
+    Receives a single message from the configured queue or subscription.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;serverWaitTime&lt;/td&gt;
+        &lt;td&gt;Server Wait Time&lt;/td&gt;
+        &lt;td&gt;The maximum time (in seconds) the server waits for a message to arrive before returning.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;T&lt;/td&gt;
+        &lt;td&gt;Type&lt;/td&gt;
+        &lt;td&gt;The expected type of the message payload.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;Message&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;deadLettered&lt;/td&gt;
+        &lt;td&gt;Dead Lettered&lt;/td&gt;
+        &lt;td&gt;Whether to receive from the dead-letter sub-queue instead of the main queue.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the received message.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.receive configKey=&quot;asbReceiverConnection&quot;&gt;
+        &lt;serverWaitTime&gt;60&lt;/serverWaitTime&gt;
+        &lt;responseVariable&gt;asb_receive_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.receive&gt;
+    ```
+
+??? note &quot;receiveBatch&quot;
+    Receives a batch of messages from the configured queue or subscription.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;maxMessageCount&lt;/td&gt;
+        &lt;td&gt;Max Message Count&lt;/td&gt;
+        &lt;td&gt;The maximum number of messages to receive in the batch.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;serverWaitTime&lt;/td&gt;
+        &lt;td&gt;Server Wait Time&lt;/td&gt;
+        &lt;td&gt;The maximum time (in seconds) the server waits for messages to arrive.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;deadLettered&lt;/td&gt;
+        &lt;td&gt;Dead Lettered&lt;/td&gt;
+        &lt;td&gt;Whether to receive from the dead-letter sub-queue.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the received messages.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.receiveBatch configKey=&quot;asbReceiverConnection&quot;&gt;
+        &lt;maxMessageCount&gt;10&lt;/maxMessageCount&gt;
+        &lt;serverWaitTime&gt;60&lt;/serverWaitTime&gt;
+        &lt;responseVariable&gt;asb_receiveBatch_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.receiveBatch&gt;
+    ```
+
+??? note &quot;receivePayload&quot;
+    Receives only the payload of a message from the configured queue or subscription.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;serverWaitTime&lt;/td&gt;
+        &lt;td&gt;Server Wait Time&lt;/td&gt;
+        &lt;td&gt;The maximum time (in seconds) the server waits for a message to arrive.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;T&lt;/td&gt;
+        &lt;td&gt;Type&lt;/td&gt;
+        &lt;td&gt;The expected type of the message payload.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;deadLettered&lt;/td&gt;
+        &lt;td&gt;Dead Lettered&lt;/td&gt;
+        &lt;td&gt;Whether to receive from the dead-letter sub-queue.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the received payload.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.receivePayload configKey=&quot;asbReceiverConnection&quot;&gt;
+        &lt;serverWaitTime&gt;60&lt;/serverWaitTime&gt;
+        &lt;responseVariable&gt;asb_receivePayload_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.receivePayload&gt;
+    ```
+
+??? note &quot;receiveDeferred&quot;
+    Receives a deferred message by its sequence number.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;sequenceNumber&lt;/td&gt;
+        &lt;td&gt;Sequence Number&lt;/td&gt;
+        &lt;td&gt;The sequence number of the deferred message to receive.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the received message.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.receiveDeferred configKey=&quot;asbReceiverConnection&quot;&gt;
+        &lt;sequenceNumber&gt;12345&lt;/sequenceNumber&gt;
+        &lt;responseVariable&gt;asb_receiveDeferred_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.receiveDeferred&gt;
+    ```
+
+#### Message Settlement and Lock Management Operations
+
+These operations are used with the **PEEK_LOCK** receive mode to settle received messages or manage message locks.
+
+!!! warning &quot;Important&quot;
+    Message settlement operations (`complete`, `abandon`, `defer`, `deadLetter`) and the `renewLock` operation must be used in the **same integration flow** as the `receive` or `receiveDeferred` operation that retrieved the message. You cannot receive a message in one request and settle or renew its lock in a separate request. The receive and settlement/lock operations must be part of a single message processing flow.
+
+??? note &quot;complete&quot;
+    Marks a message as successfully processed and removes it from the queue.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;sequenceNumber&lt;/td&gt;
+        &lt;td&gt;Sequence Number&lt;/td&gt;
+        &lt;td&gt;The sequence number of the message to complete.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.complete configKey=&quot;asbReceiverConnection&quot;&gt;
+        &lt;sequenceNumber&gt;${vars.asb_receive_1.payload.sequenceNumber}&lt;/sequenceNumber&gt;
+        &lt;responseVariable&gt;asb_complete_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.complete&gt;
+    ```
+
+??? note &quot;abandon&quot;
+    Releases the lock on a message, making it available for other receivers.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;sequenceNumber&lt;/td&gt;
+        &lt;td&gt;Sequence Number&lt;/td&gt;
+        &lt;td&gt;The sequence number of the message to abandon.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.abandon configKey=&quot;asbReceiverConnection&quot;&gt;
+        &lt;sequenceNumber&gt;${vars.asb_receive_1.payload.sequenceNumber}&lt;/sequenceNumber&gt;
+        &lt;responseVariable&gt;asb_abandon_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.abandon&gt;
+    ```
+
+??? note &quot;defer&quot;
+    Defers a message for later retrieval using its sequence number.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;sequenceNumber&lt;/td&gt;
+        &lt;td&gt;Sequence Number&lt;/td&gt;
+        &lt;td&gt;The sequence number of the message to defer.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.defer configKey=&quot;asbReceiverConnection&quot;&gt;
+        &lt;sequenceNumber&gt;${vars.asb_receive_1.payload.sequenceNumber}&lt;/sequenceNumber&gt;
+        &lt;responseVariable&gt;asb_defer_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.defer&gt;
+    ```
+
+??? note &quot;deadLetter&quot;
+    Moves a message to the dead-letter sub-queue with an optional reason and description.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;sequenceNumber&lt;/td&gt;
+        &lt;td&gt;Sequence Number&lt;/td&gt;
+        &lt;td&gt;The sequence number of the message to dead-letter.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;deadLetterReason&lt;/td&gt;
+        &lt;td&gt;Dead Letter Reason&lt;/td&gt;
+        &lt;td&gt;The reason for dead-lettering the message.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;deadLetterErrorDescription&lt;/td&gt;
+        &lt;td&gt;Dead Letter Error Description&lt;/td&gt;
+        &lt;td&gt;A description of the error that caused the message to be dead-lettered.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.deadLetter configKey=&quot;asbReceiverConnection&quot;&gt;
+        &lt;sequenceNumber&gt;${vars.asb_receive_1.payload.sequenceNumber}&lt;/sequenceNumber&gt;
+        &lt;deadLetterReason&gt;Processing failed&lt;/deadLetterReason&gt;
+        &lt;deadLetterErrorDescription&gt;Invalid message format&lt;/deadLetterErrorDescription&gt;
+        &lt;responseVariable&gt;asb_deadLetter_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.deadLetter&gt;
+    ```
+
+??? note &quot;renewLock&quot;
+    Renews the lock on a message to extend the processing time. Only applicable in PEEK_LOCK mode.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;sequenceNumber&lt;/td&gt;
+        &lt;td&gt;Sequence Number&lt;/td&gt;
+        &lt;td&gt;The sequence number of the message whose lock should be renewed.&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.renewLock configKey=&quot;asbReceiverConnection&quot;&gt;
+        &lt;sequenceNumber&gt;${vars.asb_receive_1.payload.sequenceNumber}&lt;/sequenceNumber&gt;
+        &lt;responseVariable&gt;asb_renewLock_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.renewLock&gt;
+    ```
+
+#### Connection Operations
+
+??? note &quot;close (Receiver)&quot;
+    Closes the MessageReceiver connection.
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;th colspan=&quot;5&quot;&gt;Output&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;responseVariable&lt;/td&gt;
+        &lt;td&gt;Response Variable&lt;/td&gt;
+        &lt;td&gt;The name of the variable to store the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;-&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;overwriteBody&lt;/td&gt;
+        &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+        &lt;td&gt;Whether to replace the message body with the operation output.&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+        &lt;td&gt;false&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;asb.close configKey=&quot;asbReceiverConnection&quot;&gt;
+        &lt;responseVariable&gt;asb_close_1&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/asb.close&gt;
+    ```
+</body>
+</html>

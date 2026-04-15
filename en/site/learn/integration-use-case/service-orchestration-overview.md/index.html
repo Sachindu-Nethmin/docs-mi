@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>service-orchestration-overview.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Service Orchestration
+
+Service Orchestration is the process of exposing multiple fine-grained services using a single coarse-grained service. The service client will only have access to a single coarse-grained service, which encapsulates the multiple fine-grained services that are invoked in the process flow.
+&lt;!--
+![service chaining]({{base_path}}/assets/img/integrate/use-cases-overview/service-chaining-new.png)
+--&gt;
+
+There are two distinct types of service orchestration:
+
+- Synchronous service orchestration
+- Asynchronous service orchestration
+
+In both the above orchestration approaches, the WSO2 Integrator: MI can interact with services using two different patterns (depending on the use case):
+
+**Service chaining**
+
+Multiple services that need to be orchestrated are invoked one after the other in a synchronous manner. The input to one service is dependant on the output of another service. Invocation of services and input-output mapping is handled by the service orchestration layer (which is the WSO2 Integrator: MI). 
+
+**Parallel service invocations**
+
+Multiple services are invoked simultaneously without any blocking until a response is received from another service.
+
+&lt;table&gt;
+	&lt;tr&gt;
+		&lt;td&gt;
+			&lt;b&gt;Tutorials&lt;/b&gt;&lt;/br&gt;
+			&lt;ul&gt;
+				&lt;li&gt;
+					&lt;a href=&quot;{{base_path}}/learn/integration-tutorials/exposing-several-services-as-a-single-service&quot;&gt;How to expose several services as a single service&lt;/a&gt;.
+				&lt;/li&gt;
+			&lt;/ul&gt;
+		&lt;/td&gt;
+	&lt;/tr&gt;
+&lt;/table&gt;</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>sf-access-token-generation.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Salesforce Access Token Generation
+
+First, we will create a Salesforce App (Connected App) and obtain the OAuth 2 tokens from the Salesforce REST API.
+
+1. Navigate to the [Salesforce Developer Edition](https://developer.salesforce.com/signup) and create a Salesforce account.
+
+   &lt;img src=&quot;https://apim.docs.wso2.com/en/4.1.0/assets/img/integrate/connectors/salesforce-developer-edition-signup.png&quot; title=&quot;Create Salesforce account&quot; width=&quot;80%&quot;/&gt;
+
+2. Log in to Salesforce after verifying your account with the newly created credentials. In the upper-right corner, select **Setup**.
+
+   &lt;img src=&quot;https://apim.docs.wso2.com/en/4.1.0/assets/img/integrate/connectors/salesforce-account-setup.png&quot; title=&quot;Select setup&quot; width=&quot;60%&quot;/&gt;
+
+3. Navigate to **Apps › App Manager** and click **New Connected App**.  
+
+   &lt;img src=&quot;https://apim.docs.wso2.com/en/4.1.0/assets/img/integrate/connectors/new-connected-app.png&quot; title=&quot;Add new connected app&quot; width=&quot;90%&quot;/&gt;
+
+4. On the **New Connected App** page, fill the required fields:  
+
+   &lt;img src=&quot;https://apim.docs.wso2.com/en/4.1.0/assets/img/integrate/connectors/create-connected-app.png&quot; title=&quot;Create new connected app&quot;/&gt;
+
+    * **Connected App Name**, **API Name**, and **Contact Email** under **Basic Information**.
+    * Under **API (Enable OAuth Settings)**, tick **Enable OAuth Settings**.
+    * **Callback URL**: `https://login.salesforce.com`
+    * **Selected OAuth Scopes**:
+        * *Manage user data via APIs (API)*
+        * *Manage user data via Web browsers (web)*
+        * *Perform requests at any time (refresh_token, offline_access)*
+    * Untick **Require Proof Key for Code Exchange (PKCE)**.
+
+6. Click **Save**.
+
+7. Back in **Apps › App Manager**, click the Connected App you just created, then **View**.
+
+8. Under **API (Enable OAuth Settings)**, copy the **Consumer Key** and **Consumer Secret**.  
+   &lt;img src=&quot;https://apim.docs.wso2.com/en/4.1.0/assets/img/integrate/connectors/connected-app.jpg&quot; title=&quot;Connected app&quot;/&gt;
+
+9. Click **Edit**, and under **OAuth Policies** set **Permitted Users** to **All users may self-authorize**, then **Save**.
+
+10. Obtain an authorization **code**. Replace `&lt;DOMAIN&gt;` with your org’s My Domain name:
+
+    ```
+    https://&lt;DOMAIN&gt;.develop.my.salesforce.com/services/oauth2/authorize?response_type=code&amp;client_id=&lt;CONSUMER_KEY&gt;&amp;redirect_uri=https://login.salesforce.com
+    ```
+
+    After authenticating, you will be redirected to a URL like:
+
+    ```
+    https://login.salesforce.com/?code=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    ```
+
+11. Note the `code` parameter (masked above).
+
+12. Exchange the code for tokens (example shown with all secrets masked):
+
+```bash
+curl --location --request POST \
+  &quot;https://xxxxxxxxxxxxxxxx.develop.my.salesforce.com/services/oauth2/token?code=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&amp;grant_type=authorization_code&amp;client_id=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&amp;client_secret=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX&amp;redirect_uri=https://login.salesforce.com&quot; \
+  --header &quot;Accept: */*&quot; \
+  --header &quot;Accept-Encoding: gzip, deflate&quot; \
+  --header &quot;Cache-Control: no-cache&quot; \
+  --header &quot;Connection: keep-alive&quot; \
+  --header &quot;Content-Length: 0&quot; \
+  --header &quot;Host: xxxxxxxxxxxxxxxx.develop.my.salesforce.com&quot; \
+  --header &quot;User-Agent: PostmanRuntime/7.19.0&quot; \
+  --header &quot;cache-control: no-cache&quot;
+```
+
+12. In Postman, import the request and replace the following placeholders with your own values:
+
+* `code`
+* `client_id`
+* `client_secret`
+
+&lt;img src=&quot;https://apim.docs.wso2.com/en/4.1.0/assets/img/integrate/connectors/postman-connected-app.png&quot; title=&quot;Postman connected app&quot;/&gt;
+</body>
+</html>

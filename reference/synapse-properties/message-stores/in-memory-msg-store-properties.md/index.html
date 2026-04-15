@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>in-memory-msg-store-properties.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># In Memory Message Store
+## Introduction
+This is a basic &lt;b&gt;message store&lt;/b&gt; that stores messages in an in-memory queue. This means that all the stored messages will be lost when the server restarts. The in memory message store is a lot faster than a persistent message store. Therefore, it can be used to temporarily store messages for high-speed &lt;b&gt;store and forward&lt;/b&gt; integrations where message persistence is not a requirement.&lt;/br&gt;&lt;/br&gt;
+
+&lt;b&gt;Note&lt;/b&gt;: In memory message stores are not recommended for use in production as well as in scenarios where large scale message storing is required. You can use an external message store (e.g., &lt;b&gt;JMS message store&lt;/b&gt;) for such scenarios.
+
+## Properties
+
+Listed below are the properties that can be configured when [creating an In-Memory Message Store]({{base_path}}/develop/creating-artifacts/creating-a-message-store/).
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Property&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Message Store Name&lt;/td&gt;
+    &lt;td&gt;A name to identify the In-Memory message store.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Message Store Type&lt;/td&gt;
+    &lt;td&gt;
+      Select &lt;b&gt;In-Memory Message Store&lt;/b&gt; from the drop-down list.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</body>
+</html>

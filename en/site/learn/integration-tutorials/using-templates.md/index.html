@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>using-templates.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Reuse Mediation Sequences
+
+## What you&#x27;ll build
+
+In this sample scenario, you will use a **Sequence Template**
+and reuse it in multiple places of the mediation flow.
+
+## Let&#x27;s get started!
+
+### Step 1: Set up the workspace
+
+{!includes/setting-up-workspace-for-mi-for-vscode.md!}
+
+### Step 2: Develop the integration artifacts
+
+#### Create an integration project
+
+{!includes/create-new-project.md!}
+
+4. In the **Project Creation Form**, enter `UseTemplateTutorial` as the **Project Name**.
+
+5. Provide a location under **Select Project Directory**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/tutorials/using-templates/create-new-project.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/using-templates/create-new-project.png&quot; alt=&quot;create new project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+6. Click **Create**.
+
+#### Create a REST API
+
+1. Go to **MI Project Overview** &gt; **Add Artifact**.
+2. Select **API** under **Create an Integration**.
+3.  Specify values for the required REST API properties:
+
+    &lt;table&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Property&lt;/th&gt;
+        &lt;th&gt;Value&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Name&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;HealthcareAPI&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;
+          The name of the REST API.
+        &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Context&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;/healthcare&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;
+          Here you are anchoring the API in the &lt;code&gt;/healthcare &lt;/code&gt; context. This will become part of the name of the generated URL used by the client when sending requests to the Healthcare service. For example, setting the context to /healthcare means that the API will only handle HTTP requests where the URL path starts with &lt;code&gt;http://host:port/healthcare&lt;code&gt;.
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;                                                                   
+
+4.  Click **Create**. This will open the **Service Designer** interface.
+
+    You can now start configuring the API resource.
+
+5. Click on the `GET` API resource under **Available resources** on the **Service Designer**.
+
+    You will now see the graphical view of the `HealthcareAPI` with its default API Resource.
+
+6. Click the **Edit** icon to edit the API resource.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/tutorials/using-templates/edit-icon.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/using-templates/edit-icon.png&quot; alt=&quot;edit icon&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+4.  Click the new API Resource to access the **Properties** tab and enter the following details:
+
+    &lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Property&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Resource Path&lt;/td&gt;
+        &lt;td&gt;
+            &lt;code&gt;/categories/{category}/reserve&lt;/code&gt;
+        &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Methods&lt;/td&gt;
+        &lt;td&gt;
+            &lt;code&gt;POST&lt;/code&gt; &lt;br&gt; This defines that the API resource only handles requests where the HTTP method is POST.
+        &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;/table&gt;
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/tutorials/using-templates/edit-api-resource.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/using-templates/edit-api-resource.png&quot; alt=&quot;edit API resource&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+8. Click **Update**.
+
+#### Create HTTP connections
+
+In this tutorial, we have three hospital services hosted as the backend:
+
+-   Grand Oak Community Hospital: `http://localhost:9090/grandoaks/`
+-   Clemency Medical Center: `http://localhost:9090/clemency/`
+-   Pine Valley Community Hospital: `http://localhost:9090/pinevalley/`
+
+The request method is `POST` and the format of the request URL expected by the back-end services is as below.
+`http://localhost:9090/grandoaks/categories/{category}/reserve`
+
+Let&#x27;s create three different HTTP connections for the above services.
+
+1. Navigate to the **Project Overview** page.
+
+2. Click on **Add artifact**.
+
+   &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/add-artifact-icon.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/add-artifact-icon.png&quot; alt=&quot;add artifact&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. Click **+ View More** under **Create an Integration**.
+4. Select **Connections** under **Other Artifacts** to open the **Connector Store Form**.
+
+   &lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/connections-artifact.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/connections-artifact.png&quot; alt=&quot;connections artifact&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+5. Select **Http**.
+6. You need to add dependencies to the project, if not added yet.
+7. In the **Add New Connection** form, specify the following values to create the new HTTP connection.
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Property&lt;/th&gt;
+            &lt;th&gt;Value&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Connection Name&lt;/td&gt;
+            &lt;td&gt;
+                &lt;code&gt;GrandOakConn&lt;/code&gt;
+            &lt;/td&gt;
+            &lt;td&gt;
+                The name of the connection represents the Grand Oaks Hospital service.
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Base URL&lt;/td&gt;
+            &lt;td&gt;
+                &lt;code&gt;http://localhost:9090/grandoaks&lt;/code&gt;
+            &lt;/td&gt;
+            &lt;td&gt;
+                The base of the request URL for the back-end service.
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+4.  Click **Create**.
+
+5.  Similarly, create the HTTP connections for the other two hospital services using the URI Templates given below:
+    -   ClemencyConn: `http://localhost:9090/clemency`
+    -   PineValleyConn: `http://localhost:9090/pinevalley`
+
+#### Create a sequence template
+
+1. Navigate to the **Project Overview** page.
+2. Click on the **Add artifact**.
+3. Click **+ View More** under **Create an Integration**.
+4. Select **Template** under **Other Artifacts**.
+2. Next, select the **Sequence Template** from the appeared template artifact menu. 
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-sequence-template/sequence-template-form.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-sequence-template/sequence-template-form.png&quot; alt=&quot;select sequence template&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. In the **Template Artifact** form that appears, specify the following values to create the new sequence template.
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Property&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Template Name&lt;/td&gt;
+            &lt;td&gt;&lt;code&gt;HospitalRoutingSeq&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Parameters&lt;/td&gt;
+            &lt;td&gt;
+                &lt;ol&gt;
+                    &lt;li&gt;Click on **+ Add Parameter**&lt;/li&gt;
+                    &lt;li&gt;In the form that appears, specify the following values to add a parameter&lt;/li&gt;
+                        &lt;ul&gt;
+                            &lt;li&gt;**Parameter**: &lt;code&gt;sethospital&lt;/code&gt;&lt;/li&gt;
+                            &lt;li&gt;**Is Mandatory**: Keep it untick.&lt;/li&gt;
+                            &lt;li&gt;**Default Value**: Keep it empty.&lt;/li&gt;
+                        &lt;/ul&gt;
+                    &lt;li&gt;Click **Save**&lt;/li&gt;
+                &lt;/ol&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/tutorials/using-templates/filled-sequence-template.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/using-templates/filled-sequence-template.png&quot; alt=&quot;Filled sequence template&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+4. Click **Create**. 
+
+5. Navigate to **MI Project Explorer** &gt; **Templates** &gt; **HospitalRoutingSeq**.
+
+6. Add a **Log** mediator by clicking on the **+** in the design view and selecting the **Log** mediator from the palette. This will print a message indicating to which hospital a requested message is routed.
+
+7. In the form that appears specify the following values. 
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Property&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Log Category&lt;/td&gt;
+            &lt;td&gt;`INFO`&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Message&lt;/td&gt;
+            &lt;td&gt;Routing to `${params.functionParams.sethospital}`&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+8. Click **Add**.
+
+#### Update the mediation flow
+
+You can now start configuring the API resource.
+
+1. Navigate to **MI Project Explorer** &gt; **APIs** &gt; **HealthcareAPI** &gt; **/categories/{category}/reserve**.
+
+2. Add a **Variable** mediator by clicking on the **+** sign in the design view and selecting the **Variable** mediator from the palette. This is used to extract the hospital name that is sent in the request payload. In the form that appears, specify the following values. 
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Property&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+        &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;Name&lt;/td&gt;
+         &lt;td&gt;Enter &lt;code&gt;Hospital&lt;/code&gt;.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;Action&lt;/td&gt;
+         &lt;td&gt;Select &lt;code&gt;set&lt;/code&gt;.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;Data Type&lt;/td&gt;
+         &lt;td&gt;Select &lt;code&gt;STRING&lt;/code&gt;.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;Value&lt;/td&gt;
+         &lt;td&gt;
+            &lt;div class=&quot;content-wrapper&quot;&gt;
+              &lt;p&gt;Follow the steps given below to specify the expression value:&lt;/p&gt;
+            &lt;ol&gt;
+                &lt;li&gt;Click the &lt;b&gt;Ex&lt;/b&gt; button in the &lt;b&gt;Value&lt;/b&gt; field. This specifies the value type as an &lt;i&gt;expression&lt;/i&gt;.&lt;/li&gt;
+               &lt;li&gt;Enter &lt;code&gt;payload.hospital&lt;/code&gt; as the expression value.&lt;/li&gt;
+            &lt;/ol&gt;
+               &lt;b&gt;Note&lt;/b&gt;:
+               This is the synapse expression that will extract the hospital from the request payload.
+            &lt;/div&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+
+3.  Add a **Switch** mediator by clicking the **+** sign after the **Variable** mediator, and selecting **Switch** mediator from the palette. In the form that appears, specify the following values.
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Property&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Expression&lt;/td&gt;
+            &lt;td&gt;
+                &lt;p&gt;The &lt;strong&gt;Expression&lt;/strong&gt; field is where we specify the synapse expression, which obtains the value of the Hospital that we stored in the Variable mediator.&lt;/p&gt;
+                &lt;p&gt;Follow the steps given below to specify the expression:&lt;/p&gt;
+                &lt;ol&gt;
+                    &lt;li&gt;Click &lt;b&gt;Ex&lt;/b&gt; button in the &lt;b&gt;Value&lt;/b&gt; field towards the end&lt;/li&gt;
+                    &lt;li&gt;Enter &lt;code&gt;vars.Hospital&lt;/code&gt;&lt;/li&gt;
+                &lt;/ol&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Cases&lt;/td&gt;
+            &lt;td&gt;
+                &lt;p&gt;You can use &lt;b&gt;+ Add new case&lt;/b&gt; button to add case branches&lt;/p&gt;
+                &lt;ol&gt;
+                    &lt;li&gt;Case 1: Click on &lt;b&gt;+ Add new case&lt;/b&gt; and specify &lt;b&gt;Case Regex&lt;/b&gt; as &lt;code&gt;grand oak community hospital&lt;/code&gt;&lt;/li&gt;
+                    &lt;li&gt;Case 2: Click on &lt;b&gt;+ Add new case&lt;/b&gt; and specify &lt;b&gt;Case Regex&lt;/b&gt; as &lt;code&gt;clemency medical center&lt;/code&gt;&lt;/li&gt;
+                    &lt;li&gt;Case 3: Click on &lt;b&gt;+ Add new case&lt;/b&gt; and specify &lt;b&gt;Case Regex&lt;/b&gt; as &lt;code&gt;pine valley community hospital&lt;/code&gt;&lt;/li&gt;
+                &lt;/ol&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/tutorials/using-templates/add-switch-mediator.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/using-templates/add-switch-mediator.png&quot; alt=&quot;Add switch mediator&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+4. Add a **Call Template** mediator to each case branch by clicking the **+** sign in each case branch, and selecting **Call Template** mediator from the palette. In the form that appears, specify the following values.
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;&lt;/th&gt;
+            &lt;th&gt;Case 1&lt;/th&gt;
+            &lt;th&gt;Case 2&lt;/th&gt;
+            &lt;th&gt;Case 3&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Target Template&lt;/td&gt;
+            &lt;td&gt;Select &lt;code&gt;HospitalRoutingSeq&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Select &lt;code&gt;HospitalRoutingSeq&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Select &lt;code&gt;HospitalRoutingSeq&lt;/code&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Call-Template Parameter&lt;/td&gt;
+            &lt;td&gt;
+                Click on &lt;b&gt;+ Add Parameter&lt;/b&gt; button, and specify the following values.
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;Parameter Name&lt;/b&gt;: &lt;code&gt;sethospital&lt;/code&gt;&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Parameter Value&lt;/b&gt;: &lt;code&gt;grandoaks&lt;/code&gt;&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;
+                Click on &lt;b&gt;+ Add Parameter&lt;/b&gt; button, and specify the following values.
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;Parameter Name&lt;/b&gt;: &lt;code&gt;sethospital&lt;/code&gt;&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Parameter Value&lt;/b&gt;: &lt;code&gt;clemency&lt;/code&gt;&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;
+                Click on &lt;b&gt;+ Add Parameter&lt;/b&gt; button, and specify the following values.
+                &lt;ul&gt;
+                    &lt;li&gt;&lt;b&gt;Parameter Name&lt;/b&gt;: &lt;code&gt;sethospital&lt;/code&gt;&lt;/li&gt;
+                    &lt;li&gt;&lt;b&gt;Parameter Value&lt;/b&gt;: &lt;code&gt;pinevalley&lt;/code&gt;&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+5. Add an HTTP **POST** operation by clicking the **+** sign after the **Call Template** mediator in each case branch. In the form that appears, specify the following values.
+
+    &lt;table&gt;
+        &lt;thead&gt;
+            &lt;tr&gt;
+                &lt;th&gt;&lt;/th&gt;
+                &lt;th&gt;Case 1&lt;/th&gt;
+                &lt;th&gt;Case 2&lt;/th&gt;
+                &lt;th&gt;Case 3&lt;/th&gt;
+            &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+            &lt;tr&gt;
+                &lt;td&gt;Connection&lt;/td&gt;
+                &lt;td&gt;&lt;code&gt;GrandOakConn&lt;/code&gt;&lt;/td&gt;
+                &lt;td&gt;&lt;code&gt;ClemencyConn&lt;/code&gt;&lt;/td&gt;
+                &lt;td&gt;&lt;code&gt;PineValleyConn&lt;/code&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+                &lt;td&gt;Relative Path&lt;/td&gt;
+                &lt;td&gt;Enter &lt;code&gt;/categories/\${params.uriParams.category}/reserve&lt;/code&gt;&lt;/td&gt;
+                &lt;td&gt;Enter &lt;code&gt;/categories/\${params.uriParams.category}/reserve&lt;/code&gt;&lt;/td&gt;
+                &lt;td&gt;Enter &lt;code&gt;/categories/\${params.uriParams.category}/reserve&lt;/code&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+                &lt;td&gt;Content Type&lt;/td&gt;
+                &lt;td&gt;Select &lt;code&gt;JSON&lt;/code&gt;&lt;/td&gt;
+                &lt;td&gt;Select &lt;code&gt;JSON&lt;/code&gt;&lt;/td&gt;
+                &lt;td&gt;Select &lt;code&gt;JSON&lt;/code&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+                &lt;td&gt;Request Body&lt;/td&gt;
+                &lt;td&gt;Enter &lt;code&gt;\${payload}&lt;/code&gt;&lt;/td&gt;
+                &lt;td&gt;Enter &lt;code&gt;\${payload}&lt;/code&gt;&lt;/td&gt;
+                &lt;td&gt;Enter &lt;code&gt;\${payload}&lt;/code&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/tbody&gt;
+    &lt;/table&gt;
+
+
+6. Add a **Respond** mediator by clicking the **+** sign after the **Switch** mediator. It will return the response from the health care service back to the client.
+
+&lt;a href=&quot;{{base_path}}/assets/img/integrate/tutorials/using-templates/design-view.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/tutorials/using-templates/design-view.png&quot; alt=&quot;Complete design view&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+### Step 3: Build and run the artifacts
+
+{!includes/build-and-run-artifacts.md!}
+
+The artifacts will be deployed in the embedded WSO2 Integrator: MI and the server will start.
+
+- See the startup log in the **Console** tab.
+- See the URLs of the deployed services and APIs in the **Runtime Services** tab. 
+
+### Step 4: Test the use case
+
+Let&#x27;s test the use case by sending a simple client request that invokes the service.
+
+#### Start the back-end service
+
+1. Download the JAR file of the back-end service from [here](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/Hospital-Service-JDK11-2.0.0.jar).
+2. Open a terminal, and navigate to the location where you saved the back-end service.
+3. Execute the following command to start the service:
+
+    ```bash
+    java -jar Hospital-Service-JDK11-2.0.0.jar
+    ```
+
+#### Send the client request
+
+Let&#x27;s send a simple request to invoke the service. You can use Postman or any other **HTTP Client**.
+
+1. Open the Postman application. If you do not have the application, download it from here : [Postman](https://www.postman.com/downloads/)
+
+2. Add the request information as given below and click the &lt;b&gt;Send&lt;/b&gt; button.
+    
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Method&lt;/th&gt;
+            &lt;td&gt;
+               &lt;code&gt;POST&lt;/code&gt; 
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Headers&lt;/th&gt;
+            &lt;td&gt;
+              &lt;code&gt;Content-Type=application/json&lt;/code&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th&gt;URL&lt;/th&gt;
+            &lt;td&gt;&lt;code&gt;http://localhost:8290/healthcare/categories/surgery/reserve&lt;/code&gt;&lt;/br&gt;&lt;/br&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Body&lt;/th&gt;
+            &lt;td&gt;
+            &lt;div&gt;
+              &lt;code&gt;
+                {
+                    &quot;patient&quot;: {
+                        &quot;name&quot;: &quot;John Doe&quot;,
+                        &quot;dob&quot;: &quot;1940-03-19&quot;,
+                        &quot;ssn&quot;: &quot;234-23-5253&quot;,
+                        &quot;address&quot;: &quot;California&quot;,
+                        &quot;phone&quot;: &quot;8770586755&quot;,
+                        &quot;email&quot;: &quot;johndoe@gmail.com&quot;
+                    },
+                    &quot;doctor&quot;: &quot;thomas collins&quot;,
+                    &quot;hospital_id&quot;: &quot;grandoaks&quot;,
+                    &quot;hospital&quot;: &quot;grand oak community hospital&quot;,
+                    &quot;cardNo&quot;: &quot;7844481124110331&quot;,
+                    &quot;appointment_date&quot;: &quot;2025-04-02&quot;
+                }
+              &lt;/code&gt;
+            &lt;/div&gt;&lt;/br&gt;
+            &lt;ul&gt;
+              &lt;li&gt;
+                This JSON payload contains details of the appointment reservation, which includes patient details, doctor, hospital, and data of appointment.
+              &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/tr&gt;
+     &lt;/table&gt;
+
+     &lt;br/&gt;&lt;br/&gt;
+     &lt;video src=&quot;{{base_path}}/assets/vids/surgery-reserve.webm&quot; width=&quot;720&quot; height=&quot;480&quot; controls&gt;&lt;/video&gt;
+     &lt;br/&gt;&lt;br/&gt;
+     
+If you want to send the client request from your terminal:
+
+1.  Install and set up [cURL](https://curl.haxx.se/) as your REST client.
+2.  Create a JSON file named `request.json` with the following request payload.
+
+    ```json
+    {
+        &quot;patient&quot;: {
+            &quot;name&quot;: &quot;John Doe&quot;,
+            &quot;dob&quot;: &quot;1940-03-19&quot;,
+            &quot;ssn&quot;: &quot;234-23-5253&quot;,
+            &quot;address&quot;: &quot;California&quot;,
+            &quot;phone&quot;: &quot;8770586755&quot;,
+            &quot;email&quot;: &quot;johndoe@gmail.com&quot;
+        },
+        &quot;doctor&quot;: &quot;thomas collins&quot;,
+        &quot;hospital_id&quot;: &quot;grandoaks&quot;,
+        &quot;hospital&quot;: &quot;grand oak community hospital&quot;,
+        &quot;cardNo&quot;: &quot;7844481124110331&quot;,
+        &quot;appointment_date&quot;: &quot;2025-04-02&quot;
+    }
+    ```
+
+3.  Open a command line terminal and execute the following command from
+    the location where the request.json file you created is saved:
+
+    ```bash
+    curl -X POST -H &quot;Content-Type: application/json&quot; --data @request.json http://localhost:8290/healthcare/categories/surgery/reserve
+    ```
+
+#### Analyze the response
+
+You will see the following response received to your &lt;b&gt;HTTP Client&lt;/b&gt;:
+
+```json
+{
+    &quot;appointmentNumber&quot;: 1,
+    &quot;doctor&quot;: {
+        &quot;name&quot;: &quot;thomas collins&quot;,
+        &quot;hospital&quot;: &quot;grand oak community hospital&quot;,
+        &quot;category&quot;: &quot;surgery&quot;,
+        &quot;availability&quot;: &quot;9.00 a.m - 11.00 a.m&quot;,
+        &quot;fee&quot;: 7000.0
+    },
+    &quot;patient&quot;: {
+        &quot;name&quot;: &quot;John Doe&quot;,
+        &quot;dob&quot;: &quot;1940-03-19&quot;,
+        &quot;ssn&quot;: &quot;234-23-5253&quot;,
+        &quot;address&quot;: &quot;California&quot;,
+        &quot;phone&quot;: &quot;8770586755&quot;,
+        &quot;email&quot;: &quot;johndoe@gmail.com&quot;
+    },
+    &quot;fee&quot;: 7000.0,
+    &quot;confirmed&quot;: false
+}
+```
+
+Now check the **Console** tab and you will see the following message: 
+
+`INFO {LogMediator} - {api:HealthcareAPI} To: /healthcare/categories/surgery/reserve, MessageID: urn:uuid:cb0ccafb-8880-44cb-9cb8-23c068a893b4, correlation_id: cb0ccafb-8880-44cb-9cb8-23c068a893b4, Direction: request, message = Routing to grand oak community hospital`.
+
+This is the message printed by the Log mediator when the message from the client is routed to the relevant endpoint in the switch mediator.
+</body>
+</html>

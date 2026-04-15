@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>switching-from-jms-to-http.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Switch from JMS to HTTP(S)
+
+This example demonstrates how the WSO2 Integrator: MI receives messages over the JMS transport and forwards them over an HTTP/S transport. In this sample, the client sends a request message to the proxy service exposed in JMS. The WSO2 Integrator: MI forwards this message to the HTTP endpoint and returns the reply to the client through a JMS temporary queue.
+
+## Synapse configuration
+
+Following are the integration artifacts (proxy service) that we can use to implement this scenario. See the instructions on how to [build and run](#build-and-run) this example.
+
+=== &quot;Proxy Service&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy name=&quot;JMStoHTTPStockQuoteProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;jms&quot;
+        xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot; /&gt;
+                &lt;call&gt;
+                    &lt;endpoint key=&quot;SimpleStockQuoteService&quot; /&gt;
+                &lt;/call&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence/&gt;
+        &lt;/target&gt;
+        &lt;parameter name=&quot;transport.jms.ContentType&quot;&gt;
+            &lt;rules&gt;
+                &lt;jmsProperty&gt;contentType&lt;/jmsProperty&gt;
+                &lt;default&gt;text/xml&lt;/default&gt;
+            &lt;/rules&gt;
+        &lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.jms.Destination&quot;&gt;Queue1&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.jms.ConnectionFactory&quot;&gt;myQueueListener&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;Endpoint&quot;
+    ```xml
+    &lt;endpoint name=&quot;SimpleStockQuoteService&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+       &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+    &lt;/endpoint&gt;
+    ```
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}.
+3. Create the [proxy service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service) with the configurations given above.
+4. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+5. Start the selected message broker and create a queue named &lt;strong&gt;Queue1&lt;/strong&gt;. 
+6. [Configure MI with the selected message broker]({{base_path}}/install-and-setup/setup/brokers/configure-with-activemq) and start the Micro-Integrator.
+
+Set up the back-end service:
+
+1. Download the [back-end service](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/axis2Server.zip).
+2. Extract the downloaded zip file.
+3. Open a terminal and navigate to the `axis2Server/bin/` directory inside the extracted folder.
+4. Execute the following command to start the axis2server with the SimpleStockQuote back-end service:
+  
+    === &quot;On MacOS/Linux&quot; 
+          ```bash 
+          sh axis2server.sh
+          ```
+    === &quot;On Windows&quot;
+          ```bash 
+          axis2server.bat
+          ```
+
+Publish the following XML message to the Queue1.
+```xml
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+   &lt;soapenv:Header/&gt;
+   &lt;soapenv:Body&gt;
+   	&lt;m0:placeOrder xmlns:m0=&quot;http://services.samples&quot;&gt;
+	    &lt;m0:order&gt;
+	        &lt;m0:price&gt;172.23182849731984&lt;/m0:price&gt;
+	        &lt;m0:quantity&gt;18398&lt;/m0:quantity&gt;
+	        &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+	    &lt;/m0:order&gt;
+	&lt;/m0:placeOrder&gt;
+   &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+```
+</body>
+</html>

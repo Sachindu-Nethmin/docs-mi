@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>datasource-configuration-parameters.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Datasource Parameters
+
+The datasource configuration in a data service specifies how the service connects to the datasource. The datasource connection parameters you can use depends on the type of datasource you are exposing.
+
+## RDBMS Connection parameters
+
+Shown below is the synapse configuration of an RDBMS datasource in a data service. See the complete list of [JDBC connection pool parameters](http://tomcat.apache.org/tomcat-7.0-doc/jdbc-pool.html) and the [DBCP configuration guide](http://commons.apache.org/proper/commons-dbcp/configuration.html) for more details.
+
+!!! Note
+      The default values of the following parameters might not be optimal for the specific hardware/server configurations in your environment. We recommend that you carry out load tests in your environment to tune them accordingly. See [Tuning Datasource Configuration Parameters]({{base_path}}/install-and-setup/setup/performance-tuning/jdbc-tuning) for information on how you can select the best values for these parameters.
+
+```toml
+&lt;data name=&quot;RDBMSDataService&quot; serviceStatus=&quot;inactive&quot; transports=&quot;http https local&quot;&gt;
+   &lt;config enableOData=&quot;false&quot; id=&quot;data&quot;&gt;
+      &lt;property name=&quot;driverClassName&quot;&gt;com.mysql.jdbc.Driver&lt;/property&gt;
+      &lt;property name=&quot;url&quot;&gt;jdbc:mysql://[machine-name/ip]:[port]/[database-name]&lt;/property&gt;
+      &lt;property name=&quot;defaultTransactionIsolation&quot;&gt;TRANSACTION_NONE&lt;/property&gt;
+      &lt;property name=&quot;initialSize&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;maxActive&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;minIdle&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;maxIdle&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;maxWait&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;validationQuery&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;timeBetweenEvictionRunsMillis&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;numTestsPerEvictionRun&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;minEvictableIdleTimeMillis&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;removeAbandonedTimeout&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;defaultCatalog&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;validatorClassName&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;connectionProperties&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;initSQL&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;jdbcInterceptors&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;validationInterval&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;abandonWhenPercentageFull&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;maxAge&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;suspectTimeout&quot;&gt;&lt;/property&gt;
+      &lt;property name=&quot;validationQueryTimeout&quot;&gt;&lt;/property&gt;
+   &lt;/config&gt;
+&lt;/data&gt;
+```</body>
+</html>

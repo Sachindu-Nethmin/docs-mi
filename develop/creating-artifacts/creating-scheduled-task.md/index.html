@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>creating-scheduled-task.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Create a Scheduled trigger (Task)
+
+Follow the instructions below to create a Scheduled trigger in the WSO2 Integrator: MI for Visual Studio Code (MI for VS Code) extension.
+
+## Create a Scheduled trigger artifact
+
+{!includes/creating-project.md!}
+
+    Hereafter, this project will be referred to as `&lt;PROJECT_NAME&gt;`.
+
+3. To add a new Scheduled trigger, navigate to **WSO2 Integrator: MI Project Explorer**.
+
+4. Click on the **+** icon to open the **Add Artifact** pane.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/add-artifact-icon.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/add-artifact-icon.png&quot; alt=&quot;add artifact&quot; width=&quot;40%&quot;&gt;&lt;/a&gt;
+
+5. On the **Add artifact** pane, click **Automation** under **Create an Integration** to open the **Task Form**.
+
+6. Specify values for the [required parameters]({{base_path}}/reference/synapse-properties/scheduled-task-properties) for the Scheduled trigger.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-scheduled-tasks/create-new-scheduled-task.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-scheduled-tasks/create-new-scheduled-task.png&quot; alt=&quot;create new Scheduled trigger&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+The created Scheduled trigger will be available in **Project Overview** under **Automation**.
+
+!!! info
+    You can switch to the default Visual Studio Code Explorer to view the folder structure.
+
+    The newly-created task will be stored in the `&lt;PROJECT_NAME&gt;/src/main/wso2mi/artifacts/tasks` folder of your integration project.
+
+## Update configurations
+
+You can later update the task configurations to specify the incoming message that should trigger the task and the destination where the message should be injected.
+
+1. Go to **MI Project Explorer**.
+
+2. Under **Automation**, select the task you want to edit.
+
+3. This will open the **Task View**.
+
+4. Click the pen icon next to the task name.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-scheduled-tasks/edit-scheduled-task.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-scheduled-tasks/edit-scheduled-task.png&quot; alt=&quot;create new Scheduled trigger&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+5. Update task configurations.
+
+6. Click **Update**.
+
+!!! info
+    See the [Scheduled triggers Property Catalog]({{base_path}}/reference/synapse-properties/scheduled-task-properties/) documentation for a list of all available configurations for tasks.
+
+## Tutorials
+
+Follow our tutorial on Scheduled triggers:
+
+- [Periodically execute an integration process]({{base_path}}/learn/integration-tutorials/using-scheduled-tasks) using a Scheduled trigger
+
+## Examples
+
+Follow our examples on Scheduled triggers:     
+
+- [Task Scheduling using a Simple Trigger]({{base_path}}/learn/examples/scheduled-tasks/task-scheduling-simple-trigger)
+- [Inject Messages to a RESTful Endpoint]({{base_path}}/learn/examples/scheduled-tasks/injecting-messages-to-rest-endpoint)
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ldap-connector-example.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>---
+search:
+  boost: 2
+---
+
+# LDAP Connector Example
+
+Given below is a sample scenario that demonstrates how to perform CRUD operations on LDAP entries using LDAP Connector.
+
+## What you&#x27;ll build
+
+This example demonstrates on how to use the LDAP connector to create and read LDAP entries on a student directory. 
+    ![image]({{base_path}}/assets/img/integrate/connectors/ldap_connector/ldap_connector_usecase.png)
+
+This will have 2 API resources, `create`, `search`.
+
+* `/create`: This will create a new LDAP entry in the LDAP server.
+
+* `/search`: This will perform a search for one or more LDAP entities with the specified search keys.
+
+If you do not want to configure this yourself, you can simply [get the project](#get-the-project) and run it.
+
+## Set up the integration project
+
+Before you begin, see [Setting up LDAP]({{base_path}}/reference/connectors/ldap-connector/setting-up-ldap/) if you need to set up an LDAP and try this out. 
+
+Follow the steps in the [create integration project]({{base_path}}/develop/create-integration-project/) guide to set up the Integration Project.
+
+## Create a connection
+
+1. In the Design View, click the **+** button and select **Connection**.
+2. In the search bar, type `ldap` and select the `Ldap Connector` from the list.
+3. In the connection configuration pane, set the **Connection Name** to `ServiceNowConnection` and fill in the required details:
+    - **Provider URL**: The URL of the LDAP server. For example, `ldap://localhost:10389/`.
+    - **Username**: The username of the ldap account.
+    - **Password**: The password of the ldap account.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/ldap_connector/add-new-connection.png&quot; title=&quot;Adding new connection&quot; height=&quot;100&quot; width=&quot;500&quot; alt=&quot;Adding new connection&quot;/&gt;
+
+## Create an API
+
+1. In the Design View, click the **+** button and select **API** in create an integration project pane.
+
+2. Enter the API Name as `college_student_api` and the Context as `/student`, then click **Create**.
+
+3. To add the Ldap connector:
+    - In the **Design View**, click the **+** button.
+    - In the **Mediator** section, search for `ldap`.
+    - Select the **Ldap** connector and click **Download**.
+
+## Implement the API
+1. Go to the **Source View** of the API by clicking on the **&lt;&gt;** icon in the top right corner of the **Design View**.
+2. Copy and paste the following code in the **Source View** of the API.
+
+??? note &quot;Source view of the implemented resource&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;api context=&quot;/student&quot; name=&quot;college_student_api&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;resource methods=&quot;POST&quot; url-mapping=&quot;/create&quot;&gt;
+            &lt;inSequence&gt;
+                &lt;ldap.addEntry configKey=&quot;LDAP_Connection&quot;&gt;
+                    &lt;objectClass&gt;inetOrgPerson&lt;/objectClass&gt;
+                    &lt;attributes&gt;&#x27;{
+                    &quot;mail&quot;: &quot;triss@wso2.com&quot;,
+                    &quot;userPassword&quot;: &quot;geralt&amp;amp;triss&quot;,
+                    &quot;sn&quot;: &quot;dim&quot;,
+                    &quot;cn&quot;: &quot;dim&quot;,
+                    &quot;manager&quot;: &quot;cn=geralt,ou=Groups,dc=example,dc=com&quot;
+                    }&#x27;&lt;/attributes&gt;
+                    &lt;dn&gt;{${payload.dn}}&lt;/dn&gt;
+                    &lt;responseVariable&gt;ldap_addEntry_1&lt;/responseVariable&gt;
+                    &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+                &lt;/ldap.addEntry&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence&gt;
+            &lt;/faultSequence&gt;
+        &lt;/resource&gt;
+        &lt;resource methods=&quot;POST&quot; url-mapping=&quot;/search&quot;&gt;
+            &lt;inSequence&gt;
+                &lt;ldap.searchEntry configKey=&quot;LDAP_Connection&quot;&gt;
+                    &lt;onlyOneReference&gt;false&lt;/onlyOneReference&gt;
+                    &lt;objectClass&gt;inetOrgPerson&lt;/objectClass&gt;
+                    &lt;limit&gt;10&lt;/limit&gt;
+                    &lt;scope&gt;&lt;/scope&gt;
+                    &lt;filters&gt;&#x27;{
+                    &quot;manager&quot;: &quot;cn=geralt,ou=Groups,dc=example,dc=com&quot;
+                    }&#x27;&lt;/filters&gt;
+                    &lt;dn&gt;{${payload.dn}}&lt;/dn&gt;
+                    &lt;attributes&gt;mail,uid&lt;/attributes&gt;
+                    &lt;allowEmptySearchResult&gt;true&lt;/allowEmptySearchResult&gt;
+                    &lt;responseVariable&gt;ldap_searchEntry_1&lt;/responseVariable&gt;
+                    &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+                &lt;/ldap.searchEntry&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence&gt;
+            &lt;/faultSequence&gt;
+        &lt;/resource&gt;
+    &lt;/api&gt;
+    ```
+
+## Get the project
+
+You can download the ZIP file and extract the contents to get the project code.
+
+&lt;a href=&quot;{{base_path}}/assets/attachments/connectors/ldap_connector_project.zip&quot;&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+&lt;/a&gt;
+
+## Deployment
+
+To deploy and run the project, refer to the [Build and Run]({{base_path}}/develop/deploy-artifacts/#build-and-run) guide.
+
+## Testing
+
+Invoke the API as shown below using the MI VSCode Extension.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/common/runtime-services.png&quot; title=&quot;Runtime services&quot; width=&quot;600&quot; alt=&quot;Runtime services&quot;/&gt;
+
+### Create ldap entry
+
+**Sample request**:
+
+
+- Content-Type: `application/json`
+- Request body:
+    ```json
+      {
+          &quot;dn&quot;: &quot;ou=people,dc=mycompany,dc=com&quot;
+      }
+    ```
+
+**Expected Response** :
+1. You should get a &#x27;Success&#x27; response.
+   ```json
+   {
+       &quot;result&quot;: {
+         &quot;message&quot;: &quot;Success&quot;
+       }
+   }
+   ```
+2. Open Apache Directory Studio and category DIT (Directory Information Tree) shows the hierarchical content of the
+   directory. Expand, and collapse the tree and you will see the new entries. Select the entry and you will see its attributes
+   and values on Entry Editor.
+   ![image]({{base_path}}/assets/img/integrate/connectors/ldap_connector/directory-studio-view.png)
+
+
+### Search ldap entries
+
+**Expected Response**:
+
+**Sample request**:
+
+- Content-Type: `application/json`
+- Request body:
+    ```json
+    {
+        &quot;dn&quot;: &quot;ou=people,dc=mycompany,dc=com&quot;
+    } 
+    ```
+
+**Expected Response** :
+
+You should get all entries that match with the provided filter. A sample response is as follows.
+```json
+{
+  &quot;result&quot;: {
+    &quot;entry&quot;: {
+      &quot;dn&quot;: &quot;ou=people,dc=mycompany,dc=com&quot;,
+      &quot;mail&quot;: &quot;triss@wso2.com&quot;
+    }
+  }
+}
+```
+## What&#x27;s Next
+
+* To customize this example for your own scenario, see [LDAP Connector Configuration]({{base_path}}/reference/connectors/ldap-connector/ldap-server-configuration/) documentation for all operation details of the connector.
+</body>
+</html>

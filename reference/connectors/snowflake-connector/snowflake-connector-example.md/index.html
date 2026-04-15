@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>snowflake-connector-example.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Snowflake connector example
+
+The Snowflake Connector allows you to access the [Snowflake JDBC Driver API](https://docs.snowflake.com/developer-guide/jdbc/jdbc) from an integration sequence. This provides functionalities to execute a set of standard Snowflake DDL, DML, and query commands. You can use the connector to perform query, execute, and batch-execute operations on Snowflake databases. 
+
+## What you&#x27;ll build
+
+This example demonstrates how to use the Snowflake Connector for querying, inserting, batch-inserting, and deleting data in a Snowflake database. Let&#x27;s consider a use case involving a hotel database for managing reservations. Within the hotel database, there is a table named RESERVATIONS that stores reservation details.
+
+1. Insert a single record into the Snowflake database.
+2. Insert multiple records into the Snowflake database.
+3. Query data from the Snowflake database.
+4. Delete data from the Snowflake database.
+
+All operations are exposed via an API. The API with the context `/snowflakeconnector` has 4 resources.
+
+* `/insertReservation`: Insert a single reservation into the Snowflake database.
+* `/insertReservationBatch`: Insert a batch of reservations to the Snowflake database.
+* `/getReservationInfo`: Retrieve all the reservations from the Snowflake database.
+* `/deleteReservation`: Delete a reservation from the Snowflake database.
+
+## Before you begin
+
+Before you begin, you must have a valid Snowflake account. To use the Snowflake database, you must have a valid Snowflake account. To create a snowflake account, please visit the official Snowflake website and complete the registration process. Once registered you will obtain a username and password with which you can log in to your Snowflake account, and the account identifier which is the unique identifier for your Snowflake account within your business entity and the Snowflake network.
+
+1. Create a database named `HOTEL_DB` in Snowflake.
+2. Select the `PUBLIC` schema and create a table named `RESERVATIONS` with the following columns.
+
+```sql
+create table RESERVATIONS (
+   NICNUMBER String,
+   FIRSTNAME String,
+   LASTNAME String,
+   CHECKIN String,
+   CHECKOUT String,
+   ADULTS INT,
+   CHILDREN INT,
+   ROOMTYPE String,
+   SPECIALREQUESTS String
+)
+```
+
+If you do not want to configure this yourself, you can simply [get the project](#get-the-project) and run it.
+
+### Set up the integration project
+
+Follow the steps in the [create integration project]({{base_path}}/develop/create-integration-project/) guide to set up the Integration Project.
+
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/snowflake_connector/snowflake-conn-create-project.png&quot; title=&quot;Create new Integration Project&quot; width=&quot;800&quot; alt=&quot;Create new Integration Project&quot;/&gt;
+
+
+### Add integration logic
+
+First, create a REST API called `SnowflakeConnectorApi` in your project.
+
+| Name | Context |
+| ---------------- | ---------------- |
+| SnowflakeConnectorApi  | /snowflakeconnector  |
+
+Create the following resources in the &#x27;SnowflakeConnectorApi&#x27; REST API.
+
+| uri-template               | method  |
+|----------------------------|-------- |
+| `/insertReservation`         | POST    |
+| `/getReservationInfo`        | GET     |
+| `/insertReservationBatch`    | POST    |
+| `/deleteReservation/{NICNUMBER}`         | DELETE  |
+
+Let&#x27;s add the operations to the resources in the `SnowflakeConnectorApi` API.
+
+#### - /insertReservation
+
+Users can utilize this resource to insert a single record into the Snowflake database. The user will send the reservation payload in the request body.
+
+1. In the API insequence add the [Property Mediator]({{base_path}}/reference/mediators/property-mediator/) to extract the payload from the request body. Let&#x27;s store the payload in a property named `payload`.
+    ```xml
+      &lt;property expression=&quot;json-eval($)&quot; name=&quot;payload&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+   ```
+
+2. Add the `execute` operation from the **SnowflakeConnector** section.
+
+      &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/snowflake_connector/snowflake-conn-execute-operation.png&quot; title=&quot;Add execute operation from connector&quot; width=&quot;800&quot; alt=&quot;Add execute operation from connector&quot;/&gt;
+      
+      1. Then in the appearing window, you see an option to add a new connection. Click on `Add new connection` to initiate a new Snowflake Connection. 
+         
+         &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/snowflake_connector/snowflake-conn-connection-config.png&quot; title=&quot;Snowflake Connection Config&quot; width=&quot;400&quot; alt=&quot;Snowflake Connection Config&quot;/&gt;
+         
+         1. In the **Connection Configurations** section give a name for `Snowflake Connection`.
+         2. Provide your Snowflake Account Identifier in the `Account Identifier` text box.
+         3. Provide your Snowflake username in the `Username` text box.
+         4. Provide your Snowflake password in the `Password` text box.
+         5. Click **Add**.
+      
+      2. Select the created connection for the `execute` operation. 
+      3. In the `Execute Query` text box, enter the following query.
+         ```sql
+         INSERT INTO HOTEL_DB.PUBLIC.RESERVATIONS (NICNUMBER, FIRSTNAME, LASTNAME, CHECKIN, CHECKOUT, ADULTS, CHILDREN, ROOMTYPE, SPECIALREQUESTS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ```
+      4. For the `Payload` text box, enter `$ctx:payload` as an expression.
+         
+         &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/snowflake_connector/snowflake-conn-execute-config.png&quot; title=&quot;Execute Config&quot; width=&quot;400&quot; alt=&quot;Snowflake Execute Config&quot;/&gt;
+
+         ```xml
+         &lt;snowflake.execute configKey=&quot;SNOWFLAKE_CONNECTION&quot;&gt;
+            &lt;executeQuery&gt;INSERT INTO HOTEL_DB.PUBLIC.RESERVATIONS (NICNUMBER, FIRSTNAME, LASTNAME, CHECKIN, CHECKOUT, ADULTS, CHILDREN, ROOMTYPE, SPECIALREQUESTS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)&lt;/executeQuery&gt;
+            &lt;payload&gt;{$ctx:payload}&lt;/payload&gt;
+         &lt;/snowflake.execute&gt;
+         ```
+
+3. Add the [Respond Mediator]({{base_path}}/reference/mediators/respond-mediator/) to send back the response.
+   
+#### - /getReservationInfo
+
+Using this resource users retrieve all records from table `Reservations` of `HOTEL_DB`.
+
+1. Add the `query` operation from the **SnowflakeConnector** section.
+
+      &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/snowflake_connector/snowflake-conn-query-operation.png&quot; title=&quot;Snowflake query operation&quot; width=&quot;800&quot; alt=&quot;Snowflake query operation&quot;/&gt;
+
+      1. Select the Snowflake connection configuration you created.
+      2. In the `Sql Query` text box, enter the following query.
+      
+         ```sql
+         SELECT * FROM HOTEL_DB.PUBLIC.RESERVATIONS
+         ```
+
+         &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/snowflake_connector/snowflake-conn-query-config.png&quot; title=&quot;Snowflake query configuration&quot; width=&quot;400&quot; alt=&quot;Snowflake query configuration&quot;/&gt;
+
+         ```xml
+         &lt;snowflake.query configKey=&quot;SNOWFLAKE_CONNECTION&quot;&gt;
+            &lt;query&gt;SELECT * FROM HOTEL_DB.PUBLIC.RESERVATIONS&lt;/query&gt;
+         &lt;/snowflake.query&gt;
+         ```
+
+2. Add the [Property Mediator]({{base_path}}/reference/mediators/property-mediator/) and set the Property name as `messageType` and the value as `application/json`. This is added so that the response will be in JSON.
+   ```xml
+    &lt;property name=&quot;messageType&quot; scope=&quot;axis2&quot; type=&quot;STRING&quot; value=&quot;application/json&quot;/&gt;
+   ```
+3. Add the [Respond Mediator]({{base_path}}/reference/mediators/respond-mediator/) to send back the response.
+
+#### - /insertReservationBatch
+
+Using this resource users can insert multiple records into the table `Reservations` of `HOTEL_DB`. The user will send the bulk payload in the request body.
+
+1. In the API insequence add the [Property Mediator]({{base_path}}/reference/mediators/property-mediator/) to extract the payload from the request body. Let&#x27;s store the payload in a property called `payload`.
+    ```xml
+      &lt;property expression=&quot;json-eval($)&quot; name=&quot;payload&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+    ```
+2. Add the `batchExecute` operation from the **SnowflakeConnector** section.
+
+      &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/snowflake_connector/snowflake-conn-batch-execute-operation.png&quot; title=&quot;Snowflake batch execute operation&quot; width=&quot;800&quot; alt=&quot;Snowflake batch execute operation&quot;/&gt;
+      
+      1. Select the Snowflake connection configuration you created.
+      2. In the `Execute Query` text box, enter the following query.
+         ```sql
+         INSERT INTO HOTEL_DB.PUBLIC.RESERVATIONS (NICNUMBER, FIRSTNAME, LASTNAME, CHECKIN, CHECKOUT, ADULTS, CHILDREN, ROOMTYPE, SPECIALREQUESTS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+         ```
+      3. For the `Payload` text box, enter `$ctx:payload` as an expression.
+
+         &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/snowflake_connector/snowflake-conn-batch-execute-config.png&quot; title=&quot;Snowflake batch execute operation config&quot; width=&quot;400&quot; alt=&quot;Snowflake batch execute operation config&quot;/&gt;
+
+         ```xml
+         &lt;snowflake.batchExecute configKey=&quot;SNOWFLAKE_CONNECTION&quot;&gt;
+            &lt;executeQuery&gt;INSERT INTO HOTEL_DB.PUBLIC.RESERVATIONS (NICNUMBER, FIRSTNAME, LASTNAME, CHECKIN, CHECKOUT, ADULTS, CHILDREN, ROOMTYPE, SPECIALREQUESTS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)&lt;/executeQuery&gt;
+            &lt;payload&gt;{$ctx:payload}&lt;/payload&gt;
+         &lt;/snowflake.batchExecute&gt;
+         ```
+
+      5. Add the [Respond Mediator]({{base_path}}/reference/mediators/respond-mediator/) to send back the response.
+
+#### - /deleteReservation/{NICNUMBER}
+
+Using this resource users can delete a record in table `Reservations` of `HOTEL_DB`. The user will provide the NICNUMBER as a path parameter.
+
+1. In the API insequence add the [Property Mediator]({{base_path}}/reference/mediators/property-mediator/) to construct the delete query. Let&#x27;s store the query in a property named `deleteQuery`.
+    ```xml
+      &lt;property expression=&quot;fn:concat(&#x27;DELETE FROM HOTEL_DB.PUBLIC.RESERVATIONS WHERE NICNUMBER=&#x27;,get-property(&#x27;uri.var.NICNUMBER&#x27;))&quot; name=&quot;deleteQuery&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+    ```
+2. Add the `execute` operation from the **SnowflakeConnector** section.
+      1. Select the Snowflake connection configuration you created.
+      3. In the `Execute Query` text box, enter `$ctx:deleteQuery` as an expression.
+         ```xml
+         &lt;snowflake.execute configKey=&quot;SNOWFLAKE_CONNECTION&quot;&gt;
+            &lt;executeQuery&gt;{$ctx:deleteQuery}&lt;/executeQuery&gt;
+         &lt;/snowflake.execute&gt;
+         ```
+3. Add the [Property Mediator]({{base_path}}/reference/mediators/property-mediator/) and set the Property name as `messageType` and the value as `application/json`. This is added so that the response will be in JSON.
+   ```xml
+    &lt;property name=&quot;messageType&quot; scope=&quot;axis2&quot; type=&quot;STRING&quot; value=&quot;application/json&quot;/&gt;
+   ```
+4. Add the [Respond Mediator]({{base_path}}/reference/mediators/respond-mediator/) to send back the response.
+
+??? info &quot;The resources are now ready to be tested. The API source should resemble the following. Expand to see.&quot;
+      ```xml
+      &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+      &lt;api context=&quot;/snowflakeconnector&quot; name=&quot;SnowflakeConnectorApi&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+         &lt;resource methods=&quot;POST&quot; uri-template=&quot;/insertReservation&quot;&gt;
+            &lt;inSequence&gt;
+               &lt;property name=&quot;payload&quot; scope=&quot;default&quot; type=&quot;STRING&quot; expression=&quot;json-eval($)&quot;/&gt;
+               &lt;snowflake.execute configKey=&quot;SNOWFLAKE_CONNECTION_1&quot;&gt;
+                  &lt;executeQuery&gt;INSERT INTO HOTEL_DB.PUBLIC.RESERVATIONS (NICNUMBER, FIRSTNAME, LASTNAME, CHECKIN, CHECKOUT, ADULTS, CHILDREN, ROOMTYPE, SPECIALREQUESTS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)&lt;/executeQuery&gt;
+                  &lt;payload&gt;{$ctx:payload}&lt;/payload&gt;
+               &lt;/snowflake.execute&gt;
+               &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence&gt;
+            &lt;/faultSequence&gt;
+         &lt;/resource&gt;
+         &lt;resource methods=&quot;GET&quot; uri-template=&quot;/getReservationInfo&quot;&gt;
+            &lt;inSequence&gt;
+               &lt;snowflake.query configKey=&quot;SNOWFLAKE_CONNECTION_1&quot;&gt;
+                  &lt;query&gt;SELECT * FROM HOTEL_DB.PUBLIC.RESERVATIONS&lt;/query&gt;
+               &lt;/snowflake.query&gt;
+               &lt;property name=&quot;messageType&quot; scope=&quot;axis2&quot; type=&quot;STRING&quot; value=&quot;application/json&quot;/&gt;
+               &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence&gt;
+            &lt;/faultSequence&gt;
+         &lt;/resource&gt;
+         &lt;resource methods=&quot;POST&quot; uri-template=&quot;/insertReservationBatch&quot;&gt;
+            &lt;inSequence&gt;
+               &lt;property expression=&quot;json-eval($)&quot; name=&quot;payload&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+               &lt;snowflake.batchExecute configKey=&quot;SNOWFLAKE_CONNECTION_1&quot;&gt;
+                  &lt;executeQuery&gt;INSERT INTO HOTEL_DB.PUBLIC.RESERVATIONS (NICNUMBER, FIRSTNAME, LASTNAME, CHECKIN, CHECKOUT, ADULTS, CHILDREN, ROOMTYPE, SPECIALREQUESTS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)&lt;/executeQuery&gt;
+                  &lt;payload&gt;{$ctx:payload}&lt;/payload&gt;
+               &lt;/snowflake.batchExecute&gt;
+               &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence&gt;
+            &lt;/faultSequence&gt;
+         &lt;/resource&gt;
+         &lt;resource methods=&quot;DELETE&quot; uri-template=&quot;/deleteReservation/{NICNUMBER}&quot;&gt;
+            &lt;inSequence&gt;
+               &lt;property expression=&quot;fn:concat(&#x27;DELETE FROM HOTEL_DB.PUBLIC.RESERVATIONS WHERE NICNUMBER=&#x27;,get-property(&#x27;uri.var.NICNUMBER&#x27;))&quot; name=&quot;deleteQuery&quot; scope=&quot;default&quot; type=&quot;STRING&quot;/&gt;
+               &lt;snowflake.execute configKey=&quot;SNOWFLAKE_CONNECTION_1&quot;&gt;
+                  &lt;executeQuery&gt;{$ctx:deleteQuery}&lt;/executeQuery&gt;
+               &lt;/snowflake.execute&gt;
+               &lt;property name=&quot;messageType&quot; scope=&quot;axis2&quot; type=&quot;STRING&quot; value=&quot;application/json&quot;/&gt;
+               &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence&gt;
+            &lt;/faultSequence&gt;
+         &lt;/resource&gt;
+      &lt;/api&gt;
+      ```
+
+## Export integration logic as a carbon application 
+
+To export the project, please refer to the [build and export the carbon application]({{base_path}}/develop/deploy-artifacts/#build-and-export-the-carbon-application) guide. 
+
+## Get the project
+
+You can download the ZIP file and extract the contents to get the project code.
+
+&lt;a href=&quot;{{base_path}}/assets/attachments/connectors/snowflake-connector.zip&quot;&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+&lt;/a&gt;
+
+!!! tip &quot;You may need to update the values of Snowflake connection configurations before deploying and running this project.&quot;
+
+## Deployment
+
+To deploy and run the project, please refer to the [build and run]({{base_path}}/develop/deploy-artifacts/#build-and-run) guide.
+
+You can further refer to the application deployed through the CLI tool. See the instructions on [managing integrations from the CLI]({{base_path}}/observe-and-manage/managing-integrations-with-micli).
+
+### Test the resources
+
+Let&#x27;s test the API. Deploy the carbon application and start the WSO2 Integrator: MI.
+
+1. Insert Reservation Resource
+    1. Create a file called `payload.json` with the following payload.
+        ```json
+        {
+            &quot;NICNUMBER&quot;: &quot;9876543210&quot;,
+            &quot;FIRSTNAME&quot;: &quot;Alice&quot;,
+            &quot;LASTNAME&quot;: &quot;Johnson&quot;,
+            &quot;CHECKIN&quot;: &quot;2023-10-01&quot;,
+            &quot;CHECKOUT&quot;: &quot;2023-10-05&quot;,
+            &quot;ADULTS&quot;: 1,
+            &quot;CHILDREN&quot;: 0,
+            &quot;ROOMTYPE&quot;: &quot;Single&quot;,
+            &quot;SPECIALREQUESTS&quot;: &quot;Quiet room&quot;
+        }
+        ```
+    2. Invoke the API as shown below using the curl command.
+        ```bash
+        curl -H &quot;Content-Type: application/json&quot; --request POST --data @payload.json http://localhost:8290/snowflakeconnector/insertReservation
+        ```
+       **Expected Response**:
+       You should get a response as below.
+       ```json
+       {
+         &quot;operation&quot;:&quot;execute&quot;,
+         &quot;isSuccessful&quot;:true,
+         &quot;message&quot;:&quot;Rows affected :  1&quot;
+       }
+       ```
+
+2. Insert Reservation Batch Resource
+      1. Create a file called `payload.json` with the following payload.
+         ```json
+         [
+         {
+            &quot;NICNUMBER&quot;: &quot;2345678901&quot;,
+            &quot;FIRSTNAME&quot;: &quot;Emma&quot;,
+            &quot;LASTNAME&quot;: &quot;Williams&quot;,
+            &quot;CHECKIN&quot;: &quot;2024-06-01&quot;,
+            &quot;CHECKOUT&quot;: &quot;2024-06-05&quot;,
+            &quot;ADULTS&quot;: &quot;1&quot;,
+            &quot;CHILDREN&quot;: &quot;0&quot;,
+            &quot;ROOMTYPE&quot;: &quot;Single&quot;,
+            &quot;SPECIALREQUESTS&quot;: &quot;Late check-in&quot;
+            },
+            {
+               &quot;NICNUMBER&quot;: &quot;1234567890&quot;,
+               &quot;FIRSTNAME&quot;: &quot;Bob&quot;,
+               &quot;LASTNAME&quot;: &quot;Smith&quot;,
+               &quot;CHECKIN&quot;: &quot;2023-10-01&quot;,
+               &quot;CHECKOUT&quot;: &quot;2023-10-05&quot;,
+               &quot;ADULTS&quot;: 2,
+               &quot;CHILDREN&quot;: 1,
+               &quot;ROOMTYPE&quot;: &quot;Double&quot;,
+               &quot;SPECIALREQUESTS&quot;: &quot;Extra bed&quot;
+            }
+         ]
+         ```
+      2. Invoke the API as shown below using the curl command.
+         ```bash
+         curl -H &quot;Content-Type: application/json&quot; --request POST --data @payload.json http://localhost:8290/snowflakeconnector/insertReservationBatch
+         ```
+         **Expected Response**:
+         You should get a response as below.
+
+         ```json
+         {
+            &quot;operation&quot;:&quot;batchExecute&quot;,
+            &quot;isSuccessful&quot;:true,
+            &quot;message&quot;:&quot;Successfully executed 2 statements out of 2 statements.&quot;
+         }
+         ```
+       
+3. Get Reservation Info Resource
+      1. Invoke the API as shown below using the curl command.
+         ```bash
+         curl -H &quot;Content-Type: application/json&quot; --request GET http://localhost:8290/snowflakeconnector/getReservationInfo
+         ```
+         **Expected Response**:
+         You should receive a response as below.
+         ```json
+         [
+            {
+               &quot;NICNUMBER&quot;:&quot;9876543210&quot;,
+               &quot;FIRSTNAME&quot;:&quot;Alice&quot;,
+               &quot;LASTNAME&quot;:&quot;Johnson&quot;,
+               &quot;CHECKIN&quot;:&quot;2023-10-01&quot;,
+               &quot;CHECKOUT&quot;:&quot;2023-10-05&quot;,
+               &quot;ADULTS&quot;:&quot;1&quot;,
+               &quot;CHILDREN&quot;:&quot;0&quot;,
+               &quot;ROOMTYPE&quot;:&quot;Single&quot;,
+               &quot;SPECIALREQUESTS&quot;:&quot;Quiet room&quot;
+            },
+            {
+               &quot;NICNUMBER&quot;:&quot;2345678901&quot;,
+               &quot;FIRSTNAME&quot;:&quot;Emma&quot;,    
+               &quot;LASTNAME&quot;:&quot;Williams&quot;,
+               &quot;CHECKIN&quot;:&quot;2024-06-01&quot;,
+               &quot;CHECKOUT&quot;:&quot;2024-06-05&quot;, 
+               &quot;ADULTS&quot;:&quot;1&quot;,
+               &quot;CHILDREN&quot;:&quot;0&quot;,
+               &quot;ROOMTYPE&quot;:&quot;Single&quot;,
+               &quot;SPECIALREQUESTS&quot;:&quot;Late check-in&quot;
+            },
+            {
+               &quot;NICNUMBER&quot;:&quot;1234567890&quot;,
+               &quot;FIRSTNAME&quot;:&quot;Bob&quot;,
+               &quot;LASTNAME&quot;:&quot;Smith&quot;,
+               &quot;CHECKIN&quot;:&quot;2023-10-01&quot;,
+               &quot;CHECKOUT&quot;:&quot;2023-10-05&quot;,
+               &quot;ADULTS&quot;:&quot;2&quot;,
+               &quot;CHILDREN&quot;:&quot;1&quot;,
+               &quot;ROOMTYPE&quot;:&quot;Double&quot;,
+               &quot;SPECIALREQUESTS&quot;:&quot;Extra bed&quot;
+            }
+         ]
+         ```
+4. Delete Reservation Resource
+    1. Invoke the API as shown below using the curl command.
+        ```bash
+        curl -H &quot;Content-Type: application/json&quot; --request DELETE http://localhost:8290/snowflakeconnector/deleteReservation/9876543210
+        ```
+        **Expected Response**:
+        You should receive a response as below.
+        ```json
+        {
+          &quot;operation&quot;:&quot;execute&quot;,
+          &quot;isSuccessful&quot;:true,
+          &quot;message&quot;:&quot;Rows affected :  1&quot;
+        }
+        ```
+
+## What&#x27;s next
+
+- To customize this example for your own scenario, see [Snowflake Connector Configuration]({{base_path}}/reference/connectors/snowflake-connector/snowflake-connector-reference/) documentation for all operation details of the connector.</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>odata-service.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Expose Data as an OData Service
+
+This example demonstrates how an RDBMS can be exposed as an OData service. When OData is enabled, you do not need to manually define CRUD operations. Therefore, OData services are an easy way to enable CRUD operations for a data service.
+
+!!! Note
+    Note that the OData feature can only be used for RDBMS, Cassandra, and MongoDB datasources.
+
+## Prerequisites
+
+Let&#x27;s create a MySQL database with the required data.
+
+1.  Install the MySQL server.
+2.  Create a MySQL database named `CompanyAccounts`. 
+
+    ```bash
+    CREATE DATABASE CompanyAccounts;
+    ```
+
+3.  Create a table in the `           CompanyAccounts          `
+    database as follows.
+
+    ```bash
+    CREATE TABLE ACCOUNT(AccountID int NOT NULL,Branch varchar(255) NOT NULL, AccountNumber varchar(255),AccountType ENUM(&#x27;CURRENT&#x27;, &#x27;SAVINGS&#x27;) NOT NULL,
+            Balance FLOAT,ModifiedDate DATE,PRIMARY KEY (AccountID)); 
+    ```
+
+4.  Enter the following data into the table:  
+
+    ```bash
+    INSERT INTO ACCOUNT VALUES (1,&quot;AOB&quot;,&quot;A00012&quot;,&quot;CURRENT&quot;,231221,&#x27;2014-12-02&#x27;);
+    ```
+
+## Synapse configuration
+
+Given below is the data service configuration you need to build. See the instructions on how to [build and run](#build-and-run) this example.
+
+```xml
+&lt;data name=&quot;odata_service&quot; transports=&quot;http https local&quot;&gt;
+   &lt;config enableOData=&quot;true&quot; id=&quot;Datasource&quot;&gt;
+      &lt;property name=&quot;driverClassName&quot;&gt;com.mysql.jdbc.Driver&lt;/property&gt;
+      &lt;property name=&quot;url&quot;&gt;jdbc:mysql://localhost:3306/CompanyAccounts&lt;/property&gt;
+      &lt;property name=&quot;username&quot;&gt;root&lt;/property&gt;
+      &lt;property name=&quot;password&quot;&gt;password&lt;/property&gt;
+   &lt;/config&gt;
+&lt;/data&gt;
+```
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+
+3. [Create the data service]({{base_path}}/develop/creating-artifacts/data-services/creating-data-services) with the configurations given above.
+
+4. Download the JDBC driver for MySQL from [here](http://dev.mysql.com/downloads/connector/j/).
+
+5. Switch to the **EXPLORER** view in VS Code and copy the downloaded driver to the `&lt;PROJECT_NAME&gt;/deployment/lib/` directory in the project structure.
+
+    !!! Note
+        If the driver class does not exist in the relevant folders when you create the datasource, you will get an exception such as `Unable to load class: com.mysql.jdbc.Driver`.
+
+6. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+Open a command prompt execute the following CURL commands using CRUD operations:
+
+!!! Note
+    Note that you should have privileges to perform CRUD operations on the database. If not, the OData service will not work properly.
+
+
+-   To get the service document:
+
+    ```bash
+    curl -X GET -H &#x27;Accept: application/json&#x27; http://localhost:8290/odata/odata_service/Datasource
+    ```
+
+-   To get the metadata of the service:
+
+    ```bash
+    curl -X GET -H &#x27;Accept: application/xml&#x27; http://localhost:8290/odata/odata_service/Datasource/$metadata
+    ```
+
+-   To read details from the ACCOUNT table:
+
+    ```bash
+    curl -X GET -H &#x27;Accept: application/xml&#x27; http://localhost:8290/odata/odata_service/Datasource/ACCOUNT
+    ```
+    
+!!! info &quot;Supported functionality&quot;
+
+    - Navigation (e.g. GET /EMPLOYEES(1001)/DEPARTMENTS)
+        - One to One
+        - One to Many
+    - Count
+        - Append count to the result set (e.g. GET /EMPLOYEES?$count=true)
+        - Get only the count (e.g. GET /EMPLOYEES/$count)
+    - Top (e.g. GET /EMPLOYEES?$top=10)
+    - Skip (e.g. GET /EMPLOYEES?$skip=5)
+    - Select (e.g. GET /EMPLOYEES?$select=emp_no,last_name)
+    - Sort
+        - Ascending (e.g. GET /EMPLOYEES?$orderby=last_name asc)
+        - Descending (e.g. GET /EMPLOYEES?$orderby=last_name desc)
+    - Filter (e.g. GET /EMPLOYEES?$filter=dept_no eq &#x27;d001&#x27; and emp_no eq 10001)
+    - Pagination (e.g. GET /EMPLOYEES?$skiptoken=5)
+</body>
+</html>

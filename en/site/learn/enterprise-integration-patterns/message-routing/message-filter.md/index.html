@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>message-filter.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Message Filter
+
+This page explains how you can implement a sample scenario of Message Filter EIP using WSO2 Integrator: MI.
+
+## Introduction to Message Filter
+
+The Message Filter EIP checks an incoming message against specific criteria that the message must adhere to. If the criteria are not met, the filter discards the message otherwise, it routes the message to the output channel.
+
+!!! info
+    For more information, see the [Message Filter](http://www.eaipatterns.com/Filter.html) documentation.
+
+## Sample scenario
+
+The sample scenario depicts an inventory for stocks where an incoming request is filtered based on its content. If the content meets the criteria, the message filter allows the request to proceed otherwise, the message is dropped.
+
+The diagram below depicts how to simulate the sample scenario using WSO2 MI.
+
+### Scenario 1: content meeting the filter criteria
+
+&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-routing/message-filter-eip.png&quot; style=&quot;width: 70%;&quot; alt=&quot;Message filter EIP&quot;&gt;
+
+### Scenario 2: content not meeting the filter criteria
+
+&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-routing/message-filter.png&quot; style=&quot;width: 70%;&quot; alt=&quot;Message filter&quot;&gt;
+
+Before digging into implementation details, let&#x27;s take a look at the correlation between the sample scenario and the Message Filter EIP by comparing their core components.
+
+| Message Filter EIP            | Message Filter Sample Scenario                                        | 
+|-------------------------------|-----------------------------------------------------------------------|
+| Quote                         | Stock Quote Request                                                   | 
+| Message Filter                | If Else Mediator is used to filter the content of the incoming message | 
+
+## Synapse configuration of the artifacts
+
+=== &quot;Proxy Service&quot;
+```xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;proxy name=&quot;MessageFilterProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;http https&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+	&lt;target&gt;
+		&lt;inSequence&gt;
+			&lt;filter xmlns:m0=&quot;http://services.samples&quot; source=&quot;//m0:getQuote/m0:request/m0:symbol&quot; regex=&quot;foo&quot;&gt;
+				&lt;then&gt;
+					&lt;call&gt;
+						&lt;endpoint key=&quot;StockServiceEP&quot;/&gt;
+					&lt;/call&gt;
+					&lt;respond/&gt;
+				&lt;/then&gt;
+				&lt;else&gt;
+					&lt;drop/&gt;
+				&lt;/else&gt;
+			&lt;/filter&gt;
+		&lt;/inSequence&gt;
+	&lt;/target&gt;
+&lt;/proxy&gt;
+```
+
+### How the implementation works
+
+Let&#x27;s examine the elements of the configuration in detail:
+
+- **Proxy Service**: The proxy service receives requests and forwards them to the appropriate back-end service, abstracting the routing logic from the client. The client always sends requests to the exposed service, not directly to the back-end services.
+
+- **InSequence**: When the client invokes the service, the message is processed by the inSequence and routed according to the defined logic.
+
+- **Filter**: Filters incoming messages, discarding those that do not meet the specified criteria.
+
+- **Respond**: If a matching condition is found, the respond mediator routes the message to the endpoint specified in the address URI.
+
+- **OutSequence**: The response from the endpoint is processed by the outSequence and then returned to the sender.
+## Set up the sample scenario
+
+Follow the below instructions to simulate this sample scenario.
+
+{!includes/eip-set-up.md!}
+
+3. Download the [backend service](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/axis2Server.zip).
+
+4. Extract the downloaded zip file.
+
+5. Open a terminal, and navigate to the `axis2Server/bin/` directory inside the extracted folder.
+
+6. Execute the following command to start the axis2server with the SimpleStockQuote backend service:
+
+    === &quot;On MacOS/Linux&quot;   
+          ```bash
+          sh axis2server.sh
+          ```
+    === &quot;On Windows&quot;                
+          ```bash
+          axis2server.bat
+          ``` 
+
+7. Download the artifacts of the sample.
+
+    &lt;a href=&quot;{{base_path}}/assets/attachments/learn/enterprise-integration-patterns/message-filter.zip&quot;&gt;
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+    &lt;/a&gt;
+
+8. Import the artifacts to WSO2 MI.
+
+    Click **File** -&gt; **Open Folder** -&gt; Select the extracted ZIP file to import the downloaded ZIP file.
+
+9.  Start the project in the WSO2 MI server.
+
+    For instructions, go to [Build and Run]({{base_path}}/develop/deploy-artifacts/#build-and-run) Documentation.
+
+10. Start SoapUI.
+
+    For instructions on downloading and starting, go to [SoapUI Getting Started](https://www.soapui.org/getting-started/) Documentation.
+
+## Execute the sample
+
+Send the following request using SoapUI (or any other Soap client).
+
+```xml
+POST http://localhost:8290/services/MessageFilterProxy
+
+Accept-Encoding: gzip,deflate
+Content-Type: text/xml;charset=UTF-8
+SOAPAction: &quot;urn:getQuote&quot;
+Connection: Keep-Alive
+
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+    &lt;soapenv:Header/&gt;
+    &lt;soapenv:Body&gt;
+        &lt;ser:getQuote&gt;
+            &lt;ser:request&gt;
+                &lt;ser:symbol&gt;foo&lt;/ser:symbol&gt;
+            &lt;/ser:request&gt;
+        &lt;/ser:getQuote&gt;
+    &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+```
+
+## Analyze the output
+
+When your request has the value `foo`, you will receive a response like this:
+
+```xml
+&lt;?xml version=&#x27;1.0&#x27; encoding=&#x27;UTF-8&#x27;?&gt;
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+    &lt;soapenv:Header/&gt;
+    &lt;soapenv:Body&gt;
+        &lt;ns:getQuoteResponse xmlns:ns=&quot;http://services.samples&quot;&gt;
+            &lt;ns:return xmlns:ax21=&quot;http://services.samples/xsd&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:type=&quot;ax21:GetQuoteResponse&quot;&gt;
+                &lt;ax21:change&gt;-2.352337680518278&lt;/ax21:change&gt;
+                &lt;ax21:earnings&gt;12.727065083278656&lt;/ax21:earnings&gt;
+                &lt;ax21:high&gt;92.75656524398916&lt;/ax21:high&gt;
+                &lt;ax21:last&gt;88.78328252546186&lt;/ax21:last&gt;
+                &lt;ax21:lastTradeTimestamp&gt;Mon Aug 12 11:30:32 IST 2024&lt;/ax21:lastTradeTimestamp&gt;
+                &lt;ax21:low&gt;92.40515024154969&lt;/ax21:low&gt;
+                &lt;ax21:marketCap&gt;3618966.99564144&lt;/ax21:marketCap&gt;
+                &lt;ax21:name&gt;foo Company&lt;/ax21:name&gt;
+                &lt;ax21:open&gt;91.53912035529257&lt;/ax21:open&gt;
+                &lt;ax21:peRatio&gt;-18.98135135726734&lt;/ax21:peRatio&gt;
+                &lt;ax21:percentageChange&gt;2.7410884095070918&lt;/ax21:percentageChange&gt;
+                &lt;ax21:prevClose&gt;-85.81765084115912&lt;/ax21:prevClose&gt;
+                &lt;ax21:symbol&gt;foo&lt;/ax21:symbol&gt;
+                &lt;ax21:volume&gt;19747&lt;/ax21:volume&gt;
+            &lt;/ns:return&gt;
+        &lt;/ns:getQuoteResponse&gt;
+    &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+```
+
+!!! Note
+        If you send a request with any other value, the request will be dropped, and you will receive a 202 response.
+</body>
+</html>

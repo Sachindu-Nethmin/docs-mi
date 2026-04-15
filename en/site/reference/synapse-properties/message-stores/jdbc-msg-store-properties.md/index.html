@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>jdbc-msg-store-properties.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># JDBC Message Store
+## Introduction
+Used for storing and retrieving messages more efficiently in comparison with other message stores. This is a variation of the already existing synapse message store implementation and is designed in a manner similar to the same message store. The JDBC message store uses a JDBC connector to connect to external relational databases.
+
+To try this out quickly, see the [JDBC Message Store example]({{base_path}}/learn/examples/message-store-processor-examples/using-jdbc-message-store/).
+
+The advantages of using a JDBC message store instead of any other message store are as follows:
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;b&gt;Easy to connect&lt;/b&gt;: You only need to have a JDBC connector to connect to an external relational database.
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;b&gt;Quick transactions&lt;/b&gt;: JDBC message stores are capable of handling a large number of transactions per second.
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;b&gt;Ability to work with a high capacity for a long period of time&lt;/b&gt;: Since JDBC stores use databases as the medium to store data, it can store a large volume of data and is capable of handling data for a longer period of time.
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+## Properties
+
+Listed below are the properties used for [creating a JDBC Message Store]({{base_path}}/develop/creating-artifacts/creating-a-message-store/).
+
+### Required Properties
+
+The following properties are required when [creating a JDBC Message Store]({{base_path}}/develop/creating-artifacts/creating-a-message-store/).
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Property&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Name&lt;/td&gt;
+    &lt;td&gt;
+      The name of the message store.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Database Table&lt;/td&gt;
+    &lt;td&gt;
+      The name of the database table.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Driver&lt;/td&gt;
+    &lt;td&gt;
+      The class name of the database driver.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;URL&lt;/td&gt;
+    &lt;td&gt;
+      The JDBC URL of the database that the data will be written to.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;User&lt;/td&gt;
+    &lt;td&gt;
+      The user name used to connect to the database.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Password&lt;/td&gt;
+    &lt;td&gt;
+      The password used to connect to the database.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+### Connection Pool Properties
+
+The syntax of the JDBC message store can be different depending on whether you connect to the database using a connection pool, or using a datasource. Given below are the connection pool properties:
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Property&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;store.jdbc.driver &lt;/td&gt;
+    &lt;td&gt;
+      The class name of the database driver.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;store.jdbc.connection.url&lt;/td&gt;
+    &lt;td&gt;
+      The database URL.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;store.jdbc.username &lt;/td&gt;
+    &lt;td&gt;
+      The user name to access the database.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;store.jdbc.password&lt;/td&gt;
+    &lt;td&gt;
+      The password to access the database.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;store.jdbc.table  &lt;/td&gt;
+    &lt;td&gt;
+      Table name of the database.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+### External Datasource Properties
+
+The syntax of the JDBC message store can be different depending on whether you connect to the database using a connection pool, or using a datasource. Given below are the external datasource properties:
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Property&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;store.jdbc.dsName&lt;/td&gt;
+    &lt;td&gt;
+      The name of the datasource to be looked up.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;store.jdbc.table&lt;/td&gt;
+    &lt;td&gt;
+      The table name of the database.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+### Internal Datasource Properties
+
+To make sure that the datasource appears in the **Datasource Name** list, you need to expose it as a JNDI datasource.
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Property&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Name&lt;/td&gt;
+    &lt;td&gt;The name for the message store.&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Database Table&lt;/td&gt;
+    &lt;td&gt;
+      The name of the database table.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;Datasource Name&lt;/td&gt;
+    &lt;td&gt;
+      The class name of the datasource.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;</body>
+</html>

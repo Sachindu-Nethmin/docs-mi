@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>rdbms-data-service.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Expose an RDBMS Datasource
+
+This example demonstrates how RDBMS data (stored in a MySQL database) can be exposed as a data service.
+
+## Prerequisites
+
+Let&#x27;s create a MySQL database with the required data.
+
+1.  Install the MySQL server.
+2.  Create a database named `Employees` .
+
+    ```bash
+    CREATE DATABASE Employees;
+    ```
+
+3.  Create the Employee table inside the Employees database:
+
+    ```bash
+    USE Employees;
+
+    CREATE TABLE Employees (EmployeeNumber int(11) NOT NULL, FirstName varchar(255) NOT NULL, LastName varchar(255) DEFAULT NULL, Email varchar(255) DEFAULT NULL, Salary varchar(255));
+    ```
+
+## Synapse configuration
+Given below is the data service configuration you need to build. See the instructions on how to [build and run](#build-and-run) this example.
+
+```xml
+&lt;data enableBatchRequests=&quot;true&quot; name=&quot;RDBMSDataService&quot; serviceGroup=&quot;&quot; serviceNamespace=&quot;&quot; transports=&quot;http&quot;&gt;
+    &lt;description/&gt;
+    &lt;query id=&quot;GetEmployeeDetails&quot; useConfig=&quot;Datasource&quot;&gt;
+        &lt;sql&gt;select EmployeeNumber, FirstName, LastName, Email, Salary from Employees where EmployeeNumber=:EmployeeNumber&lt;/sql&gt;
+        &lt;param name=&quot;EmployeeNumber&quot; paramType=&quot;SCALAR&quot; sqlType=&quot;STRING&quot;/&gt;
+        &lt;result element=&quot;Employees&quot; rowName=&quot;Employee&quot;&gt;
+            &lt;element column=&quot;EmployeeNumber&quot; name=&quot;EmployeeNumber&quot; xsdType=&quot;xs:string&quot;/&gt;
+            &lt;element column=&quot;FirstName&quot; name=&quot;FirstName&quot; xsdType=&quot;xs:string&quot;/&gt;
+            &lt;element column=&quot;LastName&quot; name=&quot;LastName&quot; xsdType=&quot;xs:string&quot;/&gt;
+            &lt;element column=&quot;Email&quot; name=&quot;Email&quot; xsdType=&quot;xs:string&quot;/&gt;
+            &lt;element column=&quot;Salary&quot; name=&quot;Salary&quot; xsdType=&quot;xs:string&quot;/&gt;
+        &lt;/result&gt;
+    &lt;/query&gt;
+  &lt;config id=&quot;Datasource&quot;&gt;
+    &lt;property name=&quot;driverClassName&quot;&gt;com.mysql.jdbc.Driver&lt;/property&gt;
+    &lt;property name=&quot;url&quot;&gt;jdbc:mysql://localhost:3306/Employees&lt;/property&gt;
+    &lt;property name=&quot;username&quot;&gt;root&lt;/property&gt;
+    &lt;property name=&quot;password&quot;&gt;password&lt;/property&gt;
+  &lt;/config&gt;
+    &lt;query id=&quot;AddEmployeeDetails&quot; useConfig=&quot;Datasource&quot;&gt;
+        &lt;sql&gt;insert into Employees (EmployeeNumber, FirstName, LastName, Email, Salary) values(:EmployeeNumber,:FirstName,:LastName,:Email,:Salary)&lt;/sql&gt;
+        &lt;param name=&quot;EmployeeNumber&quot; paramType=&quot;SCALAR&quot; sqlType=&quot;STRING&quot;/&gt;
+        &lt;param name=&quot;FirstName&quot; paramType=&quot;SCALAR&quot; sqlType=&quot;STRING&quot;/&gt;
+        &lt;param name=&quot;LastName&quot; paramType=&quot;SCALAR&quot; sqlType=&quot;STRING&quot;/&gt;
+        &lt;param name=&quot;Email&quot; paramType=&quot;SCALAR&quot; sqlType=&quot;STRING&quot;/&gt;
+        &lt;param name=&quot;Salary&quot; paramType=&quot;SCALAR&quot; sqlType=&quot;STRING&quot;/&gt;
+    &lt;/query&gt;
+    &lt;query id=&quot;UpdateEmployeeDetails&quot; useConfig=&quot;Datasource&quot;&gt;
+        &lt;param name=&quot;EmployeeNumber&quot; paramType=&quot;SCALAR&quot; sqlType=&quot;STRING&quot;/&gt;
+        &lt;sql&gt;update Employees set FirstName=:FirstName, LastName=:LastName, Email=:Email, Salary=:Salary where EmployeeNumber=:EmployeeNumber&lt;/sql&gt;
+        &lt;param name=&quot;FirstName&quot; paramType=&quot;SCALAR&quot; sqlType=&quot;STRING&quot;/&gt;
+        &lt;param name=&quot;LastName&quot; paramType=&quot;SCALAR&quot; sqlType=&quot;STRING&quot;/&gt;
+        &lt;param name=&quot;Email&quot; paramType=&quot;SCALAR&quot; sqlType=&quot;STRING&quot;/&gt;
+        &lt;param name=&quot;Salary&quot; paramType=&quot;SCALAR&quot; sqlType=&quot;STRING&quot;/&gt;
+    &lt;/query&gt;
+    &lt;resource method=&quot;GET&quot; path=&quot;Employee/{EmployeeNumber}&quot;&gt;
+        &lt;call-query href=&quot;GetEmployeeDetails&quot;&gt;
+            &lt;with-param name=&quot;EmployeeNumber&quot; query-param=&quot;EmployeeNumber&quot;/&gt;
+        &lt;/call-query&gt;
+    &lt;/resource&gt;
+    &lt;resource method=&quot;POST&quot; path=&quot;Employee&quot;&gt;
+        &lt;call-query href=&quot;AddEmployeeDetails&quot;&gt;
+            &lt;with-param name=&quot;EmployeeNumber&quot; query-param=&quot;EmployeeNumber&quot;/&gt;
+            &lt;with-param name=&quot;FirstName&quot; query-param=&quot;FirstName&quot;/&gt;
+            &lt;with-param name=&quot;LastName&quot; query-param=&quot;LastName&quot;/&gt;
+            &lt;with-param name=&quot;Email&quot; query-param=&quot;Email&quot;/&gt;
+            &lt;with-param name=&quot;Salary&quot; query-param=&quot;Salary&quot;/&gt;
+        &lt;/call-query&gt;
+    &lt;/resource&gt;
+    &lt;resource method=&quot;PUT&quot; path=&quot;Employee&quot;&gt;
+        &lt;call-query href=&quot;UpdateEmployeeDetails&quot;&gt;
+            &lt;with-param name=&quot;EmployeeNumber&quot; query-param=&quot;EmployeeNumber&quot;/&gt;
+            &lt;with-param name=&quot;FirstName&quot; query-param=&quot;FirstName&quot;/&gt;
+            &lt;with-param name=&quot;LastName&quot; query-param=&quot;LastName&quot;/&gt;
+            &lt;with-param name=&quot;Email&quot; query-param=&quot;Email&quot;/&gt;
+            &lt;with-param name=&quot;Salary&quot; query-param=&quot;Salary&quot;/&gt;
+        &lt;/call-query&gt;
+    &lt;/resource&gt;
+&lt;/data&gt;
+```
+
+!!! Tip
+    If you use **External** instead of the **Default** as the datasource type, your datasource should be supported by an external provider class, such as `com.mysql.jdbc.jdbc2.optional.MysqlXADataSource`.&lt;/br&gt;&lt;/br&gt;
+    After an external datasource is created, it can be used as another datasource in queries. See the example on [handling distributed transactions]({{base_path}}/learn/examples/data-integration/distributed-trans-data-service) for more information on using external datasources.
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+3. [Create the data service]({{base_path}}/develop/creating-artifacts/data-services/creating-data-services) with the configurations given above.
+4. Download the JDBC driver for MySQL from [here](http://dev.mysql.com/downloads/connector/j/). 
+
+5. Switch to the **EXPLORER** view in VS Code and copy the downloaded driver to the `&lt;PROJECT_NAME&gt;/deployment/lib/` directory in the project structure.
+   
+    !!! Note
+        If the driver class does not exist in the relevant folders when you create the datasource, you will get an exception such as `Unable to load class: com.mysql.jdbc.Driver`.
+
+6. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI. 
+
+Let&#x27;s take a look at the curl commands that are used to send the HTTP
+requests for each of the resources:
+
+#### Post new data
+
+1.  Create a file called `           employee-payload.xml          `
+    file, and define the XML payload for posting new data as shown
+    below.
+
+    ```bash
+    &lt;_postemployee&gt;
+        &lt;EmployeeNumber&gt;3&lt;/EmployeeNumber&gt;
+        &lt;FirstName&gt;Will&lt;/FirstName&gt;
+        &lt;LastName&gt;Smith&lt;/LastName&gt;
+        &lt;Email&gt;will@google.com&lt;/Email&gt;
+        &lt;Salary&gt;15500.0&lt;/Salary&gt;
+    &lt;/_postemployee&gt;
+    ```
+
+2.  Send the following HTTP request from the location where the
+    `           employee-payload.xml          ` file is stored:
+
+    ```bash
+    curl -X POST -H &#x27;Accept: application/xml&#x27;  -H &#x27;Content-Type: application/xml&#x27; --data &quot;@employee-payload.xml&quot; http://localhost:8290/services/RDBMSDataService/employee
+    ```
+
+#### Get data
+
+The service can be invoked in REST-style via [curl](http://curl.haxx.se/). Shown below is the curl command to invoke the GET resource:
+
+```bash
+curl -X GET http://localhost:8290/services/RDBMSDataService.HTTPEndpoint/Employee/3
+```
+
+This generates a response as follows.
+
+```bash
+&lt;Entries xmlns=&quot;http://ws.wso2.org/dataservice&quot;&gt;&lt;Entry&gt;&lt;EmployeeNumber&gt;3&lt;/EmployeeNumber&gt;&lt;FirstName&gt;Will&lt;/FirstName&gt;&lt;LastName&gt;Smith&lt;/LastName&gt;&lt;Email&gt;will@google.com&lt;/Email&gt;&lt;Salary&gt;15500.0&lt;/Salary&gt;&lt;/Entry&gt;&lt;Entry&gt;&lt;EmployeeNumber&gt;3&lt;/EmployeeNumber&gt;&lt;FirstName&gt;Will&lt;/FirstName&gt;&lt;LastName&gt;Smith&lt;/LastName&gt;&lt;Email&gt;will@google.com&lt;/Email&gt;&lt;Salary&gt;15500.0&lt;/Salary&gt;&lt;/Entry&gt;&lt;Entry&gt;&lt;EmployeeNumber&gt;3&lt;/EmployeeNumber&gt;&lt;FirstName&gt;Will&lt;/FirstName&gt;&lt;LastName&gt;Smith&lt;/LastName&gt;&lt;Email&gt;will@google.com&lt;/Email&gt;&lt;Salary&gt;15500.0&lt;/Salary&gt;&lt;/Entry&gt;&lt;/Entries&gt;
+```
+
+#### Update data
+
+1.  Create a file called
+    `           employee-update-payload.xml          ` file, and define
+    the XML payload for updating an existing employee record as shown
+    below.
+
+    ```bash
+    &lt;_putemployee&gt;
+        &lt;EmployeeNumber&gt;3&lt;/EmployeeNumber&gt;
+        &lt;FirstName&gt;Smith&lt;/FirstName&gt;
+        &lt;LastName&gt;Will&lt;/LastName&gt;
+        &lt;Email&gt;will@google.com&lt;/Email&gt;
+        &lt;Salary&gt;30000.0&lt;/Salary&gt;
+    &lt;/_putemployee&gt;
+    ```
+
+2.  Send the following HTTP request from the location where the
+    `           employee-update-payload.xml          ` file is stored:
+
+    ```bash
+    curl -X PUT -H &#x27;Accept: application/xml&#x27;  -H &#x27;Content-Type: application/xml&#x27; --data &quot;@employee-update-payload.xml&quot; http://localhost:8290/services/RDBMSDataService/employee
+    ```
+
+#### Get Swagger definition
+
+-   Copy the following URL to your browser to get the Swagger definition in JSON format:
+
+    ```bash
+    http://localhost:8290/services/RDBMSDataService?swagger.json
+    ```
+
+-   Copy the following URL to your browser to get the Swagger definition in YAML format:
+
+    ```bash
+    http://localhost:8290/services/RDBMSDataService?swagger.yaml
+    ```
+</body>
+</html>

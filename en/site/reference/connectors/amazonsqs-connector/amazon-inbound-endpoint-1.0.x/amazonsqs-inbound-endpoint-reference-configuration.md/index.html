@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>amazonsqs-inbound-endpoint-reference-configuration.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># AmazonSQS Inbound Endpoint Reference
+
+The following configurations allow you to configure AmazonSQS Inbound Endpoint for your scenario. 
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Parameter&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+    &lt;th&gt;Required&lt;/th&gt;
+    &lt;th&gt;Possible Values&lt;/th&gt;
+    &lt;th&gt;Default Value&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;code&gt;waitTime&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;The time to wait when polling queues for messages. By default, there is no wait (short polling). Setting the waitTime up to 20 seconds (the maximum wait time) creates &lt;a href=&quot;https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html#sqs-long-polling&quot;&gt;long polling&lt;/a&gt;.&lt;/td&gt;
+    &lt;td&gt;No&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;0 - 20&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;0&lt;/code&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;code&gt;destination&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;URL of the Amazon SQS Queue from which you want to consume messages.&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;td&gt;N/A	&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;code&gt;secretKey&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;The secret key used to sign requests (a 40-character sequence).&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;code&gt;accessKey&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;The access key that corresponds to the secret key that you used to sign the request (a 20-character sequence).&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;code&gt;maxNoOfMessage&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;Maximum number of messages to return. Amazon SQS never returns more messages than this value but might return fewer. Not necessarily all the messages in the queue are returned.&lt;/td&gt;
+    &lt;td&gt;No&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;1-10&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;1&lt;/code&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;code&gt;attributeNames&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;A comma-separated list of attributes you want to return along with the received message.&lt;/td&gt;
+    &lt;td&gt;No&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+  &lt;/tr&gt; 
+  &lt;tr&gt;
+    &lt;td&gt;&lt;code&gt;contentType&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;Content type of the message&lt;/a&gt;&lt;/td&gt;
+    &lt;td&gt;No&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;text/plain&lt;br&gt;
+                        application/json&lt;br&gt;
+                        application/xml&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;text/plain&lt;/code&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;&lt;code&gt;autoRemoveMessage&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;Check whether the message needs to be deleted from the queue. If you set this parameter to false, the message will remain in the queue until the message retention period expires.&lt;/td&gt;
+    &lt;td&gt;No&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;true&lt;br&gt;
+                        false&lt;/code&gt;&lt;/td&gt;
+    &lt;td&gt;&lt;code&gt;true&lt;/code&gt;&lt;/td&gt;
+  &lt;/tr&gt;  
+&lt;/table&gt;
+
+    
+**Rollback the messages**
+ 
+In a failure scenario, the Amazon SQS message will roll back if the following property is set to true in the fault sequence.
+ 
+ ```
+ &lt;property name=&quot;SET_ROLLBACK_ONLY&quot; value=&quot;true&quot;/&gt;
+ ```
+    
+??? note &quot;Sample fault sequence&quot;
+        ```
+        &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        &lt;sequence name=&quot;fault&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;property name=&quot;SET_ROLLBACK_ONLY&quot; value=&quot;true&quot;/&gt;
+            &lt;log level=&quot;custom&quot;&gt;
+                &lt;property name=&quot;Transaction Action&quot; value=&quot;Rollbacked&quot;/&gt;
+            &lt;/log&gt;
+            &lt;log level=&quot;full&quot;&gt;
+                &lt;property name=&quot;MESSAGE&quot; value=&quot;Executing default &#x27;fault&#x27; sequence&quot;/&gt;
+                &lt;property expression=&quot;get-property(&#x27;ERROR_CODE&#x27;)&quot;
+                    name=&quot;ERROR_CODE&quot; xmlns:ns=&quot;http://org.apache.synapse/xsd&quot;/&gt;
+                &lt;property expression=&quot;get-property(&#x27;ERROR_MESSAGE&#x27;)&quot;
+                    name=&quot;ERROR_MESSAGE&quot; xmlns:ns=&quot;http://org.apache.synapse/xsd&quot;/&gt;
+            &lt;/log&gt;
+            &lt;drop/&gt;
+        &lt;/sequence&gt;
+        ```</body>
+</html>

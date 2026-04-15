@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>amazondynamodb-connector-configuration.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Setting up the Amazon DynamoDB Connector 
+
+Amazon DynamoDB Connector allows you to access the [Amazon DynamoDB REST API](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.API.html) from integration sequence. 
+
+Amazon DynamoDB makes it simple and cost-effective to store and retrieve any amount of data, as well as serve any level of request traffic. It uses a NoSQL database model, which is non-relational, allowing documents, graphs, and columnar among its data models.
+
+## Configuring message builders/formatters
+
+Before you start configuring the  Amazon DynamoDB connector, you also need to configure the integration runtime, and we refer to that location as `&lt;PRODUCT_HOME&gt;`.
+
+Specific message builders/formatters configuration needs to be enabled in the product as shown below before starting the integration service.
+
+You need to enable this property by adding the following to the `&lt;PRODUCT_HOME&gt;/conf/deployment.toml` file. You can further refer to the [Working with Message Builders and Formatters]({{base_path}}/install-and-setup/setup/message-builders-formatters/message-builders-and-formatters/) and [Product Configurations]({{base_path}}/reference/config-catalog-mi/) documentations.
+
+```toml
+[[custom_message_formatters]]
+class=&quot;org.apache.synapse.commons.json.JsonStreamFormatter&quot;
+content_type = &quot;application/x-amz-json-1.0&quot;
+
+[[custom_message_builders]]
+class=&quot;org.apache.synapse.commons.json.JsonStreamBuilder&quot;
+content_type = &quot;application/x-amz-json-1.0&quot;
+```
+
+!!! note
+    If you want to perform blocking invocations, ensure that the above builder and formatter are added and enabled in the `&lt;PRODUCT_HOME&gt;\repository\conf\axis2\axis2_blocking_client.xml` file.
+
+## Setting up the AWS Account and DynamoDB Environment
+
+Please follow the steps mentioned in the [Setting up the Amazon Lambda Environment]({{base_path}}/reference/connectors/amazonlambda-connector/setting-up-amazonlambda/) document in order to create an Amazon account and obtain the access key id and secret access key.
+
+Please find the following steps to navigate in to the Amazon DynamoDB using the AWS account.
+
+1. Sign in to the AWS Management Console and search **Database** section under **Services**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/dynamodb-aws-console.png&quot; title=&quot;Amazon Dynamodb aws console&quot; width=&quot;600&quot; alt=&quot;Amazon Dynamodb aws console&quot;/&gt; 
+
+2. You can see the following operations and sub operations. The output in the AWS DynamoDB console are shown below.
+
+    - Working with Items in Amazon DynamoDB
+    - Working with Tables in Amazon DynamoDB
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/dynamodb-aws-results-console.png&quot; title=&quot;Amazon Dynamodb Table view&quot; width=&quot;600&quot; alt=&quot;Amazon Dynamodb Table view&quot;/&gt; </body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>filter-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>---
+tags:
+  - filter
+  - ifelse
+---
+
+# If Else Mediator
+
+The **If Else Mediator** can be used for filtering messages based on a Synapse expression, 
+XPath, JSONPath or a regular expression. If the condition succeeds, the
+If Else mediator executes the other mediators enclosed in the sequence.
+
+## Syntax
+
+``` java
+&lt;filter (source=&quot;[SynapseExpression|XPath|json-eval(JSONPath)]&quot; regex=&quot;string&quot;) | xpath=&quot;[SynapseExpression|XPath|json-eval(JSONPath)]&quot;&gt;
+   mediator+
+&lt;/filter&gt;
+```
+
+This mediator could also be used to handle a scenario where two
+different sequences are applied to messages that meet the filter
+criteria and messages that do not meet the filter criteria.
+
+``` java
+&lt;filter (source=&quot;[SynapseExpression|XPath|json-eval(JSONPath)]&quot; regex=&quot;string&quot;) | xpath=&quot;[SynapseExpression|XPath|json-eval(JSONPath)]&quot;&gt;
+   &lt;then&gt;
+     mediator+
+   &lt;/then&gt;
+   &lt;else&gt;
+     mediator+
+   &lt;/else&gt;
+&lt;/filter&gt;
+```
+
+In this case, the filter condition remains the same. The messages that
+match the filter criteria will be mediated using the set of mediators
+enclosed in the `         then        ` element. The messages that do
+not match the filter criteria will be mediated using the set of
+mediators enclosed in the `         else        ` element.
+
+## Configuration
+
+The parameters available for configuring the If Else mediator are as
+follows:
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Condition&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;This is used to specify the condition that resolves to a boolean value. The message will be branched based on the result of this condition.&lt;/p&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+### Advanced configurations
+
+Parameters available to configure advanced properties of the If Else mediator are as follows:
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;
+      Parameter Name
+    &lt;/th&gt;
+    &lt;th&gt;
+      Description
+    &lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;strong&gt;Use a regex pattern&lt;/strong&gt;
+    &lt;/td&gt;
+    &lt;td&gt;
+      If this is selected, the condition will use a regex-based evaluation.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;strong&gt;Expression&lt;/strong&gt;
+    &lt;/td&gt;
+    &lt;td&gt;An expression that resolves to a string value, which will be compared with the regex pattern. This field is enabled only when 
+      &lt;strong&gt;Use a regex pattern&lt;/strong&gt; is selected.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;strong&gt;Matches&lt;/strong&gt;
+    &lt;/td&gt;
+    &lt;td&gt;The regex pattern to compare with the evaluated expression. This field is enabled only when 
+      &lt;strong&gt;Use a regex pattern&lt;/strong&gt; is selected.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+##  Examples
+
+### Approving or rejecting loan applications based on a condition
+
+In this example, the If Else Mediator will check the credit score in a loan application and decide whether to approve or reject it. 
+If the credit score is 1000, the application is approved; otherwise, it is rejected.
+
+``` java
+&lt;filter xpath=&quot;${payload.loanApplication.creditScore == 1000}&quot;&gt;
+   &lt;then&gt;
+      &lt;log category=&quot;INFO&quot;&gt;
+         &lt;message&gt;ApprovalStatus = Approved&lt;/message&gt;
+      &lt;/log&gt;
+      &lt;sequence key=&quot;loan_approval_seq&quot;/&gt;
+   &lt;/then&gt;
+   &lt;else&gt;
+      &lt;log category=&quot;INFO&quot;&gt;
+         &lt;message&gt;ApprovalStatus = Rejected&lt;/message&gt;
+      &lt;/log&gt;
+      &lt;sequence key=&quot;loan_rejection_seq&quot;/&gt;
+   &lt;/else&gt;
+&lt;/filter&gt;
+```
+</body>
+</html>

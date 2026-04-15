@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>overview.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># System Management
+
+System Management patterns aim to monitor the number of messages sent and their processing times without analyzing the message data, except for some fields in the message header in selected patterns. This is in contrast to Business Activity Monitoring, which directly analyzes the payload data contained in a message.
+
+This section introduces various system management patterns and how they can be simulated using the WSO2 Integrator: MI.
+
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/system-management/control-bus&quot;&gt;Control Bus&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/control-bus-icon.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/control-bus-icon.gif&quot; alt=&quot;control-bus&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;Administers a messaging system that is distributed across multiple platforms and a wide geographic area.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/system-management/detour&quot;&gt;Detour&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/detour-icon.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/detour-icon.gif&quot; alt=&quot;detour&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;Routes a message through intermediate steps to perform validation, testing or debugging functions.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/system-management/message-history&quot;&gt;Message History&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;/td&gt;
+        &lt;td&gt;Lists all applications that the message passed through since its origination.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/system-management/message-store&quot;&gt;Message Store&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-store-icon.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-store-icon.gif&quot; alt=&quot;message-store&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;Reports against message information without disturbing the loosely coupled and transient nature of a messaging system.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/system-management/smart-proxy&quot;&gt;Smart Proxy&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/smart-proxy-icon.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/smart-proxy-icon.gif&quot; alt=&quot;smart-proxy&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;Tracks messages on a service that publishes reply messages to the Return Address specified by the requester.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/system-management/test-message&quot;&gt;Test Message&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/test-message-icon.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/test-message-icon.gif&quot; alt=&quot;test-message&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;Ensures the health of message processing components by preventing situations such as garbling outgoing messages due to an internal fault.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/system-management/wire-tap&quot;&gt;Wire Tap&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/wire-tap-icon.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/wire-tap-icon.gif&quot; alt=&quot;wire-tap&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;Inspects messages that travel on a Point-to-Point Channel.&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+</body>
+</html>

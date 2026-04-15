@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>transactional-client.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Transactional Client
+
+This page explains how you can implement a sample scenario of the Transactional Client EIP using WSO2 Integrator: MI.
+
+## Introduction to Transactional Client
+
+The Transactional Client EIP controls transactions with the messaging system. It makes the client’s session with the messaging system transactional so that the client can specify transaction boundaries. 
+
+!!! info
+
+    For more information, see the [Transactional Client](http://www.eaipatterns.com/TransactionalClient.html) documentation.
+
+![Transactional client solution]({{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-endpoints/transactional-client-solution.gif)
+
+## Sample scenario
+
+In many business scenarios, there can be data loss when transferring from one section to another because of crashes and other interruptions. This sample scenario demonstrates how messages containing the MESSAGE_COUNT value (MESSAGE_COUNT=1) are assumed to be causing a failure in mediation, and how transactions guarantee that data will not be lost.
+
+There are two ways to implement transactions in WSO2 MI as follows.
+
+- Transaction Mediator
+- JMS Transactions
+
+The WSO2 MI can control transactional behavior with a JMS queue and by simulating the Transactional Client EAI pattern. For more information on transactions in WSO2 MI, refer to the [Work with Transactions]({{base_path}}/learn/examples/working-with-transactions/) documentation.
+
+The diagram below depicts how to simulate the sample scenario using WSO2 MI.
+
+&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-endpoints/transactional-client.png&quot; style=&quot;width: 70%;&quot; alt=&quot;Transactional client&quot;&gt;
+
+Before digging into implementation details, let&#x27;s take a look at the relationship between the sample scenario and the Transactional Client EIP by comparing their core components.
+
+| Transactional Client EIP            | Transactional Client Sample Scenario            |
+|-------------------------------------|-------------------------------------------------|
+| Transactional Producer              | Proxy service                                   |
+| Message                             | Simple Stock Quote Request                      |
+| Transactional Consumer              | Simple Stock Quote Service                      |
+
+## Synapse configuration of the artifacts
+
+Given below is the synapse configuration of this sample.
+
+=== &quot;Proxy Service&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy name=&quot;StockQuoteProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;jms&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+            &lt;property name=&quot;OUT_ONLY&quot; scope=&quot;axis2&quot; type=&quot;BOOLEAN&quot; value=&quot;true&quot;/&gt;
+            &lt;class name=&quot;org.wso2.esb.client.MessageCounterMediator&quot;/&gt;
+            &lt;log category=&quot;INFO&quot; level=&quot;full&quot;&gt;
+                &lt;property name=&quot;MESSAGE*ID&quot; expression=&quot;get-property(&#x27;MESSAGE_COUNT&#x27;)&quot;/&gt;
+            &lt;/log&gt;
+            &lt;switch source=&quot;get-property(&#x27;MESSAGE_COUNT&#x27;)&quot;&gt;
+                &lt;case regex=&quot;1&quot;&gt;
+                    &lt;property name=&quot;SET_ROLLBACK_ONLY&quot; scope=&quot;axis2&quot; type=&quot;BOOLEAN&quot; value=&quot;true&quot;/&gt;
+                    &lt;log category=&quot;INFO&quot; level=&quot;custom&quot;&gt;
+                        &lt;property name=&quot;Transaction Action&quot; value=&quot;Rollbacked&quot;/&gt;
+                    &lt;/log&gt;
+                &lt;/case&gt;
+                &lt;default&gt;
+                    &lt;log category=&quot;INFO&quot; level=&quot;custom&quot;&gt;
+                        &lt;property name=&quot;Transaction Action&quot; value=&quot;Committed&quot;/&gt;
+                    &lt;/log&gt;
+                    &lt;call&gt;
+                        &lt;endpoint key=&quot;SimpleStockEp&quot;/&gt;
+                    &lt;/call&gt;
+                &lt;/default&gt;
+            &lt;/switch&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence/&gt;
+        &lt;/target&gt;
+        &lt;parameter name=&quot;transport.jms.ContentType&quot;&gt;
+            &lt;rules&gt;
+                &lt;jmsProperty&gt;contentType&lt;/jmsProperty&gt;
+                &lt;default&gt;text/xml&lt;/default&gt;
+            &lt;/rules&gt;
+        &lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.jms.Destination&quot;&gt;StockQuoteQueue&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.jms.ConnectionFactory&quot;&gt;myQueueConnectionFactory&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;Endpoint&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;endpoint name=&quot;SimpleStockEp&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;&gt;
+            &lt;suspendOnFailure&gt;
+                &lt;initialDuration&gt;-1&lt;/initialDuration&gt;
+                &lt;progressionFactor&gt;1&lt;/progressionFactor&gt;
+            &lt;/suspendOnFailure&gt;
+            &lt;markForSuspension&gt;
+                &lt;retriesBeforeSuspension&gt;0&lt;/retriesBeforeSuspension&gt;
+            &lt;/markForSuspension&gt;
+        &lt;/address&gt;
+    &lt;/endpoint&gt;
+    ```
+
+Let&#x27;s investigate the elements of the configuration in detail.
+
+- **class** - A Custom mediator called MessageCountMediator is loaded. This mediator keeps track of the number of messages that pass through the sequence it calls by updating the value of a variable named `MESSAGE_COUNT`.
+- **switch** - The Switch mediator checks the value of `MESSAGE_COUNT`.
+- **case** - If the value of `MESSAGE_COUNT` is 1, the transaction is considered to have failed, and no message will be put on the call channel.
+- **default** - The default action of the switch case flow control. This occurs when the `MESSAGE_COUNT` is anything but 1. The message is put on the call channel, and the transaction is considered a success. 
+
+## Set up the sample scenario
+
+Follow the below instructions to simulate this sample scenario.
+
+{!includes/eip-set-up.md!}
+
+3. Let&#x27;s use ActiveMQ as the message broker in this example. Follow the instructions in the [Connect to ActiveMQ]({{base_path}}/install-and-setup/setup/brokers/configure-with-activemq/) Documentation to configure the broker with WSO2 MI, and start the broker.
+
+    !!! Note
+        Make sure to configure the relevant [JMS parameters]({{base_path}}/reference/synapse-properties/transport-parameters/jms-transport-parameters/) in the `&lt;MI_HOME&gt;/conf/deployment.toml` file.
+
+        ```
+        [[transport.jms.listener]]
+        name = &quot;myQueueConnectionFactory&quot;
+        parameter.initial_naming_factory = &quot;org.apache.activemq.jndi.ActiveMQInitialContextFactory&quot;
+        parameter.provider_url = &quot;tcp://localhost:61616&quot;
+        parameter.connection_factory_name = &quot;QueueConnectionFactory&quot;
+        parameter.connection_factory_type = &quot;queue&quot;
+        ```
+
+4. Download the [backend service](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/axis2Server.zip).
+
+5. Extract the downloaded zip file.
+
+6. Open a terminal, and navigate to the `axis2Server/bin/` directory inside the extracted folder.
+
+7. Execute the following command to start the axis2server with the SimpleStockQuote backend service:
+
+    === &quot;On MacOS/Linux&quot;   
+          ```bash
+          sh axis2server.sh
+          ```
+    === &quot;On Windows&quot;                
+          ```bash
+          axis2server.bat
+
+8. Navigate to the URL where the ActiveMQ WebConsole is available. You can find this URL in the terminal where you started the ActiveMQ instance. It is similar to `http://127.0.0.1:8161/`. 
+
+9. By default, the username and password are both `admin`. 
+
+10. After signing in, click on **Manage ActiveMQ broker**.
+
+11. On the opened page, select the **Queues** tab.
+
+12. Create a queue named `StockQuoteQueue`. 
+
+13. Download the artifacts of the sample.
+
+    &lt;a href=&quot;{{base_path}}/assets/attachments/learn/enterprise-integration-patterns/TransactionalClient.zip&quot;&gt;
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+    &lt;/a&gt;
+
+14. Import the artifacts to WSO2 MI.
+
+    Click **File** -&gt; **Open Folder** -&gt; Select the extracted ZIP file to import the downloaded ZIP file.
+
+15. Download [MessageCounter.jar]({{base_path}}/assets/attachments/jar/MessageCounter.jar) and copy it to the `&lt;PROJECT_HOME&gt;/deployment/libs` directory.
+
+16. Start the project in the WSO2 MI server.
+
+    For instructions, go to [Build and Run]({{base_path}}/develop/deploy-artifacts/#build-and-run) Documentation.
+
+## Execute the sample
+
+1. Go to ActiveMQ WebConsole and send a JMS message by using the **Send To** operation that appeared for the `StockQuoteQueue` queue. Use the following details to send the message.
+    
+    - **Destination**: `StockQuoteQueue`
+    - **Queue or Topic**: `Queue`
+    - **Message Body**: 
+            
+        ```xml
+        &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+            &lt;soapenv:Header/&gt;
+            &lt;soapenv:Body&gt;
+                &lt;m0:placeOrder xmlns:m0=&quot;http://services.samples&quot;&gt;
+                    &lt;m0:order&gt;
+                        &lt;m0:price&gt;172.23182849731984&lt;/m0:price&gt;
+                        &lt;m0:quantity&gt;18398&lt;/m0:quantity&gt;
+                        &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+                    &lt;/m0:order&gt;
+                &lt;/m0:placeOrder&gt;
+            &lt;/soapenv:Body&gt;
+        &lt;/soapenv:Envelope&gt;
+        ```
+
+2. Resend the same JMS message.
+
+## Analyze the output
+
+From the two message attempts, the first attempt will roll back and the second attempt will be committed. A message similar to the one below appears in the simple axis2server. 
+
+```
+Thu Aug 15 10:37:55 IST 2024 samples.services.SimpleStockQuoteService  :: Accepted order #3 for : 18398 stocks of IBM at $ 172.23182849731984
+```
+
+A log similar to below will be printed in the WSO2 MI console.
+
+```
+[2024-08-15 09:58:52,066]  INFO {LogMediator} - {proxy:StockQuoteProxy} To: , WSAction: urn:mediate, SOAPAction: urn:mediate, MessageID: ID:chathurangaj.local-60281-1723653809547-4:4:1:1:9, Direction: request, MESSAGE*ID = 1, Envelope: &lt;?xml version=&#x27;1.0&#x27; encoding=&#x27;utf-8&#x27;?&gt;&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&lt;soapenv:Body&gt;
+    &lt;m0:placeOrder xmlns:m0=&quot;http://services.samples&quot;&gt;
+        &lt;m0:order&gt;
+            &lt;m0:price&gt;172.23182849731984&lt;/m0:price&gt;
+            &lt;m0:quantity&gt;18398&lt;/m0:quantity&gt;
+            &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+        &lt;/m0:order&gt;
+    &lt;/m0:placeOrder&gt;
+   &lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
+[2024-08-15 09:58:52,066]  INFO {LogMediator} - {proxy:StockQuoteProxy} Transaction Action = Rollbacked
+[2024-08-15 09:59:06,684]  INFO {LogMediator} - {proxy:StockQuoteProxy} To: , WSAction: urn:mediate, SOAPAction: urn:mediate, MessageID: ID:chathurangaj.local-60281-1723653809547-4:4:1:1:10, Direction: request, MESSAGE*ID = 2, Envelope: &lt;?xml version=&#x27;1.0&#x27; encoding=&#x27;utf-8&#x27;?&gt;&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;&lt;soapenv:Body&gt;
+    &lt;m0:placeOrder xmlns:m0=&quot;http://services.samples&quot;&gt;
+        &lt;m0:order&gt;
+            &lt;m0:price&gt;172.23182849731984&lt;/m0:price&gt;
+            &lt;m0:quantity&gt;18398&lt;/m0:quantity&gt;
+            &lt;m0:symbol&gt;IBM&lt;/m0:symbol&gt;
+        &lt;/m0:order&gt;
+    &lt;/m0:placeOrder&gt;
+   &lt;/soapenv:Body&gt;&lt;/soapenv:Envelope&gt;
+[2024-08-15 09:59:06,686]  INFO {LogMediator} - {proxy:StockQuoteProxy} Transaction Action = Committed
+```
+</body>
+</html>

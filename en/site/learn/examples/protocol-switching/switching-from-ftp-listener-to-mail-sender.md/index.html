@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>switching-from-ftp-listener-to-mail-sender.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Switch from FTP Listener to Mail Sender
+
+This example demonstrates how WSO2 Integrator: MI receives messages through the FTP transport listener and forwards the messages through the mail transport sender.
+
+VFS transport listener will pick the file from the directory in the FTP server. The file in the FTP directory will be deleted. The response will be sent to the given e-mail address.
+
+## Synapse configuration
+
+Following are the integration artifacts that we can used to implement this scenario. See the instructions on how to [build and run](#build-and-run) this example.
+
+=== &quot;Proxy Service&quot;
+    ```xml
+    &lt;proxy name=&quot;SFTPtoMailToProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;vfs&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;header name=&quot;Action&quot; value=&quot;urn:getQuote&quot; /&gt;
+                &lt;call&gt;
+                    &lt;endpoint key=&quot;SimpleStockQuoteService&quot; /&gt;
+                &lt;/call&gt;
+                &lt;property action=&quot;set&quot; name=&quot;OUT_ONLY&quot; value=&quot;true&quot; /&gt;
+                &lt;property name=&quot;Subject&quot; scope=&quot;transport&quot; type=&quot;STRING&quot; value=&quot;Stock quote response&quot; /&gt;
+                &lt;property name=&quot;messageType&quot; scope=&quot;axis2&quot; type=&quot;STRING&quot; value=&quot;application/xml&quot; /&gt;
+                &lt;send&gt;
+                    &lt;endpoint key=&quot;MailEndpoint&quot; /&gt;
+                &lt;/send&gt;
+            &lt;/inSequence&gt;
+        &lt;/target&gt;
+        &lt;parameter name=&quot;transport.vfs.FileURI&quot;&gt;vfs:sftp://guest:guest@localhost/test?vfs.passive=true&lt;/parameter&gt; &lt;!--CHANGE--&gt;
+        &lt;parameter name=&quot;transport.vfs.ContentType&quot;&gt;text/xml&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.vfs.FileNamePattern&quot;&gt;.*\.xml&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.PollInterval&quot;&gt;15&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    ```
+
+=== &quot;SimpleStockQuoteService Endpoint&quot;
+    ```xml
+    &lt;endpoint name=&quot;SimpleStockQuoteService&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+    &lt;/endpoint&gt;
+    ```
+
+=== &quot;Mail Endpoint&quot; 
+    ```xml
+    &lt;endpoint name=&quot;MailEndpoint&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;address uri=&quot;mailto:user@host&quot;/&gt;
+    &lt;/endpoint&gt;
+    ```
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!} 
+3. Create the proxy service with the [VFS configurations parameters given above]({{base_path}}/reference/config-catalog-mi/#vfs-transport).
+4. Create the [endpoint]({{base_path}}/develop/creating-artifacts/creating-endpoints/) with the given deatails for SimpleStockQuoteService Endpoint.
+5. Create the [endpoint]({{base_path}}/develop/creating-artifacts/creating-endpoints/) with the given deatails for Mail Endpoint.
+6. Configure [MailTo transport sender]({{base_path}}/install-and-setup/setup/transport-configurations/configuring-transports/#configuring-the-mailto-transport).
+7. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI and start the WSO2 Integrator: MI.
+
+Set up the back-end service.
+
+1.	Download the [back-end service](
+https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/axis2Server.zip).
+2. Extract the downloaded zip file.
+3. Open a terminal, navigate to the `axis2Server/bin/` directory inside the extracted folder.
+4. Execute the following command to start the axis2server with the SimpleStockQuote back-end service:
+
+    === &quot;On MacOS/Linux&quot;   
+          ```bash 
+          sh axis2server.sh
+          ```
+    === &quot;On Windows&quot;              
+          ```bash 
+          axis2server.bat
+          ```
+      
+Add the following request.xml file to the sftp location and verify the content received via the mailto transport.
+
+```xml
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+   &lt;soapenv:Header/&gt;
+&lt;soapenv:Body&gt;
+	&lt;m0:getQuote xmlns:m0=&quot;http://services.samples&quot;&gt;
+        &lt;m0:request&gt;
+            &lt;m0:symbol&gt;WSO2&lt;/m0:symbol&gt;
+        &lt;/m0:request&gt;
+     &lt;/m0:getQuote&gt;
+&lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt; 
+```
+</body>
+</html>

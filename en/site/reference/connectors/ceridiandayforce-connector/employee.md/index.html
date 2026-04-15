@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>employee.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Working with Employees
+
+### Overview 
+
+The following operations allow you to work with Employee where you can retrieve employee human resources data and update it.
+If the employee is not already in Dayforce, you can add them.
+
+| Operation | Description |
+| ------------- |-------------|
+|[GET Employees](#retrieving-a-list-of-employees)| Search for employees using a number of parameters including organizational unit, hire dates, and employment status. |
+|[GET Employee Details](#retrieving-details-of-employee)|Retrieve detailed data for a given employee.|
+|[POST Employee](#create-an-employee)|Create an employee in Dayforce. This includes hiring an employee. Dayforce validates the data you submit and creates a new record for the employee.|
+|[PATCH Employee](#update-existing-employee)|Update existing employee records. Supports rehire as well.|
+
+### Operation details
+
+This section provides more details on each of the operations.
+
+#### Retrieving a list of Employees
+
+We can use GET Employees operation with required parameters to search and find the required employees.
+
+**GET Employees**
+```xml
+&lt;ceridiandayforce.getEmployees&gt;
+    &lt;employeeNumber&gt;{$ctx:employeeNumber}&lt;/employeeNumber&gt;
+    &lt;employmentStatusXRefCode&gt;{$ctx:employmentStatusXRefCode}&lt;/employmentStatusXRefCode&gt;
+    &lt;orgUnitXRefCode&gt;{$ctx:orgUnitXRefCode}&lt;/orgUnitXRefCode&gt;
+    &lt;filterHireStartDate&gt;{$ctx:filterHireStartDate}&lt;/filterHireStartDate&gt;
+    &lt;filterHireEndDate&gt;{$ctx:filterHireEndDate}&lt;/filterHireEndDate&gt;
+    &lt;filterTerminationStartDate&gt;{$ctx:filterTerminationStartDate}&lt;/filterTerminationStartDate&gt;
+    &lt;filterTerminationEndDate&gt;{$ctx:filterTerminationEndDate}&lt;/filterTerminationEndDate&gt;
+    &lt;filterUpdatedStartDate&gt;{$ctx:filterUpdatedStartDate}&lt;/filterUpdatedStartDate&gt;
+    &lt;filterUpdatedEndDate&gt;{$ctx:filterUpdatedEndDate}&lt;/filterUpdatedEndDate&gt;
+    &lt;contextDate&gt;{$ctx:contextDate}&lt;/contextDate&gt;
+&lt;/ceridiandayforce.getEmployees&gt;
+```
+
+**Properties**
+
+* employeeNumber: Employment identification number assigned to an employee. A partial value can be provided for a wider search.\
+* employmentStatusXRefCode: A case-sensitive field containing employment status values, which can be client-specific. Use a ContextDate value to search for employees with a given status as of a point in time. Otherwise, the search will use the current date and time.&lt;br/&gt;
+* orgUnitXRefCode: A case-sensitive field that identifies a client&#x27;s organizational units. Use this to search all levels of the employees’ organization including department, location, region, corporate, etc. Use a ContextDate value to search for employees with a specific value as of a point in time. Otherwise, the search will use the current date and time.&lt;br/&gt;
+* filterHireStartDate: Use to search for employees whose most recent hire date is greater than or equal to the specified value (e.g. 2017-01-01T13:24:56). Use with filterHireEndDate to search for employees hired or rehired in a given timeframe.
+* filterHireEndDate: This date is used to search for employees whose most recent hire date is less than or equal to the specified value. Typically this parameter is used in conjunction with FilterHireStartDate to search for employees hired or rehired in a given timeframe. Example: 2017-01-01T13:24:56
+* filterTerminationStartDate: This date is used to search for employees with termination date values greater than or equal to the specified value. Typically this parameter is used in conjunction with FilterTerminationStartDate to search for employees terminated in a given timeframe. Example: 2017-01-01T13:24:56
+* filterTerminationEndDate: This date is used to search for employees with termination date values less than or equal to the specified value. Typically this parameter is used in conjunction with filterTerminationStartDate to search for employees terminated in a given timeframe. Example: 2017-01-01T13:24:56
+* filterUpdatedStartDate: The beginning date used when searching for employees with updates (and newly effective records) in a specified timeframe. When a value is provided for this parameter, a filterUpdatedEndDate value must also be provided. Because this search is conducted across all entities in the HR data model regardless of whether the requesting user has access to them, it is possible that the query will return XRefCode of employees with changes in which the consuming application is not interested. Example: 2017-01-01T13:24:56
+* filterUpdatedEndDate: The end date used when searching for employees with updates (and newly effective records) in a specified timeframe. When a value is provided for this parameter, a filterUpdatedStartDate value must also be provided. Example: 2017-01-01T13:24:56
+* contextDate: The Context Date value is an “as-of” date used to determine which employee data to search when records have specific start and end dates. The service defaults to the current datetime if the requester does not specify a value. Example: 2017-01-01T13:24:56
+
+**Sample request**
+
+Following is a sample request that can be handled by the GET Employees operation.
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;employeeNumber&quot;: &quot;42199&quot;
+}
+```
+
+**Sample response**
+
+Given below is a sample response for the GET Employees operation.
+
+```json
+{
+  &quot;XRefCode&quot;: &quot;42199&quot;
+}
+```
+
+**Related Dayforce documentation**
+
+[https://developers.dayforce.com/Build/API-Explorer/Employee/GET-Employees.aspx](https://developers.dayforce.com/Build/API-Explorer/Employee/GET-Employees.aspx)
+
+#### Retrieving details of employee
+We can use GET Employee Details operation with required parameters to retrieve information on employees
+
+**GET Employee Details**
+```xml
+&lt;ceridiandayforce.getEmployeeDetails&gt;
+    &lt;xRefCode&gt;{$ctx:xRefCode}&lt;/xRefCode&gt;
+    &lt;contextDate&gt;{$ctx:contextDate}&lt;/contextDate&gt;
+    &lt;expand&gt;{$ctx:expand}&lt;/expand&gt;
+    &lt;contextDateRangeFrom&gt;{$ctx:contextDateRangeFrom}&lt;/contextDateRangeFrom&gt;
+    &lt;contextDateRangeTo&gt;{$ctx:contextDateRangeTo}&lt;/contextDateRangeTo&gt;
+&lt;/ceridiandayforce.getEmployeeDetails&gt;
+```
+
+**Properties**
+
+* xRefCode: The unique identifier (external reference code) of the employee to be retrieved. The value provided must be the exact match for an employee; otherwise, a bad request (400) error will be returned.
+* contextDate: The Context Date value is an “as-of” date used to determine which employee data to search when records have specific start and end dates. The service defaults to the current datetime if the requester does not specify a value. Example: 2017-01-01T13:24:56
+* expand: This parameter accepts a comma-separated list of top-level entities that contain the data elements needed for downstream processing. When this parameter is not used, only data elements from the employee primary record will be included. For more information, please refer to the Introduction to Dayforce Web Services document.
+* contextDateRangeFrom: The Context Date Range From value is the start of the range of dates used to determine which employee data to search when records have specific start and end dates. The service defaults to null if the requester does not specify a value. Example: 2017-01-01T13:24:56
+* contextDateRangeTo: The Context Date Range To value is end of the range of dates to determine which employee data to search when records have specific start and end dates. The service defaults to null if the requester does not specify a value. Example: 2017-01-01T13:24:56
+
+**Sample request**
+
+Following is a sample request that can be handled by the GET Employee Details operation.
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;xRefCode&quot;: &quot;42199&quot;
+}
+```
+
+**Sample response**
+
+Given below is a sample response for the GET Employee Details operation.
+
+```json
+{
+  &quot;Data&quot;: {
+    &quot;BioExempt&quot;: false,
+    &quot;BirthDate&quot;: &quot;1969-06-23T00:00:00&quot;,
+    &quot;ChecksumTimestamp&quot;: &quot;2019-10-01T08:21:19.28&quot;,
+    &quot;ClockSupervisor&quot;: false,
+    &quot;Culture&quot;: {
+      &quot;XRefCode&quot;: &quot;en-US&quot;,
+      &quot;ShortName&quot;: &quot;English (US)&quot;,
+      &quot;LongName&quot;: &quot;English (US)&quot;
+    },
+    &quot;EligibleForRehire&quot;: &quot;NOTANSWERED&quot;,
+    &quot;FederatedId&quot;: &quot;aaron.glover&quot;,
+    &quot;Gender&quot;: &quot;M&quot;,
+    &quot;HireDate&quot;: &quot;2000-08-23T00:00:00&quot;,
+    &quot;HomePhone&quot;: &quot;202 265 8987&quot;,
+    &quot;NewHireApprovalDate&quot;: &quot;2000-01-01T00:00:00&quot;,
+    &quot;NewHireApproved&quot;: true,
+    &quot;NewHireApprovedBy&quot;: &quot;System&quot;,
+    &quot;OriginalHireDate&quot;: &quot;2000-08-23T00:00:00&quot;,
+    &quot;PhotoExempt&quot;: false,
+    &quot;RegisteredDisabled&quot;: &quot;NO&quot;,
+    &quot;RequiresExitInterview&quot;: false,
+    &quot;SeniorityDate&quot;: &quot;2000-08-23T00:00:00&quot;,
+    &quot;SocialSecurityNumber&quot;: &quot;252013727&quot;,
+    &quot;StartDate&quot;: &quot;2000-08-23T00:00:00&quot;,
+    &quot;TaxExempt&quot;: true,
+    &quot;FirstTimeAccessEmailSentCount&quot;: 0,
+    &quot;FirstTimeAccessVerificationAttempts&quot;: 0,
+    &quot;SendFirstTimeAccessEmail&quot;: false,
+    &quot;EmployeeBadge&quot;: {
+      &quot;BadgeNumber&quot;: &quot;33333&quot;,
+      &quot;EffectiveStart&quot;: &quot;2000-01-01T00:00:00&quot;
+    },
+    &quot;LoginId&quot;: &quot;mworker&quot;,
+    &quot;HomeOrganization&quot;: {
+      &quot;XRefCode&quot;: &quot;500Packaging&quot;,
+      &quot;ShortName&quot;: &quot;Plant 1 - Packaging&quot;,
+      &quot;LongName&quot;: &quot;Plant 1 - Packaging&quot;
+    },
+    &quot;EmployeeNumber&quot;: &quot;42199&quot;,
+    &quot;BioSensitivityLevel&quot;: {
+      &quot;XRefCode&quot;: &quot;DEFAULT&quot;,
+      &quot;ShortName&quot;: &quot;Default&quot;,
+      &quot;LongName&quot;: &quot;Default&quot;
+    },
+    &quot;XRefCode&quot;: &quot;42199&quot;,
+    &quot;CommonName&quot;: &quot;Aaron&quot;,
+    &quot;DisplayName&quot;: &quot;Aaron Glover&quot;,
+    &quot;FirstName&quot;: &quot;Aaron&quot;,
+    &quot;LastName&quot;: &quot;Glover&quot;
+  }
+}
+```
+
+**Related Dayforce documentation**
+
+[https://developers.dayforce.com/Build/API-Explorer/Employee/GET-Employee-Details.aspx](https://developers.dayforce.com/Build/API-Explorer/Employee/GET-Employee-Details.aspx)
+
+#### Create an employee
+
+We can use POST Employee operation with required parameters to create a new employee in Dayforce.
+
+**POST Employee**
+```xml
+&lt;ceridiandayforce.postEmployees&gt;
+    &lt;fieldAndValue&gt;{$ctx:fieldAndValue}&lt;/fieldAndValue&gt;
+    &lt;isValidateOnly&gt;{$ctx:isValidateOnly}&lt;/isValidateOnly&gt;
+&lt;/ceridiandayforce.postEmployees&gt;
+```
+
+**Properties**
+
+* isValidateOnly: When a TRUE value is used in this parameter, POST (hire and rehire ) and PATCH (employee update) operations validate the request without applying updates to the database.
+
+**Sample request**
+
+Following is a sample request that can be handled by the POST Employee operation.
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;employeeNumber&quot;: &quot;42199&quot;,
+  &quot;isValidateOnly&quot;: &quot;true&quot;,
+  &quot;fieldAndValue&quot;: {
+  &quot;FirstName&quot;: &quot;FSample&quot;,
+  &quot;LastName&quot;: &quot;LSample&quot;,
+  &quot;XRefCode&quot;:&quot;POST0090&quot;,
+  &quot;BioExempt&quot;: false,
+  &quot;BirthDate&quot;: &quot;1990-05-12T00:00:00&quot;,
+  &quot;Culture&quot;: {
+    &quot;XRefCode&quot;: &quot;en-US&quot;
+  },
+  &quot;Gender&quot;: &quot;M&quot;,
+  &quot;HireDate&quot;: &quot;2017-01-15T00:00:00&quot;,
+  &quot;PhotoExempt&quot;: false,
+  &quot;RequiresExitInterview&quot;: false,
+  &quot;SocialSecurityNumber&quot;: &quot;252012728&quot;,
+  &quot;SendFirstTimeAccessEmail&quot;: false,
+  &quot;FirstTimeAccessEmailSentCount&quot;: 0,
+  &quot;FirstTimeAccessVerificationAttempts&quot;: 0,
+  &quot;Addresses&quot;: {
+    &quot;Items&quot;: [
+      {
+        &quot;Address1&quot;: &quot;4110 Yonge St.&quot;,
+        &quot;City&quot;: &quot;North York&quot;,
+        &quot;PostalCode&quot;: &quot;M2P 2B7&quot;,
+        &quot;Country&quot;: {
+          &quot;XRefCode&quot;: &quot;CAN&quot;
+        },
+        &quot;State&quot;: {
+          &quot;XRefCode&quot;: &quot;ON&quot;
+        },
+        &quot;ContactInformationType&quot;: {
+          &quot;XRefCode&quot;: &quot;PrimaryResidence&quot;
+        },
+        &quot;EffectiveStart&quot;: &quot;2017-01-15T00:00:00&quot;
+      }
+    ]
+  } ,
+  &quot;Contacts&quot;: {
+    &quot;Items&quot;: [
+      {
+        &quot;ContactInformationType&quot;: {
+          &quot;XRefCode&quot;: &quot;HomePhone&quot;
+        },
+        &quot;ContactNumber&quot;:&quot;4169872987&quot;,
+        &quot;Country&quot;: {
+          &quot;XRefCode&quot;: &quot;CAN&quot;
+        },
+        &quot;EffectiveStart&quot;: &quot;2017-01-15T00:00:00&quot;,
+        &quot;ShowRejectedWarning&quot;: true,
+        &quot;IsForSystemCommunications&quot;: false,
+        &quot;IsPreferredContactMethod&quot;: false,
+        &quot;NumberOfVerificationRequests&quot;: 0
+      }
+    ]
+  },
+  &quot;EmploymentStatuses&quot;: {
+    &quot;Items&quot;: [
+      {
+
+        &quot;EffectiveStart&quot;: &quot;2017-01-15T00:00:00&quot;,
+        &quot;EmploymentStatus&quot;: {
+          &quot;XRefCode&quot;: &quot;ACTIVE&quot;
+        },
+        &quot;PayType&quot;: {
+          &quot;XRefCode&quot;: &quot;HourlyNon&quot;
+        },
+        &quot;PayClass&quot;: {
+          &quot;XRefCode&quot;: &quot;FT&quot;
+        },
+        &quot;PayGroup&quot;: {
+          &quot;XRefCode&quot;: &quot;CAN&quot;
+        },
+        &quot;CreateShiftRotationShift&quot;: true,
+        &quot;BaseRate&quot;: 10.25,
+        &quot;EmploymentStatusReason&quot;: {
+          &quot;XrefCode&quot;:&quot;NEWHIRE&quot;
+        }
+      }
+    ]
+  },
+  &quot;Roles&quot;: {
+    &quot;Items&quot;: [
+      {
+
+        &quot;Role&quot;: {
+          &quot;XRefCode&quot;: &quot;CAssociate&quot;
+        },
+        &quot;EffectiveStart&quot;: &quot;2017-01-15T00:00:00&quot;,
+        &quot;isDefault&quot;: true
+      }
+    ]
+  },
+  &quot;WorkAssignments&quot;: {
+    &quot;Items&quot;: [
+      {
+        &quot;Position&quot;: {
+          &quot;Department&quot;: {
+            &quot;XRefCode&quot;: &quot;6&quot;
+          },
+          &quot;Job&quot;: {
+            &quot;XRefCode&quot;: &quot;7&quot;
+          }
+        },
+        &quot;Location&quot;: {
+          &quot;XRefCode&quot;: &quot;500Operations&quot;
+        },
+        &quot;EffectiveStart&quot;: &quot;2017-01-15T00:00:00&quot;,
+        &quot;IsPAPrimaryWorkSite&quot;: false,
+        &quot;IsPrimary&quot;: true,
+        &quot;IsVirtual&quot;: false,
+        &quot;EmploymentStatusReason&quot;: {
+          &quot;XrefCode&quot;:&quot;NEW ASSIGNMENT&quot;
+        }
+
+      }
+    ]
+  }
+}
+}
+```
+
+**Sample response**
+
+Given below is a sample response for the POST Employee operation.
+
+```json
+{
+    &quot;ProcessResults&quot;: [
+        {
+            &quot;Code&quot;: &quot;HR_Employee_ValidSSNRequired&quot;,
+            &quot;Context&quot;: &quot;Employee.SocialSecurityNumber&quot;,
+            &quot;Level&quot;: &quot;WARN&quot;,
+            &quot;Message&quot;: &quot;Valid National ID is required for employee&quot;
+        }
+    ]
+}
+```
+
+**Related Dayforce documentation**
+
+[https://developers.dayforce.com/Build/API-Explorer/Employee/POST-Employee.aspx](https://developers.dayforce.com/Build/API-Explorer/Employee/POST-Employee.aspx)
+
+#### Update existing employee
+
+We can use PATCH employee operation to update an existing employee details.
+
+
+**PATCH Employee**
+```xml
+&lt;ceridiandayforce.patchEmployee&gt;
+    &lt;fieldAndValue&gt;{$ctx:fieldAndValue}&lt;/fieldAndValue&gt;
+    &lt;xRefCode&gt;{$ctx:xRefCode}&lt;/xRefCode&gt;
+    &lt;isValidateOnly&gt;{$ctx:isValidateOnly}&lt;/isValidateOnly&gt;
+&lt;/ceridiandayforce.patchEmployee&gt;
+```
+
+**Properties**
+
+* xRefCode: The unique identifier (external reference code) of the employee to be retrieved. The value provided must be the exact match for an employee; otherwise, a bad request (400) error will be returned.
+* isValidateOnly: When a TRUE value is used in this parameter, POST (hire and rehire ) and PATCH (employee update) operations validate the request without applying updates to the database.
+
+**Sample request**
+
+Following is a sample request that can be handled by the PATCH Employee operation.
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;employeeNumber&quot;: &quot;42199&quot;,
+  &quot;isValidateOnly&quot;: &quot;true&quot;,
+  &quot;xRefCode&quot;: &quot;42199&quot;,
+  &quot;fieldAndValue&quot;: {
+  &quot;FirstName&quot;: &quot;FSample&quot;,
+  &quot;LastName&quot;: &quot;LSample&quot;,
+  &quot;XRefCode&quot;:&quot;42199&quot;,
+  &quot;BioExempt&quot;: false,
+  &quot;BirthDate&quot;: &quot;1990-05-12T00:00:00&quot;,
+  &quot;Culture&quot;: {
+    &quot;XRefCode&quot;: &quot;en-US&quot;
+  },
+  &quot;Gender&quot;: &quot;M&quot;,
+  &quot;HireDate&quot;: &quot;2017-01-15T00:00:00&quot;,
+  &quot;PhotoExempt&quot;: false,
+  &quot;RequiresExitInterview&quot;: false,
+  &quot;SocialSecurityNumber&quot;: &quot;252012728&quot;,
+  &quot;SendFirstTimeAccessEmail&quot;: false,
+  &quot;FirstTimeAccessEmailSentCount&quot;: 0,
+  &quot;FirstTimeAccessVerificationAttempts&quot;: 0,
+  &quot;Addresses&quot;: {
+    &quot;Items&quot;: [
+      {
+        &quot;Address1&quot;: &quot;4110 Yonge St.&quot;,
+        &quot;City&quot;: &quot;North York&quot;,
+        &quot;PostalCode&quot;: &quot;M2P 2B7&quot;,
+        &quot;Country&quot;: {
+          &quot;XRefCode&quot;: &quot;CAN&quot;
+        },
+        &quot;State&quot;: {
+          &quot;XRefCode&quot;: &quot;ON&quot;
+        },
+        &quot;ContactInformationType&quot;: {
+          &quot;XRefCode&quot;: &quot;PrimaryResidence&quot;
+        },
+        &quot;EffectiveStart&quot;: &quot;2017-01-15T00:00:00&quot;
+      }
+    ]
+  } ,
+  &quot;Contacts&quot;: {
+    &quot;Items&quot;: [
+      {
+        &quot;ContactInformationType&quot;: {
+          &quot;XRefCode&quot;: &quot;HomePhone&quot;
+        },
+        &quot;ContactNumber&quot;:&quot;4169872987&quot;,
+        &quot;Country&quot;: {
+          &quot;XRefCode&quot;: &quot;CAN&quot;
+        },
+        &quot;EffectiveStart&quot;: &quot;2017-01-15T00:00:00&quot;,
+        &quot;ShowRejectedWarning&quot;: true,
+        &quot;IsForSystemCommunications&quot;: false,
+        &quot;IsPreferredContactMethod&quot;: false,
+        &quot;NumberOfVerificationRequests&quot;: 0
+      }
+    ]
+  },
+  &quot;EmploymentStatuses&quot;: {
+    &quot;Items&quot;: [
+      {
+
+        &quot;EffectiveStart&quot;: &quot;2017-01-15T00:00:00&quot;,
+        &quot;EmploymentStatus&quot;: {
+          &quot;XRefCode&quot;: &quot;ACTIVE&quot;
+        },
+        &quot;PayType&quot;: {
+          &quot;XRefCode&quot;: &quot;HourlyNon&quot;
+        },
+        &quot;PayClass&quot;: {
+          &quot;XRefCode&quot;: &quot;FT&quot;
+        },
+        &quot;PayGroup&quot;: {
+          &quot;XRefCode&quot;: &quot;CAN&quot;
+        },
+        &quot;CreateShiftRotationShift&quot;: true,
+        &quot;BaseRate&quot;: 10.25,
+        &quot;EmploymentStatusReason&quot;: {
+          &quot;XrefCode&quot;:&quot;NEWHIRE&quot;
+        }
+      }
+    ]
+  },
+  &quot;Roles&quot;: {
+    &quot;Items&quot;: [
+      {
+
+        &quot;Role&quot;: {
+          &quot;XRefCode&quot;: &quot;CAssociate&quot;
+        },
+        &quot;EffectiveStart&quot;: &quot;2017-01-15T00:00:00&quot;,
+        &quot;isDefault&quot;: true
+      }
+    ]
+  },
+  &quot;WorkAssignments&quot;: {
+    &quot;Items&quot;: [
+      {
+        &quot;Position&quot;: {
+          &quot;Department&quot;: {
+            &quot;XRefCode&quot;: &quot;6&quot;
+          },
+          &quot;Job&quot;: {
+            &quot;XRefCode&quot;: &quot;7&quot;
+          }
+        },
+        &quot;Location&quot;: {
+          &quot;XRefCode&quot;: &quot;500Operations&quot;
+        },
+        &quot;EffectiveStart&quot;: &quot;2017-01-15T00:00:00&quot;,
+        &quot;IsPAPrimaryWorkSite&quot;: false,
+        &quot;IsPrimary&quot;: true,
+        &quot;IsVirtual&quot;: false,
+        &quot;EmploymentStatusReason&quot;: {
+          &quot;XrefCode&quot;:&quot;NEW ASSIGNMENT&quot;
+        }
+
+      }
+    ]
+  }
+}
+}
+```
+
+**Sample response**
+
+Given below is a sample response for the PATCH Employee operation.
+
+```json
+{
+    &quot;ProcessResults&quot;: [
+        {
+            &quot;Code&quot;: &quot;HR_Employee_ValidSSNRequired&quot;,
+            &quot;Context&quot;: &quot;Employee.SocialSecurityNumber&quot;,
+            &quot;Level&quot;: &quot;WARN&quot;,
+            &quot;Message&quot;: &quot;Valid National ID is required for employee&quot;
+        }
+    ]
+}
+```
+
+**Related Dayforce documentation**
+
+[https://developers.dayforce.com/Build/API-Explorer/Employee/PATCH-Employee.aspx](https://developers.dayforce.com/Build/API-Explorer/Employee/PATCH-Employee.aspx)
+
+### Sample configuration
+
+Following example illustrates how to connect to Dayforce with the init operation and query operation.
+
+1.Create a sample proxy as below :
+```xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
+       name=&quot;query&quot;
+       startOnLoad=&quot;true&quot;
+       statistics=&quot;disable&quot;
+       trace=&quot;disable&quot;
+       transports=&quot;http,https&quot;&gt;
+   &lt;target&gt;
+      &lt;inSequence&gt;
+         &lt;log level=&quot;full&quot; separator=&quot;,&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.username)&quot; name=&quot;username&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.password)&quot; name=&quot;password&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.clientNamespace)&quot; name=&quot;clientNamespace&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.apiVersion)&quot; name=&quot;apiVersion&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.xRefCode)&quot; name=&quot;xRefCode&quot;/&gt;
+         &lt;ceridiandayforce.init&gt;
+            &lt;username&gt;{$ctx:username}&lt;/username&gt;
+            &lt;password&gt;{$ctx:password}&lt;/password&gt;
+            &lt;clientNamespace&gt;{$ctx:clientNamespace}&lt;/clientNamespace&gt;
+            &lt;apiVersion&gt;{$ctx:apiVersion}&lt;/apiVersion&gt;
+         &lt;/ceridiandayforce.init&gt;
+         &lt;ceridiandayforce.getEmployees&gt;
+            &lt;xRefCode&gt;{$ctx:xRefCode}&lt;/xRefCode&gt;
+         &lt;/ceridiandayforce.getEmployees&gt;
+         &lt;send/&gt;
+      &lt;/inSequence&gt;
+   &lt;/target&gt;
+   &lt;description/&gt;
+&lt;/proxy&gt;
+                                
+```
+
+2.Create a json file named query.json and copy the configurations given below to it:
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;employeeNumber&quot;: &quot;42199&quot;
+}
+```
+3.Replace the credentials with your values.
+
+4.Execute the following curl command:
+
+```bash
+curl http://localhost:8280/services/query -H &quot;Content-Type: application/json&quot; -d @query.json
+```
+5.Dayforce returns a json response similar to the one shown below:
+ 
+```json
+{
+  &quot;XRefCode&quot;: &quot;42199&quot;
+}
+```</body>
+</html>

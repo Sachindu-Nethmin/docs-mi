@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>employeerawpunches.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Working with Employee Raw Punches
+
+### Overview 
+
+The following operations allow you to retrieve, create raw punches of an employee
+
+| Operation | Description |
+| ------------- |-------------|
+|[GET Employee Raw Punches](#retrieving-employee-raw-punches)| Retrieve raw punches as they are entered at the clock. |
+|[POST Employee Raw Punches](#creating-employee-raw-punches)| Insert a raw punch. This raw punch record will be treated as a punch coming from the clock and be validated against configured punch policies. |
+
+### Operation details
+
+This section provides more details on each of the operations.
+
+#### Retrieving Employee Raw Punches
+We can use GET Employee Raw Punches operation with required parameters to retrieve raw punches of employees.
+
+**GET Employee Raw Punches**
+```xml
+&lt;ceridiandayforce.getEmployeeRawPunches&gt;
+    &lt;filterTransactionStartTimeUTC&gt;{$ctx:filterTransactionStartTimeUTC}&lt;/filterTransactionStartTimeUTC&gt;
+    &lt;filterTransactionEndTimeUTC&gt;{$ctx:filterTransactionEndTimeUTC}&lt;/filterTransactionEndTimeUTC&gt;
+    &lt;employeeXRefCode&gt;{$ctx:employeeXRefCode}&lt;/employeeXRefCode&gt;
+    &lt;employeeBadge&gt;{$ctx:employeeBadge}&lt;/employeeBadge&gt;
+    &lt;punchState&gt;{$ctx:punchState}&lt;/punchState&gt;
+    &lt;punchTypes&gt;{$ctx:punchTypes}&lt;/punchTypes&gt;
+    &lt;pageSize&gt;{$ctx:pageSize}&lt;/pageSize&gt;
+&lt;/ceridiandayforce.getEmployeeRawPunches&gt;
+```
+
+**Properties**
+
+* filterTransactionStartTimeUTC (Mandatory): Inclusive transaction period start date in UTC to determine which employee punch data to retrieve. Example: 2017-01-01T00:00:00
+* filterTransactionEndTimeUTC (Mandatory): Inclusive transaction period end date in UTC to determine which employee punch data to retrieve. Example: 2017-01-01T00:00:00
+* employeeXRefCode (Optional): The unique identifier (external reference code) of the employee to be retrieved. The value provided must be the exact match for an employee
+* employeeBadge (Optional): The badge number of the employee to be retrieved. The value provided must be the exact match for a badge
+* punchState (Optional): The state of the punch. Examples: [PROCESSED, REJECTED, ALL]
+* punchTypes (Optional): Comma separated values of punch types. Example: [Punch_In, Break_Out, Job_Transfer, ALL, etc]
+* pageSize (Optional): The number of records returned per page in the paginated response
+
+**Sample request**
+
+Following is a sample request that can be handled by this operation.
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;xRefCode&quot;: &quot;42199&quot;,
+  &quot;filterTransactionStartTimeUTC&quot;: &quot;2019-06-03T00:00:00&quot;,
+  &quot;filterTransactionEndTimeUTC&quot;: &quot;2019-06-05T00:00:00&quot;
+}
+```
+
+**Sample response**
+
+Given below is a sample response for this operation.
+
+```json
+{
+    &quot;Data&quot;: [
+        {
+            &quot;RawPunchXRefCode&quot;: &quot;#DF_322&quot;,
+            &quot;PunchState&quot;: &quot;Rejected&quot;,
+            &quot;EmployeeBadge&quot;: &quot;42199&quot;,
+            &quot;RawPunchTime&quot;: &quot;2019-06-04T11:28:28-04:00&quot;,
+            &quot;WasOfflinePunch&quot;: false,
+            &quot;PunchType&quot;: &quot;Punch_In&quot;,
+            &quot;PunchDevice&quot;: &quot;prdemo500bHTML&quot;,
+            &quot;IsDuplicate&quot;: false,
+            &quot;RejectedReason&quot;: &quot;Employee Badge Validation&quot;,
+            &quot;IPAddress&quot;: &quot;10.66.25.192&quot;,
+            &quot;PunchOrigin&quot;: &quot;C&quot;
+        },
+        {
+            &quot;RawPunchXRefCode&quot;: &quot;#DF_323&quot;,
+            &quot;PunchState&quot;: &quot;Rejected&quot;,
+            &quot;EmployeeXRefCode&quot;: &quot;42199&quot;,
+            &quot;EmployeeBadge&quot;: &quot;33333&quot;,
+            &quot;RawPunchTime&quot;: &quot;2019-06-04T11:28:56-04:00&quot;,
+            &quot;WasOfflinePunch&quot;: false,
+            &quot;PunchType&quot;: &quot;Punch_In&quot;,
+            &quot;PunchDevice&quot;: &quot;prdemo500bHTML&quot;,
+            &quot;IsDuplicate&quot;: false,
+            &quot;RejectedReason&quot;: &quot;Shift Start Validation&quot;,
+            &quot;IPAddress&quot;: &quot;10.66.25.192&quot;,
+            &quot;PunchOrigin&quot;: &quot;C&quot;
+        },
+        {
+            &quot;RawPunchXRefCode&quot;: &quot;#DF_324&quot;,
+            &quot;PunchState&quot;: &quot;Processed&quot;,
+            &quot;EmployeeXRefCode&quot;: &quot;42199&quot;,
+            &quot;EmployeeBadge&quot;: &quot;33333&quot;,
+            &quot;RawPunchTime&quot;: &quot;2019-06-04T11:30:00-04:00&quot;,
+            &quot;WasOfflinePunch&quot;: false,
+            &quot;PunchType&quot;: &quot;Punch_In&quot;,
+            &quot;PunchDevice&quot;: &quot;prdemo500bHTML&quot;,
+            &quot;IsDuplicate&quot;: false,
+            &quot;IPAddress&quot;: &quot;10.66.25.192&quot;,
+            &quot;PunchOrigin&quot;: &quot;C&quot;
+        },
+        {
+            &quot;RawPunchXRefCode&quot;: &quot;#DF_325&quot;,
+            &quot;PunchState&quot;: &quot;Processed&quot;,
+            &quot;EmployeeXRefCode&quot;: &quot;42199&quot;,
+            &quot;EmployeeBadge&quot;: &quot;33333&quot;,
+            &quot;RawPunchTime&quot;: &quot;2019-06-04T11:30:18-04:00&quot;,
+            &quot;WasOfflinePunch&quot;: false,
+            &quot;PunchType&quot;: &quot;Meal_In&quot;,
+            &quot;PunchDevice&quot;: &quot;prdemo500bHTML&quot;,
+            &quot;IsDuplicate&quot;: false,
+            &quot;IPAddress&quot;: &quot;10.66.25.192&quot;,
+            &quot;PunchOrigin&quot;: &quot;C&quot;
+        },
+        {
+            &quot;RawPunchXRefCode&quot;: &quot;#DF_326&quot;,
+            &quot;PunchState&quot;: &quot;Processed&quot;,
+            &quot;EmployeeXRefCode&quot;: &quot;42199&quot;,
+            &quot;EmployeeBadge&quot;: &quot;33333&quot;,
+            &quot;RawPunchTime&quot;: &quot;2019-06-04T18:28:28-04:00&quot;,
+            &quot;WasOfflinePunch&quot;: false,
+            &quot;PunchType&quot;: &quot;Meal_Out&quot;,
+            &quot;PunchDevice&quot;: &quot;API&quot;,
+            &quot;IsDuplicate&quot;: false,
+            &quot;IPAddress&quot;: &quot;63.235.55.130&quot;,
+            &quot;PunchOrigin&quot;: &quot;C&quot;
+        }
+    ],
+    &quot;Paging&quot;: {
+        &quot;Next&quot;: &quot;&quot;
+    }
+}
+```
+
+**Related Dayforce documentation**
+
+[https://developers.dayforce.com/Build/API-Explorer/Time-Management/GET-Employee-Raw-Punches.aspx](https://developers.dayforce.com/Build/API-Explorer/Time-Management/GET-Employee-Raw-Punches.aspx)
+
+#### Creating Employee Raw Punches
+We can use POST Employee Raw Punches operation with required parameters to create raw punches for employees.
+
+**POST Employee Raw Punches**
+```xml
+&lt;ceridiandayforce.postEmployeeRawPunches&gt;
+    &lt;isValidateOnly&gt;{$ctx:isValidateOnly}&lt;/isValidateOnly&gt;
+    &lt;fieldAndValue&gt;{$ctx:fieldAndValue}&lt;/fieldAndValue&gt;
+&lt;/ceridiandayforce.postEmployeeRawPunches&gt;
+```
+
+**Properties**
+
+* isValidateOnly (Mandatory): When a TRUE value is used in this parameter, POST and PATCH operations validate the request without applying updates to the database.
+
+**Sample request**
+
+Following is a sample request that can be handled by this operation.
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;xRefCode&quot;: &quot;42199&quot;,
+  &quot;isValidateOnly&quot;: &quot;true&quot;,
+  &quot;fieldAndValue&quot;: {
+	  &quot;EmployeeBadge&quot;: &quot;33333&quot;,
+	  &quot;RawPunchTime&quot;: &quot;2019-06-04T11:28:28-04:00&quot;,
+	  &quot;PunchType&quot;: &quot;Punch_In&quot;,
+	  &quot;PunchDevice&quot;: &quot;API&quot;
+	}
+}
+```
+
+**Sample response**
+
+Dayforce returns HTTP Code 200
+
+**Related Dayforce documentation**
+
+[https://developers.dayforce.com/Build/API-Explorer/Time-Management/POST-Employee-Raw-Punches.aspx](https://developers.dayforce.com/Build/API-Explorer/Time-Management/POST-Employee-Raw-Punches.aspx)
+
+### Sample configuration
+
+Following example illustrates how to connect to Dayforce with the init operation and query operation.
+
+1.Create a sample proxy as below :
+```xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
+       name=&quot;query&quot;
+       startOnLoad=&quot;true&quot;
+       statistics=&quot;disable&quot;
+       trace=&quot;disable&quot;
+       transports=&quot;http,https&quot;&gt;
+   &lt;target&gt;
+      &lt;inSequence&gt;
+         &lt;log level=&quot;full&quot; separator=&quot;,&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.username)&quot; name=&quot;username&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.password)&quot; name=&quot;password&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.clientNamespace)&quot; name=&quot;clientNamespace&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.apiVersion)&quot; name=&quot;apiVersion&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.filterTransactionStartTimeUTC)&quot; name=&quot;filterTransactionStartTimeUTC&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.filterTransactionEndTimeUTC)&quot; name=&quot;filterTransactionEndTimeUTC&quot;/&gt;
+         &lt;ceridiandayforce.init&gt;
+            &lt;username&gt;{$ctx:username}&lt;/username&gt;
+            &lt;password&gt;{$ctx:password}&lt;/password&gt;
+            &lt;clientNamespace&gt;{$ctx:clientNamespace}&lt;/clientNamespace&gt;
+            &lt;apiVersion&gt;{$ctx:apiVersion}&lt;/apiVersion&gt;
+         &lt;/ceridiandayforce.init&gt;
+         &lt;ceridiandayforce.getEmployeeRawPunches&gt;
+            &lt;filterTransactionStartTimeUTC&gt;{$ctx:filterTransactionStartTimeUTC}&lt;/filterTransactionStartTimeUTC&gt;
+            &lt;filterTransactionEndTimeUTC&gt;{$ctx:filterTransactionEndTimeUTC}&lt;/filterTransactionEndTimeUTC&gt;
+         &lt;/ceridiandayforce.getEmployeeRawPunches&gt;
+         &lt;send/&gt;
+      &lt;/inSequence&gt;
+   &lt;/target&gt;
+   &lt;description/&gt;
+&lt;/proxy&gt;
+                                
+```
+
+2.Create a json file named query.json and copy the configurations given below to it:
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;xRefCode&quot;: &quot;42199&quot;,
+  &quot;filterTransactionStartTimeUTC&quot;: &quot;2019-06-03T00:00:00&quot;,
+  &quot;filterTransactionEndTimeUTC&quot;: &quot;2019-06-05T00:00:00&quot;
+}
+```
+3.Replace the credentials with your values.
+
+4.Execute the following curl command:
+
+```bash
+curl http://localhost:8280/services/query -H &quot;Content-Type: application/json&quot; -d @query.json
+```
+5.Dayforce returns HTTP Code 200 with the following response body
+
+```json
+{
+    &quot;Data&quot;: [
+        {
+            &quot;RawPunchXRefCode&quot;: &quot;#DF_322&quot;,
+            &quot;PunchState&quot;: &quot;Rejected&quot;,
+            &quot;EmployeeBadge&quot;: &quot;42199&quot;,
+            &quot;RawPunchTime&quot;: &quot;2019-06-04T11:28:28-04:00&quot;,
+            &quot;WasOfflinePunch&quot;: false,
+            &quot;PunchType&quot;: &quot;Punch_In&quot;,
+            &quot;PunchDevice&quot;: &quot;prdemo500bHTML&quot;,
+            &quot;IsDuplicate&quot;: false,
+            &quot;RejectedReason&quot;: &quot;Employee Badge Validation&quot;,
+            &quot;IPAddress&quot;: &quot;10.66.25.192&quot;,
+            &quot;PunchOrigin&quot;: &quot;C&quot;
+        },
+        {
+            &quot;RawPunchXRefCode&quot;: &quot;#DF_323&quot;,
+            &quot;PunchState&quot;: &quot;Rejected&quot;,
+            &quot;EmployeeXRefCode&quot;: &quot;42199&quot;,
+            &quot;EmployeeBadge&quot;: &quot;33333&quot;,
+            &quot;RawPunchTime&quot;: &quot;2019-06-04T11:28:56-04:00&quot;,
+            &quot;WasOfflinePunch&quot;: false,
+            &quot;PunchType&quot;: &quot;Punch_In&quot;,
+            &quot;PunchDevice&quot;: &quot;prdemo500bHTML&quot;,
+            &quot;IsDuplicate&quot;: false,
+            &quot;RejectedReason&quot;: &quot;Shift Start Validation&quot;,
+            &quot;IPAddress&quot;: &quot;10.66.25.192&quot;,
+            &quot;PunchOrigin&quot;: &quot;C&quot;
+        },
+        {
+            &quot;RawPunchXRefCode&quot;: &quot;#DF_324&quot;,
+            &quot;PunchState&quot;: &quot;Processed&quot;,
+            &quot;EmployeeXRefCode&quot;: &quot;42199&quot;,
+            &quot;EmployeeBadge&quot;: &quot;33333&quot;,
+            &quot;RawPunchTime&quot;: &quot;2019-06-04T11:30:00-04:00&quot;,
+            &quot;WasOfflinePunch&quot;: false,
+            &quot;PunchType&quot;: &quot;Punch_In&quot;,
+            &quot;PunchDevice&quot;: &quot;prdemo500bHTML&quot;,
+            &quot;IsDuplicate&quot;: false,
+            &quot;IPAddress&quot;: &quot;10.66.25.192&quot;,
+            &quot;PunchOrigin&quot;: &quot;C&quot;
+        },
+        {
+            &quot;RawPunchXRefCode&quot;: &quot;#DF_325&quot;,
+            &quot;PunchState&quot;: &quot;Processed&quot;,
+            &quot;EmployeeXRefCode&quot;: &quot;42199&quot;,
+            &quot;EmployeeBadge&quot;: &quot;33333&quot;,
+            &quot;RawPunchTime&quot;: &quot;2019-06-04T11:30:18-04:00&quot;,
+            &quot;WasOfflinePunch&quot;: false,
+            &quot;PunchType&quot;: &quot;Meal_In&quot;,
+            &quot;PunchDevice&quot;: &quot;prdemo500bHTML&quot;,
+            &quot;IsDuplicate&quot;: false,
+            &quot;IPAddress&quot;: &quot;10.66.25.192&quot;,
+            &quot;PunchOrigin&quot;: &quot;C&quot;
+        },
+        {
+            &quot;RawPunchXRefCode&quot;: &quot;#DF_326&quot;,
+            &quot;PunchState&quot;: &quot;Processed&quot;,
+            &quot;EmployeeXRefCode&quot;: &quot;42199&quot;,
+            &quot;EmployeeBadge&quot;: &quot;33333&quot;,
+            &quot;RawPunchTime&quot;: &quot;2019-06-04T18:28:28-04:00&quot;,
+            &quot;WasOfflinePunch&quot;: false,
+            &quot;PunchType&quot;: &quot;Meal_Out&quot;,
+            &quot;PunchDevice&quot;: &quot;API&quot;,
+            &quot;IsDuplicate&quot;: false,
+            &quot;IPAddress&quot;: &quot;63.235.55.130&quot;,
+            &quot;PunchOrigin&quot;: &quot;C&quot;
+        }
+    ],
+    &quot;Paging&quot;: {
+        &quot;Next&quot;: &quot;&quot;
+    }
+}
+```
+</body>
+</html>

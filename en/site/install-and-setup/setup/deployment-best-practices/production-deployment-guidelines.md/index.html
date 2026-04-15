@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>production-deployment-guidelines.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Production Deployment Checklist
+
+Given below is a checklist that will guide you to set up your production environment for WSO2 Integrator: MI.
+
+&lt;table&gt;
+   &lt;thead&gt;
+      &lt;tr class=&quot;header&quot;&gt;
+         &lt;th&gt;Guideline&lt;/th&gt;
+         &lt;th&gt;Details&lt;/th&gt;
+      &lt;/tr&gt;
+   &lt;/thead&gt;
+   &lt;tbody&gt;
+      &lt;tr class=&quot;odd&quot;&gt;
+         &lt;td&gt;Security hardening&lt;/td&gt;
+         &lt;td&gt;
+            &lt;div class=&quot;content-wrapper&quot;&gt;
+               &lt;p&gt;Guidelines for hardening the security of a WSO2 deployment in a production environment can be discussed under three high-level categories:&lt;/p&gt;
+               &lt;ul&gt;
+                  &lt;li&gt;Product-level security&lt;/li&gt;
+                  &lt;li&gt;OS-level security&lt;/li&gt;
+                  &lt;li&gt;Network-level security&lt;br /&gt;
+                     &lt;br /&gt;
+                  &lt;/li&gt;
+               &lt;/ul&gt;
+               &lt;div class=&quot;panel&quot; style=&quot;border-width: 1px;&quot;&gt;
+                  &lt;div class=&quot;panelHeader&quot; style=&quot;border-bottom-width: 1px;&quot;&gt;
+                     &lt;strong&gt;Related links&lt;/strong&gt;
+                  &lt;/div&gt;
+                  &lt;div class=&quot;panelContent&quot;&gt;
+                     &lt;p&gt;&lt;a href=&quot;{{base_path}}/install-and-setup/setup/deployment-best-practices/security-guidelines-for-production-deployment&quot;&gt;Security Guidelines for a Production Deployment&lt;/a&gt;&lt;/p&gt;
+                  &lt;/div&gt;
+               &lt;/div&gt;
+            &lt;/div&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;even&quot;&gt;
+         &lt;td&gt;Hostname&lt;/td&gt;
+         &lt;td&gt;
+            &lt;div class=&quot;content-wrapper&quot;&gt;
+               By default, WSO2 products identify the hostname of the current machine through the Java API. However, it is recommended to configure the hostname by setting the &lt;code&gt;hostname&lt;/code&gt; parameter in the &lt;code&gt;deployment.toml&lt;/code&gt; file.
+               &lt;div class=&quot;code panel pdl&quot; style=&quot;border-width: 1px;&quot;&gt;
+                  &lt;div class=&quot;codeContent panelContent pdl&quot;&gt;
+                     &lt;div class=&quot;sourceCode&quot; id=&quot;cb1&quot; data-syntaxhighlighter-params=&quot;brush: xml; gutter: false; theme: Confluence&quot; data-theme=&quot;Confluence&quot; style=&quot;brush: xml; gutter: false; theme: Confluence&quot;&gt;
+                        &lt;pre class=&quot;sourceCode xml&quot;&gt;&lt;code class=&quot;sourceCode xml&quot;&gt;&lt;span id=&quot;cb1-1&quot;&gt;&lt;a href=&quot;#cb1-1&quot;&gt;&lt;/a&gt;&lt;span class=&quot;kw&quot;&gt;[server]&lt;/br&gt;hostname=&quot;localhost&quot;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
+                     &lt;/div&gt;
+                  &lt;/div&gt;
+               &lt;/div&gt;
+               &lt;div class=&quot;panel&quot; style=&quot;border-width: 1px;&quot;&gt;
+                  &lt;div class=&quot;panelHeader&quot; style=&quot;border-bottom-width: 1px;&quot;&gt;
+                     &lt;strong&gt;Related links&lt;/strong&gt;
+                  &lt;/div&gt;
+                  &lt;div class=&quot;panelContent&quot;&gt;
+                     &lt;p&gt;&lt;a href=&quot;{{base_path}}/install-and-setup/setup/deployment-best-practices/changing-the-hostname&quot;&gt;Changing the hostname&lt;/a&gt;&lt;/p&gt;
+                  &lt;/div&gt;
+               &lt;/div&gt;
+            &lt;/div&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;odd&quot;&gt;
+         &lt;td&gt;Registry and governance&lt;/td&gt;
+         &lt;td&gt;
+            &lt;div class=&quot;content-wrapper&quot;&gt;
+               &lt;p&gt;The WSO2 Integrator: MI runtime uses a file-based registry instead of a database.&lt;/p&gt;
+               &lt;ul&gt;
+                  &lt;li&gt;
+                     &lt;a href=&quot;{{base_path}}/install-and-setup/setup/deployment/file-based-registry&quot;&gt;File-based registry&lt;/a&gt; for the WSO2 Integrator: MI runtime.
+                  &lt;/li&gt;
+               &lt;/ul&gt;
+            &lt;/div&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;even&quot;&gt;
+         &lt;td&gt;Performance Tuning&lt;/td&gt;
+         &lt;td&gt;
+            &lt;div class=&quot;content-wrapper&quot;&gt;
+               &lt;p&gt;Most of the performance tuning recommendations are common to all WSO2 products. However, each WSO2 product may have additional guidelines for optimizing the performance of product-specific features.&lt;/p&gt;
+               &lt;ul&gt;
+                  &lt;li&gt;
+                     Performance tuning - WSO2 Integrator: MI
+                  &lt;/li&gt;
+               &lt;/ul&gt;
+            &lt;/div&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;odd&quot;&gt;
+         &lt;td&gt;Firewalls&lt;/td&gt;
+         &lt;td&gt;
+            &lt;div class=&quot;content-wrapper&quot;&gt;
+               &lt;p&gt;The following ports must be accessed when operating within a firewall:&lt;/p&gt;
+               &lt;ul&gt;
+                  &lt;li&gt;8290 - Default HTTP port used by the WSO2 Integrator: MI for proxy services and APIs.&lt;/li&gt;
+                  &lt;li&gt;8253 - Default HTTPS port used by the WSO2 Integrator: MI for proxy services and APIs.&lt;/li&gt;
+                  &lt;li&gt;9164 - Default HTTPS port used by the WSO2 Integrator: MI Management APIs.&lt;/li&gt;
+               &lt;/ul&gt;
+            &lt;/div&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;even&quot;&gt;
+         &lt;td&gt;Proxy servers&lt;/td&gt;
+         &lt;td&gt;
+            If the runtime is hosted behind a proxy such as ApacheHTTPD, you can configure the runtime  to use the proxy server. See the following topics for instructions:
+            &lt;ul&gt;
+               &lt;li&gt;Configuring a &lt;a href=&quot;{{base_path}}/install-and-setup/setup/configuring-proxy-servers&quot;&gt;proxy server for the WSO2 Integrator: MI runtime&lt;/a&gt;.&lt;/li&gt;
+            &lt;/ul&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;odd&quot;&gt;
+         &lt;td&gt;High availability&lt;/td&gt;
+         &lt;td&gt;
+            &lt;p&gt;In the cloud native deployment, high availability should be achieved via the container orchestration system ( Ex: Kubernetes ). There are builtin &lt;a href=&quot;{{base_path}}/install-and-setup/setup/deployment-best-practices/basic-health-checks&quot;&gt;readiness and liveness probes&lt;/a&gt; available in WSO2 Integrator: MI.&lt;/p&gt;
+            &lt;p&gt;In a VM deployment, we can use a load balancer with multiple nodes as described &lt;a href=&quot;{{base_path}}/install-and-setup/setup/deployment/deploying-wso2-mi&quot;&gt;here&lt;/a&gt; to achieve high availability.&lt;/p&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;even&quot;&gt;
+         &lt;td&gt;Data backup and archiving&lt;/td&gt;
+         &lt;td&gt;Implement a &lt;a href=&quot;{{base_path}}/install-and-setup/setup/deployment-best-practices/backup-recovery&quot;&gt;backup and recovery strategy&lt;/a&gt; for your system.&lt;/td&gt;
+      &lt;/tr&gt;
+   &lt;/tbody&gt;
+&lt;/table&gt;
+</body>
+</html>

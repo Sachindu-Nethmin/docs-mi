@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>eip-overview.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Enterprise Integration Patterns with WSO2 Integrator: MI
+
+Enterprise Application Integration (EAI) is key to connecting business applications with heterogeneous systems. Over the years, architects of integration solutions have invented their own blend of patterns in a variety of ways. However, most of these architectures have similarities, initiating a set of widely-accepted standards in architecting integration patterns. Most of these standards are described in the [Enterprise Integration Patterns Catalog](http://www.eaipatterns.com/toc.html).
+
+In this guide, we have shown how each pattern in the Patterns Catalog can be simulated using various constructs in WSO2 Integrator:  MI. Click on a topic in the list below for details.  
+
+## Messaging Systems
+
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-systems/message-channels&quot;&gt;Message Channels&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/channels.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/channels.png&quot; alt=&quot;channels&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How one application communicates with another using messaging.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-systems/message&quot;&gt;Message&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message.png&quot; alt=&quot;message&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How two applications connected by a message channel exchange a piece of information.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-systems/pipes-and-filters&quot;&gt;Pipes and Filters&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/pipes-and-filters-icon.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/pipes-and-filters-icon.gif&quot; alt=&quot;pipes-and-filters&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to perform complex processing on a message while maintaining independence and flexibility.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-systems/message-router&quot;&gt;Message Router&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/content-based-router-icon.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/content-based-router-icon.gif&quot; alt=&quot;content-based-router&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to decouple individual processing steps so that messages can be passed to different filters depending on conditions.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-systems/message-translator&quot;&gt;Message Translator&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-translator-icon.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-translator-icon.gif&quot; alt=&quot;message-translator&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How systems using different data formats communicate with each other using messaging.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-systems/message-endpoint&quot;&gt;Message Endpoint&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-endpoint.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-endpoint.png&quot; alt=&quot;message-endpoint&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How an application connects to a messaging channel to send and receive messages.&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+
+## Messaging Channels
+
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-channels/point-to-point-channel&quot;&gt;Point-to-Point Channel&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/point-to-point.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/point-to-point.png&quot; alt=&quot;point-to-point&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How the caller can be sure that exactly one receiver will receive the document or perform the call.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-channels/publish-subscribe-channel&quot;&gt;Publish-Subscribe Channel&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/publish-subscribe.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/publish-subscribe.png&quot; alt=&quot;publish-subscribe&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How the sender broadcasts an event to all interested receivers.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-channels/datatype-channel&quot;&gt;Datatype Channel&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/datatype-channel.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/datatype-channel.png&quot; alt=&quot;datatype-channel&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How the application sends a data item such that the receiver will know how to process it.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-channels/invalid-message-channel&quot;&gt;Invalid Message Channel&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/invalid-message-channel.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/invalid-message-channel.png&quot; alt=&quot;invalid-message-channel&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a messaging receiver gracefully handles a message that makes no sense.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-channels/dead-letter-channel&quot;&gt;Dead Letter Channel&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/dead-letter-channel.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/dead-letter-channel.png&quot; alt=&quot;dead-letter-channel&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;What the messaging system does with a message it cannot deliver.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-channels/guaranteed-delivery&quot;&gt;Guaranteed Delivery&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/guaranteed-messaging.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/guaranteed-messaging.png&quot; alt=&quot;guaranteed-messaging&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How the sender ensures delivery of a message, even if the messaging system fails.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-channels/channel-adapter&quot;&gt;Channel Adapter&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/channel-adapter.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/channel-adapter.png&quot; alt=&quot;channel-adapter&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to connect an application to the messaging system to send/receive messages.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-channels/messaging-bridge&quot;&gt;Messaging Bridge&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-bridge.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-bridge.png&quot; alt=&quot;messaging-bridge&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How multiple messaging systems can be connected so that messages available on one are also available on the others.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-channels/message-bus&quot;&gt;Message Bus&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-bus.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-bus.png&quot; alt=&quot;message-bus&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;An architecture enabling separate applications to work together in a decoupled fashion such that applications can be easily added or removed without affecting the others.&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+
+## Message Construction
+
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/command-message&quot;&gt;Command Message&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/command-message.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/command-message.png&quot; alt=&quot;command-message&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How messaging can be used to invoke a procedure in another application.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/document-message&quot;&gt;Document Message&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/document-message.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/document-message.png&quot; alt=&quot;document-message&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How messaging can be used to transfer data between applications.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/event-message&quot;&gt;Event Message&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/event-message.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/event-message.png&quot; alt=&quot;event-message&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How messaging can be used to transmit events from one application to another.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/request-reply&quot;&gt;Request-Reply&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/request-reply.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/request-reply.png&quot; alt=&quot;request-reply&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How an application that sends a message gets a response from the receiver.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/return-address&quot;&gt;Return Address&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/return-address.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/return-address.png&quot; alt=&quot;return-address&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a replier knows where to send the reply.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/correlation-identifier&quot;&gt;Correlation Identifier&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/correlation-identifier.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/correlation-identifier.png&quot; alt=&quot;correlation-identifier&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a requester that has received a reply knows which request the reply is for.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/message-sequence&quot;&gt;Message Sequence&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-sequence.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-sequence.png&quot; alt=&quot;message-sequence&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How messaging can transmit an arbitrarily large amount of data.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/message-expiration&quot;&gt;Message Expiration&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-expiration.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-expiration.png&quot; alt=&quot;message-expiration&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a sender indicates when a message should be considered stale and therefore should not be processed.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/format-indicator&quot;&gt;Format Indicator&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;/td&gt;
+        &lt;td&gt;How a message’s data format can be designed to allow for possible future changes.&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+
+## Message Routing
+
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-routing/content-based-router&quot;&gt;Content-Based Router&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/content-based-router.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/content-based-router.png&quot; alt=&quot;content-based-router&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to handle a situation when the implementation of a single logical function (such as an inventory check) is spread across multiple physical systems.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-routing/message-filter&quot;&gt;Message Filter&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-filter.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-filter.png&quot; alt=&quot;message-filter&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a component avoids receiving uninteresting messages.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-routing/dynamic-router&quot;&gt;Dynamic Router&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/dynamic-router.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/dynamic-router.png&quot; alt=&quot;dynamic-router&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to avoid the dependency of a router in all possible destinations, while maintaining its efficiency.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-routing/recipient-list&quot;&gt;Recipient List&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/recipient-list.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/recipient-list.png&quot; alt=&quot;recipient-list&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to route a message to a list of dynamically specified recipients.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-routing/splitter&quot;&gt;Splitter&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/splitter.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/splitter.png&quot; alt=&quot;splitter&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to process a message if it contains multiple elements, each of which may have to be processed in a different way.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-routing/aggregator&quot;&gt;Aggregator&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/aggregator.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/aggregator.png&quot; alt=&quot;aggregator&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to combine the results of individual but related messages so that they can be processed as a whole.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-routing/composed-message-processor&quot;&gt;Composed Message Processor&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/distribution-aggregate.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/distribution-aggregate.png&quot; alt=&quot;distribution-aggregate&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to maintain the overall flow when processing a message consisting of multiple elements, each of which may require different processing.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-routing/scatter-gather&quot;&gt;Scatter-Gather&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/broadcast-aggregate-icon.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/broadcast-aggregate-icon.png&quot; alt=&quot;Scatter-Gather&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to maintain the overall flow when a message needs to be sent to multiple recipients, each of which may send a reply.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-routing/routing-slip&quot;&gt;Routing Slip&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/routing-table.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/routing-table.png&quot; alt=&quot;routing-table&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to route a message consecutively through a series of steps when the sequence of the steps is not known at design time and may vary for each message.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-routing/process-manager&quot;&gt;Process Manager&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/process-manager.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/process-manager.png&quot; alt=&quot;process-manager&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to route a message through multiple processing steps, when the required steps may not be known at design time and may not be sequential.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-routing/message-broker&quot;&gt;Message Broker&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-broker.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-broker.png&quot; alt=&quot;message-broker&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to decouple the destination of a message from the sender and maintain central control over the flow of messages.&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+
+## Message Transformation
+
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-transformation/envelope-wrapper&quot;&gt;Envelope Wrapper&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/envelope-wrapper.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/envelope-wrapper.png&quot; alt=&quot;envelope-wrapper&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How existing systems participate in a messaging exchange, which places specific requirements in the message format, such as message header fields or encryption.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-transformation/content-enricher&quot;&gt;Content Enricher&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/data-enricher.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/data-enricher.png&quot; alt=&quot;data-enricher&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to communicate with another system if the message originator does not have all the required data items available.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-transformation/content-filter&quot;&gt;Content Filter&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/content-filter.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/content-filter.png&quot; alt=&quot;content-filter&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to simplify dealing with a large message when you are interested only in a few data items.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-transformation/claim-check&quot;&gt;Claim Check&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/store-in-library.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/store-in-library.png&quot; alt=&quot;store-in-library&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to reduce the data volume of a message sent across the system without sacrificing information content.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-transformation/normalizer&quot;&gt;Normalizer&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/normalizer.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/normalizer.png&quot; alt=&quot;normalizer&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to process messages that are semantically equivalent but arrive in a different format.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-transformation/canonical-data-model&quot;&gt;Canonical Data Model&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;/td&gt;
+        &lt;td&gt;How to minimize dependencies when integrating applications that use different data formats.&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+
+## Messaging Endpoints
+
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/messaging-gateway&quot;&gt;Messaging Gateway&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-gateway.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-gateway.png&quot; alt=&quot;messaging-gateway&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How to encapsulate access to the messaging system from the rest of the application.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/messaging-mapper&quot;&gt;Messaging Mapper&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;/td&gt;
+        &lt;td&gt;How to move data between domain objects and the messaging infrastructure, while keeping the two independent of each other.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/transactional-client&quot;&gt;Transactional Client&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/transactional-client.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/transactional-client.png&quot; alt=&quot;transactional-client&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a client controls its transactions with the messaging system.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/polling-consumer&quot;&gt;Polling Consumer&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/polling-consumer.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/polling-consumer.png&quot; alt=&quot;polling-consumer&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How an application consumes a message when the application is ready.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/event-driven-consumer&quot;&gt;Event-Driven Consumer&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/event-driven-consumer.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/event-driven-consumer.png&quot; alt=&quot;event-driven-consumer&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How an application automatically consumes messages as they become available.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/competing-consumers&quot;&gt;Competing Consumers&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/competing-consumers.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/competing-consumers.png&quot; alt=&quot;competing-consumers&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a messaging client processes multiple messages concurrently.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/message-dispatcher&quot;&gt;Message Dispatcher&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-dispatcher.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-dispatcher.png&quot; alt=&quot;message-dispatcher&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How multiple consumers on a single channel coordinate their message processing.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/selective-consumer&quot;&gt;Selective Consumer&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-selector.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-selector.png&quot; alt=&quot;message-selector&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a message consumer selects which messages to receive.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/durable-subscriber&quot;&gt;Durable Subscriber&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/durable-subscription.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/durable-subscription.png&quot; alt=&quot;durable-subscription&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a subscriber avoids missing messages while it is not listening for them.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/messaging-endpoints/service-activator&quot;&gt;Service Activator&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-adapter.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-adapter.png&quot; alt=&quot;messaging-adapter&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How an application designs a service to be invoked via both messaging and non-messaging techniques.&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+</body>
+</html>

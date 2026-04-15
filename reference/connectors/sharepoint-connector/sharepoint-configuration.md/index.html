@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>sharepoint-configuration.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Sharepoint Connector Reference
+
+The following operations allow you to work with the Microsoft Graph APIs related to Sharepoint. Click an operation name to see parameter details and samples on how to use it.
+
+## Initialize the connector
+
+To use the Sharepoint connector, first create the connection with your configuration. When calling a Sharepoint operation, ensure the connection is referenced using the `configKey` attribute.
+
+??? note &quot;init&quot;
+    The `init` operation initializes the connection to Microsoft Graph API.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;name&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Unique name to identify the connection.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;base&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The service root URL. The default value is `https://graph.microsoft.com/v1.0`.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;clientId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Client ID of the registered application.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;clientSecret&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Client secret of the registered application.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;tenant&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Your Azure AD tenant ID or domain name.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.init&gt;
+        &lt;connectionType&gt;sharepoint&lt;/connectionType&gt;
+        &lt;name&gt;SHAREPOINT_CONN&lt;/name&gt;
+        &lt;base&gt;https://graph.microsoft.com/v1.0&lt;/base&gt;
+        &lt;clientId&gt;REPLACE_WITH_CLIENT_ID&lt;/clientId&gt;
+        &lt;clientSecret&gt;REPLACE_WITH_CLIENT_SECRET&lt;/clientSecret&gt;
+        &lt;tenant&gt;REPLACE_WITH_TENANT&lt;/tenant&gt;
+    &lt;/sharepoint.init&gt;
+    ```
+
+## Operations
+
+??? note &quot;createFolder&quot;
+    The `createFolder` operation creates a new folder within the specified parent folder in SharePoint. The newly created folder is returned upon successful execution.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt; 
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;The unique identifier of the site. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;Yes&lt;/td&gt; 
+        &lt;/tr&gt; 
+        &lt;tr&gt; 
+            &lt;td&gt;&lt;code&gt;parentItemId&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;The ID of the parent folder. Use &lt;code&gt;&#x27;root&#x27;&lt;/code&gt; for the root directory. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;Yes&lt;/td&gt; 
+        &lt;/tr&gt; 
+        &lt;tr&gt; 
+            &lt;td&gt;&lt;code&gt;name&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;The name of the folder to be created. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;Yes&lt;/td&gt; 
+        &lt;/tr&gt; 
+        &lt;tr&gt; 
+            &lt;td&gt;&lt;code&gt;folder&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;Empty object to indicate this item is a folder. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt; 
+        &lt;tr&gt; 
+            &lt;td&gt;&lt;code&gt;MicrosoftGraphConflictBehavior&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;Specifies how to handle naming conflicts when creating files or folders. Accepts &lt;code&gt;&#x27;fail&#x27;&lt;/code&gt; (default), &lt;code&gt;&#x27;replace&#x27;&lt;/code&gt;, or &lt;code&gt;&#x27;rename&#x27;&lt;/code&gt;. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;No&lt;/td&gt; 
+        &lt;/tr&gt; 
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.createFolder configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.site_id)}&lt;/siteId&gt;
+        &lt;parentItemId&gt;{json-eval($.parent_id)}&lt;/parentItemId&gt;
+        &lt;name&gt;{json-eval($.folder_name)}&lt;/name&gt;
+        &lt;folder&gt;{}&lt;/folder&gt;
+        &lt;MicrosoftGraphConflictBehavior&gt;{json-eval($.conflict_behavior)}&lt;/MicrosoftGraphConflictBehavior&gt;
+    &lt;/sharepoint.createFolder&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;site_id&quot;: &quot;site123&quot;,
+        &quot;parent_id&quot;: &quot;root&quot;,
+        &quot;folder_name&quot;: &quot;New Folder&quot;,
+        &quot;MicrosoftGraphConflictBehavior&quot;: &quot;fail&quot;
+    }
+    ```
+
+??? note &quot;uploadFile&quot;
+    The `uploadFile` operation uploads a new file to the specified folder within a SharePoint site. Upon successful execution, the newly uploaded file will be available at the target location.
+    &lt;table&gt; 
+        &lt;tr&gt; 
+            &lt;th&gt;Parameter name&lt;/th&gt; 
+            &lt;th&gt;Description&lt;/th&gt; 
+            &lt;th&gt;Required&lt;/th&gt; 
+        &lt;/tr&gt; 
+        &lt;tr&gt;    
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;The unique identifier of the SharePoint site where the file will be uploaded. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;Yes&lt;/td&gt; 
+        &lt;/tr&gt; 
+        &lt;tr&gt; 
+            &lt;td&gt;&lt;code&gt;parentItemId&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;The ID of the parent folder where the file will be uploaded. Use &lt;code&gt;&#x27;root&#x27;&lt;/code&gt; for the root directory. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;Yes&lt;/td&gt; 
+        &lt;/tr&gt; 
+        &lt;tr&gt; 
+            &lt;td&gt;&lt;code&gt;fileName&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;The name of the file to be uploaded. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt; 
+            &lt;td&gt;Yes&lt;/td&gt; 
+        &lt;/tr&gt; 
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.uploadFile configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+        &lt;parentItemId&gt;{json-eval($.parentItemId)}&lt;/parentItemId&gt;
+        &lt;fileName&gt;{json-eval($.fileName)}&lt;/fileName&gt;
+    &lt;/sharepoint.uploadFile&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;,
+        &quot;parentItemId&quot;: &quot;root&quot;,
+        &quot;fileName&quot;: &quot;NewDocument.docx&quot;
+    }
+    ```
+
+??? note &quot;createGroup&quot;
+    The `createGroup` operation creates a new Microsoft 365 Group, which provisions a connected SharePoint site. Upon successful execution, the newly created group details are returned.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;description&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;A brief description of the group, outlining its purpose and intended use. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;displayName&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The display name of the group, visible in Microsoft 365 applications and directories. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;groupTypes&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;An array specifying the types of the group. For Microsoft 365 groups, set this to &lt;code&gt;[&#x27;Unified&#x27;]&lt;/code&gt;. Type: &lt;code&gt;string[]&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;mailEnabled&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Indicates whether the group is mail-enabled. Set to &lt;code&gt;true&lt;/code&gt; to enable email functionalities for the group. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;mailNickname&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The mail alias for the group, used in its email address. This must be unique within the organization. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;securityEnabled&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Determines whether the group is a security group. For Microsoft 365 groups, set this to &lt;code&gt;false&lt;/code&gt;. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;visibility&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Defines the visibility of the group. Acceptable values are &lt;code&gt;&#x27;Private&#x27;&lt;/code&gt; or &lt;code&gt;&#x27;Public&#x27;&lt;/code&gt;. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.createGroup configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;description&gt;{json-eval($.description)}&lt;/description&gt;
+        &lt;displayName&gt;{json-eval($.displayName)}&lt;/displayName&gt;
+        &lt;groupTypes&gt;{json-eval($.groupTypes)}&lt;/groupTypes&gt;
+        &lt;mailEnabled&gt;{json-eval($.mailEnabled)}&lt;/mailEnabled&gt;
+        &lt;mailNickname&gt;{json-eval($.mailNickname)}&lt;/mailNickname&gt;
+        &lt;securityEnabled&gt;{json-eval($.securityEnabled)}&lt;/securityEnabled&gt;
+        &lt;visibility&gt;{json-eval($.visibility)}&lt;/visibility&gt;
+    &lt;/sharepoint.createGroup&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;description&quot;: &quot;Team collaboration for Project Alpha&quot;,
+        &quot;displayName&quot;: &quot;Project Alpha Team&quot;,
+        &quot;groupTypes&quot;: [&quot;Unified&quot;],
+        &quot;mailEnabled&quot;: &quot;true&quot;,
+        &quot;mailNickname&quot;: &quot;projectalpha&quot;,
+        &quot;securityEnabled&quot;: &quot;false&quot;,
+        &quot;visibility&quot;: &quot;Private&quot;
+    }
+    ```
+
+??? note &quot;createList&quot;
+    The `createList` operation creates a new list within the specified SharePoint site. Upon successful execution, the newly created list details are returned.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the site. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;properties&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Specifies the name and the properties of the new list. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.createList configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+        &lt;properties&gt;{json-eval($.listProperties)}&lt;/properties&gt;
+    &lt;/sharepoint.createList&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;,
+        &quot;listProperties&quot;: {
+            &quot;displayName&quot;: &quot;Books through MI&quot;,
+            &quot;columns&quot;: [
+                {
+                    &quot;name&quot;: &quot;BookAuthor&quot;,
+                    &quot;text&quot;: {}
+                },
+                {
+                    &quot;name&quot;: &quot;PageCount&quot;,
+                    &quot;number&quot;: {}
+                }
+            ],
+            &quot;list&quot;: {
+                &quot;template&quot;: &quot;genericList&quot;
+            }
+        }
+    }
+    ```
+
+??? note &quot;createListItem&quot;
+    The `createListItem` operation creates a new item within the specified SharePoint list. Upon successful execution, the newly created list item details are returned.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the SharePoint site where the list resides. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;listId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the list where the item will be created. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;fields&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The object containing the data for the new list item. Type: &lt;code&gt;object&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.createListItem configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+        &lt;listId&gt;{json-eval($.listId)}&lt;/listId&gt;
+        &lt;fields&gt;{json-eval($.fields)}&lt;/fields&gt;
+    &lt;/sharepoint.createListItem&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;,
+        &quot;listId&quot;: &quot;list456&quot;,
+        &quot;fields&quot;: {
+            &quot;BookAuthor&quot;: &quot;Ross Geller&quot;,
+            &quot;PageCount&quot;: 567
+        }
+    }
+    ```
+
+??? note &quot;deleteDriveItem&quot;
+    The `deleteDriveItem` operation deletes the specified file or folder within a SharePoint site. Upon successful execution, the item is removed from the site.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the SharePoint site where the item resides. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;itemId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the item (file or folder) to be deleted. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.deleteDriveItem configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+        &lt;itemId&gt;{json-eval($.itemId)}&lt;/itemId&gt;
+    &lt;/sharepoint.deleteDriveItem&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;,
+        &quot;itemId&quot;: &quot;item789&quot;
+    }
+    ```
+
+??? note &quot;deleteList&quot;
+    The `deleteList` operation deletes the specified list within a SharePoint site. Upon successful execution, the targeted list is removed from the site.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the SharePoint site where the list resides. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;listId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the list to be deleted. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.deleteList configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+        &lt;listId&gt;{json-eval($.listId)}&lt;/listId&gt;
+    &lt;/sharepoint.deleteList&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;,
+        &quot;listId&quot;: &quot;list456&quot;
+    }
+    ```
+
+??? note &quot;deleteListItem&quot;
+    The `deleteListItem` operation deletes the specified item within a SharePoint list. Upon successful execution, the targeted list item is permanently removed from the list.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the SharePoint site where the list resides. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;listId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the list containing the item to be deleted. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;itemId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the item (file or folder) to be deleted. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.deleteListItem configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+        &lt;listId&gt;{json-eval($.listId)}&lt;/listId&gt;
+        &lt;itemId&gt;{json-eval($.itemId)}&lt;/itemId&gt;
+    &lt;/sharepoint.deleteListItem&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;,
+        &quot;listId&quot;: &quot;list456&quot;,
+        &quot;itemId&quot;: &quot;5&quot;
+    }
+    ```
+
+??? note &quot;getDriveItemById&quot;
+    The `getDriveItemById` operation retrieves metadata about the specified file or folder within a SharePoint site. Upon successful execution, detailed information about the drive item is returned.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the SharePoint site where the item resides. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;itemId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the item (file or folder) whose metadata is to be retrieved. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.getDriveItemById configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+        &lt;itemId&gt;{json-eval($.itemId)}&lt;/itemId&gt;
+    &lt;/sharepoint.getDriveItemById&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;,
+        &quot;itemId&quot;: &quot;item789&quot;
+    }
+    ```
+
+??? note &quot;getFolderChildren&quot;
+    The `getFolderChildren` operation retrieves all items within the specified folder in a SharePoint site. Upon successful execution, a list of child items (files and subfolders) along with their metadata is returned.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the SharePoint site where the folder resides. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;itemId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the folder whose children are to be retrieved. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.getFolderChildren configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+        &lt;itemId&gt;{json-eval($.itemId)}&lt;/itemId&gt;
+    &lt;/sharepoint.getFolderChildren&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;,
+        &quot;itemId&quot;: &quot;folder456&quot;
+    }
+    ```
+
+??? note &quot;getGroupSite&quot;
+    The `getGroupSite` operation retrieves the root SharePoint site associated with the specified Microsoft 365 Group. Upon successful execution, detailed information about the group&#x27;s SharePoint site is returned.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;groupId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the Microsoft 365 Group. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.getGroupSite configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;groupId&gt;{json-eval($.groupId)}&lt;/groupId&gt;
+    &lt;/sharepoint.getGroupSite&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;groupId&quot;: &quot;group123&quot;
+    }
+    ```
+
+??? note &quot;getListById&quot;
+    The `getListById` operation retrieves detailed information about a specific SharePoint list using its unique identifier (GUID). Upon successful execution, the operation returns metadata and properties of the specified list.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the SharePoint site where the list resides. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;listId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier (GUID) of the list to be retrieved. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.getListById configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+        &lt;listId&gt;{json-eval($.listId)}&lt;/listId&gt;
+    &lt;/sharepoint.getListById&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;,
+        &quot;listId&quot;: &quot;3fa85f64-5717-4562-b3fc-2c963f66afa6&quot;
+    }
+    ```
+
+??? note &quot;getListItemById&quot;
+    The `getListItemById` operation retrieves detailed information about a specific item within a SharePoint list using its unique identifier (ID). Upon successful execution, the operation returns metadata and properties of the specified list item.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the SharePoint site where the list resides. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;listId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier (GUID) of the list containing the item to be retrieved. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;itemId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the item (file or folder) to be retrieved. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.getListItemById configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+        &lt;listId&gt;{json-eval($.listId)}&lt;/listId&gt;
+        &lt;itemId&gt;{json-eval($.itemId)}&lt;/itemId&gt;
+    &lt;/sharepoint.getListItemById&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;,
+        &quot;listId&quot;: &quot;3fa85f64-5717-4562-b3fc-2c963f66afa6&quot;,
+        &quot;itemId&quot;: &quot;item789&quot;
+    }
+    ```
+
+??? note &quot;getListItems&quot;
+    The `getListItems` operation retrieves all items within the specified SharePoint list. Upon successful execution, a collection of list items along with their metadata is returned.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the SharePoint site where the list resides. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;listId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier (GUID) of the list from which items are to be retrieved. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.getListItems configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+        &lt;listId&gt;{json-eval($.listId)}&lt;/listId&gt;
+    &lt;/sharepoint.getListItems&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;,
+        &quot;listId&quot;: &quot;3fa85f64-5717-4562-b3fc-2c963f66afa6&quot;
+    }
+    ```
+
+??? note &quot;getLists&quot;
+    The `getLists` operation retrieves all lists within the specified SharePoint site. Upon successful execution, a collection of lists along with their metadata is returned.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the SharePoint site where the lists are located. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.getLists configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+    &lt;/sharepoint.getLists&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;
+    }
+    ```
+
+??? note &quot;getRootChildren&quot;
+    The `getRootChildren` operation retrieves all items in the root directory of the drive within the specified SharePoint site. Upon successful execution, a collection of child items (files and folders) along with their metadata is returned.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the SharePoint site where the root drive is located. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.getRootChildren configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+    &lt;/sharepoint.getRootChildren&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;
+    }
+    ```
+
+??? note &quot;updateFileContent&quot;
+    The `updateFileContent` operation updates the content of the specified file within a SharePoint site. Upon successful execution, the file&#x27;s content is updated with the provided data.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the SharePoint site where the item resides. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;itemId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the item (file or folder) to be updated. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.updateFileContent configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+        &lt;itemId&gt;{json-eval($.itemId)}&lt;/itemId&gt;
+    &lt;/sharepoint.updateFileContent&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;,
+        &quot;itemId&quot;: &quot;file456&quot;
+    }
+    ```
+
+??? note &quot;updateFolder&quot;
+    The `updateFolder` operation updates the properties of the specified folder within a SharePoint site. Upon successful execution, the folder&#x27;s properties are updated with the provided data.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the SharePoint site where the folder resides. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;itemId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the folder to be updated. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;name&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The new name for the folder. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.updateFolder configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+        &lt;itemId&gt;{json-eval($.itemId)}&lt;/itemId&gt;
+        &lt;name&gt;{json-eval($.name)}&lt;/name&gt;
+    &lt;/sharepoint.updateFolder&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;,
+        &quot;itemId&quot;: &quot;folder456&quot;,
+        &quot;name&quot;: &quot;New Folder Name&quot;
+    }
+    ```
+
+??? note &quot;updateList&quot;
+    The `updateList` operation updates the properties of the specified SharePoint list. Upon successful execution, the list&#x27;s properties are updated with the provided data.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the SharePoint site where the list resides. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;listId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier (GUID) of the list to be updated. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;displayName&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The new display name you wish to assign to the list. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;description&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The new description text for the list. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.updateList configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+        &lt;listId&gt;{json-eval($.listId)}&lt;/listId&gt;
+        &lt;displayName&gt;{json-eval($.displayName)}&lt;/displayName&gt;
+        &lt;description&gt;{json-eval($.description)}&lt;/description&gt;
+    &lt;/sharepoint.updateList&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;,
+        &quot;listId&quot;: &quot;3fa85f64-5717-4562-b3fc-2c963f66afa6&quot;,
+        &quot;displayName&quot;: &quot;Updated List Name&quot;,
+        &quot;description&quot;: &quot;This is the updated description for the list.&quot;
+    }
+    ```
+
+??? note &quot;updateListItemFields&quot;
+    The `updateListItemFields` operation updates the fields of the specified list item within a SharePoint site. Upon successful execution, the item&#x27;s properties are updated with the provided data.
+    &lt;table&gt; 
+        &lt;tr&gt; 
+            &lt;th&gt;Parameter name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;siteId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the SharePoint site where the list resides. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;listId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier (GUID) of the list containing the item to be updated. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;itemId&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;The unique identifier of the item (file or folder) to be updated. Type: &lt;code&gt;string&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;code&gt;properties&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Specifies the properties of the item to be updated. Type: &lt;code&gt;object&lt;/code&gt;&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;sharepoint.updateListItemFields configKey=&quot;SHAREPOINT_CONN&quot;&gt;
+        &lt;siteId&gt;{json-eval($.siteId)}&lt;/siteId&gt;
+        &lt;listId&gt;{json-eval($.listId)}&lt;/listId&gt;
+        &lt;itemId&gt;{json-eval($.itemId)}&lt;/itemId&gt;
+        &lt;properties&gt;{json-eval($.properties)}&lt;/properties&gt;
+    &lt;/sharepoint.updateListItemFields&gt;
+    ```
+ 
+    **Sample request**
+
+    ```json
+    {
+        &quot;siteId&quot;: &quot;site123&quot;,
+        &quot;listId&quot;: &quot;3fa85f64-5717-4562-b3fc-2c963f66afa6&quot;,
+        &quot;itemId&quot;: &quot;3&quot;,
+        &quot;properties&quot;: {
+            &quot;BookAuthor&quot;: &quot;Chandler Bing&quot;,
+            &quot;PageCount&quot;: 2456
+        }
+    }
+    ```
+
+## Error codes related to Sharepoint Connector
+
+The connector may encounter errors during operation execution. When an error occurs, the `ERROR_MESSAGE` property will contain detailed information about the error. You can handle these errors using a `Fault Sequence` in your integration. For more information, see [Using Fault Sequences]({{base_path}}/learn/examples/sequence-examples/using-fault-sequences/).
+
+| Error code | Description |
+| -------- | ------- |
+| 701001 | General error. |
+| 701002 | Invalid configuration error. |
+| 701003 | Error in access token generation flow. |
+</body>
+</html>

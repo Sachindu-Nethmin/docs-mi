@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>sample-queries.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Sample Queries
+
+Listed below are some complex &lt;b&gt;query&lt;/b&gt; definitions that you may require when defining an RDBMS data service.
+
+!!! Info
+    For detailed instructions on defining a data service using WSO2 Integration Studio, see [Creating a Data Service]({{base_path}}/develop/creating-artifacts/data-services/creating-data-services).
+
+## Calling a MySQL function
+
+Assume you have the following MySQL function, which takes a string parameter and returns the same as output. 
+
+!!! Note
+    You need to create a database before executing the query.
+
+```bash
+create function myFunction(p_inparam varchar(20))
+  returns varchar(20)
+  begin
+     declare output_text varchar(20);
+     set output_text = p_inparam;
+     return output_text;
+  end
+```
+
+To call this function from the data service, create an RDBMS datasource (for your data service) that connects to the MySQL database, and then define a query with the following SQL statement:
+
+```sql
+select myFunction(&#x27;WSAS&#x27;) as ABC
+```
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/data-services/mysql-function-query-sql.png&quot; width=&quot;700&quot; alt=&quot;sql query of mysql function&quot;&gt;
+
+The complete data service configuration (.dbs file) will be as follows:
+
+```xml
+&lt;data name=&quot;sqlfunctionService&quot;&gt;
+   &lt;config id=&quot;mynew&quot;&gt;
+      &lt;property name=&quot;driverClassName&quot;&gt;com.mysql.jdbc.Driver&lt;/property&gt;
+      &lt;property name=&quot;url&quot;&gt;jdbc:mysql://localhost:3306/sample&lt;/property&gt;
+      &lt;property name=&quot;username&quot;&gt;root&lt;/property&gt;
+      &lt;property name=&quot;password&quot;&gt;root&lt;/property&gt;
+   &lt;/config&gt;
+   &lt;query id=&quot;NewfunctionQuery&quot; useConfig=&quot;mynew&quot;&gt;
+      &lt;sql&gt;select myFunction(&#x27;WSAS&#x27;) as ABC&lt;/sql&gt;
+      &lt;result element=&quot;wsas&quot; rowName=&quot;wsas&quot;&gt;
+         &lt;element column=&quot;output_text&quot; name=&quot;n_param&quot; xsdType=&quot;string&quot;/&gt;
+      &lt;/result&gt;
+      &lt;param name=&quot;imparam&quot; sqlType=&quot;STRING&quot;/&gt;
+   &lt;/query&gt;
+   &lt;operation name=&quot;functionop&quot;&gt;
+      &lt;call-query href=&quot;NewfunctionQuery&quot;&gt;
+         &lt;with-param name=&quot;imparam&quot; query-param=&quot;imparam&quot;/&gt;
+      &lt;/call-query&gt;
+   &lt;/operation&gt;
+&lt;/data&gt;
+```
+
+## Calling an Oracle function
+
+Assume you have the following Oracle stored function, which returns the total number of entries in a table:
+
+```bash
+CREATE OR REPLACE FUNCTION myfunction(ename IN VARCHAR, eid IN NUMBER) RETURN INTEGER
+AS myCount INTEGER;
+BEGIN
+    INSERT INTO TEAMS values(eid, ename);
+    SELECT COUNT(*) into myCount from TEAMS;
+    RETURN myCount;
+END;
+/
+```
+
+Create a table before executing the query as follows:
+
+```bash
+CREATE TABLE TEAMS(id INTEGER, team VARCHAR(30));
+```
+
+To call this function from the data service, create an RDBMS datasource (for your data service) that connects to the Oracle database, and define a query as given below.
+
+-  SQL statement:
+
+      ```sql
+      {call ?:=myfunction(?,?)}
+      ```
+
+      &lt;img src=&quot;{{base_path}}/assets/img/integrate/data-services/oracle-function-query-sql.png&quot; width=&quot;500&quot; alt=&quot;sql query of oracle function&quot;&gt;
+
+-  Create three &lt;b&gt;Input&lt;/b&gt; mappings as follows:
+
+      ```xml
+      &lt;param name=&quot;totalTeams&quot; sqlType=&quot;INTEGER&quot; type=&quot;OUT&quot; ordinal=&quot;1&quot; /&gt;
+      &lt;param name=&quot;ename&quot; sqlType=&quot;STRING&quot; ordinal=&quot;2&quot; /&gt;
+      &lt;param name=&quot;eid&quot; sqlType=&quot;INTEGER&quot; ordinal=&quot;3&quot; /&gt;
+      ```
+
+      &lt;img src=&quot;{{base_path}}/assets/img/integrate/data-services/oracle-function-input-mapping.png&quot; width=&quot;500&quot; alt=&quot;oracle function input parameters&quot;&gt;
+
+      The first input parameter carries the return value of the function. The other two are inputs to the function. Note that you must define an Input parameter with &lt;b&gt;OUT&lt;/b&gt; type to get the result of the function (i.e., the first parameter in the query above).
+
+-  Create an &lt;b&gt;Output&lt;/b&gt; mapping:
+
+      ```xml
+      &lt;result element=&quot;TotalTeams&quot; rowName=&quot;&quot;&gt;
+         &lt;element name=&quot;totalTeams&quot; column=&quot;totalTeams&quot; xsdType=&quot;xs:integer&quot; /&gt;
+      &lt;/result&gt;
+      ```
+
+      &lt;img src=&quot;{{base_path}}/assets/img/integrate/data-services/oracle-function-output-mapping.png&quot; width=&quot;500&quot; alt=&quot;oracle function output parameter&quot;&gt;
+
+      This output parameter gets the value as a result set from the data service.
+
+For example, see the following data service configuration:
+
+```xml
+&lt;data name=&quot;testOracleFunction&quot;&gt;
+   &lt;config id=&quot;or&quot;&gt;
+      &lt;property name=&quot;org.wso2.ws.dataservice.driver&quot;&gt;oracle.jdbc.driver.OracleDriver&lt;/property&gt;
+      &lt;property name=&quot;org.wso2.ws.dataservice.protocol&quot;&gt;jdbc:oracle:thin:user/pwd@localhost:1521/XE&lt;/property&gt;
+      &lt;property name=&quot;org.wso2.ws.dataservice.user&quot;&gt;user&lt;/property&gt;
+      &lt;property name=&quot;org.wso2.ws.dataservice.password&quot;&gt;pwd&lt;/property&gt;
+   &lt;/config&gt;
+   &lt;query id=&quot;q1&quot; useConfig=&quot;or&quot;&gt;
+      &lt;sql&gt;{call ?:=myfunction(?,?)}&lt;/sql&gt;
+      &lt;result element=&quot;TotalTeams&quot; rowName=&quot;&quot;&gt;
+         &lt;element name=&quot;totalTeams&quot; column=&quot;totalTeams&quot; xsdType=&quot;xs:integer&quot; /&gt;
+      &lt;/result&gt;
+      &lt;param name=&quot;totalTeams&quot; sqlType=&quot;INTEGER&quot; type=&quot;OUT&quot; ordinal=&quot;1&quot; /&gt;
+      &lt;param name=&quot;ename&quot; sqlType=&quot;STRING&quot; ordinal=&quot;2&quot; /&gt;
+      &lt;param name=&quot;eid&quot; sqlType=&quot;INTEGER&quot; ordinal=&quot;3&quot; /&gt;
+   &lt;/query&gt;
+   &lt;operation name=&quot;op1&quot;&gt;
+      &lt;call-query href=&quot;q1&quot;&gt;
+         &lt;with-param name=&quot;ename&quot; query-param=&quot;ename&quot; /&gt;
+         &lt;with-param name=&quot;eid&quot; query-param=&quot;eid&quot; /&gt;
+      &lt;/call-query&gt;
+   &lt;/operation&gt;
+&lt;/data&gt;
+```
+
+## Defining a dynamic SQL query
+
+Dynamic SQL queries allow you to change SQL queries (e.g., defining additional conditions in the SQL) in the runtime without changing the data service configuration. For this to work, you must specify the required SQL query statements (e.g., with WHERE clause) using the `QUERY_STRING` data type. These statements will be directed to the final SQL query during runtime.  
+
+!!! Warning
+	 Dynamic queries can lead to SQL injection attacks. Therefore, we recommend that the clients validate the values set using the `QUERY_STRING` data type during runtime.
+
+The `QUERY_STRING` data type is available as an SQL type when creating Input mappings for queries:
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/data-services/input-query-string.png&quot; width=&quot;500&quot; alt=&quot;add query string to input&quot;&gt;
+
+You can add the SQL query using the mapping name:
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/data-services/dynamic-query.png&quot; width=&quot;500&quot; alt=&quot;dynamic query for data service&quot;&gt;
+
+!!! info
+	 To avoid any errors, the value we pass to the query param must be URL encoded. You may refer to https://www.w3schools.com/tags/ref_urlencode.ASP and do the encoding.
+
+For example, see the following data service configuration:
+
+```xml
+&lt;data name=&quot;DynamicQuerySample&quot; serviceNamespace=&quot;http://ws.wso2.org/dataservice/samples/rdbms_sample&quot;&gt;
+   &lt;config id=&quot;default&quot;&gt;
+      &lt;property name=&quot;driverClassName&quot;&gt;org.h2.Driver&lt;/property&gt;
+      &lt;property name=&quot;url&quot;&gt;jdbc:h2:file:./samples/database/DATA_SERV_SAMP&lt;/property&gt;
+      &lt;property name=&quot;username&quot;&gt;wso2ds&lt;/property&gt;
+      &lt;property name=&quot;password&quot;&gt;wso2ds&lt;/property&gt;
+      &lt;property name=&quot;minIdle&quot;&gt;1&lt;/property&gt;
+      &lt;property name=&quot;maxActive&quot;&gt;10&lt;/property&gt;
+      &lt;property name=&quot;autoCommit&quot;&gt;false&lt;/property&gt;
+   &lt;/config&gt;
+   &lt;query id=&quot;employeesSQL&quot; useConfig=&quot;default&quot;&gt;
+      &lt;sql&gt;select * from Employees :filterQuery&lt;/sql&gt;
+      &lt;result element=&quot;employees&quot; rowName=&quot;employee&quot;&gt;
+         &lt;element column=&quot;lastName&quot; name=&quot;last-name&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;firstName&quot; name=&quot;first-name&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;email&quot; name=&quot;email&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;salary&quot; name=&quot;salary&quot; xsdType=&quot;double&quot;/&gt;
+      &lt;/result&gt;
+      &lt;param name=&quot;filterQuery&quot; sqlType=&quot;QUERY_STRING&quot;/&gt;
+   &lt;/query&gt;
+   &lt;query id=&quot;customerInCountrySQL&quot; useConfig=&quot;default&quot;&gt;
+      &lt;sql&gt;select * from Customers where country = :country :filter&lt;/sql&gt;
+      &lt;result element=&quot;customer-addresses&quot; rowName=&quot;customer-address&quot;&gt;
+         &lt;element column=&quot;customerNumber&quot; name=&quot;customer-number&quot; xsdType=&quot;integer&quot;/&gt;
+         &lt;element column=&quot;contactLastName&quot; name=&quot;contact-last-name&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;contactFirstName&quot; name=&quot;contact-first-name&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;addressLine1&quot; name=&quot;address-line1&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;addressLine2&quot; name=&quot;address-line2&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;city&quot; name=&quot;city&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;state&quot; name=&quot;state&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;postalCode&quot; name=&quot;postal-code&quot; xsdType=&quot;string&quot;/&gt;
+         &lt;element column=&quot;country&quot; name=&quot;country&quot; xsdType=&quot;string&quot;/&gt;
+      &lt;/result&gt;
+      &lt;param name=&quot;country&quot; sqlType=&quot;STRING&quot;/&gt;
+      &lt;param name=&quot;filter&quot; sqlType=&quot;QUERY_STRING&quot;/&gt;
+   &lt;/query&gt;
+   &lt;query id=&quot;insertUpdateQuery&quot; useConfig=&quot;default&quot;&gt;
+      &lt;sql&gt;:query&lt;/sql&gt;
+      &lt;param name=&quot;query&quot; sqlType=&quot;QUERY_STRING&quot;/&gt;
+   &lt;/query&gt;
+   &lt;operation name=&quot;getEmployees&quot;&gt;
+      &lt;call-query href=&quot;employeesSQL&quot;&gt;
+         &lt;with-param name=&quot;filterQuery&quot; query-param=&quot;filterQuery&quot;/&gt;
+      &lt;/call-query&gt;
+   &lt;/operation&gt;
+   &lt;operation name=&quot;getCustomersInCountry&quot;&gt;
+      &lt;call-query href=&quot;customerInCountrySQL&quot;&gt;
+         &lt;with-param name=&quot;country&quot; query-param=&quot;country&quot;/&gt;
+         &lt;with-param name=&quot;filter&quot; query-param=&quot;filter&quot;/&gt;
+      &lt;/call-query&gt;
+   &lt;/operation&gt;
+   &lt;operation name=&quot;insertUpdateOp&quot;&gt;
+      &lt;call-query href=&quot;insertUpdateQuery&quot;&gt;
+         &lt;with-param name=&quot;query&quot; query-param=&quot;query&quot;/&gt;
+      &lt;/call-query&gt;
+   &lt;/operation&gt;
+&lt;/data&gt;
+```</body>
+</html>

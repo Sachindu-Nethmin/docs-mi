@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>send-email-from-integration-service.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Send an Email from an Integration Service
+
+## What you&#x27;ll build
+
+When you integrate the systems in your organization, it is also necessary to integrate with third-party systems and their capabilities to enhance your services. WSO2 Integrator: MI uses **Connectors** for the purpose of referring the APIs of third-party systems.
+
+**In this tutorial**, when a client sends an appointment reservation request to the WSO2 Integrator: MI, the client should receive an email confirming the appointment reservation details. To build this use case, you can add an Email connector to the mediation flow.
+
+## Let&#x27;s get started!
+
+### Step 1: Set up the workspace
+
+{!includes/setting-up-workspace-for-mi-for-vscode.md!}
+
+### Step 2: Develop the integration artifacts
+
+#### Create an integration project
+
+{!includes/create-new-project.md!}
+
+4. In the **Project Creation Form**, enter `EmailConnectorTutorial` as the **Project Name**.
+
+5. Provide a location under **Select Project Directory**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/learn/tutorials/send-email-from-integration-service/create-new-project.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/tutorials/send-email-from-integration-service/create-new-project.png&quot; alt=&quot;create new project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+6. Click **Create**.
+
+Now let&#x27;s start designing the integration by adding the necessary artifacts.
+
+#### Create an HTTP connection
+
+1. Navigate to the **Project Overview** page.
+
+2. Click on **Add artifact**.
+
+   &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/add-artifact-icon.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/add-artifact-icon.png&quot; alt=&quot;add artifact&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. Click **+ View More** under **Create an Integration**.
+4. Select **Connections** under **Other Artifacts** to open the **Connector Store Form**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/connections-artifact.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/connections-artifact.png&quot; alt=&quot;connections artifact&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+5. Select **Http**.
+   You need to add dependencies to the project, if not added yet.
+6. In the **Add New Connection** form, specify the following values to create the new HTTP connection.
+     &lt;table&gt;
+         &lt;thead&gt;
+           &lt;tr&gt;
+              &lt;th&gt;Property&lt;/th&gt;
+              &lt;th&gt;Value&lt;/th&gt;
+              &lt;th&gt;Description&lt;/th&gt;
+           &lt;/tr&gt;
+         &lt;/thead&gt;
+         &lt;tbody&gt;
+           &lt;tr&gt;
+              &lt;td&gt;Connection Name&lt;/td&gt;
+              &lt;td&gt;&lt;code&gt;HospitalServicesConn&lt;/code&gt;&lt;/td&gt;
+              &lt;td&gt;The name of the connection.&lt;/td&gt;
+           &lt;/tr&gt;
+           &lt;tr&gt;
+              &lt;td&gt;Base URL&lt;/td&gt;
+              &lt;td&gt;
+                 &lt;code&gt;http://localhost:9090&lt;/code&gt;
+              &lt;/td&gt;
+              &lt;td&gt;The base of the request URL for the back-end service.&lt;/td&gt;
+           &lt;/tr&gt;
+         &lt;/tbody&gt;
+     &lt;/table&gt;
+
+#### Create an email connection
+
+1. Navigate to the **Project Overview** page.
+2. Click on **Add artifact**.
+3. Click **+ View More** under **Create an Integration**.
+4. Select **Connections** under **Other Artifacts** to open the **Connector Store Form**.
+5. From the available connections for the email connector, select **SMTPS**.
+   You need to add dependencies to the project, if not added yet.
+6. In the **Add New Connection** form, specify the following values to create a new SMTPS connection.
+
+    !!! Tip
+        If you have enabled 2-factor authentication, an app password should be obtained as instructed [here](https://support.google.com/accounts/answer/185833?hl=en).
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Property&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Connection Name&lt;/td&gt;
+            &lt;td&gt;
+                Enter `smtpsconnection`
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Host&lt;/td&gt;
+            &lt;td&gt;
+                Enter `smtp.gmail.com`
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Port&lt;/td&gt;
+            &lt;td&gt;
+                Enter `465`
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Username&lt;/td&gt;
+            &lt;td&gt;
+                Enter your email address
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Password&lt;/td&gt;
+            &lt;td&gt;
+                Enter your email password
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Require TLS&lt;/td&gt;
+            &lt;td&gt;
+                Select `false`
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+#### Create the REST API
+
+1. Navigate to the **Project Overview** page.
+2. Click on **Add artifact**.
+3. Select **APIs** under **Create an Integration** to open the **API Form**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/api-artifact.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/api-artifact.png&quot; alt=&quot;api artifact&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+        
+4. Specify values for the required REST API properties:
+
+    &lt;table&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Property&lt;/th&gt;
+        &lt;th&gt;Value&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Name&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;HealthcareAPI&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;
+          The name of the REST API.
+        &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Context&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;/healthcare &lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;
+          Here you are anchoring the API in the &lt;code&gt;/healthcare &lt;/code&gt; context. This will become part of the name of the generated URL used by the client when sending requests to the Healthcare service. For example, setting the context to &lt;code&gt;/healthcare &lt;/code&gt; means that the API will only handle HTTP requests where the URL path starts with &lt;code&gt;http://host:port/healthcare&lt;code&gt;.
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;                                                                   
+
+4.  Click **Create**. This will open the **Service Designer** interface.
+
+    You can now start configuring the API resource.
+
+5. Click on the `GET` API resource under **Available resources** on the **Service Designer**.
+
+    You will now see the graphical view of the `HealthcareAPI` with its default API Resource.
+
+6. Click the **Edit** icon to edit the API resource.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/learn/tutorials/sending-simple-message-to-service/edit-icon.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/tutorials/sending-simple-message-to-service/edit-icon.png&quot; alt=&quot;edit icon&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+7.  Specify values for the required resource properties:
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Property&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Resource Path&lt;/td&gt;
+            &lt;td&gt;
+                &lt;code&gt;/categories/{category}/reserve&lt;/code&gt; &lt;/br&gt; This defines the request URL format. In this case, the full request URL format is &lt;code&gt;http://host:port/categories/{category}/reserve&lt;/code&gt; where &lt;code&gt;{category}&lt;/code&gt; is a variable.
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Methods&lt;/td&gt;
+            &lt;td&gt;
+                &lt;code&gt;POST&lt;/code&gt; &lt;br&gt; This defines that the API resource only handles requests where the HTTP method is POST.
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    &lt;a href=&quot;{{base_path}}/assets/img/learn/tutorials/send-email-from-integration-service/edit-api-resource.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/tutorials/send-email-from-integration-service/edit-api-resource.png&quot; alt=&quot;edit API resource&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+8. Click **Update**.
+
+#### Update the mediation flow
+
+You can now start updating the API resource with the mediation flow.
+
+1. Navigate to the **MI Project Explorer** &gt; **APIs** &gt; **HealthcareAPI** &gt; **/categories/{category}/reserve**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/learn/tutorials/send-email-from-integration-service/update-mediation-flow.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/tutorials/send-email-from-integration-service/update-mediation-flow.png&quot; alt=&quot;edit API resource&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+2. To add **Variable mediator** click **+** icon in the design view and select **Variable mediator** from the palette. This is used to extract the hospital name that is sent in the request payload. 
+
+3. With the **Variable mediator** selected, specify the details given below.
+    &lt;table&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Property&lt;/th&gt;
+        &lt;th&gt;Value&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Action&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;set&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;The variable action.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Name&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;hospital&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;The name that will be used to refer to this variable&#x27;s values.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Action&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;set&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;The variable action.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;Data Type&lt;/td&gt;
+         &lt;td&gt;STRING&lt;/td&gt;
+         &lt;td&gt;The data type of the variable.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Value (Expression)&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;payload.hospital_id&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;
+          &lt;ol&gt;
+              &lt;li&gt;
+                  Click the &lt;strong&gt;Ex&lt;/strong&gt; button in the &lt;b&gt;Value&lt;/b&gt; field towards the end. This specifies the value type as an &lt;i&gt;expression&lt;/i&gt;.
+              &lt;/li&gt;
+              &lt;li&gt;
+                  Enter &lt;code&gt;payload.hospital_id&lt;/code&gt; as the expression value.
+              &lt;/li&gt;
+          &lt;/ol&gt;
+              &lt;b&gt;Note&lt;/b&gt;:
+              This is the synapse expression that will extract the hospital from the request payload.
+          &lt;/div&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Description&lt;/td&gt;
+        &lt;td&gt;Get hospital name&lt;/td&gt;
+        &lt;td&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+
+4. Click **Submit**.
+
+5. Add another **Variable Mediator** by clicking **+** after the previously added variable mediator and select **Variable Mediator** from the palette. This is used to extract the patient&#x27;s email address. 
+
+6. With the variable mediator selected, specify the details given below.
+
+    &lt;table&gt;
+      &lt;tr&gt;
+          &lt;th&gt;Property&lt;/th&gt;
+          &lt;th&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Action&lt;/td&gt;
+        &lt;td&gt;Enter &lt;code&gt;set&lt;/code&gt;.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Name&lt;/td&gt;
+        &lt;td&gt;Enter &lt;code&gt;email_id&lt;/code&gt;.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Action&lt;/td&gt;
+        &lt;td&gt;Enter &lt;code&gt;set&lt;/code&gt;.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Data Type&lt;/td&gt;
+        &lt;td&gt;STRING&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;Value&lt;/td&gt;
+        &lt;td&gt;
+            &lt;ol&gt;
+                &lt;li&gt;
+                    Click the &lt;strong&gt;Ex&lt;/strong&gt; button in the &lt;b&gt;Value&lt;/b&gt; field towards the end. This specifies the value type as &lt;i&gt;expression&lt;/i&gt;.
+                &lt;/li&gt;
+                &lt;li&gt;
+                    Enter &lt;code&gt;payload.patient.email&lt;/code&gt; to overwrite the default expression.
+                &lt;/li&gt;
+            &lt;/ol&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Description&lt;/td&gt;
+          &lt;td&gt;Get Email ID&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+
+7. Click on the **+** icon in the sequence after the previously added variable mediator to add a **GET** operation. From the palette, select **Mediators** &gt; **HTTP** &gt; **GET** operation.
+8. Once the **GET** operation form is opened, fill in the information in the table below:
+
+     &lt;table&gt;
+         &lt;tr&gt;
+              &lt;th&gt;Field&lt;/th&gt;
+              &lt;th&gt;Value&lt;/th&gt;
+              &lt;th&gt;Description&lt;/th&gt;
+         &lt;/tr&gt;
+         &lt;tbody&gt;
+             &lt;tr&gt;
+                  &lt;td&gt;Connection&lt;/td&gt;
+                  &lt;td&gt;&lt;code&gt;HospitalServiceConn&lt;/code&gt;&lt;/td&gt;
+                  &lt;td&gt;The connection to be used to execute the operation.&lt;/td&gt;
+             &lt;/tr&gt;
+             &lt;tr&gt;
+                  &lt;td&gt;Relative Path&lt;/td&gt;
+                  &lt;td&gt;&lt;code&gt;/${vars.hospital}/categories/${params.uriParams.category}/reserve&lt;/code&gt;&lt;/td&gt;
+                  &lt;td&gt;Indicates the relative path added to the base URL of the connection. In this case, 
+     the variable &#x27;category&#x27; that needs to be included in the request is accessed as 
+     &lt;code&gt;{params.uriParams.category}&lt;/code&gt; in the relative path.&lt;/td&gt;
+             &lt;/tr&gt;
+         &lt;/tbody&gt;
+     &lt;/table&gt;
+
+9. Click **Submit**.
+
+    !!! Note
+        The following response will be returned from GrandOakEP, ClemencyEP, or PineValleyEP:
+        ```json
+        {&quot;appointmentNumber&quot;:1,   &quot;doctor&quot;:
+            {&quot;name&quot;:&quot;thomas collins&quot;,
+                     &quot;hospital&quot;:&quot;grand oak community hospital&quot;,
+                     &quot;category&quot;:&quot;surgery&quot;,&quot;availability&quot;:&quot;9.00 a.m - 11.00 a.m&quot;,
+                     &quot;fee&quot;:7000.0},
+               &quot;patient&quot;:
+                   {&quot;name&quot;:&quot;John Doe&quot;,
+                    &quot;dob&quot;:&quot;1990-03-19&quot;,
+                    &quot;ssn&quot;:&quot;234-23-525&quot;,
+                    &quot;address&quot;:&quot;California&quot;,
+                    &quot;phone&quot;:&quot;8770586755&quot;,
+                    &quot;email&quot;:&quot;johndoe@gmail.com&quot;},
+               &quot;fee&quot;:7000.0,
+               &quot;confirmed&quot;:false}
+        ```
+
+10. Add another **Variable mediator** just after the **GET** operation to retrieve and store the response sent from HospitalService endpoint. This will be used within the body of the email.
+
+11. With the variable mediator selected, specify the details given below.
+
+     &lt;table&gt;
+       &lt;tr&gt;
+           &lt;th&gt;Property&lt;/th&gt;
+           &lt;th&gt;Description&lt;/th&gt;
+       &lt;/tr&gt;
+       &lt;tr&gt;
+         &lt;td&gt;Name&lt;/td&gt;
+         &lt;td&gt;Enter &lt;code&gt;hospital_response&lt;/code&gt;.&lt;/td&gt;
+       &lt;/tr&gt;
+       &lt;tr&gt;
+         &lt;td&gt;Action&lt;/td&gt;
+         &lt;td&gt;Enter &lt;code&gt;set&lt;/code&gt;.&lt;/td&gt;
+       &lt;/tr&gt;
+       &lt;tr&gt;
+         &lt;td&gt;Data Type&lt;/td&gt;
+         &lt;td&gt;STRING&lt;/td&gt;
+       &lt;/tr&gt;
+       &lt;tr&gt;
+         &lt;td&gt;Value&lt;/td&gt;
+         &lt;td&gt;
+             &lt;ol&gt;
+                 &lt;li&gt;
+                     Click the &lt;strong&gt;Ex&lt;/strong&gt; button in the &lt;b&gt;Value&lt;/b&gt; field towards the end. This specifies the value type as &lt;i&gt;expression&lt;/i&gt;.
+                 &lt;/li&gt;
+                 &lt;li&gt;
+                     Enter &lt;code&gt;payload&lt;/code&gt; to overwrite the default expression.
+                 &lt;/li&gt;
+             &lt;/ol&gt;
+         &lt;/td&gt;
+       &lt;/tr&gt;
+       &lt;tr&gt;
+           &lt;td&gt;Description&lt;/td&gt;
+           &lt;td&gt;Get Hospital Response&lt;/td&gt;
+       &lt;/tr&gt;
+     &lt;/table&gt;
+
+12. Click **+** icon below the previously added variable mediator and add the **Send** operation from the **Email** connector.
+
+13. With the **Send** operation selected, specify the following details in the property tab.
+
+14. Specify the following details in the property tab;
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Property&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Connection&lt;/td&gt;
+            &lt;td&gt;
+                Select the created &lt;code&gt;smtpsconnection&lt;/code&gt; from the drop-down list.
+            &lt;/td&gt;
+        &lt;tr&gt;
+            &lt;td&gt;From&lt;/td&gt;
+            &lt;td&gt;
+              Enter your email address as the value. This will be the account from which the email is sent.
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Personal Name&lt;/td&gt;
+            &lt;td&gt;
+              Enter personal name of the person who is sending the email.
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;To&lt;/td&gt;
+            &lt;td&gt;
+                &lt;ol&gt;
+                    &lt;li&gt;
+                        Click the &lt;strong&gt;Ex&lt;/strong&gt; button in the &lt;b&gt;Value&lt;/b&gt; field towards the end. This specifies the value type as &lt;i&gt;expression&lt;/i&gt;.
+                    &lt;/li&gt;
+                    &lt;li&gt;
+                        Enter &lt;code&gt;vars.email_id&lt;/code&gt; as the value. This retrieves the patient&#x27;s email address, which was stored in the relevant variable mediator. 
+                    &lt;/li&gt;
+                &lt;/ol&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Subject&lt;/td&gt;
+            &lt;td&gt;
+                Enter &lt;code&gt;Appointment Status&lt;/code&gt; as the value. This is the subject line in the email that is sent out.
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Content&lt;/td&gt;
+            &lt;td&gt;
+                &lt;ol&gt;
+                    &lt;li&gt;
+                        Click the &lt;strong&gt;Ex&lt;/strong&gt; button in the &lt;b&gt;Value&lt;/b&gt; field towards the end. This specifies the value type as &lt;i&gt;expression&lt;/i&gt;.
+                    &lt;/li&gt;
+                    &lt;li&gt;
+                        Enter &lt;code&gt;vars.hospital_response&lt;/code&gt; as the value. This retrieves the payment response that was stored in the relevant variable mediator.
+                    &lt;/li&gt;
+                &lt;/ol&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+15. Add a **Respond** mediator to end the sequence processing.
+
+&lt;a href=&quot;{{base_path}}/assets/img/learn/tutorials/send-email-from-integration-service/final-integration.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/tutorials/send-email-from-integration-service/final-integration.png&quot; alt=&quot;final integration&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+We have now finished creating all the required artifacts.
+
+### Step 3: Build and run the artifacts
+
+{!includes/build-and-run-artifacts.md!}
+
+The artifacts will be deployed in the embedded WSO2 Integrator: MI and the server will start.
+
+- See the startup log in the **Console** tab.
+- See the URLs of the deployed services and APIs in the **Runtime Services** tab.
+
+### Step 4: Test the use case
+
+Let&#x27;s test the use case by sending a simple client request that invokes the service.
+
+#### Start the back-end service
+
+1. Download the JAR file of the back-end service from [here](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/Hospital-Service-JDK11-2.0.0.jar).
+2. Open a terminal, and navigate to the location where you saved the back-end service.
+3. Execute the following command to start the service:
+
+    ```bash
+    java -jar Hospital-Service-JDK11-2.0.0.jar
+    ```
+
+#### Send the client request
+
+Let&#x27;s send a request to the API resource. You can use Postman or any other **HTTP Client**. Make sure you provide a valid email address so that you can test the email being sent to the patient.
+
+1. Open the Postman application. If you do not have the application, download it from here : [Postman](https://www.postman.com/downloads/)
+
+2. Add the request information as given below and click the &lt;b&gt;Send&lt;/b&gt; button.
+    
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Method&lt;/th&gt;
+            &lt;td&gt;
+               &lt;code&gt;POST&lt;/code&gt; 
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Headers&lt;/th&gt;
+            &lt;td&gt;
+              &lt;code&gt;Content-Type=application/json&lt;/code&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th&gt;URL&lt;/th&gt;
+            &lt;td&gt;&lt;code&gt;http://localhost:8290/healthcare/categories/surgery/reserve&lt;/code&gt;&lt;/br&gt;&lt;/br&gt;
+              &lt;ul&gt;
+                &lt;li&gt;
+                  The URI-Template format that is used in this URL was defined when creating the API resource:
+          &lt;code&gt;http://&lt;host&gt;:&lt;port&gt;/categories/{category}/reserve&lt;/code&gt;.
+                &lt;/li&gt;
+              &lt;/ul&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Body&lt;/th&gt;
+            &lt;td&gt;
+            &lt;div&gt;
+              &lt;code&gt;
+                {
+                  &quot;patient&quot;: {
+                  &quot;name&quot;: &quot;John Doe&quot;,
+                  &quot;dob&quot;: &quot;1940-03-19&quot;,
+                  &quot;ssn&quot;: &quot;234-23-525&quot;,
+                  &quot;address&quot;: &quot;California&quot;,
+                  &quot;phone&quot;: &quot;8770586755&quot;,
+                  &quot;email&quot;: &quot;johndoe@gmail.com&quot;,
+                  &quot;cardNo&quot;: &quot;7844481124110331&quot;
+                  },
+                  &quot;doctor&quot;: &quot;thomas collins&quot;,
+                  &quot;hospital_id&quot;: &quot;grandoaks&quot;,
+                  &quot;hospital&quot;: &quot;grand oak community hospital&quot;,
+                  &quot;appointment_date&quot;: &quot;2025-04-02&quot;
+                }
+              &lt;/code&gt;
+            &lt;/div&gt;&lt;/br&gt;
+            &lt;ul&gt;
+              &lt;li&gt;
+                This JSON payload contains details of the appointment reservation, which includes patient details, doctor, hospital, and data of appointment.
+              &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/tr&gt;
+     &lt;/table&gt;
+     
+     &lt;br/&gt;&lt;br/&gt;
+     &lt;video src=&quot;{{base_path}}/assets/vids/surgery-reserve.webm&quot; width=&quot;720&quot; height=&quot;480&quot; controls&gt;&lt;/video&gt;
+     &lt;br/&gt;&lt;br/&gt;
+     
+If you want to send the client request from your terminal:
+
+1. Install and set up [cURL](https://curl.haxx.se/) as your REST client.
+2. Create a JSON file named `request.json` with the following request payload. 
+
+    ```json
+    {
+      &quot;patient&quot;: {
+      &quot;name&quot;: &quot;John Doe&quot;,
+      &quot;dob&quot;: &quot;1940-03-19&quot;,
+      &quot;ssn&quot;: &quot;234-23-525&quot;,
+      &quot;address&quot;: &quot;California&quot;,
+      &quot;phone&quot;: &quot;8770586755&quot;,
+      &quot;email&quot;: &quot;johndoe@gmail.com&quot;,
+      &quot;cardNo&quot;: &quot;7844481124110331&quot;
+      },
+      &quot;doctor&quot;: &quot;thomas collins&quot;,
+      &quot;hospital_id&quot;: &quot;grandoaks&quot;,
+      &quot;hospital&quot;: &quot;grand oak community hospital&quot;,
+      &quot;appointment_date&quot;: &quot;2025-04-02&quot;
+    }
+    ```
+
+3.  Open a command line terminal and execute the following command from the location where the `request.json` file you created is saved:
+
+    ```bash
+    curl -v -X POST --data @request.json http://localhost:8290/healthcare/categories/surgery/reserve --header &quot;Content-Type: application/json&quot;
+    ```
+   
+#### Analyze the response
+
+An email will be sent to the provided patient email address with the following details:
+
+```bash
+Subject: Appointment Status
+             
+Message: 
+    {
+        &quot;appointmentNumber&quot;: 1,
+        &quot;doctor&quot;: {
+            &quot;name&quot;: &quot;thomas collins&quot;,
+            &quot;hospital&quot;: &quot;grand oak community hospital&quot;,
+            &quot;category&quot;: &quot;surgery&quot;,
+            &quot;availability&quot;: &quot;9.00 a.m - 11.00 a.m&quot;,
+            &quot;fee&quot;: 7000.0
+        },
+        &quot;patient&quot;: {
+            &quot;name&quot;: &quot;John Doe&quot;,
+            &quot;dob&quot;: &quot;1940-03-19&quot;,
+            &quot;ssn&quot;: &quot;234-23-525&quot;,
+            &quot;address&quot;: &quot;California&quot;,
+            &quot;phone&quot;: &quot;8770586755&quot;,
+            &quot;email&quot;: &quot;johndoe@gmail.com&quot;
+        },
+        &quot;fee&quot;: 7000.0,
+        &quot;confirmed&quot;: false
+    }
+```
+
+You have now explored how to import the Email connector to the WSO2 Integrator: MI and then use the connector operations to send emails.
+</body>
+</html>

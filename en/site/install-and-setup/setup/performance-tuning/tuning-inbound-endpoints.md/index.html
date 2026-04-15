@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>tuning-inbound-endpoints.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Tuning Inbound Endpoints
+
+See the following topics to tune the HTTP and Kafka inbound endpoints.
+
+## Tuning the HTTP Inbound
+
+By default inbound endpoints share the PassThrough transport worker pool to handle incoming requests. If you need a separate worker pool for the inbound endpoint to increase the performance, you need to configure the [HTTP worker pool parameters]({{base_path}}/reference/synapse-properties/inbound-endpoints/listening-inbound-endpoints/http-inbound-endpoint-properties/#worker-pool-configuration-properties) when &lt;b&gt;creating the inbound endpoint&lt;/b&gt;.
+
+## Tuning the Kafka inbound
+
+Open the `deployment.toml` file, and change the inbound thread pool size based on your use case. Recommended values are specified below.
+
+```toml
+[mediation]
+inbound.core_threads = 200 
+inbound.max_threads = 1000   
+```
+See the [descriptions of the parameters]({{base_path}}/reference/config-catalog-mi/#message-mediation).
+
+When you **create your inbound endpoint**, set the [sequential]({{base_path}}/reference/synapse-properties/inbound-endpoints/polling-inbound-endpoints/kafka-inbound-endpoint-properties) parameter to `false` for better performance.
+</body>
+</html>

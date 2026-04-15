@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>first-integration-connect-saas.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Connect to SaaS or B2B Systems
+
+In the previous tutorial, you learned how to route and transform messages, deploy, and test integrations in WSO2 Integrator:  MI. In this tutorial, you’ll learn how to create a loan review email notification flow that sends an email based on the client&#x27;s loan status.
+
+## What you&#x27;ll build
+
+Let&#x27;s consider a scenario where a client sends a loan request to the `Bank` API deployed in WSO2 Integrator: MI. Upon receiving the request, the API sends an email notification to the client indicating that the loan request has been received and is under review. This is done using a SaaS-based email service.
+
+In this example, you will use &lt;a target=&quot;_blank&quot; href=&quot;https://developers.google.com/gmail/imap/imap-smtp&quot;&gt;Gmail&#x27;s SMTP service&lt;/a&gt; as the email provider.
+
+&lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/what_you_will_build_saas.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/what_you_will_build_saas.png&quot; alt=&quot;Create New Project&quot; width=&quot;60%&quot;&gt;&lt;/a&gt;
+
+## What you&#x27;ll learn
+
+- How to integrate and send emails using the Email connector.
+
+## Prerequisites
+
+1. You need Visual Studio Code (VS Code) with the &lt;a target=&quot;_blank&quot; href=&quot;https://marketplace.visualstudio.com/items?itemName=WSO2.micro-integrator&quot;&gt;WSO2 Integrator: MI for VS Code&lt;/a&gt; extension installed.
+
+    !!! Info
+        See the [Install WSO2 Integrator: MI for VS Code]({{base_path}}/develop/mi-for-vscode/install-wso2-mi-for-vscode/) documentation to learn how to install WSO2 Integrator: MI for VS Code.
+
+2. You must have completed the **Route and Transform messages** tutorial under **Build your first Integration** before proceeding. Start the [Route and Transform messages]({{base_path}}/get-started/build-first-integration/first-integration-route-and-transform/) tutorial if you haven’t completed it yet.
+
+Now, it&#x27;s time to design the email notification flow. Follow the steps below to create the email notification integration.
+
+## Step 1 - Create a new API resource
+
+To develop the above scenario, let&#x27;s get started with creating a new API resource in the `Bank` API.
+
+1. Click on the Service Designer (&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/service_designer_icon.png&quot; alt=&quot;inline expression editor&quot; class=&quot;inline-icon&quot;&gt;) icon of the `Bank` API in the **WSO2 Integrator: MI Project Explorer** to open the Service Designer.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/service_designer_icon_bank_api_3.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/service_designer_icon_bank_api_3.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+2. In the Service Designer, click the **+ Resource** button to add a new API resource.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_resource_btn_3.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_resource_btn_3.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. In the **Add API Resource** pane, set `/loan-review` as the **Resource Path** and select the `POST` method.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_api_resource_pane_loan_review_post.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_api_resource_pane_loan_review_post.png&quot; alt=&quot;Create New Project&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+4. Finally, click **Create** to add the new API resource.
+
+## Step 2 - Design the integration
+
+1. Open the **Resource View** of the newly created API resource by clicking the `POST /loan-review` resource under **Available resources** in the **Service Designer**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/select_loan_review_post_resource.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/select_loan_review_post_resource.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+2. After opening the **Resource View**, click on the **Start** node on the canvas to set an input payload for the integration flow.
+
+    !!! Note
+        Setting an input payload for the integration flow is not mandatory. However, it is recommended, as it will be used to enable expression suggestions, which you will explore in later steps of this tutorial.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/click_start_node_3.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/click_start_node_3.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. Click **Add Request**, provide the following JSON payload, then click **Add**. Finally, click **Save** to complete the input payload setup.
+
+    ```json
+    {
+        &quot;customerId&quot;: &quot;C567&quot;,
+        &quot;name&quot;: &quot;Jane Smith&quot;,
+        &quot;email&quot;: &quot;jane.smith@example.com&quot;,
+        &quot;amount&quot;: 25000
+    }
+    ```
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_start_payload_saas.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_start_payload_saas.gif&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+4. Click on the **+** icon on the canvas to open the **Mediator Palette**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_new_mediator_loan_review_1.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_new_mediator_loan_review_1.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+5. Search for `email` in the **Mediator Palette**, then click the download (&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/connector_download_icon.png&quot; alt=&quot;inline expression editor&quot; class=&quot;inline-icon&quot;&gt;) icon to add the [Email connector]({{base_path}}/reference/connectors/email-connector/email-connector-overview/) to the project. In the confirmation pane, select **Yes** to add the required dependencies.
+
+    !!! Tip &quot;What is a connector?&quot;
+        - Connectors in WSO2 Integrator:  MI enable seamless integration with external systems, cloud platforms, and messaging services without the need for custom implementations. They provide a standardized way to send, receive, and process data from third-party applications like Salesforce, Kafka, and AWS services. To explore connectors in detail, see the [Connector documentation]({{base_path}}/reference/connectors/connectors-overview/).
+        - In VS Code, you can view all available connectors by clicking **Add Module** under the **Mediators** tab in the **Mediator Palette**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/download_email_connector.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/download_email_connector.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+6. Once the connector is downloaded, select the `Send` operation from the **Mediator Palette**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/select_email_send.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/select_email_send.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+7. Click **+ Add new connection** to create a new connection.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/email_add_new_connection_btn.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/email_add_new_connection_btn.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+8. Select `SMTPS` and fill in the following details to create a connection to Gmail&#x27;s SMTP service. Finally, click **Add** in the **Add New Connection** form to create the connection.
+
+    !!! Tip
+        If two-factor authentication is enabled, you need to obtain an app password by following the instructions &lt;a target=&quot;_blank&quot; href=&quot;https://support.google.com/accounts/answer/185833?hl=en&quot;&gt;here&lt;/a&gt;.
+
+    | Property            | Value                   |
+    |---------------------|-------------------------|
+    | **Connection Name** | `GmailConnection`        |
+    | **Host**        | `smtp.gmail.com` |
+    | **Port**        | `465` |
+    | **Username**        | Your email address |
+    | **Password**        | Your email password or app password|
+
+    !!! Note
+        It is recommended to use secure vault to store credentials. For more information, refer to &lt;a href=&quot;{{base_path}}/install-and-setup/setup/security/encrypting-plain-text/&quot;&gt;Encrypting Secrets&lt;/a&gt;.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/email_create_connection.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/email_create_connection.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+
+9. After creating the connection, enter your email address in the **From** field and set `Loan Application Received` as the **Subject** in the **Add Send** form.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/email_set_subject.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/email_set_subject.png&quot; alt=&quot;Create New Project&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+    In the next step, you will extract the recipient&#x27;s email address from the incoming payload and assign it to the **To** field using an expression.
+
+10. Click on the expression (&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/enable_expression_icon.png&quot; alt=&quot;inline expression editor&quot; class=&quot;inline-icon&quot;&gt;) icon to enable expression mode for the **To** field.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/enable_expression_to.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/enable_expression_to.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+11. Once expressions are enabled, click on the expression editor (&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/expression_editor_icon.png&quot; alt=&quot;inline expression editor&quot; class=&quot;inline-icon&quot;&gt;) icon to open the editor.
+
+12. Select **Payload** → **email** to extract the recipient&#x27;s email address from the payload.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/email_set_to.gif&quot; class=&quot;glightbox&quot;&gt;
+        &lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/email_set_to.gif&quot; width=&quot;50%&quot; alt=&quot;Add inline expression&quot;&gt;
+    &lt;/a&gt;
+
+    In the next step, you will use a template with inline expressions to extract data from the incoming payload and construct the email body.
+
+    !!! Tip
+        You can use the following pre-filled template in the **Content** field to skip the inline expression insertion steps and continue from **Step 16**.
+
+        ```text
+        Dear ${payload.name},
+
+        We have received your loan application for $ ${payload.amount}. Our team will review your application and contact you shortly.
+
+        Thank you,
+        O2 Bank
+        ```
+
+13. In the **Content** field, enter the following template.
+
+    ```text
+    Dear ,
+
+    We have received your loan application for $ . Our team will review your application and contact you shortly.
+
+    Thank you,
+    O2 Bank
+    ```
+
+14. In the template, place your cursor in the appropriate location (next to `Dear `), click on the inline expression editor (&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/inline_expression_icon.png&quot; alt=&quot;inline expression editor&quot; class=&quot;inline-icon&quot;&gt;) icon, then select **Payload** → **name**, and click **Add** to insert the inline expression into the template.
+
+15. Repeat the same steps to insert the loan **amount** after the `$` symbol in the template.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_inline_expressions_email_body.gif&quot; class=&quot;glightbox&quot;&gt;
+        &lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_inline_expressions_email_body.gif&quot; width=&quot;50%&quot; alt=&quot;Add inline expression&quot;&gt;
+    &lt;/a&gt;
+
+16. Ensure that **Overwrite Message Body** is checked, then click **Submit** to add the email operation to the integration flow.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/email_send_configs.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/email_send_configs.png&quot; alt=&quot;Create New Project&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+17. Click on the **+** icon located just after the **Send** operation to open the **Mediator Palette** to add a [Respond Mediator]({{base_path}}/reference/mediators/respond-mediator) to respond to the client request.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_respond_loan_request_flow.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/add_respond_loan_request_flow.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+18. Select **Respond** mediator under **Mediators**, and click **Add** to insert it to the integration flow.
+
+You have successfully updated the integration flow to send an email with the loan request status. For reference, you can review the configured API and Email connection.
+
+??? &quot;Bank API&quot;
+
+    !!! info
+        You can view the source view by clicking on the **Show Source** (`&lt;/&gt;`) icon located in the top right corner of the VS Code.
+
+    === &quot;Design View&quot;
+        &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/email_api.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/email_api.png&quot; alt=&quot;ai datamapping api&quot; width=&quot;70%&quot;&gt;&lt;/a&gt;
+
+    === &quot;Source View&quot;
+        ```yaml
+        &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        &lt;api context=&quot;/bankapi&quot; name=&quot;BankAPI&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;resource methods=&quot;GET&quot; uri-template=&quot;/&quot;&gt;
+                &lt;inSequence&gt;
+                    &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;default&quot;&gt;
+                        &lt;format&gt;{
+                            &quot;greetings&quot;:&quot;Welcome to O2 Bank !!&quot;
+                            }
+                        &lt;/format&gt;
+                    &lt;/payloadFactory&gt;
+                    &lt;respond/&gt;
+                &lt;/inSequence&gt;
+                &lt;faultSequence&gt;
+                &lt;/faultSequence&gt;
+            &lt;/resource&gt;
+            &lt;resource methods=&quot;POST&quot; uri-template=&quot;/deposit&quot;&gt;
+                &lt;inSequence&gt;
+                    &lt;http.post configKey=&quot;CurrencyConverter&quot;&gt;
+                        &lt;relativePath&gt;/currency/rate&lt;/relativePath&gt;
+                        &lt;headers&gt;[]&lt;/headers&gt;
+                        &lt;requestBodyType&gt;JSON&lt;/requestBodyType&gt;
+                        &lt;requestBodyJson&gt;{
+                            &amp;quot;fromCurrency&amp;quot;: &amp;quot; ${payload.currency} &amp;quot;,
+                            &amp;quot;toCurrency&amp;quot;: &amp;quot;USD&amp;quot;
+                            }
+                        &lt;/requestBodyJson&gt;
+                        &lt;forceScAccepted&gt;false&lt;/forceScAccepted&gt;
+                        &lt;disableChunking&gt;false&lt;/disableChunking&gt;
+                        &lt;forceHttp10&gt;false&lt;/forceHttp10&gt;
+                        &lt;noKeepAlive&gt;false&lt;/noKeepAlive&gt;
+                        &lt;forcePostPutNobody&gt;false&lt;/forcePostPutNobody&gt;
+                        &lt;responseVariable&gt;http_post_1&lt;/responseVariable&gt;
+                        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+                    &lt;/http.post&gt;
+                    &lt;filter xpath=&quot;${vars.http_post_1.attributes.statusCode == 200}&quot;&gt;
+                        &lt;then&gt;
+                            &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;default&quot;&gt;
+                                &lt;format&gt;{ &quot;status&quot;: &quot;successful&quot;, &quot;amountDeposited&quot;: ${payload.amount * vars.http_post_1.payload.rate} }&lt;/format&gt;
+                            &lt;/payloadFactory&gt;
+                        &lt;/then&gt;
+                        &lt;else&gt;
+                            &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;default&quot;&gt;
+                                &lt;format&gt;{
+                                    &quot;status&quot;: &quot;unsuccessful&quot;,
+                                    &quot;error&quot;: &quot;${vars.http_post_1.payload.message}&quot;
+                                    }
+                                &lt;/format&gt;
+                            &lt;/payloadFactory&gt;
+                        &lt;/else&gt;
+                    &lt;/filter&gt;
+                    &lt;respond/&gt;
+                &lt;/inSequence&gt;
+                &lt;faultSequence&gt;
+                &lt;/faultSequence&gt;
+            &lt;/resource&gt;
+            &lt;resource methods=&quot;POST&quot; uri-template=&quot;/loan-review&quot;&gt;
+                &lt;inSequence&gt;
+                    &lt;email.send configKey=&quot;GmailConnection&quot;&gt;
+                        &lt;from&gt;ENTER_YOUR_EMAIL_HERE&lt;/from&gt;
+                        &lt;personalName&gt;&lt;/personalName&gt;
+                        &lt;to&gt;{${payload.email}}&lt;/to&gt;
+                        &lt;cc&gt;&lt;/cc&gt;
+                        &lt;bcc&gt;&lt;/bcc&gt;
+                        &lt;replyTo&gt;&lt;/replyTo&gt;
+                        &lt;subject&gt;Loan Application Received&lt;/subject&gt;
+                        &lt;content&gt;Dear ${payload.name},
+                                        We have received your loan application for $ ${payload.amount}. Our team will review your application and contact you shortly.
+                                        Thank you,
+                                        O2 Bank&lt;/content&gt;
+                        &lt;contentType&gt;text/html&lt;/contentType&gt;
+                        &lt;encoding&gt;UTF-8&lt;/encoding&gt;
+                        &lt;attachments&gt;&lt;/attachments&gt;
+                        &lt;inlineImages&gt;[]&lt;/inlineImages&gt;
+                        &lt;contentTransferEncoding&gt;Base64&lt;/contentTransferEncoding&gt;
+                        &lt;responseVariable&gt;email_send_1&lt;/responseVariable&gt;
+                        &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+                    &lt;/email.send&gt;
+                    &lt;respond /&gt;
+                &lt;/inSequence&gt;
+                &lt;faultSequence&gt;
+                &lt;/faultSequence&gt;
+            &lt;/resource&gt;
+        &lt;/api&gt;
+        ```
+
+??? &quot;Email Connection&quot;
+
+    !!! info
+        You can view the source view by clicking on the **Show Source** (`&lt;/&gt;`) icon located in the top right corner of the VS Code.
+
+    === &quot;Design View&quot;
+        &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/gmail_connection.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/gmail_connection.png&quot; alt=&quot;http connection config&quot; width=&quot;40%&quot;&gt;&lt;/a&gt;
+        
+    === &quot;Source View&quot;
+        ```yaml
+        &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        &lt;localEntry key=&quot;GmailConnection&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;email.init&gt;
+                &lt;connectionType&gt;SMTPS&lt;/connectionType&gt;
+                &lt;host&gt;smtp.gmail.com&lt;/host&gt;
+                &lt;port&gt;465&lt;/port&gt;
+                &lt;username&gt;REPLACE&lt;/username&gt;
+                &lt;password&gt;REPLACE&lt;/password&gt;
+                &lt;name&gt;GmailConnection&lt;/name&gt;
+            &lt;/email.init&gt;
+        &lt;/localEntry&gt;
+        ```
+
+## Step 3 - Run the integration
+
+Now that you have updated the integration, it&#x27;s time to deploy the integration to the WSO2 Integrator: MI server runtime.
+
+Click the **Build and Run** icon located in the top right corner of VS Code.
+
+&lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/build_and_run_btn_email.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/build_and_run_btn_email.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+## Step 4 - Test the integration service
+
+1. Once the **Runtime Services** interface is open, select the `BankAPI`, and click the **Try It** button.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/swagger_select_bank_api_email.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/swagger_select_bank_api_email.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+2. Select the `/loan-review` resource and click **Try it Out** to test the API.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/swagger_select_email_resource.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/swagger_select_email_resource.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. Provide a JSON payload and click the **Execute** button to invoke the API. You may use the following sample payload to test the API. Make sure to update the `name` and `email` fields with the actual recipient&#x27;s information.
+
+    ```json
+    {
+        &quot;customerId&quot;: &quot;C567&quot;,
+        &quot;name&quot;: &quot;Jane Smith&quot;,
+        &quot;email&quot;: &quot;jane.smith@example.com&quot;,
+        &quot;amount&quot;: 45000
+    }
+    ```
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/swagger_execute_email.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/swagger_execute_email.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+4. Check the response received from the server, and verify that the loan request status email has been successfully delivered by checking the recipient’s inbox.
+
+Congratulations!
+You have now learned how to integrate with an email SaaS provider using connectors to send emails as part of your integration flow.
+
+## What&#x27;s next?  
+
+You have now completed this tutorial series, where you learned how to build a complete integration flow step by step. Throughout this journey, you have explored how to create Integration APIs, route and transform messages, connect to external SaaS and B2B systems.
+
+Now, you can explore advanced integration scenarios, applying what you’ve learned to real-world use cases and expanding your expertise in WSO2 Integrator: MI.
+
+Try more [tutorials and examples]({{base_path}}/learn/learn-overview/).
+
+{% raw %}
+&lt;style&gt;
+.language-bash {
+    color: var(--md-feedback-button-color) !important;
+}
+.language-bash .hljs-string, .hljs-keyword {
+    color: var(--md-feedback-button-color) !important;
+}
+.language-bash .hljs-variable {
+    font-weight: 600;
+    color: rgb(45, 116, 215) !important;
+}
+&lt;/style&gt;
+{% endraw %}
+</body>
+</html>

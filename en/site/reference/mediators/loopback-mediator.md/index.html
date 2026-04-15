@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>loopback-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Loopback Mediator
+
+The **Loopback Mediator** moves messages from the in flow (request path) to the out flow (response path). All the configuration included in the in sequence that appears after the Loopback mediator is skipped.
+
+!!! Info
+    The messages that have already been passed from the In sequence to the Out sequence cannot be moved to the Out sequence again via the Loopback mediator. 
+
+## Syntax
+
+The loopback token refers to a `&lt;loopback/&gt;` element, which is used to skip the rest of the in flow and move the message to the out flow.
+
+``` java
+&lt;loopback/&gt;
+```
+
+## Example
+
+This example is a main sequence configuration with two [Payload mediators]({{base_path}}/reference/mediators/payloadfactory-mediator). Assume you only want to use the
+first factory but need to keep the second factory in the configuration for future reference. The Loopback mediator is added after the first
+Payload mediator configuration to skip the second Payload mediator configuration. This configuration will cause the message to be processed
+with the first Payload mediator and then immediately move to the out flow, skipping the second Payload mediator in the in flow.
+
+``` java
+&lt;proxy name=&quot;SimpleProxy&quot; transports=&quot;http https&quot; startOnLoad=&quot;true&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;target&gt;
+      &lt;inSequence&gt;
+      &lt;payloadFactory media-type=&quot;xml&quot;&gt;
+        &lt;format&gt;
+          &lt;m:messageBeforeLoopBack xmlns:m=&quot;http://services.samples&quot;&gt;
+            &lt;m:messageBeforeLoopBackSymbol&gt;
+              &lt;m:symbolBeforeLoopBack&gt;$1&lt;/m:symbolBeforeLoopBack&gt;
+            &lt;/m:messageBeforeLoopBackSymbol&gt;
+          &lt;/m:messageBeforeLoopBack&gt;
+        &lt;/format&gt;
+        &lt;args&gt;
+          &lt;arg xmlns:m0=&quot;http://services.samples&quot;
+            evaluator=&quot;xml&quot;
+            expression=&quot;//m0:symbol/text()&quot;/&gt;
+          &lt;/args&gt;
+      &lt;/payloadFactory&gt;
+
+      &lt;loopback/&gt;
+
+      &lt;payloadFactory media-type=&quot;xml&quot;&gt;
+        &lt;format&gt;
+          &lt;m:messageAfterLoopBack xmlns:m=&quot;http://services.samples&quot;&gt;
+            &lt;m:messageAfterLoopBackSymbol&gt;
+              &lt;m:symbolAfterLoopBack&gt;$1&lt;/m:symbolAfterLoopBack&gt;
+            &lt;/m:messageAfterLoopBackSymbol&gt;
+          &lt;/m:messageAfterLoopBack&gt;
+        &lt;/format&gt;
+        &lt;args&gt;
+          &lt;arg xmlns:m0=&quot;http://services.samples&quot;
+            evaluator=&quot;xml&quot;
+            expression=&quot;//m0:symbolBeforeLoopBack/text()&quot;/&gt;
+        &lt;/args&gt;
+      &lt;/payloadFactory&gt;
+    &lt;/inSequence&gt;
+    &lt;outSequence&gt;
+      &lt;send/&gt;
+    &lt;/outSequence&gt;
+  &lt;/target&gt;
+&lt;/proxy&gt;
+```
+</body>
+</html>

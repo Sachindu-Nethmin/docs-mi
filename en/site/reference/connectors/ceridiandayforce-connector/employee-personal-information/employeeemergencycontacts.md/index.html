@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>employeeemergencycontacts.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Working with Employee Emergency Contacts
+
+### Overview 
+
+The following operations allow you to retrieve, create or update emergency contacts of an employee
+
+| Operation | Description |
+| ------------- |-------------|
+|[GET Employee Emergency Contacts](#retrieving-employee-emergency-contact)| Retrieve an employee&#x27;s emergency contact information. |
+|[POST Employee Emergency Contacts](#creating-employee-emergency-contact)| Create an employee&#x27;s emergency contact information. |
+|[PATCH Employee Emergency Contacts](#updating-employee-emergency-contact)| Update an employee&#x27;s emergency contact information. |
+
+### Operation details
+
+This section provides more details on each of the operations.
+
+#### Retrieving Employee Emergency Contact
+We can use GET Employee Emergency Contacts operation with required parameters to retrieve the emergency contact information of an employee.
+
+**GET Employee Emergency Addresses**
+```xml
+&lt;ceridiandayforce.getEmployeeEmergencyContacts&gt;
+    &lt;xRefCode&gt;{$ctx:xRefCode}&lt;/xRefCode&gt;
+    &lt;contextDate&gt;{$ctx:contextDate}&lt;/contextDate&gt;
+    &lt;contextDateRangeFrom&gt;{$ctx:contextDateRangeFrom}&lt;/contextDateRangeFrom&gt;
+    &lt;contextDateRangeTo&gt;{$ctx:contextDateRangeTo}&lt;/contextDateRangeTo&gt;
+&lt;/ceridiandayforce.getEmployeeEmergencyContacts&gt;
+```
+
+**Properties**
+
+* xRefCode (Mandatory): he unique identifier (external reference code) of the employee whose data will be retrieved. The value provided must be the exact match for an employee; otherwise, a bad request (400) error will be returned.
+* contextDate (Optional): The Context Date value is an “as-of” date used to determine which employee data to search when records have specific start and end dates. The service defaults to the current datetime if the requester does not specify a value. Example: 2017-01-01T13:24:56
+* contextDateRangeFrom (Optional): The Context Date Range From value is the start of the range of dates used to determine which employee data to search when records have specific start and end dates. The service defaults to null if the requester does not specify a value. Example: 2017-01-01T13:24:56
+* contextDateRangeTo (Optional): The Context Date Range To value is the end of the range of dates to determine which employee data to search when records have specific start and end dates. The service defaults to null if the requester does not specify a value. Example: 2017-01-01T13:24:56
+
+**Sample request**
+
+Following is a sample request that can be handled by this operation.
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;xRefCode&quot;: &quot;42199&quot;,
+  &quot;contextDateRangeTo&quot;: &quot;2017-01-01T13:24:56&quot;
+}
+```
+
+**Sample response**
+
+Given below is a sample response for this operation.
+
+```json
+{
+    &quot;Data&quot;: [
+        {
+            &quot;FirstName&quot;: &quot;Alice&quot;,
+            &quot;LastName&quot;: &quot;Glover&quot;,
+            &quot;IsPrimary&quot;: true,
+            &quot;Relationship&quot;: {
+                &quot;XRefCode&quot;: &quot;WIFE&quot;,
+                &quot;ShortName&quot;: &quot;Wife&quot;,
+                &quot;LongName&quot;: &quot;Wife&quot;
+            },
+            &quot;Addresses&quot;: {
+                &quot;Items&quot;: []
+            },
+            &quot;Contacts&quot;: {
+                &quot;Items&quot;: [
+                    {
+                        &quot;ContactNumber&quot;: &quot;213 658 9654&quot;,
+                        &quot;Country&quot;: {
+                            &quot;Name&quot;: &quot;United States of America&quot;,
+                            &quot;XRefCode&quot;: &quot;USA&quot;,
+                            &quot;ShortName&quot;: &quot;United States of America&quot;,
+                            &quot;LongName&quot;: &quot;United States of America&quot;
+                        },
+                        &quot;EffectiveStart&quot;: &quot;2000-01-01T00:00:00&quot;,
+                        &quot;ContactInformationType&quot;: {
+                            &quot;ContactInformationTypeGroup&quot;: {
+                                &quot;XRefCode&quot;: &quot;Phone&quot;,
+                                &quot;ShortName&quot;: &quot;Phone&quot;,
+                                &quot;LongName&quot;: &quot;Phone&quot;
+                            },
+                            &quot;XRefCode&quot;: &quot;Mobile&quot;,
+                            &quot;ShortName&quot;: &quot;Mobile&quot;,
+                            &quot;LongName&quot;: &quot;Mobile&quot;
+                        },
+                        &quot;IsForSystemCommunications&quot;: false,
+                        &quot;IsPreferredContactMethod&quot;: false,
+                        &quot;IsUnlistedNumber&quot;: false,
+                        &quot;IsVerified&quot;: false,
+                        &quot;IsRejected&quot;: false,
+                        &quot;ShowRejectedWarning&quot;: true,
+                        &quot;NumberOfVerificationRequests&quot;: 0
+                    }
+                ]
+            }
+        }
+    ]
+}
+```
+
+**Related Dayforce documentation**
+
+[https://developers.dayforce.com/Build/API-Explorer/Employee-Personal-Information/Employee-Emergency-Contacts/GET-Employee-Emergency-Contacts.aspx](https://developers.dayforce.com/Build/API-Explorer/Employee-Personal-Information/Employee-Emergency-Contacts/GET-Employee-Emergency-Contacts.aspx)
+
+#### Creating Employee Emergency Contact
+We can use POST Employee Emergency Contacts operation with required parameters to create the required employee&#x27;s emergency contact information.
+
+**POST Employee Emergency Contacts**
+```xml
+&lt;ceridiandayforce.postEmployeeEmergencyContacts&gt;
+    &lt;xRefCode&gt;{$ctx:xRefCode}&lt;/xRefCode&gt;
+    &lt;isValidateOnly&gt;{$ctx:isValidateOnly}&lt;/isValidateOnly&gt;
+    &lt;fieldAndValue&gt;{$ctx:fieldAndValue}&lt;/fieldAndValue&gt;
+&lt;/ceridiandayforce.postEmployeeEmergencyContacts&gt;
+```
+
+**Properties**
+
+* xRefCode (Mandatory): The unique identifier (external reference code) of the employee whose data will be retrieved. The value provided must be the exact match for an employee; otherwise, a bad request (400) error will be returned.
+* isValidateOnly (Mandatory): When a TRUE value is used in this parameter, POST and PATCH operations validate the request without applying updates to the database.
+
+**Sample request**
+
+Following is a sample request that can be handled by this operation.
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;xRefCode&quot;: &quot;42199&quot;,
+  &quot;isValidateOnly&quot;: &quot;true&quot;,
+  &quot;contextDateRangeFrom&quot;: &quot;2017-01-01T13:24:56&quot;,
+  &quot;fieldAndValue&quot;: {
+      &quot;FirstName&quot;: &quot;Alice&quot;,
+      &quot;LastName&quot;: &quot;Glover&quot;,
+      &quot;IsPrimary&quot;: true,
+      &quot;Relationship&quot;: {
+        &quot;XRefCode&quot;: &quot;WIFE&quot;,
+        &quot;ShortName&quot;: &quot;Wife&quot;,
+        &quot;LongName&quot;: &quot;Wife&quot;
+      },
+      &quot;Addresses&quot;: {
+        &quot;Items&quot;: []
+      },
+      &quot;Contacts&quot;: {
+        &quot;Items&quot;: [
+          {
+            &quot;ContactNumber&quot;: &quot;213 658 9654&quot;,
+            &quot;Country&quot;: {
+              &quot;Name&quot;: &quot;United States of America&quot;,
+              &quot;XRefCode&quot;: &quot;USA&quot;,
+              &quot;ShortName&quot;: &quot;United States of America&quot;,
+              &quot;LongName&quot;: &quot;United States of America&quot;
+            },
+            &quot;EffectiveStart&quot;: &quot;2000-01-01T00:00:00&quot;,
+            &quot;ContactInformationType&quot;: {
+              &quot;ContactInformationTypeGroup&quot;: {
+                &quot;XRefCode&quot;: &quot;Phone&quot;,
+                &quot;ShortName&quot;: &quot;Phone&quot;,
+                &quot;LongName&quot;: &quot;Phone&quot;
+              },
+              &quot;XRefCode&quot;: &quot;Mobile&quot;,
+              &quot;ShortName&quot;: &quot;Mobile&quot;,
+              &quot;LongName&quot;: &quot;Mobile&quot;
+            },
+            &quot;IsForSystemCommunications&quot;: false,
+            &quot;IsPreferredContactMethod&quot;: false,
+            &quot;IsUnlistedNumber&quot;: false,
+            &quot;IsVerified&quot;: false,
+            &quot;IsRejected&quot;: false,
+            &quot;ShowRejectedWarning&quot;: true,
+            &quot;NumberOfVerificationRequests&quot;: 0
+          }
+        ]
+      }
+    }
+}
+```
+
+**Sample response**
+
+This method returns a HTTP code 200 and no response body
+
+**Related Dayforce documentation**
+
+[https://developers.dayforce.com/Build/API-Explorer/Employee-Personal-Information/Employee-Emergency-Contacts/POST-Employee-Emergency-Contacts.aspx](https://developers.dayforce.com/Build/API-Explorer/Employee-Personal-Information/Employee-Emergency-Contacts/POST-Employee-Emergency-Contacts.aspx)
+
+#### Updating Employee Emergency Contact
+We can use PATCH Employee Emergency Contacts operation with required parameters to update the emergency contact information  of existing employees.
+
+**PATCH Employee Emergency Contacts**
+```xml
+&lt;ceridiandayforce.patchEmployeeEmergencyContacts&gt;
+    &lt;xRefCode&gt;{$ctx:xRefCode}&lt;/xRefCode&gt;
+    &lt;isValidateOnly&gt;{$ctx:isValidateOnly}&lt;/isValidateOnly&gt;
+    &lt;fieldAndValue&gt;{$ctx:fieldAndValue}&lt;/fieldAndValue&gt;
+&lt;/ceridiandayforce.patchEmployeeEmergencyContacts&gt;
+```
+
+**Properties**
+
+* xRefCode (Mandatory): The unique identifier (external reference code) of the employee whose data will be retrieved. The value provided must be the exact match for an employee; otherwise, a bad request (400) error will be returned.
+* isValidateOnly (Mandatory): When a TRUE value is used in this parameter, POST and PATCH operations validate the request without applying updates to the database.
+
+**Sample request**
+
+Following is a sample request that can be handled by this operation.
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;xRefCode&quot;: &quot;42199&quot;,
+  &quot;isValidateOnly&quot;: &quot;true&quot;,
+  &quot;contextDateRangeFrom&quot;: &quot;2017-01-01T13:24:56&quot;,
+  &quot;fieldAndValue&quot;: {
+      &quot;FirstName&quot;: &quot;Alice&quot;,
+      &quot;LastName&quot;: &quot;Glover&quot;,
+      &quot;IsPrimary&quot;: true,
+      &quot;Relationship&quot;: {
+        &quot;XRefCode&quot;: &quot;WIFE&quot;,
+        &quot;ShortName&quot;: &quot;Wife&quot;,
+        &quot;LongName&quot;: &quot;Wife&quot;
+      },
+      &quot;Addresses&quot;: {
+        &quot;Items&quot;: []
+      },
+      &quot;Contacts&quot;: {
+        &quot;Items&quot;: [
+          {
+            &quot;ContactNumber&quot;: &quot;213 658 9654&quot;,
+            &quot;Country&quot;: {
+              &quot;Name&quot;: &quot;United States of America&quot;,
+              &quot;XRefCode&quot;: &quot;USA&quot;,
+              &quot;ShortName&quot;: &quot;United States of America&quot;,
+              &quot;LongName&quot;: &quot;United States of America&quot;
+            },
+            &quot;EffectiveStart&quot;: &quot;2000-01-01T00:00:00&quot;,
+            &quot;ContactInformationType&quot;: {
+              &quot;ContactInformationTypeGroup&quot;: {
+                &quot;XRefCode&quot;: &quot;Phone&quot;,
+                &quot;ShortName&quot;: &quot;Phone&quot;,
+                &quot;LongName&quot;: &quot;Phone&quot;
+              },
+              &quot;XRefCode&quot;: &quot;Mobile&quot;,
+              &quot;ShortName&quot;: &quot;Mobile&quot;,
+              &quot;LongName&quot;: &quot;Mobile&quot;
+            },
+            &quot;IsForSystemCommunications&quot;: false,
+            &quot;IsPreferredContactMethod&quot;: false,
+            &quot;IsUnlistedNumber&quot;: false,
+            &quot;IsVerified&quot;: false,
+            &quot;IsRejected&quot;: false,
+            &quot;ShowRejectedWarning&quot;: true,
+            &quot;NumberOfVerificationRequests&quot;: 0
+          }
+        ]
+      }
+    }
+}
+```
+
+**Sample response**
+
+This operation returns HTTP code 200 with no response body
+
+**Related Dayforce documentation**
+
+[https://developers.dayforce.com/Build/API-Explorer/Employee-Personal-Information/Employee-Emergency-Contacts/PATCH-Employee-Emergency-Contacts.aspx](https://developers.dayforce.com/Build/API-Explorer/Employee-Personal-Information/Employee-Emergency-Contacts/PATCH-Employee-Emergency-Contacts.aspx)
+
+### Sample configuration
+
+Following example illustrates how to connect to Dayforce with the init operation and query operation.
+
+1.Create a sample proxy as below :
+```xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
+       name=&quot;query&quot;
+       startOnLoad=&quot;true&quot;
+       statistics=&quot;disable&quot;
+       trace=&quot;disable&quot;
+       transports=&quot;http,https&quot;&gt;
+   &lt;target&gt;
+      &lt;inSequence&gt;
+         &lt;log level=&quot;full&quot; separator=&quot;,&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.username)&quot; name=&quot;username&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.password)&quot; name=&quot;password&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.clientNamespace)&quot; name=&quot;clientNamespace&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.apiVersion)&quot; name=&quot;apiVersion&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.isValidateOnly)&quot; name=&quot;isValidateOnly&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.fieldAndValue)&quot; name=&quot;fieldAndValue&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.xRefCode)&quot; name=&quot;xRefCode&quot;/&gt;
+         &lt;ceridiandayforce.init&gt;
+            &lt;username&gt;{$ctx:username}&lt;/username&gt;
+            &lt;password&gt;{$ctx:password}&lt;/password&gt;
+            &lt;clientNamespace&gt;{$ctx:clientNamespace}&lt;/clientNamespace&gt;
+            &lt;apiVersion&gt;{$ctx:apiVersion}&lt;/apiVersion&gt;
+         &lt;/ceridiandayforce.init&gt;
+         &lt;ceridiandayforce.patchEmployeeEmergencyContacts&gt;
+            &lt;xRefCode&gt;{$ctx:xRefCode}&lt;/xRefCode&gt;
+            &lt;isValidateOnly&gt;{$ctx:isValidateOnly}&lt;/isValidateOnly&gt;
+            &lt;fieldAndValue&gt;{$ctx:fieldAndValue}&lt;/fieldAndValue&gt;
+         &lt;/ceridiandayforce.patchEmployeeEmergencyContacts&gt;
+         &lt;send/&gt;
+      &lt;/inSequence&gt;
+   &lt;/target&gt;
+   &lt;description/&gt;
+&lt;/proxy&gt;
+                                
+```
+
+2.Create a json file named query.json and copy the configurations given below to it:
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;xRefCode&quot;: &quot;42199&quot;,
+  &quot;isValidateOnly&quot;: &quot;true&quot;,
+  &quot;contextDateRangeFrom&quot;: &quot;2017-01-01T13:24:56&quot;,
+  &quot;fieldAndValue&quot;: {
+      &quot;FirstName&quot;: &quot;Alice&quot;,
+      &quot;LastName&quot;: &quot;Glover&quot;,
+      &quot;IsPrimary&quot;: true,
+      &quot;Relationship&quot;: {
+        &quot;XRefCode&quot;: &quot;WIFE&quot;,
+        &quot;ShortName&quot;: &quot;Wife&quot;,
+        &quot;LongName&quot;: &quot;Wife&quot;
+      },
+      &quot;Addresses&quot;: {
+        &quot;Items&quot;: []
+      },
+      &quot;Contacts&quot;: {
+        &quot;Items&quot;: [
+          {
+            &quot;ContactNumber&quot;: &quot;213 658 9654&quot;,
+            &quot;Country&quot;: {
+              &quot;Name&quot;: &quot;United States of America&quot;,
+              &quot;XRefCode&quot;: &quot;USA&quot;,
+              &quot;ShortName&quot;: &quot;United States of America&quot;,
+              &quot;LongName&quot;: &quot;United States of America&quot;
+            },
+            &quot;EffectiveStart&quot;: &quot;2000-01-01T00:00:00&quot;,
+            &quot;ContactInformationType&quot;: {
+              &quot;ContactInformationTypeGroup&quot;: {
+                &quot;XRefCode&quot;: &quot;Phone&quot;,
+                &quot;ShortName&quot;: &quot;Phone&quot;,
+                &quot;LongName&quot;: &quot;Phone&quot;
+              },
+              &quot;XRefCode&quot;: &quot;Mobile&quot;,
+              &quot;ShortName&quot;: &quot;Mobile&quot;,
+              &quot;LongName&quot;: &quot;Mobile&quot;
+            },
+            &quot;IsForSystemCommunications&quot;: false,
+            &quot;IsPreferredContactMethod&quot;: false,
+            &quot;IsUnlistedNumber&quot;: false,
+            &quot;IsVerified&quot;: false,
+            &quot;IsRejected&quot;: false,
+            &quot;ShowRejectedWarning&quot;: true,
+            &quot;NumberOfVerificationRequests&quot;: 0
+          }
+        ]
+      }
+    }
+}
+```
+3.Replace the credentials with your values.
+
+4.Execute the following curl command:
+
+```bash
+curl http://localhost:8280/services/query -H &quot;Content-Type: application/json&quot; -d @query.json
+```
+5.Dayforce returns HTTP Code 200
+</body>
+</html>

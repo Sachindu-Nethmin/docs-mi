@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>pulsar-connector-reference.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Apache Pulsar Connector Reference
+
+This documentation provides a reference guide for the Apache Pulsar Connector. The Pulsar connector allows you to connect to Apache Pulsar, a distributed messaging system, and perform message publishing.
+Click an operation name to see parameter details and samples on how to use it.
+
+## Connection Configurations
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/pulsar/PulsarConnections.png&quot; title=&quot;Apache Pulsar Connections&quot; width=&quot;700&quot; alt=&quot;Apache Pulsar Connections&quot;/&gt;
+
+The WSO2 Apache Pulsar Connector allows you to establish both secure and non-secure connections to Apache Pulsar. 
+
+---
+
+### Connection Configuration Parameters
+
+??? note &quot;PULSAR&quot;
+    This operation allows you to initialize the connection to Apache Pulsar.ddd
+
+    **Note:** Unless explicitly stated, the default values of the optional parameters match those defined in the official [Apache Pulsar Configuration documentation](https://pulsar.apache.org/reference/#/4.0.x/client/client-configuration-client).
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Display Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;name&lt;/td&gt;
+            &lt;td&gt;Connection name&lt;/td&gt;
+            &lt;td&gt;Unique name to identify the connection.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;serviceUrl&lt;/td&gt;
+            &lt;td&gt;Broker URL&lt;/td&gt;
+            &lt;td&gt;The Pulsar broker URL to connect. It follows the format - `pulsar://&lt;host_name&gt;:&lt;port&gt;` where pulsar is the protocol. The content following the `://` is the host name and the port on which the broker is running.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th colspan=&quot;3&quot;&gt;Additional parameters for connection&lt;/td&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionTimeoutMs&lt;/td&gt;
+            &lt;td&gt;Connection Timeout (in milliseconds)&lt;/td&gt;
+            &lt;td&gt;Timeout for establishing a TCP connection in milliseconds.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;operationTimeoutSeconds&lt;/td&gt;
+            &lt;td&gt;Operation Timeout (in seconds)&lt;/td&gt;
+            &lt;td&gt;Specifies how long the client should wait (in seconds) for sending a message before timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestTimeoutMs&lt;/td&gt;
+            &lt;td&gt;Request Timeout (in milliseconds)&lt;/td&gt;
+            &lt;td&gt;Timeout duration (in milliseconds) for individual Pulsar requests.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;lookupTimeoutMs&lt;/td&gt;
+            &lt;td&gt;Lookup Timeout (in milliseconds)&lt;/td&gt;
+            &lt;td&gt;Timeout (in milliseconds) for topic lookup operations. If the broker does not respond in time, the request fails. This helps prevent the client from waiting indefinitely when trying to resolve a topic to a broker.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionMaxIdleSeconds&lt;/td&gt;
+            &lt;td&gt;Connection Max Idle Time (in seconds)&lt;/td&gt;
+            &lt;td&gt;Specifies the maximum time (in seconds) a connection can stay idle before being closed.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;numIoThreads&lt;/td&gt;
+            &lt;td&gt;Number of IO Threads&lt;/td&gt;
+            &lt;td&gt;Sets the number of threads dedicated for handling network I/O operations such as reading and writing data to the broker.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;numListenerThreads&lt;/td&gt;
+            &lt;td&gt;Number of Listener Threads&lt;/td&gt;
+            &lt;td&gt;The number of threads used to process messages received by consumers.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;enableBusyWait&lt;/td&gt;
+            &lt;td&gt;Enable Busy Wait&lt;/td&gt;
+            &lt;td&gt;When enabled, uses busy-waiting for IO threads instead of traditional blocking IO. This may reduce latency but increases CPU usage.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;initialBackoffInterval&lt;/td&gt;
+            &lt;td&gt;Initial Backoff Interval (in milliseconds)&lt;/td&gt;
+            &lt;td&gt;Initial backoff interval for reconnection attempts (in milliseconds).&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxBackoffInterval&lt;/td&gt;
+            &lt;td&gt;Max Backoff Interval (in milliseconds)&lt;/td&gt;
+            &lt;td&gt;Maximum backoff interval for reconnection attempts (in milliseconds).&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionsPerBroker&lt;/td&gt;
+            &lt;td&gt;Number of Connections Per Broker&lt;/td&gt;
+            &lt;td&gt;Determines how many TCP connections the client maintains per broker. Increasing this can help with high-throughput scenarios.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxLookupRedirects&lt;/td&gt;
+            &lt;td&gt;Maximum Number of Lookup Redirects&lt;/td&gt;
+            &lt;td&gt;The maximum number of times a lookup request can be redirected when resolving a topic to its broker. If the number of redirects exceeds this limit, the lookup operation fails. This helps prevent infinite redirect loops during topic resolution.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxLookupRequest&lt;/td&gt;
+            &lt;td&gt;Maximum Number of Lookup Requests&lt;/td&gt;
+            &lt;td&gt;Maximum number of lookup requests allowed on each broker connection to prevent overloading a broker.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;concurrentLookupRequest&lt;/td&gt;
+            &lt;td&gt;Number of Concurrent Lookup Requests&lt;/td&gt;
+            &lt;td&gt;The number of concurrent lookup requests that can be sent on each broker connection.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxConcurrentLookupRequests&lt;/td&gt;
+            &lt;td&gt;Maximum Number of Concurrent Lookup Requests&lt;/td&gt;
+            &lt;td&gt;The number of concurrent lookup requests that can be sent on each broker connection. Setting a maximum prevents overloading a broker.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxNumberOfRejectedRequestPerConnection&lt;/td&gt;
+            &lt;td&gt;Maximum Number Of Rejected Request Per Connection&lt;/td&gt;
+            &lt;td&gt;Maximum number of rejected requests of a broker in a certain time frame (60 seconds) after the current connection is closed and the client creating a new connection to connect to a different broker.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;useTcpNoDelay&lt;/td&gt;
+            &lt;td&gt;Enable TCP No Delay&lt;/td&gt;
+            &lt;td&gt;Enable TCP no delay for network connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;enableTransaction&lt;/td&gt;
+            &lt;td&gt;Enable Transaction&lt;/td&gt;
+            &lt;td&gt;Whether to enable transaction support in the Pulsar connector. When set to true, the connector can participate in transactional message publishing, allowing atomic operations across multiple topics and partitions. This is useful for scenarios requiring exactly-once semantics or coordinated multi-message operations. If not needed, leave it as false to avoid extra overhead.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;keepAliveIntervalSeconds&lt;/td&gt;
+            &lt;td&gt;Keep Alive Interval (in seconds)&lt;/td&gt;
+            &lt;td&gt;Interval (in seconds) to send keep-alive messages to maintain an active connection with the broker.  This helps prevent the connection from being closed due to inactivity. If not set, the default value defined by Pulsar will be used.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;statsIntervalSeconds&lt;/td&gt;
+            &lt;td&gt;Stats Interval (in seconds)&lt;/td&gt;
+            &lt;td&gt;The interval (in seconds) at which the Pulsar connector collects and reports statistics. This helps monitor client(connector) performance and resource usage. If not set, the default value defined by Pulsar will be used.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;memoryLimitBytes&lt;/td&gt;
+            &lt;td&gt;Memory Limit (in bytes)&lt;/td&gt;
+            &lt;td&gt;The maximum amount of memory (in bytes) that the Pulsar client(connector) can use. It helps control the memory usage of the client(connector), preventing it from consuming excessive resources, which is important for stability and performance in resource-constrained environments. If not set, the default value defined by Pulsar will be used.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;listenerName&lt;/td&gt;
+            &lt;td&gt;Listener Name&lt;/td&gt;
+            &lt;td&gt;Listener name for lookup.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    Given below is a sample configuration to create a client connection without security.
+
+    ```xml
+    &lt;pulsar.init&gt;
+        &lt;name&gt;pulsarConnection&lt;/name&gt;
+        &lt;serviceUrl&gt;pulsar://localhost:6650&lt;/serviceUrl&gt;
+        &lt;connectionTimeoutMs&gt;10000&lt;/connectionTimeoutMs&gt;
+        &lt;operationTimeoutSeconds&gt;30&lt;/operationTimeoutSeconds&gt;
+        &lt;requestTimeoutMs&gt;30000&lt;/requestTimeoutMs&gt;
+        &lt;lookupTimeoutMs&gt;10000&lt;/lookupTimeoutMs&gt;
+        &lt;numIoThreads&gt;4&lt;/numIoThreads&gt;
+        &lt;numListenerThreads&gt;2&lt;/numListenerThreads&gt;
+        &lt;connectionsPerBroker&gt;1&lt;/connectionsPerBroker&gt;
+        &lt;memoryLimitBytes&gt;104857600&lt;/memoryLimitBytes&gt;
+    &lt;/pulsar.init&gt;
+    ```
+
+??? note &quot;PULSAR SECURE&quot;
+    This operation allows you to initialize a secure and authenticated connection to Apache Pulsar.
+
+    **Note:** Unless explicitly stated, the default values of the optional parameters match those defined in the official [Apache Pulsar Configuration documentation](https://pulsar.apache.org/reference/#/4.0.x/client/client-configuration-client).
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Display Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;name&lt;/td&gt;
+            &lt;td&gt;Connection Name&lt;/td&gt;
+            &lt;td&gt;Unique name to identify the connection by.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;serviceUrl&lt;/td&gt;
+            &lt;td&gt;Broker URL&lt;/td&gt;
+            &lt;td&gt;The Pulsar broker URL to connect. It follows the format- `pulsar+ssl://&lt;host_name&gt;:&lt;port&gt;` where pulsar is the protocol and `+ssl` is an optional parameter that shows that the connection is secured by TLS. The content following the `://` is the host name and the port on which the broker is running.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th colspan=&quot;3&quot;&gt;Parameters for secure connection (TLS encryption)&lt;/td&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tlsAllowInsecureConnection&lt;/td&gt;
+            &lt;td&gt;Allow Insecure TLS Connection&lt;/td&gt;
+            &lt;td&gt;Allows the client to connect to the broker using TLS even if the server&#x27;s certificate cannot be verified (e.g., self-signed certificates). Use with caution, as it disables strict certificate validation. When this is true, the value of `tlsTrustCertsFilePath` and the trust store parameters are ignored. Default value is false.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;   
+        &lt;tr&gt;
+            &lt;td&gt;useKeyStoreTls&lt;/td&gt;
+            &lt;td&gt;Use KeyStore TLS&lt;/td&gt;
+            &lt;td&gt;Enables the use of a Java KeyStore for TLS configuration instead of PEM files. Default value is false.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tlsTrustCertsFilePath&lt;/td&gt;
+            &lt;td&gt;Broker CA Certificate Path&lt;/td&gt;
+            &lt;td&gt;Specifies the file path to the CA certificate(s) used to verify the broker&#x27;s TLS certificate. This should point to a PEM-encoded certificate file. This is applicable only when `useKeyStoreTls` parameter is set to false.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tlsTrustStorePath&lt;/td&gt;
+            &lt;td&gt;TLS TrustStore Path&lt;/td&gt;
+            &lt;td&gt;The file system path to the Java KeyStore (trust store) containing trusted CA certificates for TLS connections. This is applicable only when `useKeyStoreTls` parameter is set to true.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tlsTrustStoreType&lt;/td&gt;
+            &lt;td&gt;TLS TrustStore Type&lt;/td&gt;
+            &lt;td&gt;The type of the trust store (e.g., JKS or PKCS12) used for TLS certificate validation. This is applicable only when `useKeyStoreTls` parameter is set to true.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tlsTrustStorePassword&lt;/td&gt;
+            &lt;td&gt;TLS TrustStore Password&lt;/td&gt;
+            &lt;td&gt;Password for the TLS trust store. This is applicable only when `useKeyStoreTls` parameter is set to true.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tlsProtocols&lt;/td&gt;
+            &lt;td&gt;TLS Protocols&lt;/td&gt;
+            &lt;td&gt;Specifies the list of enabled TLS protocol versions (e.g., TLSv1.2, TLSv1.3) as a comma-separated value. This controls which protocol versions the client will use when negotiating with the broker.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tlsCiphers&lt;/td&gt;
+            &lt;td&gt;TLS Ciphers&lt;/td&gt;
+            &lt;td&gt;Specifies the list of enabled TLS ciphers as a comma-separated value. This controls which encryption algorithms are allowed during the TLS handshake.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;autoCertRefreshSeconds&lt;/td&gt;
+            &lt;td&gt;Auto Certificate Refresh Interval (in seconds)&lt;/td&gt;
+            &lt;td&gt;Interval for automatic certificate refresh (in seconds).&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;enableTlsHostnameVerification&lt;/td&gt;
+            &lt;td&gt;Enable TLS Hostname Verification&lt;/td&gt;
+            &lt;td&gt;Enables hostname verification for TLS connections. When set to true, the client checks that the broker&#x27;s TLS certificate matches its hostname, providing additional security against man-in-the-middle attacks. If false, this verification is skipped.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th colspan=&quot;3&quot;&gt;Parameters for Authentication&lt;/td&gt;
+        &lt;tr&gt;
+            &lt;td&gt;authenticationType&lt;/td&gt;
+            &lt;td&gt;Authentication Type&lt;/td&gt;
+            &lt;td&gt;Type of authentication (e.g., JWT, TLS, OAUTH2, NONE).&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;jwtToken&lt;/td&gt;
+            &lt;td&gt;JWT Token&lt;/td&gt;
+            &lt;td&gt;JWT token to be used with JWT authentication type.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th colspan=&quot;3&quot;&gt;Additional parameters for connection&lt;/td&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionTimeoutMs&lt;/td&gt;
+            &lt;td&gt;Connection Timeout (in milliseconds)&lt;/td&gt;
+            &lt;td&gt;Timeout for establishing a TCP connection in milliseconds.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;operationTimeoutSeconds&lt;/td&gt;
+            &lt;td&gt;Operation Timeout (in seconds)&lt;/td&gt;
+            &lt;td&gt;Specifies how long the client should wait (in seconds) for sending a message before timing out.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;requestTimeoutMs&lt;/td&gt;
+            &lt;td&gt;Request Timeout (in milliseconds)&lt;/td&gt;
+            &lt;td&gt;Timeout duration (in milliseconds) for individual Pulsar requests.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;lookupTimeoutMs&lt;/td&gt;
+            &lt;td&gt;Lookup Timeout (in milliseconds)&lt;/td&gt;
+            &lt;td&gt;Timeout (in milliseconds) for topic lookup operations. If the broker does not respond in time, the request fails. This helps prevent the client from waiting indefinitely when trying to resolve a topic to a broker.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionMaxIdleSeconds&lt;/td&gt;
+            &lt;td&gt;Connection Max Idle Time (in seconds)&lt;/td&gt;
+            &lt;td&gt;Specifies the maximum time (in seconds) a connection can stay idle before being closed.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;numIoThreads&lt;/td&gt;
+            &lt;td&gt;Number of IO Threads&lt;/td&gt;
+            &lt;td&gt;Sets the number of threads dedicated for handling network I/O operations such as reading and writing data to the broker.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;numListenerThreads&lt;/td&gt;
+            &lt;td&gt;Number of Listener Threads&lt;/td&gt;
+            &lt;td&gt;The number of threads used to process messages received by consumers.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;enableBusyWait&lt;/td&gt;
+            &lt;td&gt;Enable Busy Wait&lt;/td&gt;
+            &lt;td&gt;When enabled, uses busy-waiting for IO threads instead of traditional blocking IO. This may reduce latency but increases CPU usage.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;initialBackoffInterval&lt;/td&gt;
+            &lt;td&gt;Initial Backoff Interval (in milliseconds)&lt;/td&gt;
+            &lt;td&gt;Initial backoff interval for reconnection attempts (in milliseconds).&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxBackoffInterval&lt;/td&gt;
+            &lt;td&gt;Max Backoff Interval (in milliseconds)&lt;/td&gt;
+            &lt;td&gt;Maximum backoff interval for reconnection attempts (in milliseconds).&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;connectionsPerBroker&lt;/td&gt;
+            &lt;td&gt;Number of Connections Per Broker&lt;/td&gt;
+            &lt;td&gt;Determines how many TCP connections the client maintains per broker. Increasing this can help with high-throughput scenarios.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxLookupRedirects&lt;/td&gt;
+            &lt;td&gt;Maximum Number of Lookup Redirects&lt;/td&gt;
+            &lt;td&gt;The maximum number of times a lookup request can be redirected when resolving a topic to its broker. If the number of redirects exceeds this limit, the lookup operation fails. This helps prevent infinite redirect loops during topic resolution.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxLookupRequest&lt;/td&gt;
+            &lt;td&gt;Maximum Number of Lookup Requests&lt;/td&gt;
+            &lt;td&gt;Maximum number of lookup requests allowed on each broker connection to prevent overloading a broker.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;concurrentLookupRequest&lt;/td&gt;
+            &lt;td&gt;Number of Concurrent Lookup Requests&lt;/td&gt;
+            &lt;td&gt;The number of concurrent lookup requests that can be sent on each broker connection.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxConcurrentLookupRequests&lt;/td&gt;
+            &lt;td&gt;Maximum Number of Concurrent Lookup Requests&lt;/td&gt;
+            &lt;td&gt;The number of concurrent lookup requests that can be sent on each broker connection. Setting a maximum prevents overloading a broker.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxNumberOfRejectedRequestPerConnection&lt;/td&gt;
+            &lt;td&gt;Maximum Number Of Rejected Request Per Connection&lt;/td&gt;
+            &lt;td&gt;Maximum number of rejected requests of a broker in a certain time frame (60 seconds) after the current connection is closed and the client creating a new connection to connect to a different broker.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;useTcpNoDelay&lt;/td&gt;
+            &lt;td&gt;Enable TCP No Delay&lt;/td&gt;
+            &lt;td&gt;Enable TCP no delay for network connections.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;enableTransaction&lt;/td&gt;
+            &lt;td&gt;Enable Transaction&lt;/td&gt;
+            &lt;td&gt;Whether to enable transaction support in the Pulsar connector. When set to true, the connector can participate in transactional message publishing, allowing atomic operations across multiple topics and partitions. This is useful for scenarios requiring exactly-once semantics or coordinated multi-message operations. If not needed, leave it as false to avoid extra overhead.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;keepAliveIntervalSeconds&lt;/td&gt;
+            &lt;td&gt;Keep Alive Interval (in seconds)&lt;/td&gt;
+            &lt;td&gt;Interval (in seconds) to send keep-alive messages to maintain an active connection with the broker.  This helps prevent the connection from being closed due to inactivity. If not set, the default value defined by Pulsar will be used.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;statsIntervalSeconds&lt;/td&gt;
+            &lt;td&gt;Stats Interval (in seconds)&lt;/td&gt;
+            &lt;td&gt;The interval (in seconds) at which the Pulsar connector collects and reports statistics. This helps monitor client(connector) performance and resource usage. If not set, the default value defined by Pulsar will be used.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;memoryLimitBytes&lt;/td&gt;
+            &lt;td&gt;Memory Limit (in bytes)&lt;/td&gt;
+            &lt;td&gt;The maximum amount of memory (in bytes) that the Pulsar client(connector) can use. It helps control the memory usage of the client(connector), preventing it from consuming excessive resources, which is important for stability and performance in resource-constrained environments. If not set, the default value defined by Pulsar will be used.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;listenerName&lt;/td&gt;
+            &lt;td&gt;Listener Name&lt;/td&gt;
+            &lt;td&gt;Listener name for lookup.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    Given below is a sample configuration to create a client connection without security.
+
+    ```xml
+    &lt;pulsar.init&gt;
+        &lt;name&gt;pulsarConnection&lt;/name&gt;
+        &lt;serviceUrl&gt;pulsar://localhost:6650&lt;/serviceUrl&gt;
+        &lt;connectionTimeoutMs&gt;10000&lt;/connectionTimeoutMs&gt;
+        &lt;operationTimeoutSeconds&gt;30&lt;/operationTimeoutSeconds&gt;
+        &lt;requestTimeoutMs&gt;30000&lt;/requestTimeoutMs&gt;
+        &lt;lookupTimeoutMs&gt;10000&lt;/lookupTimeoutMs&gt;
+        &lt;numIoThreads&gt;4&lt;/numIoThreads&gt;
+        &lt;numListenerThreads&gt;2&lt;/numListenerThreads&gt;
+        &lt;connectionsPerBroker&gt;1&lt;/connectionsPerBroker&gt;
+        &lt;memoryLimitBytes&gt;104857600&lt;/memoryLimitBytes&gt;
+        &lt;authenticationType&gt;JWT&lt;/authenticationType&gt;
+        &lt;jwtToken&gt;eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0LXVzZXIifQ.KpRMeZtp9Tjl-4wJq5PppK71sc6Gwb0utspd1PpLSr0&lt;/jwtToken&gt;
+        &lt;tlsAllowInsecureConnection&gt;false&lt;/tlsAllowInsecureConnection&gt;
+        &lt;useKeyStoreTls&gt;false&lt;/useKeyStoreTls&gt;
+        &lt;tlsTrustCertsFilePath&gt;/Users/wso2/Documents/apache-pulsar-4.0.4/ca.cert.pem&lt;/tlsTrustCertsFilePath&gt;
+    &lt;/pulsar.init&gt;
+    ```
+
+---
+
+### Publishing messages to Apache Pulsar
+
+??? note &quot;Publish Message&quot;
+    The publishMessage operation allows you to publish messages to the Apache Pulsar brokers.
+    
+    **Note:** Unless explicitly stated, the default values of the optional parameters match those defined in the official [Apache Pulsar Configuration documentation](https://pulsar.apache.org/reference/#/next/client/client-configuration-producer).
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Display Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;value&lt;/td&gt;
+            &lt;td&gt;Message&lt;/td&gt;
+            &lt;td&gt;The value or payload of the message to be published.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;tr&gt;
+            &lt;td&gt;key&lt;/td&gt;
+            &lt;td&gt;Key&lt;/td&gt;
+            &lt;td&gt;The key associated with the message for partitioning or routing.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;properties&lt;/td&gt;
+            &lt;td&gt;Message Properties&lt;/td&gt;
+            &lt;td&gt;Custom properties to attach to the message as key-value pairs.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sequenceId&lt;/td&gt;
+            &lt;td&gt;Sequence ID&lt;/td&gt;
+            &lt;td&gt;The sequence ID to assign to the message for deduplication or ordering.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;deliverAfter&lt;/td&gt;
+            &lt;td&gt;Deliver After (in milliseconds)&lt;/td&gt;
+            &lt;td&gt;The delay duration after which the message should be delivered (e.g., 5s, 1m).&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th colspan=&quot;3&quot;&gt;Producer Settings&lt;/td&gt;
+        &lt;tr&gt;
+            &lt;td&gt;topicName&lt;/td&gt;
+            &lt;td&gt;Topic Name&lt;/td&gt;
+            &lt;td&gt;The name of the Pulsar topic to which messages will be published.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;compressionType&lt;/td&gt;
+            &lt;td&gt;Compression Type&lt;/td&gt;
+            &lt;td&gt;The compression type to use for messages. Supported values: NONE, LZ4, ZLIB, ZSTD, SNAPPY. Reduces message size over the network.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sendMode&lt;/td&gt;
+            &lt;td&gt;Send Mode&lt;/td&gt;
+            &lt;td&gt;The mode for sending the message: SYNC (wait for ack) or ASYNC (send and continue).&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;batchingEnabled&lt;/td&gt;
+            &lt;td&gt;Batching Enabled&lt;/td&gt;
+            &lt;td&gt;Whether message batching is enabled for the producer. Batching can improve throughput by sending multiple messages in a single request. The default value is `true`.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;batchingMaxMessages&lt;/td&gt;
+            &lt;td&gt;Batching Max Messages&lt;/td&gt;
+            &lt;td&gt;The maximum number of messages permitted in a batch. The default value is `1000`.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;batchingMaxBytes&lt;/td&gt;
+            &lt;td&gt;Batching Max Bytes (in bytes)&lt;/td&gt;
+            &lt;td&gt;The maximum size of a batch in bytes. The default value is `131072`.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;batchingMaxPublishDelayMicros&lt;/td&gt;
+            &lt;td&gt;Batching Max Publish Delay (in microseconds)&lt;/td&gt;
+            &lt;td&gt;The maximum delay (in microseconds) to wait before publishing a batch, even if the batch is not full. Controls batching latency. The default value is `1000` microseconds.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;chunkingEnabled&lt;/td&gt;
+            &lt;td&gt;Chunking Enabled&lt;/td&gt;
+            &lt;td&gt;Whether chunking is enabled for large messages. If enabled, large messages are split into smaller chunks. The default value is `false`.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;chunkMaxMessageSize&lt;/td&gt;
+            &lt;td&gt;Chunk Max Message Size (in Bytes)&lt;/td&gt;
+            &lt;td&gt;The maximum size (in bytes) of a single message before it gets chunked.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sendTimeoutMs&lt;/td&gt;
+            &lt;td&gt;Send Timeout (in milliseconds)&lt;/td&gt;
+            &lt;td&gt;The timeout in milliseconds for a message to be sent. If the message is not acknowledged within this time, it is marked as failed.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;blockIfQueueFull&lt;/td&gt;
+            &lt;td&gt;Block Producer If Queue Full&lt;/td&gt;
+            &lt;td&gt;Whether the producer should block when the outgoing message queue is full. If false, send operations will fail immediately when the queue is full. The default value is `false`.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxPendingMessages&lt;/td&gt;
+            &lt;td&gt;Max Pending Messages&lt;/td&gt;
+            &lt;td&gt;The maximum number of messages allowed to be pending in the outgoing queue.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxPendingMessagesAcrossPartitions&lt;/td&gt;
+            &lt;td&gt;Max Pending Messages Across Partitions&lt;/td&gt;
+            &lt;td&gt;The maximum number of pending messages across all partitions. This is useful for partitioned topics.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;hashingScheme&lt;/td&gt;
+            &lt;td&gt;Hashing Scheme&lt;/td&gt;
+            &lt;td&gt;The hashing scheme used to determine the partition for a message. Supported values: JavaStringHash, Murmur3_32Hash, BoostHash. The default value is `JavaStringHash`.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;messageRoutingMode&lt;/td&gt;
+            &lt;td&gt;Message Routing Mode&lt;/td&gt;
+            &lt;td&gt;The message routing mode for partitioned topics. Supported values: SinglePartition, RoundRobinPartition, CustomPartition. The default value is `RoundRobinPartition`.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th colspan=&quot;3&quot;&gt;Output Parameters&lt;/td&gt;
+        &lt;tr&gt;
+            &lt;td&gt;responseVariable&lt;/td&gt;
+            &lt;td&gt;Output variable Name&lt;/td&gt;
+            &lt;td&gt;The name of the variable to which the output should be stored.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;overwriteBody&lt;/td&gt;
+            &lt;td&gt;Overwrite Message Body&lt;/td&gt;
+            &lt;td&gt;Replace the Message Body in Message Context with the response of the operation.&lt;/td&gt;
+            &lt;td&gt;No&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;pulsar.publishMessages configKey=&quot;securePulsar&quot;&gt;
+        &lt;topicName&gt;{${payload.topic}}&lt;/topicName&gt;
+        &lt;compressionType&gt;NONE&lt;/compressionType&gt;
+        &lt;sendMode&gt;Sync&lt;/sendMode&gt;
+        &lt;batchingEnabled&gt;false&lt;/batchingEnabled&gt;
+        &lt;key&gt;{${payload.key}}&lt;/key&gt;
+        &lt;value&gt;{${payload.message}}&lt;/value&gt;
+        &lt;sequenceId&gt;&lt;/sequenceId&gt;
+        &lt;properties&gt;[{&quot;compression&quot;:&quot;enabled&quot;}, {&quot;type&quot;:&quot;json&quot;}]&lt;/properties&gt;
+        &lt;responseVariable&gt;pulsar_publishMessages_135&lt;/responseVariable&gt;
+        &lt;overwriteBody&gt;false&lt;/overwriteBody&gt;
+    &lt;/pulsar.publishMessages&gt;
+    ```
+
+    Following properties will be set in the message context or to a new variable if the `overwriteBody` parameter is set to `false`.
+
+    ```
+    {
+        &quot;success&quot;: &quot;true&quot;
+        &quot;msgid: &quot;162:3:-1&quot;
+    }
+    ```</body>
+</html>

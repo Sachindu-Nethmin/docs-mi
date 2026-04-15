@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>loadbalancing-with-message-processor.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Implement Load Balancing with Message Forwarding Processor
+
+This example demonstrates how the message forwarding processor handles load balancing.
+
+## Synapse configuration
+
+Following are the artifact configurations that we can use to implement this scenario. See the instructions on how to [build and run](#build-and-run) this example.
+
+=== &quot;Proxy Service&quot;
+    ```xml  
+    &lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;StockQuoteProxy&quot;
+                  transports=&quot;https http&quot;
+                  startOnLoad=&quot;true&quot;&gt;
+        &lt;description/&gt;
+        &lt;target&gt;
+           &lt;inSequence&gt;
+              &lt;property name=&quot;FORCE_SC_ACCEPTED&quot; value=&quot;true&quot; scope=&quot;axis2&quot;/&gt;
+              &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+              &lt;store messageStore=&quot;JMSMS&quot;/&gt;
+           &lt;/inSequence&gt;
+           &lt;outSequence/&gt;
+           &lt;faultSequence/&gt;
+        &lt;/target&gt;
+     &lt;/proxy&gt;
+    ```
+=== &quot;Endpoint 1&quot;    
+    ```xml  
+    &lt;endpoint xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;SimpleStockQuoteService1&quot;&gt;
+      &lt;address uri=&quot;http://localhost:9001/services/SimpleStockQuoteService&quot;/&gt;
+    &lt;/endpoint&gt;
+    ```
+=== &quot;Endpoint 2&quot;    
+    ```xml  
+    &lt;endpoint xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;SimpleStockQuoteService2&quot;&gt;
+      &lt;address uri=&quot;http://localhost:9002/services/SimpleStockQuoteService&quot;/&gt;
+    &lt;/endpoint&gt;
+    ```
+=== &quot;Endpoint 3&quot;    
+    ```xml  
+    &lt;endpoint xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;SimpleStockQuoteService3&quot;&gt;
+      &lt;address uri=&quot;http://localhost:9003/services/SimpleStockQuoteService&quot;/&gt;
+    &lt;/endpoint&gt;
+    ```
+=== &quot;Message Store&quot;    
+    ```xml  
+    &lt;messageStore xmlns=&quot;http://ws.apache.org/ns/synapse&quot; class=&quot;org.apache.synapse.message.store.impl.jms.JmsStore&quot; name=&quot;JMSMS&quot;&gt;
+      &lt;parameter name=&quot;java.naming.factory.initial&quot;&gt;org.apache.activemq.jndi.ActiveMQInitialContextFactory&lt;/parameter&gt;
+      &lt;parameter name=&quot;store.jms.cache.connection&quot;&gt;false&lt;/parameter&gt;
+      &lt;parameter name=&quot;java.naming.provider.url&quot;&gt;tcp://localhost:61616&lt;/parameter&gt;
+      &lt;parameter name=&quot;store.jms.JMSSpecVersion&quot;&gt;1.1&lt;/parameter&gt;
+      &lt;parameter name=&quot;store.jms.destination&quot;&gt;JMSMS&lt;/parameter&gt;
+    &lt;/messageStore&gt;
+    ```
+=== &quot;Message Processor 1&quot;    
+    ```xml  
+    &lt;messageProcessor xmlns=&quot;http://ws.apache.org/ns/synapse&quot; class=&quot;org.apache.synapse.message.processor.impl.forwarder.ScheduledMessageForwardingProcessor&quot;
+                             name=&quot;Forwarder1&quot;
+                             targetEndpoint=&quot;SimpleStockQuoteService1&quot;
+                             messageStore=&quot;JMSMS&quot;&gt;
+      &lt;parameter name=&quot;client.retry.interval&quot;&gt;1000&lt;/parameter&gt;
+      &lt;parameter name=&quot;interval&quot;&gt;1000&lt;/parameter&gt;
+      &lt;parameter name=&quot;is.active&quot;&gt;true&lt;/parameter&gt;
+    &lt;/messageProcessor&gt;
+    ```
+=== &quot;Message Processor 2&quot;    
+    ```xml 
+    &lt;messageProcessor xmlns=&quot;http://ws.apache.org/ns/synapse&quot; class=&quot;org.apache.synapse.message.processor.impl.forwarder.ScheduledMessageForwardingProcessor&quot;
+                             name=&quot;Forwarder2&quot;
+                             targetEndpoint=&quot;SimpleStockQuoteService2&quot;
+                             messageStore=&quot;JMSMS&quot;&gt;
+      &lt;parameter name=&quot;client.retry.interval&quot;&gt;1000&lt;/parameter&gt;
+      &lt;parameter name=&quot;interval&quot;&gt;1000&lt;/parameter&gt;
+      &lt;parameter name=&quot;is.active&quot;&gt;true&lt;/parameter&gt;
+    &lt;/messageProcessor&gt;
+    ```
+=== &quot;Message Processor 3&quot;    
+    ```xml 
+    &lt;messageProcessor xmlns=&quot;http://ws.apache.org/ns/synapse&quot; class=&quot;org.apache.synapse.message.processor.impl.forwarder.ScheduledMessageForwardingProcessor&quot;
+                             name=&quot;Forwarder3&quot;
+                             targetEndpoint=&quot;SimpleStockQuoteService3&quot;
+                             messageStore=&quot;JMSMS&quot;&gt;
+      &lt;parameter name=&quot;client.retry.interval&quot;&gt;1000&lt;/parameter&gt;
+      &lt;parameter name=&quot;interval&quot;&gt;1000&lt;/parameter&gt;
+      &lt;parameter name=&quot;is.active&quot;&gt;true&lt;/parameter&gt;
+    &lt;/messageProcessor&gt;
+    ```
+
+## Build and run
+
+[Configure the ActiveMQ broker]({{base_path}}/install-and-setup/setup/brokers/configure-with-activemq).
+
+Create the artifacts:
+
+1. {!includes/build-and-run.md!}
+2. Create the [proxy service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service), [endpoints]({{base_path}}/develop/creating-artifacts/creating-endpoints), [message stores]({{base_path}}/develop/creating-artifacts/creating-a-message-store) and [message processors]({{base_path}}/develop/creating-artifacts/creating-a-message-processor) with the configurations given above.
+3. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+Set up the back-end service:
+
+1. Download the [back-end service](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/axis2Server.zip).
+2. Extract the downloaded zip file and create two additional copies of the extracted folder.
+3. Open the `axis2.xml` file located in the `axis2Server/conf/` directory within each extracted folder.
+4. Update the port numbers in the `axis2.xml` file for each folder to `9001`, `9002`, and `9003` respectively.
+3. Open a terminal, navigate to the `axis2Server/bin/` directory inside the extracted folders.
+4. Execute the following command to start the axis2server with the SimpleStockQuote back-end service:
+
+    === &quot;On MacOS/Linux&quot;   
+        ```bash
+        sh axis2server.sh
+        ```
+    === &quot;On Windows&quot;          
+        ```bash
+        axis2server.bat
+        ```
+
+Send the following request to invoke the service:
+
+```bash
+POST http://localhost:8290/services/StockQuoteProxy HTTP/1.1
+Accept-Encoding: gzip,deflate
+Content-Type: text/xml;charset=UTF-8
+SOAPAction: &quot;urn:getQuote&quot;
+Content-Length: 492
+Host: localhost:8290
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.1.1 (java 1.5)
+
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+   &lt;soapenv:Header/&gt;
+   &lt;soapenv:Body&gt;
+      &lt;ser:getQuote xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+         &lt;ser:request&gt;
+            &lt;xsd:symbol&gt;IBM&lt;/xsd:symbol&gt;
+         &lt;/ser:request&gt;
+      &lt;/ser:getQuote&gt;
+   &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+```
+
+If you send the request to the proxy service several times and observe the log on the back-end server, you will see that the following messages are distributed among the back-end nodes.
+
+```aidl
+Mon Aug 12 13:19:27 IST 2024 samples.services.SimpleStockQuoteService :: Generating quote for : IBM
+```</body>
+</html>

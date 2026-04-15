@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>overview.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Message Construction
+
+Message construction involves the architectural patterns of various constructs, functions, and activities involved in creating and transforming a message between applications.
+
+This chapter introduces message construction patterns and how they can be simulated using the WSO2 Integrator: MI.
+
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/command-message&quot;&gt;Command Message&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/command-message.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/command-message.png&quot; alt=&quot;command-message&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How messaging can be used to invoke a procedure in another application.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/document-message&quot;&gt;Document Message&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/document-message.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/document-message.png&quot; alt=&quot;document-message&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How messaging can be used to transfer data between applications.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/event-message&quot;&gt;Event Message&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/event-message.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/event-message.png&quot; alt=&quot;event-message&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How messaging can be used to transmit events from one application to another.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/request-reply&quot;&gt;Request-Reply&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/request-reply.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/request-reply.png&quot; alt=&quot;request-reply&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How an application that sends a message gets a response from the receiver.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/return-address&quot;&gt;Return Address&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/return-address.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/return-address.png&quot; alt=&quot;return-address&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a replier knows where to send the reply.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/correlation-identifier&quot;&gt;Correlation Identifier&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/correlation-identifier.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/correlation-identifier.png&quot; alt=&quot;correlation-identifier&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a requester that has received a reply knows which request the reply is for.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/message-sequence&quot;&gt;Message Sequence&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-sequence.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-sequence.png&quot; alt=&quot;message-sequence&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How messaging can transmit an arbitrarily large amount of data.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/message-expiration&quot;&gt;Message Expiration&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-expiration.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/message-expiration.png&quot; alt=&quot;message-expiration&quot; width=&quot;80&quot;&gt;&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;How a sender indicates when a message should be considered stale and therefore should not be processed.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;&lt;a href=&quot;{{base_path}}/learn/enterprise-integration-patterns/message-construction/format-indicator&quot;&gt;Format Indicator&lt;/a&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;/td&gt;
+        &lt;td&gt;How a message’s data format can be designed to allow for possible future changes.&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+</body>
+</html>

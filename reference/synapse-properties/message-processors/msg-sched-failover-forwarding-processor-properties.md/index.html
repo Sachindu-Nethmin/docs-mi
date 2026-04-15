@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>msg-sched-failover-forwarding-processor-properties.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Scheduled Failover Message Forwarding Processor
+## Introduction
+The scheduled failover message forwarding processor ensures reliable message delivery. This helps ensure guaranteed message delivery even when there is a failure in the message store.&lt;/br&gt;&lt;/br&gt;
+The only difference between the scheduled failover message forwarding processor and the scheduled message forwarding processor is that the scheduled message forwarding processor forwards messages to a defined endpoint, whereas the scheduled failover message forwarding processor forwards messages to a target message store.
+
+## Properties
+
+See the topics given below for the list of properties that can be configured for a Scheduled Failover Message Forwarding Processor.
+
+### Required Properties
+
+Following are the required parameters you can set when [adding a Scheduled Message Forwarding Processor]({{base_path}}/develop/creating-artifacts/creating-a-message-processor/):
+
+&lt;table&gt;
+   &lt;tr&gt;
+      &lt;th&gt;Property&lt;/th&gt;
+      &lt;th&gt;Description&lt;/th&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Message Processor Type&lt;/td&gt;
+      &lt;td&gt;
+         Select &lt;b&gt;Message Sampling Processor&lt;/b&gt; from the list of values.
+      &lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Message Processor Name&lt;/td&gt;
+      &lt;td&gt;
+         Give a name for the message processor artifact.
+      &lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+      &lt;td&gt;Message Store&lt;/td&gt;
+      &lt;td&gt;
+         Select a pre-defined Message Store artifact from the available list.
+      &lt;/td&gt;
+   &lt;/tr&gt;
+   &lt;tr&gt;
+         &lt;td&gt;Processor State ( &lt;code&gt;             is.active            &lt;/code&gt; )&lt;/td&gt;
+         &lt;td&gt;Activate (&lt;code&gt;true&lt;/code&gt;) or Deactivate (&lt;code&gt;false&lt;/code&gt;).
+            Activated by default.
+         &lt;/td&gt;
+     &lt;/tr&gt;
+&lt;/table&gt;
+
+### Optional Properties
+
+Following are the additional parameters you can set when [adding a Scheduled Failover Message Forwarding Processor]({{base_path}}/develop/creating-artifacts/creating-a-message-processor/):
+
+&lt;table&gt;
+   &lt;thead&gt;
+      &lt;tr&gt;
+         &lt;th&gt;
+            &lt;p&gt;Parameter Name&lt;/p&gt;
+         &lt;/th&gt;
+         &lt;th&gt;
+            &lt;p&gt;Description&lt;/p&gt;
+         &lt;/th&gt;
+      &lt;/tr&gt;
+   &lt;/thead&gt;
+   &lt;tbody&gt;
+      &lt;tr&gt;
+         &lt;td&gt;Forwarding interval ( &lt;code&gt;             interval            &lt;/code&gt; )&lt;/td&gt;
+         &lt;td&gt;
+            &lt;p&gt;Interval in milliseconds in which processor consumes messages. The default value is 1000.&lt;/p&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            &lt;p&gt;Retry interval ( &lt;code&gt;              client.retry.interval             &lt;/code&gt; )&lt;/p&gt;
+         &lt;/td&gt;
+         &lt;td&gt;
+            &lt;p&gt;Message retry interval in milliseconds. The default is value is 1000&lt;/p&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            &lt;p&gt;Maximum delivery attempts ( &lt;code&gt;              max.delivery.attempts             &lt;/code&gt; )&lt;/p&gt;
+         &lt;/td&gt;
+         &lt;td&gt;
+            &lt;p&gt;Maximum redelivery attempts before deactivating the processor. This is used when the backend server is inactive and the ESB profile tries to resend the message. If you set the value of this property to -1, it deactivates the message processor without retrying, after the first attempt fails. The default value is &lt;code&gt;4&lt;/code&gt;.&lt;/p&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;Drop message after maximum delivery attempts ( &lt;code&gt;             max.delivery.drop            &lt;/code&gt; )&lt;/td&gt;
+         &lt;td&gt;
+            &lt;p&gt;If this parameter is set to &lt;code&gt;              Enabled             &lt;/code&gt; , the message will be dropped from the message store after the maximum number of delivery attempts are made, and the message processor will remain activated. This parameter would have no effect when no value is specified for the &lt;strong&gt;Maximum Delivery Attempts&lt;/strong&gt; parameter.&lt;/p&gt;
+            &lt;p&gt;The &lt;strong&gt;Maximum Delivery Attempts&lt;/strong&gt; parameter can be used when the backend is inactive and the message is resent.&lt;br /&gt;
+               &lt;br /&gt;
+               If this parameter is disabled, the undeliverable message will not be dropped and the message processor will be deactivated.
+            The default value is &lt;code&gt;Disabled&lt;/code&gt;.
+            &lt;/p&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            &lt;p&gt;Fault sequence name ( &lt;code&gt;              message.processor.fault.sequence             &lt;/code&gt; )&lt;/p&gt;
+         &lt;/td&gt;
+         &lt;td&gt;
+            &lt;p&gt;The name of the sequence where the fault message should be sent to in case of a SOAP fault.&lt;/p&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            &lt;p&gt;Deactivate sequence name ( &lt;code&gt;              message.processor.deactivate.sequence             &lt;/code&gt; )&lt;/p&gt;
+         &lt;/td&gt;
+         &lt;td&gt;
+            &lt;p&gt;The deactivate sequence that will be executed when the processor is deactivated automatically. Automatic deactivation occurs when the maximum delivery attempts is exceeded and the Drop message after maximum delivery attempts parameter is disabled.&lt;/p&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            &lt;p&gt;Quartz configuration file path ( &lt;code&gt;              quartz.conf             &lt;/code&gt; )&lt;/p&gt;
+         &lt;/td&gt;
+         &lt;td&gt;
+            &lt;p&gt;The Quartz configuration file path. This properties file contains the Quartz configuration&lt;br /&gt;
+               parameters for fine tuning the Quartz engine. More details of the configuration can be&lt;br /&gt;
+               found at &lt;a href=&quot;https://www.quartz-scheduler.org/documentation/quartz-2.1.7/configuration/ConfigMain.html&quot;&gt;http://quartz-scheduler.org/documentation/quartz-2.x/configuration/ConfigMain&lt;/a&gt; .
+            &lt;/p&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            &lt;p&gt;Cron Expression ( &lt;code&gt;              cronExpression             &lt;/code&gt; )&lt;/p&gt;
+         &lt;/td&gt;
+         &lt;td&gt;
+            &lt;p&gt;The cron expression to be used to configure the retry pattern.&lt;/p&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;
+            Task Count (Cluster Mode)
+            &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+         &lt;/td&gt;
+         &lt;td&gt;The required number of worker nodes when you need to run the processor in more than 1 worker node. Specifying this will not guarantee that the processor will run on each worker node. There can be instances where the processor will not run in some workers nodes. The default value is 1.&lt;/td&gt;
+      &lt;/tr&gt;
+   &lt;/tbody&gt;
+&lt;/table&gt;
+</body>
+</html>

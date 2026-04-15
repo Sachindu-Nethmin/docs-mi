@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>smpp-inbound-endpoint-config.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># SMPP Inbound Endpoint Reference
+
+The following configurations allow you to configure SMPP Inbound Endpoint for your scenario. 
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;Parameter&lt;/th&gt;
+    &lt;th&gt;Description&lt;/th&gt;
+    &lt;th&gt;Required&lt;/th&gt;
+    &lt;th&gt;Possible Values&lt;/th&gt;
+    &lt;th&gt;Default Value&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;host&lt;/td&gt;
+    &lt;td&gt; IP address of the SMSC.&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;port&lt;/td&gt;
+    &lt;td&gt;Port to access the SMSC.&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;systemType&lt;/td&gt;
+    &lt;td&gt;Identifies the type of ESME system requesting to bind as a receiver with the SMSC.&lt;/td&gt;
+    &lt;td&gt;No&lt;/td&gt;
+    &lt;td&gt;&quot;&quot; - (NULL)&lt;br&gt;                        
+                        CMT - Cellular Messaging&lt;br&gt;
+                        CPT - Cellular Paging&lt;br&gt;                        
+                        VMN - Voice Mail Notification&lt;br&gt;                        
+                        VMA - Voice Mail Alerting&lt;br&gt;                        
+                        WAP - Wireless Application Protocol&lt;br&gt;                        
+                        USSD - Unstructured Supplementary Services Data&lt;/td&gt;
+    &lt;td&gt;&quot;&quot; - (NULL)&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;systemId&lt;/td&gt;
+    &lt;td&gt;Identifies the ESME system requesting to bind as a receiver with the SMSC.&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;password&lt;/td&gt;
+    &lt;td&gt;The password may be used by the SMSC to authenticate the ESME requesting to bind.&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;addressNpi&lt;/td&gt;
+    &lt;td&gt;Numbering Plan Indicator for ESME address.&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;td&gt;UNKNOWN&lt;br&gt;
+                        ISDN&lt;br&gt;
+                        DATA&lt;br&gt;
+                        TELEX&lt;br&gt;                        
+                        LAND_MOBILE&lt;br&gt;                        
+                        NATIONAL&lt;br/&gt;
+                        PRIVATE
+                        ERMES&lt;br&gt;
+                        INTERNET&lt;br&gt;                        
+                        WAP&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+  &lt;/tr&gt; 
+  &lt;tr&gt;
+    &lt;td&gt;addressTon&lt;/td&gt;
+    &lt;td&gt;Indicates Type of Number of the ESME address.&lt;/a&gt;&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;td&gt;UNKNOWN&lt;br&gt;                        
+                        INTERNATIONAL&lt;br&gt;
+                        NATIONAL&lt;br&gt;
+                        NETWORK_SPECIFIC&lt;br&gt;                        
+                        SUBSCRIBER_NUMBER&lt;br&gt;                        
+                        ALPHANUMERIC&lt;br&gt;
+                        ABBREVIATED&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;bindType&lt;/td&gt;
+    &lt;td&gt;An ESME bound as a Receiver or Transceiver is authorised to receive short messages from the SMSC.&lt;/td&gt;
+    &lt;td&gt;Yes&lt;/td&gt;
+    &lt;td&gt;BIND_RX&lt;br&gt;
+                        BIND_TRX&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+  &lt;/tr&gt; 
+  &lt;tr&gt;
+    &lt;td&gt;addressRange&lt;/td&gt;
+    &lt;td&gt;A single ESME address or a range of ESME addresses served via this SMPP receiver session.&lt;/td&gt;
+    &lt;td&gt;No&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+    &lt;td&gt;null&lt;/td&gt;
+  &lt;/tr&gt; 
+  &lt;tr&gt;
+    &lt;td&gt;enquireLinktimer&lt;/td&gt;
+    &lt;td&gt;Used to check whether SMSC is connected or not.&lt;/td&gt;
+    &lt;td&gt;No&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+    &lt;td&gt;10000&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;transactiontimer&lt;/td&gt;
+    &lt;td&gt;Time elapsed between SMPP request and the corresponding response.&lt;/td&gt;
+    &lt;td&gt;No&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+    &lt;td&gt;200&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;reconnectInterval&lt;/td&gt;
+    &lt;td&gt;The Initial retry interval to reconnect with the SMSC while SMSC is not available.&lt;/td&gt;
+    &lt;td&gt;No&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+    &lt;td&gt;1000ms&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;retryCount&lt;/td&gt;
+    &lt;td&gt;The number of times to retry to connect with SMSC, while connection with the SMSC is closed. If you want to retry forever, give the retry count value as less than 0.&lt;/td&gt;
+    &lt;td&gt;No&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+    &lt;td&gt;3&lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;exponentialFactor&lt;/td&gt;
+    &lt;td&gt;Start with Initial reconnectInterval delay until first retry attempt is made but if that one
+                        fails, we should wait (reconnectInterval * exponentialFactor) times more. For example&lt;br&gt;                        
+                        let’s say we start with exponentialFactor 2 and 100ms delay until first retry attempt is&lt;br&gt;                        
+                        made but if that one fails as well, we should wait two times more (200ms). And later 400ms, 800ms…&lt;/td&gt;
+    &lt;td&gt;No&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+    &lt;td&gt;5&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;maximumBackoffTime&lt;/td&gt;
+    &lt;td&gt;The above one is an exponential function that can grow very fast. Thus it’s useful to set maximum backoff time at some reasonable level, e.g. 10 seconds:&lt;/td&gt;
+    &lt;td&gt;No&lt;/td&gt;
+    &lt;td&gt;N/A&lt;/td&gt;
+    &lt;td&gt;10000ms&lt;/td&gt;
+    &lt;/tr&gt;  
+&lt;/table&gt;</body>
+</html>

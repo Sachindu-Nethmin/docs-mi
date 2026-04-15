@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>event-driven-integrations.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>---
+tags:
+  - kafka inbound
+---
+
+# Event-driven Integrations
+
+## Introduction
+
+In addition to traditional API-based integrations, modern systems often need to respond to **asynchronous events** from external systems such as message brokers and event buses. WSO2 Integrator:  MI allows you to build **event-driven integrations** that react to incoming events, transform data, and publish messages in real time.
+
+In this tutorial, you&#x27;ll learn how to use &lt;a target=&quot;_blank&quot; href=&quot;https://kafka.apache.org/&quot;&gt;Kafka&lt;/a&gt; with MI to build a message-driven integration that listens to a Kafka topic, transforms the received data, and optionally publishes the result to another topic.
+
+!!! tip &quot;New to WSO2 Integrator: MI?&quot;
+    If you&#x27;re just getting started, we recommend completing the [Build your first Integration]({{base_path}}/get-started/build-first-integration/) tutorial first. It will help you understand key integration concepts and get familiar with the developer tool features before diving into event-driven flows.
+
+## Prerequisites
+
+You need Visual Studio Code (VS Code) with the &lt;a target=&quot;_blank&quot; href=&quot;https://marketplace.visualstudio.com/items?itemName=WSO2.micro-integrator&quot;&gt;WSO2 Integrator: MI for VS Code&lt;/a&gt; extension installed. The MI for VS Code extension is the official developer tool for designing, developing, and testing integration solutions with WSO2 Integrator: MI.
+
+!!! Info
+    See the [Install WSO2 Integrator: MI for VS Code]({{base_path}}/develop/mi-for-vscode/install-wso2-mi-for-vscode/) documentation to learn how to install WSO2 Integrator: MI for VS Code.
+
+## What you’ll learn
+
+By following this tutorial, you will gain hands-on experience in:
+
+- Setting up a Kafka listener in WSO2 MI.
+- Consuming and processing events from a Kafka topic.
+- Transforming incoming messages using the Payload mediator.
+- Publishing transformed messages to another Kafka topic using the Kafka connector.
+
+## What you&#x27;ll build
+
+Let’s try a simple scenario where WSO2 Integrator: MI listens to a Kafka topic named `bank-transactions`, transforms each incoming bank transaction event, and publishes the normalized message to another topic called `bank-audit`. This demonstrates how you can build real-time, event-driven integrations without using any APIs.
+
+## Step 1 - Setup Kafka
+
+!!! Note &quot;Already have Kafka running?&quot;
+    If Kafka is already installed and running in your environment (locally or remotely), you can skip the installation step and continue from [Create the Topics](#create-the-topics).
+
+To start building an event-driven integration, you&#x27;ll first need a Kafka broker running. Kafka acts as a message hub, where producers publish events and consumers subscribe to them.
+
+In this tutorial, you will use the official &lt;a target=&quot;_blank&quot; href=&quot;https://hub.docker.com/layers/apache/kafka/3.7.2/images/sha256-e81f67cd3ca9c018d9b6a2d2354dc6067a5a25908c642383c652f0c6b3e8c4a4&quot;&gt;Apache Kafka Docker image (v3.7.2)&lt;/a&gt; for simplicity and ease of setup.
+
+### Prerequisites
+
+- &lt;a target=&quot;_blank&quot; href=&quot;https://docs.docker.com/get-docker/&quot;&gt;Docker&lt;/a&gt; installed and running.
+
+### Start Kafka using Docker
+
+Open a command line prompt on your machine and run the following command. This will pull the official Kafka image (if it’s not already cached) and start a Kafka broker that listens on port `9092`.
+
+```bash
+docker run --rm --name kafka -p 9092:9092 apache/kafka:3.7.2
+```
+
+You should see a message like `Kafka Server started` indicating that the broker is up and running.
+
+### Create the topics
+
+Kafka uses **topics** to organize and group related messages. In this tutorial, we&#x27;ll create a topic named `bank-transactions`, which the Kafka listener in WSO2 Integrator: MI will subscribe to, and a topic named `bank-audit`, to which the WSO2 Integrator: MI will publish the transformed messages.
+
+1. Open a new command line prompt on your machine and run the following command to create the `bank-transactions` topic.
+
+    ```bash
+    docker exec -it kafka /opt/kafka/bin/kafka-topics.sh --create --topic bank-transactions --bootstrap-server localhost:9092 --partitions 1
+    ```
+ 
+    Upon successful topic creation, the following message will be displayed: `Created topic bank-transactions`.
+
+2. Then, create the `bank-audit` topic using the following command.
+
+    ```bash
+    docker exec -it kafka /opt/kafka/bin/kafka-topics.sh --create --topic bank-audit --bootstrap-server localhost:9092 --partitions 1
+    ```
+
+## Step 2 - Create a new integration project
+
+To develop the above scenario, let&#x27;s get started with creating an integration project in the WSO2 Integrator: MI extension installed VS Code.
+
+1. Launch VS Code with the WSO2 Integrator: MI extension installed.
+
+2. Click on the WSO2 Integrator: MI icon on the Activity Bar of the VS Code editor.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/mi-vscode-extension.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/mi-vscode-extension.png&quot; alt=&quot;MI VS Code Extension&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. Click **Create New Project** on **Design View**. For more options for creating a new integration project, see [Create an Integration Project]({{base_path}}/develop/create-integration-project).
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-integration/create_new_project_btn.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/create_new_project_btn.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+4. In the **Project Creation Form**, enter `EventIntegration` as the **Project Name**.
+
+5. Ensure `4.6.0` is selected as the **WSO2 Integrator: MI runtime version**.
+
+6. Provide a location for the integration project under **Project Directory**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/create_new_event_integration_project.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/create_new_event_integration_project.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+7. Click **Create**.
+
+   Once you click **Create**, the **Add Artifact** pane will be opened.
+
+## Step 3 - Create an event listener
+
+Now that the integration project is ready, let&#x27;s create a Kafka event listener.
+
+1. In the **Add Artifact** interface, under **Create an Integration**, click **Event Integration**. This will open the list of event integrations available in WSO2 Integrator: MI.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/select_event_integration.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/select_event_integration.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+2. Select **Kafka (Inbound)** from the list. In the confirmation pane, click **Yes** to add the required dependencies.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/select_kafka_listener.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/select_kafka_listener.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. In the **Create Event Integration** form, enter `BankTransactionListener` as the **Event Integration Name** and `bank-transactions` as the **Topic Name**.
+
+    !!! Note
+        1. In this tutorial, you will use the local Kafka broker configured in [Step 1 – Set Up Kafka](#step-1-setup-kafka). If you plan to use a different Kafka broker, update the **Kafka Servers** field accordingly.
+        2. You can use the default values for the remaining fields. For advanced configurations, refer to the [Kafka listener]({{base_path}}/reference/connectors/kafka-connector/kafka-inbound-endpoint-config/) documentation.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/configure_kafka_listener.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/configure_kafka_listener.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+4. Finally, click **Create** to add the Kafka listener to your integration project.
+
+## Step 4 - Design the integration
+
+Now it&#x27;s time to design your integration. This defines the underlying logic that will be executed when a Kafka message is received. In this scenario, the message needs to be transformed and then published to another Kafka topic. Follow the steps below to complete the integration flow.
+
+1. Click on the **Start** node on the canvas to set an input payload for the integration flow.
+
+    !!! Note
+        Setting an input payload for the integration flow is not mandatory. However, it is recommended, as it will be used to enable expression suggestions, which you will explore in later steps of this tutorial.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/click_start_node_event.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/click_start_node_event.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+2. Click **Add Request**, provide the following JSON payload, then click **Add**. Finally, click **Save** to complete the input payload setup.
+
+    ```json
+    {
+        &quot;id&quot;:&quot;TXN001&quot;,
+        &quot;type&quot;:&quot;deposit&quot;,
+        &quot;accountId&quot;:&quot;ACC123&quot;,
+        &quot;amount&quot;:500
+    }
+    ```
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/add_start_payload_kafka_event.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/add_start_payload_kafka_event.gif&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. Click on the **+** icon on the canvas to open the **Mediator Palette**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/add_first_mediator.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/add_first_mediator.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    Since this is an event-driven integration, we’ll log the incoming message to ensure that events are being received by the WSO2 Integrator: MI.
+
+4. Under **Mediators**, select the **Log** mediator.
+
+    !!! Tip  
+        You can use the &lt;a target=&quot;_blank&quot; href=&quot;{{base_path}}/reference/mediators/log-mediator/&quot;&gt;Log mediator&lt;/a&gt; to print the message content to the server logs. This is helpful for checking what data is being received and for debugging during development.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/select_log_mediator.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/select_log_mediator.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+5. You will use the following template to log the message. It logs the incoming message payload along with the text `Kafka event received`. You can either copy and paste the template or use the inline expression editor to construct it.
+
+    ```text
+    Kafka event received, data = ${payload}
+    ```
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/add_inline_log_message.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/add_inline_log_message.gif&quot; alt=&quot;Create New Project&quot; width=&quot;50%&quot;&gt;&lt;/a&gt;
+
+6. Click **Add** to insert the **Log** mediator into the integration flow.
+
+7. Click on the **+** icon located just after the **Log** mediator to open the **Mediator Palette** to add a [Payload mediator]({{base_path}}/reference/mediators/payloadfactory-mediator/) to transform the Kafka message before publishing the result to the `bank-audit` topic.
+
+8. Under **Mediators**, select the **Payload** mediator.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/select_payload_mediator.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/select_payload_mediator.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+9. In the **Payload** box, enter the following sample JSON object. In the next step, you will use an inline expression to extract the JSON payload from the Kafka message and insert it into this template.
+
+    ```json
+    {
+        &quot;eventType&quot;: &quot;transaction&quot;,
+        &quot;source&quot;: &quot;bank-transactions&quot;,
+        &quot;data&quot;: 
+    }
+    ```
+
+10. In the JSON object, place your cursor next to `&quot;data&quot;: `, then click on the inline expression editor (&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/inline_expression_icon.png&quot; alt=&quot;inline expression editor&quot; class=&quot;inline-icon&quot;&gt;) icon. From the editor, select **Payload** → **payload**, and click **Add** to insert the inline expression into the JSON object.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/add_inline_expression_payload.gif&quot; class=&quot;glightbox&quot;&gt;
+        &lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/add_inline_expression_payload.gif&quot; width=&quot;50%&quot; alt=&quot;Add inline expression&quot;&gt;
+    &lt;/a&gt;
+
+11. Finally, click **Add** to insert the **Payload** mediator into the integration flow.
+
+12. Click on the **+** icon just after the **Payload** mediator to open the **Mediator Palette**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/add_mediator_after_payload.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/add_mediator_after_payload.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    In the next steps, you will use the Kafka connector to publish the transformed message to the `bank-audit` topic.
+
+5. Search for `kafka` in the **Mediator Palette**, then click the download (&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-integration/connector_download_icon.png&quot; alt=&quot;connector download icon&quot; class=&quot;inline-icon&quot;&gt;) icon to add the [Kafka connector]({{base_path}}/reference/connectors/kafka-connector/kafka-connector-overview/) to the project. In the confirmation pane, select **Yes** to add the required dependencies.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/select_kafka_connector.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/select_kafka_connector.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+6. Once the connector is downloaded, select the `PublishMessages` operation from the **Mediator Palette**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/select_publish_message.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/select_publish_message.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+14. Click **+ Add new connection** to create a new connection.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/kafka_add_new_connection_btn.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/kafka_add_new_connection_btn.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+15. Select `KAFKA` and fill in the following details to create a connection to the Kafka broker. Then, click **Add** in the **Add New Connection** form to complete the connection setup. In the next step, you will configure the operational-level parameters, such as the topic to which the messages will be published.
+
+    | Property            | Value                   |
+    |---------------------|-------------------------|
+    | **Connection Name** | `KafkaConnection`        |
+    | **Bootstrap Servers**        | `localhost:9092` |
+    | **Key Serializer Class** | `org.apache.kafka.common.serialization.StringSerializer` |
+    | **Value Serializer Class** | `org.apache.kafka.common.serialization.StringSerializer` |
+
+    !!! Note
+        1. In this tutorial, you will use the local Kafka broker configured in [Step 1 – Set Up Kafka](#step-1-setup-kafka). If you plan to use a different Kafka broker, update the **Bootstrap Servers** field accordingly.
+        2. You can keep the default values for the remaining fields. For more information, refer to the [Kafka connector]({{base_path}}/reference/connectors/kafka-connector/kafka-connector-config/) documentation.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/kafka_create_new_connection.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/kafka_create_new_connection.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+16. Fill in the following details in the **Add PublishMessages** pane, then click **Submit** to add the operation to the integration flow.
+
+    | Property            | Value                   |
+    |---------------------|-------------------------|
+    | **Topic** | `bank-audit`        |
+    | **Partition Number**        | `0` |
+    | **Content-Type** | `application/json` |
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/kafka_set_publish_params.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/kafka_set_publish_params.png&quot; alt=&quot;Create New Project&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+You have successfully completed the integration flow to listen to Kafka events and publish the transformed message to another Kafka topic. For reference, you can review the configured event listener, sequence and Kafka connection.
+
+??? &quot;BankTransactionListener&quot;
+
+    !!! info
+        You can view the source view by clicking on the **Show Source** (`&lt;/&gt;`) icon located in the top right corner of the VS Code.
+
+    === &quot;Design View&quot;
+        &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/bank_transaction_listener_config.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/bank_transaction_listener_config.png&quot; alt=&quot;Create New Project&quot; width=&quot;40%&quot;&gt;&lt;/a&gt;
+
+    === &quot;Source View&quot;
+        ```yaml
+        &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        &lt;inboundEndpoint name=&quot;BankTransactionListener&quot; class=&quot;org.wso2.carbon.inbound.kafka.KafkaMessageConsumer&quot; sequence=&quot;BankTransactionListener-inboundSequence&quot; onError=&quot;BankTransactionListener-inboundErrorSequence&quot; suspend=&quot;false&quot;&gt;
+            &lt;parameters xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+                &lt;parameter name=&quot;generateSequences&quot;&gt;true&lt;/parameter&gt;
+                &lt;parameter name=&quot;interval&quot;&gt;100&lt;/parameter&gt;
+                &lt;parameter name=&quot;sequential&quot;&gt;true&lt;/parameter&gt;
+                &lt;parameter name=&quot;coordination&quot;&gt;true&lt;/parameter&gt;
+                &lt;parameter name=&quot;bootstrap.servers&quot;&gt;localhost:9092&lt;/parameter&gt;
+                &lt;parameter name=&quot;topic.name&quot;&gt;bank-transactions&lt;/parameter&gt;
+                &lt;parameter name=&quot;group.id&quot;&gt;group1&lt;/parameter&gt;
+                &lt;parameter name=&quot;contentType&quot;&gt;application/json&lt;/parameter&gt;
+                &lt;parameter name=&quot;poll.timeout&quot;&gt;1000&lt;/parameter&gt;
+                &lt;parameter name=&quot;key.deserializer&quot;&gt;org.apache.kafka.common.serialization.StringDeserializer&lt;/parameter&gt;
+                &lt;parameter name=&quot;value.deserializer&quot;&gt;org.apache.kafka.common.serialization.StringDeserializer&lt;/parameter&gt;
+                &lt;parameter name=&quot;enable.auto.commit&quot;&gt;true&lt;/parameter&gt;
+                &lt;parameter name=&quot;auto.commit.interval.ms&quot;&gt;5000&lt;/parameter&gt;
+                &lt;parameter name=&quot;auto.offset.reset&quot;&gt;latest&lt;/parameter&gt;
+                &lt;parameter name=&quot;exclude.internal.topics&quot;&gt;true&lt;/parameter&gt;
+                &lt;parameter name=&quot;check.crcs&quot;&gt;true&lt;/parameter&gt;
+                &lt;parameter name=&quot;partition.assignment.strategy&quot;&gt;org.apache.kafka.clients.consumer.RangeAssignor&lt;/parameter&gt;
+                &lt;parameter name=&quot;max.poll.interval.ms&quot;&gt;300000&lt;/parameter&gt;
+                &lt;parameter name=&quot;max.poll.records&quot;&gt;500&lt;/parameter&gt;
+                &lt;parameter name=&quot;fetch.max.wait.ms&quot;&gt;500&lt;/parameter&gt;
+                &lt;parameter name=&quot;receive.buffer.bytes&quot;&gt;65536&lt;/parameter&gt;
+                &lt;parameter name=&quot;send.buffer.bytes&quot;&gt;131072&lt;/parameter&gt;
+                &lt;parameter name=&quot;request.timeout.ms&quot;&gt;305000&lt;/parameter&gt;
+                &lt;parameter name=&quot;reconnect.backoff.ms&quot;&gt;50&lt;/parameter&gt;
+                &lt;parameter name=&quot;retry.backoff.ms&quot;&gt;100&lt;/parameter&gt;
+                &lt;parameter name=&quot;connections.max.idle.ms&quot;&gt;540000&lt;/parameter&gt;
+                &lt;parameter name=&quot;security.protocol&quot;&gt;PLAINTEXT&lt;/parameter&gt;
+                &lt;parameter name=&quot;metrics.num.samples&quot;&gt;2&lt;/parameter&gt;
+                &lt;parameter name=&quot;metrics.recording.level&quot;&gt;INFO&lt;/parameter&gt;
+                &lt;parameter name=&quot;metrics.sample.window.ms&quot;&gt;30000&lt;/parameter&gt;
+            &lt;/parameters&gt;
+        &lt;/inboundEndpoint&gt;
+        ```
+
+??? &quot;BankTransactionListener-inboundSequence&quot;
+
+    !!! info
+        You can view the source view by clicking on the **Show Source** (`&lt;/&gt;`) icon located in the top right corner of the VS Code.
+
+    === &quot;Design View&quot;
+        &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/kafka_in_sequence_config.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/kafka_in_sequence_config.png&quot; alt=&quot;ai datamapping api&quot; width=&quot;70%&quot;&gt;&lt;/a&gt;
+
+    === &quot;Source View&quot;
+        ```yaml
+        &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        &lt;sequence name=&quot;BankTransactionListener-inboundSequence&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;log category=&quot;INFO&quot; logMessageID=&quot;false&quot; logFullPayload=&quot;false&quot;&gt;
+                &lt;message&gt;Kafka event received, data = ${payload}&lt;/message&gt;
+            &lt;/log&gt;
+            &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;default&quot;&gt;
+                &lt;format&gt;{
+                    &quot;eventType&quot;: &quot;transaction&quot;,
+                    &quot;source&quot;: &quot;bank-transactions&quot;,
+                    &quot;data&quot;: ${payload}
+                    }
+                &lt;/format&gt;
+            &lt;/payloadFactory&gt;
+            &lt;kafkaTransport.publishMessages configKey=&quot;KafkaConnection&quot;&gt;
+                &lt;topic&gt;bank-audit&lt;/topic&gt;
+                &lt;partitionNo&gt;0&lt;/partitionNo&gt;
+                &lt;contentType&gt;application/json&lt;/contentType&gt;
+                &lt;key&gt;&lt;/key&gt;
+                &lt;keySchema&gt;&lt;/keySchema&gt;
+                &lt;keySchemaId&gt;&lt;/keySchemaId&gt;
+                &lt;valueSchema&gt;&lt;/valueSchema&gt;
+                &lt;valueSchemaId&gt;&lt;/valueSchemaId&gt;
+                &lt;keySchemaSubject&gt;&lt;/keySchemaSubject&gt;
+                &lt;keySchemaVersion&gt;&lt;/keySchemaVersion&gt;
+                &lt;keySchemaSoftDeleted&gt;false&lt;/keySchemaSoftDeleted&gt;
+                &lt;valueSchemaSubject&gt;&lt;/valueSchemaSubject&gt;
+                &lt;valueSchemaVersion&gt;&lt;/valueSchemaVersion&gt;
+                &lt;valueSchemaSoftDeleted&gt;false&lt;/valueSchemaSoftDeleted&gt;
+                &lt;value&gt;&lt;/value&gt;
+            &lt;/kafkaTransport.publishMessages&gt;
+        &lt;/sequence&gt;
+        ```
+
+??? &quot;Kafka Connection&quot;
+
+    !!! info
+        You can view the source view by clicking on the **Show Source** (`&lt;/&gt;`) icon located in the top right corner of the VS Code.
+
+    === &quot;Design View&quot;
+        &lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/kafka_connection_config.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/kafka_connection_config.png&quot; alt=&quot;ai datamapping api&quot; width=&quot;40%&quot;&gt;&lt;/a&gt;
+        
+    === &quot;Source View&quot;
+        ```yaml
+        &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        &lt;localEntry key=&quot;KafkaConnection&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;kafkaTransport.init&gt;
+                &lt;connectionType&gt;KAFKA&lt;/connectionType&gt;
+                &lt;bootstrapServers&gt;localhost:9092&lt;/bootstrapServers&gt;
+                &lt;keySerializerClass&gt;org.apache.kafka.common.serialization.StringSerializer&lt;/keySerializerClass&gt;
+                &lt;valueSerializerClass&gt;org.apache.kafka.common.serialization.StringSerializer&lt;/valueSerializerClass&gt;
+                &lt;poolingEnabled&gt;false&lt;/poolingEnabled&gt;
+                &lt;name&gt;KafkaConnection&lt;/name&gt;
+            &lt;/kafkaTransport.init&gt;
+        &lt;/localEntry&gt;
+        ```
+
+## Step 5 - Run the integration
+
+Now that you have completed the integration, it&#x27;s time to deploy it to the WSO2 Integrator: MI server runtime.
+
+Click the **Build and Run** icon located in the top right corner of VS Code.
+
+&lt;a href=&quot;{{base_path}}/assets/img/get-started/event-integration/build_and_run_btn.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/event-integration/build_and_run_btn.png&quot; alt=&quot;ai datamapping api&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+## Step 6 - Test the integration
+
+Once the WSO2 Integrator: MI runtime is up and running, follow the steps below to publish a message and verify the integration.
+
+1. Open a new command line prompt on your machine and run the following command to tail the logs for the `bank-audit` topic. The WSO2 Integrator: MI will publish the transformed messages to this topic.
+
+    ```bash
+    docker exec -it kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic bank-audit --from-beginning
+    ```
+
+2. Open another command line prompt and run the following command to launch the Kafka producer and publish a message to the `bank-transactions` topic.
+
+    ```bash
+    docker exec -it kafka /opt/kafka/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic bank-transactions
+    ```
+
+    After the producer starts, you&#x27;ll see a `&gt;` prompt. Any line of text you type after that will be sent to the Kafka topic when you press `Enter`.
+
+3. Copy and paste the following JSON payload and press `Enter` to publish the message to the topic.
+
+    ```json
+    { &quot;id&quot;:&quot;TXN011&quot;, &quot;type&quot;:&quot;withdraw&quot;, &quot;accountId&quot;:&quot;ACC456&quot;, &quot;amount&quot;:1500 }
+    ```
+
+    You won’t see any confirmation, but the message is now sent to the `bank-transactions` topic.
+
+4. Check the logs of the WSO2 Integrator: MI runtime in **VS Code**. You should see a log entry similar to the following.
+
+    ```bash
+    [2025-04-03 09:49:23,029]  INFO {LogMediator} - Kafka event received, data = {&quot;id&quot;:&quot;TXN011&quot;,&quot;type&quot;:&quot;withdraw&quot;,&quot;accountId&quot;:&quot;ACC456&quot;,&quot;amount&quot;:1500}
+    ```
+
+5. Verify that the command line prompt monitoring the `bank-audit` topic now displays a new entry with the transformed message. You may see a message similar to the following:
+
+    ```json
+    {
+        &quot;eventType&quot;:&quot;transaction&quot;,
+        &quot;source&quot;:&quot;bank-transactions&quot;,
+        &quot;data&quot;:{
+            &quot;id&quot;:&quot;TXN011&quot;,
+            &quot;type&quot;:&quot;withdraw&quot;,
+            &quot;accountId&quot;:&quot;ACC456&quot;,
+            &quot;amount&quot;:1500
+        }
+    }
+    ```
+
+Congratulations! You’ve now learned how to create an event-driven integration using Kafka and apply message transformation using WSO2 Integrator: MI. This is a powerful pattern for building scalable, real-time systems.
+
+## What&#x27;s next?
+
+Now that you’ve built your first event-driven flow, you can explore how to improve the integration by,
+
+- Connecting to [SaaS platforms]({{base_path}}/learn/integration-use-case/connectors/) (e.g., sending notifications via email).
+- Integrating with external systems like [databases]({{base_path}}/learn/integration-use-case/data-integration-overview/) or [Backend services]({{base_path}}/learn/integration-tutorials/exposing-several-services-as-a-single-service/).
+- [Routing]({{base_path}}/learn/integration-use-case/message-routing-overview/) events based on custom logic or content.
+- [Enriching messages]({{base_path}}/learn/integration-tutorials/transforming-message-content/) with additional data before forwarding.
+
+{% raw %}
+&lt;style&gt;
+.language-bash {
+    color: var(--md-feedback-button-color) !important;
+}
+.language-bash .hljs-string, .hljs-keyword {
+    color: var(--md-feedback-button-color) !important;
+}
+.language-bash .hljs-variable {
+    font-weight: 600;
+    color: rgb(45, 116, 215) !important;
+}
+&lt;/style&gt;
+{% endraw %}
+</body>
+</html>

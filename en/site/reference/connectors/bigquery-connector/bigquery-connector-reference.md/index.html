@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>bigquery-connector-reference.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># BigQuery Connector Reference
+
+The following operations allow you to work with the BigQuery Connector. Click an operation name to see parameter details and samples on how to use it.
+
+---
+
+## Initialize the connector
+
+To use the BigQuery connector, add the &lt;bigquery.init&gt; or &lt;bigquery.getAccessTokenFromServiceAccount&gt; element in your configuration before carrying out any other BigQuery operations.
+
+The BigQuery API requires all requests to be authenticated as a user or a service account. For more information, see [Introduction to authentication](https://cloud.google.com/bigquery/authentication) documentation. See [Using OAuth 2.0 for Server to Server Applications](https://developers.google.com/identity/protocols/OAuth2ServiceAccount) documentation for information on service account authentication. For more information, see [related BigQuery documentation](https://developers.google.com/identity/protocols/OAuth2WebServer).
+
+??? note &quot;init&quot;
+    The init operation is used to initialize the connection to BigQuery.
+
+    **Sample configuration**
+
+    ```xml
+    &lt;bigquery.init&gt;
+        &lt;apiUrl&gt;{$ctx:apiUrl}&lt;/apiUrl&gt;
+        &lt;accessToken&gt;{$ctx:accessToken}&lt;/accessToken&gt;
+        &lt;clientSecret&gt;{$ctx:clientSecret}&lt;/clientSecret&gt;
+        &lt;client&gt;{$ctx:clientId}&lt;/clientId&gt;
+        &lt;refreshToken&gt;{$ctx:refreshToken}&lt;/refreshToken&gt;
+        &lt;registryPath&gt;{$ctx:registryPath}&lt;/registryPath&gt;
+        &lt;fields&gt;{$ctx:fields}&lt;/fields&gt;
+        &lt;prettyPrint&gt;{$ctx:prettyPrint}&lt;/prettyPrint&gt;
+        &lt;quotaUser&gt;{$ctx:quotaUser}&lt;/quotaUser&gt;
+        &lt;userIp&gt;{$ctx:userIp}&lt;/userIp&gt;
+    &lt;/bigquery.init&gt;
+    ```
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiUrl&lt;/td&gt;
+            &lt;td&gt;The base endpoint URL of the BigQuery API.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;accessToken&lt;/td&gt;
+            &lt;td&gt;The OAuth token for the BigQuery API.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;clientId&lt;/td&gt;
+            &lt;td&gt;The client ID for the BigQuery API.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;clientSecret&lt;/td&gt;
+            &lt;td&gt;The client secret for the BigQuery API.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;refreshToken&lt;/td&gt;
+            &lt;td&gt;The refresh token for the BigQuery API.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;registryPath&lt;/td&gt;
+            &lt;td&gt;The registry path to save the access token.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fields&lt;/td&gt;
+            &lt;td&gt;List of fields to be returned in the response.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;callback&lt;/td&gt;
+            &lt;td&gt;The name of the JavaScript callback function that handles the response. Used in JavaScript JSON-P requests.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiKey&lt;/td&gt;
+            &lt;td&gt;The API key. Required unless you provide an OAuth 2.0 token.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;prettyPrint&lt;/td&gt;
+            &lt;td&gt;Returns the response with indentations and line breaks. If the property is true, the response is returned in a human-readable format.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;quotaUser&lt;/td&gt;
+            &lt;td&gt;Alternative to userIp. Lets you enforce per-user quotas from a server-side application even in cases where the user&#x27;s IP address is unknown.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;userIp&lt;/td&gt;
+            &lt;td&gt;IP address of the end user for whom the API call is being made. Lets you enforce per-user quotas when calling the API from a server-side application.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ifMatch&lt;/td&gt;
+            &lt;td&gt;Etag value to use for returning a page of list values if the values have not changed.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ifNoneMatch&lt;/td&gt;
+            &lt;td&gt;Etag value to use for returning a page of list values if the values have changed.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+    
+    Alternatively, you can use the following operation (getAccessTokenFromServiceAccount) to get the access token and to do all the other operations.
+
+    ```xml
+    &lt;bigquery.getAccessTokenFromServiceAccount&gt;
+        &lt;apiUrl&gt;{$ctx:apiUrl}&lt;/apiUrl&gt;
+        &lt;keyStoreLocation&gt;{$ctx:keyStoreLocation}&lt;/keyStoreLocation&gt;
+        &lt;serviceAccount&gt;{$ctx:serviceAccount}&lt;/serviceAccount&gt;
+        &lt;scope&gt;{$ctx:scope}&lt;/scope&gt;
+        &lt;accessTokenRegistryPath&gt;{$ctx:accessTokenRegistryPath}&lt;/accessTokenRegistryPath&gt;
+    &lt;/bigquery.getAccessTokenFromServiceAccount&gt;
+    ```
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiUrl&lt;/td&gt;
+            &lt;td&gt;The base endpoint URL of the BigQuery API.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;keyStoreLocation&lt;/td&gt;
+            &lt;td&gt;The location where the p12 key file is located.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;serviceAccount&lt;/td&gt;
+            &lt;td&gt;The value of the service account.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;scope&lt;/td&gt;
+            &lt;td&gt;The space delimited scope to access the API.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;accessTokenRegistryPath&lt;/td&gt;
+            &lt;td&gt;The registry path to store the access token (this is an optional parameter).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    You can also use the below operation (getAccessTokenFromAuthorizationCode) to get the access token and to do all the other operations.
+
+    ```xml
+    &lt;bigquery.getAccessTokenFromAuthorizationCode&gt;
+        &lt;apiUrl&gt;{$ctx:apiUrl}&lt;/apiUrl&gt;
+        &lt;authorizationCode&gt;{$ctx:authorizationCode}&lt;/authorizationCode&gt;           
+        &lt;redirectUrl&gt;{$ctx:redirectUrl}&lt;/redirectUrl&gt;
+        &lt;clientSecret&gt;{$ctx:clientSecret}&lt;/clientSecret&gt;
+        &lt;clientId&gt;{$ctx:clientId}&lt;/clientId&gt;
+        &lt;registryPath&gt;{$ctx:registryPath}&lt;/registryPath&gt;
+    &lt;/bigquery.getAccessTokenFromAuthorizationCode&gt;
+    ```
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiUrl&lt;/td&gt;
+            &lt;td&gt;The base endpoint URL of the BigQuery API.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;authorizationCode&lt;/td&gt;
+            &lt;td&gt;The authorization code to be used for obtaining the access token.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;redirectUrl&lt;/td&gt;
+            &lt;td&gt;The redirect URL to be used in the OAuth 2.0 authorization flow.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;clientSecret&lt;/td&gt;
+            &lt;td&gt;The space delimited scope to access the API.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;clientId&lt;/td&gt;
+            &lt;td&gt;The registry path to store the access token (this is an optional parameter).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;registryPath&lt;/td&gt;
+            &lt;td&gt;The registry path to store the access token (this is an optional parameter).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    You can also use the below operation (getAccessTokenFromRefreshToken) to get the access token and to do all the other operations.
+
+    ```xml
+    &lt;bigquery.getAccessTokenFromRefreshToken&gt;
+        &lt;apiUrl&gt;{$ctx:apiUrl}&lt;/apiUrl&gt;
+        &lt;clientSecret&gt;{$ctx:clientSecret}&lt;/clientSecret&gt;
+        &lt;clientId&gt;{$ctx:clientId}&lt;/clientId&gt;
+        &lt;refreshToken&gt;{$ctx:refreshToken}&lt;/refreshToken&gt;
+    &lt;/bigquery.getAccessTokenFromRefreshToken&gt;
+    ```
+
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;apiUrl&lt;/td&gt;
+            &lt;td&gt;The base endpoint URL of the BigQuery API.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;clientSecret&lt;/td&gt;
+            &lt;td&gt;The space delimited scope to access the API.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;clientId&lt;/td&gt;
+            &lt;td&gt;The registry path to store the access token (this is an optional parameter).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;refreshToken&lt;/td&gt;
+            &lt;td&gt;The refresh token for the BigQuery API.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;apiUrl&quot;: &quot;https://www.googleapis.com&quot;,
+        &quot;clientId&quot;: &quot;504627865627-kdni8r2s10sjcgd4v6stthdaqb4bvnba.apps.googleusercontent.com&quot;,
+        &quot;refreshToken&quot;: &quot;1/uWful-diQNAdk-alDUa6ixxxxxxxx-LpJIikEQ2sqA&quot;,
+        &quot;clientSecret&quot;: &quot;ChlbHI_T7zssXXTRYuqj_-TM&quot;
+    }
+    ```
+
+    
+---
+
+### Datasets
+
+??? note &quot;getDataset&quot;
+    The getDataset operation retrieves a dataset. For more information, see related [BigQuery documentation](https://cloud.google.com/bigquery/docs/reference/v2/datasets/get).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;projectId&lt;/td&gt;
+            &lt;td&gt;The ID of the project to which the dataset belongs.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;datasetId&lt;/td&gt;
+            &lt;td&gt;The ID of the dataset.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;bigquery.getDataset&gt;
+        &lt;projectId&gt;{$ctx:projectId}&lt;/projectId&gt;
+        &lt;datasetId&gt;{$ctx:datasetId}&lt;/datasetId&gt;
+    &lt;/bigquery.getDataset&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;accessToken&quot;: &quot;ya29.BwKYx40Dith1DFQBDjZOHNqhcxmKs9zbkjAWQa1q8mdMFndp2-q8ifG66fwprOigRwKSNw&quot;,
+        &quot;apiUrl&quot;: &quot;https://www.googleapis.com&quot;,
+        &quot;clientId&quot;: &quot;504627865627-kdni8r2s10sjddfgXzqb4bvnba.apps.googleusercontent.com&quot;,
+        &quot;clientSecret&quot;: &quot;ChlbHI_T7zssXXTRYuqj_-TM&quot;,
+        &quot;refreshToken&quot;: &quot;1/uWful-diQNAdk-alDUa6ixxxxxxxx-LpJIikEQ2sqA&quot;,
+        &quot;registryPath&quot;: &quot;connectors/bq&quot;,
+        &quot;projectId&quot;: &quot;publicdata&quot;,
+        &quot;datasetId&quot;: &quot;samples&quot;,
+        &quot;fields&quot;: &quot;id&quot;,
+        &quot;callback&quot;: &quot;callBackFunction&quot;,
+        &quot;apiKey&quot;: &quot;154987fd5h4x6gh4&quot;,
+        &quot;prettyPrint&quot;: &quot;true&quot;,
+        &quot;quotaUser&quot;: &quot;1hx46f5g4h5ghx6h41x54gh6f4hx&quot;,
+        &quot;userIp&quot;: &quot;192.77.88.12&quot;,
+        &quot;ifNoneMatch&quot;:&quot;hnk59tKBkX8cdlePZ8VtzgVzuO4/tS1oqpXxnkU21hZeK5k4lqRrRr8&quot;,
+        &quot;ifMatch&quot;:&quot;hnk59tKBkX8cdlePZ8VtzgVzuO4/tS1oqpXxnkU21hZeK5k4lqRrRr8&quot;
+    }
+    ```
+
+    **Sample response**
+
+    ```json
+    {
+        &quot;kind&quot;: &quot;bigquery#dataset&quot;,
+        &quot;etag&quot;: &quot;1xuEK5ngZZ+fj0iioOa6Og==&quot;,
+        &quot;id&quot;: &quot;testbig-235116:testData&quot;,
+        &quot;selfLink&quot;: &quot;https://content.googleapis.com/bigquery/v2/projects/testbig-235116/datasets/testData&quot;,
+        &quot;datasetReference&quot;: {
+            &quot;datasetId&quot;: &quot;testData&quot;,
+            &quot;projectId&quot;: &quot;testbig-235116&quot;
+        },
+        &quot;defaultTableExpirationMs&quot;: &quot;5184000000&quot;,
+        &quot;access&quot;: [
+            {
+                &quot;role&quot;: &quot;WRITER&quot;,
+                &quot;specialGroup&quot;: &quot;projectWriters&quot;
+            },
+            {
+                &quot;role&quot;: &quot;OWNER&quot;,
+                &quot;specialGroup&quot;: &quot;projectOwners&quot;
+            },
+            {
+                &quot;role&quot;: &quot;OWNER&quot;,
+                &quot;userByEmail&quot;: &quot;iamkesan@gmail.com&quot;
+            },
+            {
+                &quot;role&quot;: &quot;READER&quot;,
+                &quot;specialGroup&quot;: &quot;projectReaders&quot;
+            }
+        ],
+        &quot;creationTime&quot;: &quot;1553104741840&quot;,
+        &quot;lastModifiedTime&quot;: &quot;1553104741840&quot;,
+        &quot;location&quot;: &quot;US&quot;,
+        &quot;defaultPartitionExpirationMs&quot;: &quot;5184000000&quot;
+    }
+    ```
+
+??? note &quot;listDatasets&quot;
+    The listDatasets operation lists a set of data. For more information, see related [BigQuery documentation](https://cloud.google.com/bigquery/docs/reference/v2/datasets/list).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;projectId&lt;/td&gt;
+            &lt;td&gt;The ID of the project to which the dataset belongs.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxResults&lt;/td&gt;
+            &lt;td&gt;The maximum number of results per page.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;pageToken&lt;/td&gt;
+            &lt;td&gt;The page token value.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;isAll&lt;/td&gt;
+            &lt;td&gt;A boolean value that determines whether to list all datasets, including hidden ones.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;bigquery.listDatasets&gt;
+        &lt;projectId&gt;{$ctx:projectId}&lt;/projectId&gt;
+        &lt;maxResults&gt;{$ctx:maxResults}&lt;/maxResults&gt;
+        &lt;pageToken&gt;{$ctx:pageToken}&lt;/pageToken&gt;
+        &lt;isAll&gt;{$ctx:isAll}&lt;/isAll&gt;
+    &lt;/bigquery.listDatasets&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;accessToken&quot;: &quot;ya29.BwKYx40Dith1DFQBDjZOHNqhcxmKs9zbkjAWQa1q8mdMFndp2-q8ifG66fwprOigRwKSNw&quot;,
+        &quot;apiUrl&quot;: &quot;https://www.googleapis.com&quot;,
+        &quot;clientId&quot;: &quot;504627865627-kdni8r2s10sjddfgXzqb4bvnba.apps.googleusercontent.com&quot;,
+        &quot;clientSecret&quot;: &quot;ChlbHI_T7zssXXTRYuqj_-TM&quot;,
+        &quot;refreshToken&quot;: &quot;1/uWful-diQNAdk-alDUa6ixxxxxxxx-LpJIikEQ2sqA&quot;,
+        &quot;registryPath&quot;: &quot;connectors/bq&quot;,
+        &quot;projectId&quot;: &quot;publicdata&quot;,
+        &quot;maxResults&quot;: &quot;1&quot;,
+        &quot;pageToken&quot;: &quot;1&quot;,
+        &quot;isAll&quot;: &quot;true&quot;,
+        &quot;fields&quot;: &quot;datasets/datasetReference&quot;,
+        &quot;callback&quot;: &quot;callBackFunction&quot;,
+        &quot;apiKey&quot;: &quot;154987fd5h4x6gh4&quot;,
+        &quot;prettyPrint&quot;: &quot;true&quot;,
+        &quot;quotaUser&quot;: &quot;1hx46f5g4h5ghx6h41x54gh6f4hx&quot;,
+        &quot;userIp&quot;: &quot;192.77.88.12&quot;,
+        &quot;ifNoneMatch&quot;:&quot;hnk59tKBkX8cdlePZ8VtzgVzuO4/tS1oqpXxnkU21hZeK5k4lqRrRr8&quot;,
+        &quot;ifMatch&quot;:&quot;hnk59tKBkX8cdlePZ8VtzgVzuO4/tS1oqpXxnkU21hZeK5k4lqRrRr8&quot;
+    }
+    ```
+
+    **Sample response**
+
+    ```json
+    {
+        &quot;kind&quot;: &quot;bigquery#datasetList&quot;,
+        &quot;etag&quot;: &quot;5xsXo/uZ5RUfG49EzOV9Gg==&quot;,
+        &quot;datasets&quot;: [
+            {
+                &quot;kind&quot;: &quot;bigquery#dataset&quot;,
+                &quot;id&quot;: &quot;testbig-235116:testData&quot;,
+                &quot;datasetReference&quot;: {
+                    &quot;datasetId&quot;: &quot;testData&quot;,
+                    &quot;projectId&quot;: &quot;testbig-235116&quot;
+                },
+                &quot;location&quot;: &quot;US&quot;
+            }
+        ]
+    }
+    ```
+
+### Jobs
+
+??? note &quot;runQuery&quot;
+    The runQuery operation runs an SQL query (BigQuery) and returns results if the query completes within a specified timeout. For more information, see related [BigQuery documentation](https://cloud.google.com/bigquery/docs/reference/v2/jobs/query).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;useQueryCache&lt;/td&gt;
+            &lt;td&gt;Specifies whether to look for the result in the query cache. The default value is true.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;timeoutMs&lt;/td&gt;
+            &lt;td&gt;Specifies how long (in milliseconds) the system should wait for the query to complete before expiring and returning the request.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;query&lt;/td&gt;
+            &lt;td&gt;A query string (required) that complies with the BigQuery query syntax.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;dryRun&lt;/td&gt;
+            &lt;td&gt;If set to true, BigQuery does not run the job. Instead, if the query is valid, BigQuery returns statistics about the job. If the query is invalid, an error returns. The default value is false.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;defaultProjectId&lt;/td&gt;
+            &lt;td&gt;The ID of the project that contains this dataset.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;defaultDatasetId&lt;/td&gt;
+            &lt;td&gt;A unique ID (required) for this dataset without the project name. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;projectId&lt;/td&gt;
+            &lt;td&gt;The ID of the project that is billed for the query.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxResults&lt;/td&gt;
+            &lt;td&gt;The maximum number of rows of data (results) to return per page. Responses are also limited to 10 MB. By default, there is no maximum row count and only the byte limit applies.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;kind&lt;/td&gt;
+            &lt;td&gt;The resource type of the request.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;useLegacySql&lt;/td&gt;
+            &lt;td&gt;Specifies whether to use BigQuery&#x27;s legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery&#x27;s standard SQL. For information on BigQuery&#x27;s standard SQL, see [Migrating to GoogleSQL](https://cloud.google.com/bigquery/docs/reference/standard-sql/migrating-from-legacy-sql).&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;bigquery.runQuery&gt;
+        &lt;useQueryCache&gt;{$ctx:useQueryCache}&lt;/useQueryCache&gt;
+        &lt;timeoutMs&gt;{$ctx:timeoutMs}&lt;/timeoutMs&gt;
+        &lt;query&gt;{$ctx:query}&lt;/query&gt;
+        &lt;dryRun&gt;{$ctx:dryRun}&lt;/dryRun&gt;
+        &lt;defaultProjectId&gt;{$ctx:defaultProjectId}&lt;/defaultProjectId&gt;
+        &lt;defaultDatasetId&gt;{$ctx:defaultDatasetId}&lt;/defaultDatasetId&gt;
+        &lt;projectId&gt;{$ctx:projectId}&lt;/projectId&gt;
+        &lt;maxResults&gt;{$ctx:maxResults}&lt;/maxResults&gt;
+        &lt;kind&gt;{$ctx:kind}&lt;/kind&gt;
+        &lt;useLegacySql&gt;{$ctx:useLegacySql}&lt;/useLegacySql&gt;
+    &lt;/bigquery.runQuery&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;quotaUser&quot;:&quot;1hx46f5g4h5ghx6h41x54gh6f4hx&quot;,
+        &quot;userIp&quot;:&quot;192.77.88.12&quot;,
+        &quot;accessToken&quot;:&quot;ya29.6QFjdRjTZyXmIjxkO6G6dJoLrch1Ktt1IzFm&quot;,
+        &quot;clientId&quot;: &quot;504627865627-kdni8r2s10sjddfgXzqb4bvnba.apps.googleusercontent.com&quot;,
+        &quot;clientSecret&quot;: &quot;ChlbHI_T7zssXXTRYuqj_-TM&quot;,
+        &quot;refreshToken&quot;: &quot;1/uWful-diQNAdk-alDUa6ixxxxxxxx-LpJIikEQ2sqA&quot;,
+        &quot;registryPath&quot;: &quot;connectors/bq&quot;,
+        &quot;prettyPrint&quot;:&quot;true&quot;,
+        &quot;callback&quot;:&quot;callBackFunction&quot;,
+        &quot;apiUrl&quot;:&quot;https://www.googleapis.com&quot;,
+        &quot;fields&quot;:&quot;id,etag&quot;,
+        &quot;useQueryCache&quot;:&quot;true&quot;,
+        &quot;timeoutMs&quot;:&quot;10000&quot;,
+        &quot;query&quot;:&quot;SELECT count(*) FROM [publicdata:samples.github_nested]&quot;,
+        &quot;dryRun&quot;:&quot;false&quot;,
+        &quot;defaultProjectId&quot;:&quot;bigqueryproject-1092&quot;,
+        &quot;defaultDatasetId&quot;:&quot;test_100&quot;,
+        &quot;projectId&quot;:&quot;bigqueryproject-1092&quot;,
+        &quot;maxResults&quot;:&quot;10000&quot;,
+        &quot;kind&quot;:&quot;bigquery#queryRequest&quot;,
+        &quot;ifNoneMatch&quot;:&quot;hnk59tKBkX8cdlePZ8VtzgVzuO4/tS1oqpXxnkU21hZeK5k4lqRrRr8&quot;,
+        &quot;ifMatch&quot;:&quot;hnk59tKBkX8cdlePZ8VtzgVzuO4/tS1oqpXxnkU21hZeK5k4lqRrRr8&quot;
+    }
+    ```
+
+    **Sample response**
+
+    ```json
+    {
+        &quot;kind&quot;: &quot;bigquery#queryResponse&quot;,
+        &quot;schema&quot;: {
+            &quot;fields&quot;: [
+                {
+                    &quot;name&quot;: &quot;Name&quot;,
+                    &quot;type&quot;: &quot;STRING&quot;,
+                    &quot;mode&quot;: &quot;NULLABLE&quot;
+                },
+                {
+                    &quot;name&quot;: &quot;Age&quot;,
+                    &quot;type&quot;: &quot;INTEGER&quot;,
+                    &quot;mode&quot;: &quot;NULLABLE&quot;
+                }
+            ]
+        },
+        &quot;jobReference&quot;: {
+            &quot;projectId&quot;: &quot;testbig-235116&quot;,
+            &quot;jobId&quot;: &quot;job_GECobzPaLdbBW-SqIG-WrfOzaqtQ&quot;,
+            &quot;location&quot;: &quot;US&quot;
+        },
+        &quot;totalRows&quot;: &quot;2&quot;,
+        &quot;rows&quot;: [
+            {
+                &quot;f&quot;: [
+                    {
+                        &quot;v&quot;: &quot;John&quot;
+                    },
+                    {
+                        &quot;v&quot;: &quot;45&quot;
+                    }
+                ]
+            },
+            {
+                &quot;f&quot;: [
+                    {
+                        &quot;v&quot;: &quot;Harry&quot;
+                    },
+                    {
+                        &quot;v&quot;: &quot;25&quot;
+                    }
+                ]
+            }
+        ],
+        &quot;totalBytesProcessed&quot;: &quot;670&quot;,
+        &quot;jobComplete&quot;: true,
+        &quot;cacheHit&quot;: false
+    }
+    ```
+
+### Projects
+
+??? note &quot;listProjects&quot;
+    The listProjects operation retrieves all projects. For more information, see related [BigQuery documentation](https://cloud.google.com/bigquery/docs/reference/v2/projects/list).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxResults&lt;/td&gt;
+            &lt;td&gt;The maximum number of results per page.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;pageToken&lt;/td&gt;
+            &lt;td&gt;The page token value.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;bigquery.listProjects&gt;
+        &lt;maxResults&gt;{$ctx:maxResults}&lt;/maxResults&gt;
+        &lt;pageToken&gt;{$ctx:pageToken}&lt;/pageToken&gt;
+    &lt;/bigquery.listProjects&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;accessToken&quot; : &quot;ya29.BwKYx40Dith1DFQBDjZOHNqhcxmKs9zbkjAWQa1q8mdMFndp2-q8ifG66fwprOigRwKSNw&quot;,
+        &quot;apiUrl&quot; : &quot;https://www.googleapis.com&quot;,
+        &quot;clientId&quot;: &quot;504627865627-kdni8r2s10sjddfgXzqb4bvnba.apps.googleusercontent.com&quot;,
+        &quot;clientSecret&quot;: &quot;ChlbHI_T7zssXXTRYuqj_-TM&quot;,
+        &quot;refreshToken&quot;: &quot;1/uWful-diQNAdk-alDUa6ixxxxxxxx-LpJIikEQ2sqA&quot;,
+        &quot;registryPath&quot;: &quot;connectors/bq&quot;,
+        &quot;maxResults&quot; : &quot;1&quot;,
+        &quot;pageToken&quot; : &quot;1&quot;,
+        &quot;fields&quot;: &quot;id&quot;,
+        &quot;callback&quot;: &quot;callBackFunction&quot;,
+        &quot;apiKey&quot;: &quot;154987fd5h4x6gh4&quot;,
+        &quot;prettyPrint&quot;: &quot;true&quot;,
+        &quot;quotaUser&quot;: &quot;1hx46f5g4h5ghx6h41x54gh6f4hx&quot;,
+        &quot;userIp&quot;: &quot;192.77.88.12&quot;,
+        &quot;ifNoneMatch&quot;:&quot;hnk59tKBkX8cdlePZ8VtzgVzuO4/tS1oqpXxnkU21hZeK5k4lqRrRr8&quot;,
+        &quot;ifMatch&quot;:&quot;hnk59tKBkX8cdlePZ8VtzgVzuO4/tS1oqpXxnkU21hZeK5k4lqRrRr8&quot;
+    }
+    ```
+
+    **Sample response**
+
+    ```json
+    {
+        &quot;kind&quot;: &quot;bigquery#projectList&quot;,
+        &quot;etag&quot;: &quot;jdhx8JpxmSC6iJhWFNchpw==&quot;,
+        &quot;projects&quot;: [
+            {
+                &quot;kind&quot;: &quot;bigquery#project&quot;,
+                &quot;id&quot;: &quot;ascendant-lore-235117&quot;,
+                &quot;numericId&quot;: &quot;719690246975&quot;,
+                &quot;projectReference&quot;: {
+                    &quot;projectId&quot;: &quot;ascendant-lore-235117&quot;
+                },
+                &quot;friendlyName&quot;: &quot;My First Project&quot;
+            },
+            {
+                &quot;kind&quot;: &quot;bigquery#project&quot;,
+                &quot;id&quot;: &quot;true-kite-235118&quot;,
+                &quot;numericId&quot;: &quot;911077124704&quot;,
+                &quot;projectReference&quot;: {
+                    &quot;projectId&quot;: &quot;true-kite-235118&quot;
+                },
+                &quot;friendlyName&quot;: &quot;My First Project&quot;
+            }
+        ],
+        &quot;totalItems&quot;: 2
+    }
+    ```
+
+### Table data
+
+??? note &quot;listTabledata&quot;
+    The listTabledata operation retrieves table data from a specified set of rows. For more information, see related [BigQuery documentation](https://cloud.google.com/bigquery/docs/reference/v2/tabledata/list).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;datasetId&lt;/td&gt;
+            &lt;td&gt;The maximum number of results per page.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;projectId&lt;/td&gt;
+            &lt;td&gt;The ID of the project to which the dataset belongs.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tableId&lt;/td&gt;
+            &lt;td&gt;The ID of the table.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxResults&lt;/td&gt;
+            &lt;td&gt;The maximum results per page.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;pageToken&lt;/td&gt;
+            &lt;td&gt;The page token value.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;startIndex&lt;/td&gt;
+            &lt;td&gt;Zero-based index of the starting row.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;bigquery.listTabledata&gt;
+        &lt;datasetId&gt;{$ctx:datasetId}&lt;/datasetId&gt;
+        &lt;projectId&gt;{$ctx:projectId}&lt;/projectId&gt;
+        &lt;tableId&gt;{$ctx:tableId}&lt;/tableId&gt;
+        &lt;maxResults&gt;{$ctx:maxResults}&lt;/maxResults&gt;
+        &lt;pageToken&gt;{$ctx:pageToken}&lt;/pageToken&gt;
+        &lt;startIndex&gt;{$ctx:startIndex}&lt;/startIndex&gt;
+    &lt;/bigquery.listTabledata&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;accessToken&quot;: &quot;ya29.BwKYx40Dith1DFQBDjZOHNqhcxmKs9zbkjAWQa1q8mdMFndp2-q8ifG66fwprOigRwKSNw&quot;,
+        &quot;apiUrl&quot;: &quot;https://www.googleapis.com&quot;,
+        &quot;clientId&quot;: &quot;504627865627-kdni8r2s10sjddfgXzqb4bvnba.apps.googleusercontent.com&quot;,
+        &quot;clientSecret&quot;: &quot;ChlbHI_T7zssXXTRYuqj_-TM&quot;,
+        &quot;refreshToken&quot;: &quot;1/uWful-diQNAdk-alDUa6ixxxxxxxx-LpJIikEQ2sqA&quot;,
+        &quot;registryPath&quot;: &quot;connectors/bq&quot;,
+        &quot;projectId&quot;: &quot;publicdata&quot;,
+        &quot;datasetId&quot;: &quot;samples&quot;,
+        &quot;tableId&quot;: &quot;github_nested&quot;,
+        &quot;maxResults&quot;: &quot;1&quot;,
+        &quot;pageToken&quot;: &quot;1&quot;,
+        &quot;startIndex&quot;: &quot;1&quot;,
+        &quot;fields&quot;: &quot;id&quot;,
+        &quot;callback&quot;: &quot;callBackFunction&quot;,
+        &quot;apiKey&quot;: &quot;154987fd5h4x6gh4&quot;,
+        &quot;prettyPrint&quot;: &quot;true&quot;,
+        &quot;quotaUser&quot;: &quot;1hx46f5g4h5ghx6h41x54gh6f4hx&quot;,
+        &quot;userIp&quot;: &quot;192.77.88.12&quot;,
+        &quot;ifNoneMatch&quot;:&quot;hnk59tKBkX8cdlePZ8VtzgVzuO4/tS1oqpXxnkU21hZeK5k4lqRrRr8&quot;,
+        &quot;ifMatch&quot;:&quot;hnk59tKBkX8cdlePZ8VtzgVzuO4/tS1oqpXxnkU21hZeK5k4lqRrRr8&quot;
+    }
+    ```
+
+    **Sample response**
+
+    ```json
+    {
+        &quot;kind&quot;: &quot;bigquery#tableDataList&quot;,
+        &quot;etag&quot;: &quot;RRRjVfSIc2CcCrEaLPH6Dg==&quot;,
+        &quot;totalRows&quot;: &quot;2&quot;,
+        &quot;rows&quot;: [
+            {
+                &quot;f&quot;: [
+                    {
+                        &quot;v&quot;: &quot;John&quot;
+                    },
+                    {
+                        &quot;v&quot;: null
+                    }
+                ]
+            },
+            {
+                &quot;f&quot;: [
+                    {
+                        &quot;v&quot;: &quot;Harry&quot;
+                    },
+                    {
+                        &quot;v&quot;: &quot;90&quot;
+                    }
+                ]
+            }
+        ]
+    }
+    ```
+
+??? note &quot;insertAllTableData&quot;
+    The insertAllTableData operation retrieves table data from a specified set of rows. For more information, see related [BigQuery documentation](https://cloud.google.com/bigquery/docs/reference/v2/tabledata/insertAll).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;datasetId&lt;/td&gt;
+            &lt;td&gt;The maximum number of results per page.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;projectId&lt;/td&gt;
+            &lt;td&gt;The ID of the project to which the dataset belongs.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tableId&lt;/td&gt;
+            &lt;td&gt;The ID of the table.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;skipInvalidRows&lt;/td&gt;
+            &lt;td&gt;A boolean value to check whether the row should be validated.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ignoreUnknownValues&lt;/td&gt;
+            &lt;td&gt;A boolean value to validate whether the values match the table schema.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;templateSuffix&lt;/td&gt;
+            &lt;td&gt;Instance table.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;jsonPay&lt;/td&gt;
+            &lt;td&gt;A JSON object that contains a row of data.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;bigquery.insertAllTableData&gt;
+        &lt;datasetId&gt;{$ctx:datasetId}&lt;/datasetId&gt;
+        &lt;projectId&gt;{$ctx:projectId}&lt;/projectId&gt;
+        &lt;tableId&gt;{$ctx:tableId}&lt;/tableId&gt;
+        &lt;skipInvalidRows&gt;{$ctx:skipInvalidRows}&lt;/skipInvalidRows&gt;
+        &lt;ignoreUnknownValues&gt;{$ctx:ignoreUnknownValues}&lt;/ignoreUnknownValues&gt;
+        &lt;templateSuffix&gt;{$ctx:templateSuffix}&lt;/templateSuffix&gt;
+        &lt;jsonPay&gt;{$ctx:jsonPay}&lt;/jsonPay&gt;
+    &lt;/bigquery.insertAllTableData&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;apiUrl&quot;:&quot;https://www.googleapis.com&quot;,
+        &quot;keyStoreLocation&quot;:&quot;/home/hariprasath/Desktop/bigQuery/p12/Non Production-232c0d8ac8f2.p12&quot;,
+        &quot;serviceAccount&quot;:&quot;service-account.gserviceaccount.com&quot;,
+        &quot;scope&quot;:&quot;https://www.googleapis.com/auth/bigquery&quot;,
+        &quot;datasetId&quot;: &quot;zSta&quot;,
+        &quot;tableId&quot;: &quot;ECOMM&quot;,
+        &quot;projectId&quot;: &quot;dataservices&quot;,
+        &quot;kind&quot;: &quot;bigquery#tableDataInsertAllRequest&quot;,
+        &quot;skipInvalidRows&quot;: true,
+        &quot;ignoreUnknownValues&quot;: true,
+        &quot;templateSuffix&quot;:&quot;_20160315&quot;,
+        &quot;jsonPay&quot;:
+            {
+                &quot;insertId&quot;: &quot;xxxxx&quot;,
+                &quot;json&quot;:
+                    {
+                        &quot;SOURCE_ID&quot;:&quot;2&quot;,
+                        &quot;DESTINATION_ID&quot;:&quot;13&quot;,
+                        &quot;SIGNAL_TYPE_ID&quot;:&quot;13&quot;,
+                        &quot;DATA&quot;:&quot;hariprasath&quot;,
+                        &quot;TRANSACTION_TIMESTAMP&quot;:&quot;2014-03-01T22:12:22.000Z&quot;,
+                        &quot;BQ_INSERT_TIMESTAMP&quot;:&quot;2016-02-26 20:12:01&quot;      
+                    }
+            }
+    }
+    ```
+
+    Following is a sample request that inserts multiple records.
+
+    ```json
+    {
+        &quot;apiUrl&quot;:&quot;https://www.googleapis.com&quot;,
+        &quot;keyStoreLocation&quot;:&quot;/home/hariprasath/Desktop/bigQuery/p12/Non Production-232c0d8ac8f2.p12&quot;,
+        &quot;serviceAccount&quot;:&quot;service-account.gserviceaccount.com&quot;,
+        &quot;scope&quot;:&quot;https://www.googleapis.com/auth/bigquery&quot;,
+        &quot;datasetId&quot;: &quot;zSta&quot;,
+        &quot;tableId&quot;: &quot;Sample&quot;,
+        &quot;projectId&quot;: &quot;dataservices&quot;,
+        &quot;kind&quot;: &quot;bigquery#tableDataInsertAllRequest&quot;,
+        &quot;skipInvalidRows&quot;: true,
+        &quot;ignoreUnknownValues&quot;: true,
+        &quot;templateSuffix&quot;:&quot;_20160315&quot;,
+        &quot;jsonPay&quot;:[
+            {
+                &quot;insertId&quot;:&quot;1014&quot;,
+                &quot;json&quot;:{
+                    &quot;Name&quot;:&quot;John&quot;,
+                    &quot;Age&quot;:25
+                }
+            },
+            {
+                &quot;insertId&quot;:&quot;1015&quot;,
+                &quot;json&quot;:{
+                    &quot;Name&quot;:&quot;Vasan&quot;,
+                    &quot;Age&quot;:45
+                }
+            }
+        ]
+    }
+    ```
+
+    **Sample response**
+
+    ```json
+    {
+        &quot;kind&quot;: &quot;bigquery#tableDataInsertAllResponse&quot;
+    }
+    ```
+
+### Tables
+
+??? note &quot;getTable&quot;
+    The getTable operation retrieves a table by ID. For more information, see related [BigQuery documentation](https://cloud.google.com/bigquery/docs/reference/v2/tables/get).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;tableId&lt;/td&gt;
+            &lt;td&gt;The ID of the table.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;datasetId&lt;/td&gt;
+            &lt;td&gt;The dataset ID of the requested table.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;projectId&lt;/td&gt;
+            &lt;td&gt;The project ID of the requested table.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;bigquery.getTable&gt;
+        &lt;tableId&gt;{$ctx:tableId}&lt;/tableId&gt;
+        &lt;datasetId&gt;{$ctx:datasetId}&lt;/datasetId&gt;
+        &lt;projectId&gt;{$ctx:projectId}&lt;/projectId&gt;
+    &lt;/bigquery.getTable&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;accessToken&quot;: &quot;ya29.BwKYx40Dith1DFQBDjZOHNqhcxmKs9zbkjAWQa1q8mdMFndp2-q8ifG66fwprOigRwKSNw&quot;,
+        &quot;apiUrl&quot;: &quot;https://www.googleapis.com&quot;,
+        &quot;clientId&quot;: &quot;504627865627-kdni8r2s10sjddfgXzqb4bvnba.apps.googleusercontent.com&quot;,
+        &quot;clientSecret&quot;: &quot;ChlbHI_T7zssXXTRYuqj_-TM&quot;,
+        &quot;refreshToken&quot;: &quot;1/uWful-diQNAdk-alDUa6ixxxxxxxx-LpJIikEQ2sqA&quot;,
+        &quot;registryPath&quot;: &quot;connectors/bq&quot;,
+        &quot;projectId&quot;: &quot;publicdata&quot;,
+        &quot;datasetId&quot;: &quot;samples&quot;,
+        &quot;tableId&quot;: &quot;github_nested&quot;,
+        &quot;maxResults&quot;: &quot;1&quot;,
+        &quot;pageToken&quot;: &quot;1&quot;,
+        &quot;startIndex&quot;: &quot;1&quot;,
+        &quot;fields&quot;: &quot;id&quot;,
+        &quot;callback&quot;: &quot;callBackFunction&quot;,
+        &quot;apiKey&quot;: &quot;154987fd5h4x6gh4&quot;,
+        &quot;prettyPrint&quot;: &quot;true&quot;,
+        &quot;quotaUser&quot;: &quot;1hx46f5g4h5ghx6h41x54gh6f4hx&quot;,
+        &quot;userIp&quot;: &quot;192.77.88.12&quot;,
+        &quot;ifNoneMatch&quot;:&quot;hnk59tKBkX8cdlePZ8VtzgVzuO4/tS1oqpXxnkU21hZeK5k4lqRrRr8&quot;,
+        &quot;ifMatch&quot;:&quot;hnk59tKBkX8cdlePZ8VtzgVzuO4/tS1oqpXxnkU21hZeK5k4lqRrRr8&quot;
+    }
+    ```
+
+    **Sample response**
+
+    ```json
+    {
+        &quot;kind&quot;: &quot;bigquery#tableList&quot;,
+        &quot;etag&quot;: &quot;ASMRI9cY0t0ilhpaFI4OMA==&quot;,
+        &quot;tables&quot;: [
+            {
+                &quot;kind&quot;: &quot;bigquery#table&quot;,
+                &quot;id&quot;: &quot;testbig-235116:testData.github_nested_copy&quot;,
+                &quot;tableReference&quot;: {
+                    &quot;projectId&quot;: &quot;testbig-235116&quot;,
+                    &quot;datasetId&quot;: &quot;testData&quot;,
+                    &quot;tableId&quot;: &quot;github_nested_copy&quot;
+                },
+                &quot;type&quot;: &quot;TABLE&quot;,
+                &quot;creationTime&quot;: &quot;1553104818977&quot;,
+                &quot;expirationTime&quot;: &quot;1558288818977&quot;
+            },
+            {
+                &quot;kind&quot;: &quot;bigquery#table&quot;,
+                &quot;id&quot;: &quot;testbig-235116:testData.sample_20190322&quot;,
+                &quot;tableReference&quot;: {
+                    &quot;projectId&quot;: &quot;testbig-235116&quot;,
+                    &quot;datasetId&quot;: &quot;testData&quot;,
+                    &quot;tableId&quot;: &quot;sample_20190322&quot;
+                },
+                &quot;type&quot;: &quot;TABLE&quot;,
+                &quot;creationTime&quot;: &quot;1553239767833&quot;,
+                &quot;expirationTime&quot;: &quot;1558423767833&quot;
+            }
+        ],
+        &quot;totalItems&quot;: 2
+    }
+    ```
+
+??? note &quot;listTables&quot;
+    The listTables operation retrieves all available tables in the specified dataset. For more information, see related [BigQuery documentation](https://cloud.google.com/bigquery/docs/reference/v2/tables/list).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;datasetId&lt;/td&gt;
+            &lt;td&gt;The dataset ID of the tables that should be listed.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;pageToken&lt;/td&gt;
+            &lt;td&gt;The page token (which is returned by a previous call) for requesting the next page of results.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;projectId&lt;/td&gt;
+            &lt;td&gt;The project ID of the tables that should be listed.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;maxResults&lt;/td&gt;
+            &lt;td&gt;The maximum number of results to return.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;bigquery.listTables&gt;
+        &lt;datasetId&gt;{$ctx:datasetId}&lt;/datasetId&gt;
+        &lt;pageToken&gt;{$ctx:pageToken}&lt;/pageToken&gt;
+        &lt;projectId&gt;{$ctx:projectId}&lt;/projectId&gt;
+        &lt;maxResults&gt;{$ctx:maxResults}&lt;/maxResults&gt;
+    &lt;/bigquery.listTables&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;accessToken&quot;: &quot;ya29.BwKYx40Dith1DFQBDjZOHNqhcxmKs9zbkjAWQa1q8mdMFndp2-q8ifG66fwprOigRwKSNw&quot;,
+        &quot;apiUrl&quot;: &quot;https://www.googleapis.com&quot;,
+        &quot;clientId&quot;: &quot;504627865627-kdni8r2s10sjddfgXzqb4bvnba.apps.googleusercontent.com&quot;,
+        &quot;clientSecret&quot;: &quot;ChlbHI_T7zssXXTRYuqj_-TM&quot;,
+        &quot;refreshToken&quot;: &quot;1/uWful-diQNAdk-alDUa6ixxxxxxxx-LpJIikEQ2sqA&quot;,
+        &quot;registryPath&quot;: &quot;connectors/bq&quot;,
+        &quot;projectId&quot;: &quot;publicdata&quot;,
+        &quot;datasetId&quot;: &quot;samples&quot;,
+        &quot;tableId&quot;: &quot;github_nested&quot;,
+        &quot;maxResults&quot;: &quot;1&quot;,
+        &quot;pageToken&quot;: &quot;1&quot;,
+        &quot;startIndex&quot;: &quot;1&quot;,
+        &quot;fields&quot;: &quot;id&quot;,
+        &quot;callback&quot;: &quot;callBackFunction&quot;,
+        &quot;apiKey&quot;: &quot;154987fd5h4x6gh4&quot;,
+        &quot;prettyPrint&quot;: &quot;true&quot;,
+        &quot;quotaUser&quot;: &quot;1hx46f5g4h5ghx6h41x54gh6f4hx&quot;,
+        &quot;userIp&quot;: &quot;192.77.88.12&quot;,
+        &quot;ifNoneMatch&quot;:&quot;hnk59tKBkX8cdlePZ8VtzgVzuO4/tS1oqpXxnkU21hZeK5k4lqRrRr8&quot;,
+        &quot;ifMatch&quot;:&quot;hnk59tKBkX8cdlePZ8VtzgVzuO4/tS1oqpXxnkU21hZeK5k4lqRrRr8&quot;
+    }
+    ```
+
+    **Sample response**
+
+    ```json
+    {
+        &quot;kind&quot;: &quot;bigquery#tableList&quot;,
+        &quot;etag&quot;: &quot;ASMRI9cY0t0ilhpaFI4OMA==&quot;,
+        &quot;tables&quot;: [
+            {
+                &quot;kind&quot;: &quot;bigquery#table&quot;,
+                &quot;id&quot;: &quot;testbig-235116:testData.github_nested_copy&quot;,
+                &quot;tableReference&quot;: {
+                    &quot;projectId&quot;: &quot;testbig-235116&quot;,
+                    &quot;datasetId&quot;: &quot;testData&quot;,
+                    &quot;tableId&quot;: &quot;github_nested_copy&quot;
+                },
+                &quot;type&quot;: &quot;TABLE&quot;,
+                &quot;creationTime&quot;: &quot;1553104818977&quot;,
+                &quot;expirationTime&quot;: &quot;1558288818977&quot;
+            },
+            {
+                &quot;kind&quot;: &quot;bigquery#table&quot;,
+                &quot;id&quot;: &quot;testbig-235116:testData.sample_20190322&quot;,
+                &quot;tableReference&quot;: {
+                    &quot;projectId&quot;: &quot;testbig-235116&quot;,
+                    &quot;datasetId&quot;: &quot;testData&quot;,
+                    &quot;tableId&quot;: &quot;sample_20190322&quot;
+                },
+                &quot;type&quot;: &quot;TABLE&quot;,
+                &quot;creationTime&quot;: &quot;1553239767833&quot;,
+                &quot;expirationTime&quot;: &quot;1558423767833&quot;
+            }
+        ],
+        &quot;totalItems&quot;: 2
+    }
+    ```</body>
+</html>

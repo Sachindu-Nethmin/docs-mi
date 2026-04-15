@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>schedules.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Working with Employee Schedules
+
+### Overview 
+
+The following operations allow you to retrieve schedules of an employee
+
+| Operation | Description |
+| ------------- |-------------|
+|[GET Schedules](#retrieving-employee-schedules)| Retrieve the configured schedules for a single employee for every day within a defined period. In order to use this request, an employee XRefCodes is needed. Employee XRefCodes can be retrieved with GET Employees. |
+
+### Operation details
+
+This section provides more details on each of the operations.
+
+#### Retrieving Employee Schedules
+We can use GET Schedules operation with required parameters to find the schedules of employees.
+
+**GET Schedules**
+```xml
+&lt;ceridiandayforce.getSchedules&gt;
+    &lt;xRefCode&gt;{$ctx:xRefCode}&lt;/xRefCode&gt;
+    &lt;filterScheduleStartDate&gt;{$ctx:filterScheduleStartDate}&lt;/filterScheduleStartDate&gt;
+    &lt;filterScheduleEndDate&gt;{$ctx:filterScheduleEndDate}&lt;/filterScheduleEndDate&gt;
+    &lt;isPosted&gt;{$ctx:isPosted}&lt;/isPosted&gt;
+    &lt;expand&gt;{$ctx:expand}&lt;/expand&gt;
+&lt;/ceridiandayforce.getSchedules&gt;
+```
+
+**Properties**
+
+* xRefCode (Mandatory): The unique identifier (external reference code) of the employee whose data will be retrieved. The value provided must be the exact match for an employee; otherwise, a bad request (400) error will be returned.
+* filterScheduleStartDate (Mandatory): Inclusive period start aligned to the employee business day start date to determine which employee schedule data to retrieve . Example: 2017-01-01T13:24:56
+* filterScheduleEndDate (Mandatory): Exclusive period end aligned to the employee business day start to determine which employee schedule data to retrieve . Example: 2017-01-01T13:24:56
+* isPosted (Optional - boolean): A flag to determine whether to display posted schedules. By default it searches for published schedules
+* expand (Optional - string): This parameter accepts a comma-separated list of top-level entities that contain the data elements needed for downstream processing. When this parameter is not used, only data elements from the primary record will be included. For more information, please refer to the Introduction to Dayforce Web Services document.
+
+**Sample request**
+
+Following is a sample request that can be handled by this operation.
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;xRefCode&quot;: &quot;42199&quot;,
+  &quot;filterScheduleStartDate&quot;: &quot;2018-02-04T00:00:00&quot;,
+  &quot;filterScheduleEndDate&quot;: &quot;2018-02-18T00:00:00&quot;
+}
+```
+
+**Sample response**
+
+Given below is a sample response for this operation.
+
+```json
+
+```
+
+**Related Dayforce documentation**
+
+[https://developers.dayforce.com/Build/API-Explorer/Time-Management/GET-Employee-Schedules.aspx](https://developers.dayforce.com/Build/API-Explorer/Time-Management/GET-Employee-Schedules.aspx)
+
+### Sample configuration
+
+Following example illustrates how to connect to Dayforce with the init operation and query operation.
+
+1.Create a sample proxy as below :
+```xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
+       name=&quot;query&quot;
+       startOnLoad=&quot;true&quot;
+       statistics=&quot;disable&quot;
+       trace=&quot;disable&quot;
+       transports=&quot;http,https&quot;&gt;
+   &lt;target&gt;
+      &lt;inSequence&gt;
+         &lt;log level=&quot;full&quot; separator=&quot;,&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.username)&quot; name=&quot;username&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.password)&quot; name=&quot;password&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.clientNamespace)&quot; name=&quot;clientNamespace&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.apiVersion)&quot; name=&quot;apiVersion&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.xRefCode)&quot; name=&quot;xRefCode&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.isValidateOnly)&quot; name=&quot;isValidateOnly&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.fieldAndValue)&quot; name=&quot;fieldAndValue&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.contextDate)&quot; name=&quot;contextDate&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.filterScheduleStartDate)&quot; name=&quot;filterScheduleStartDate&quot;/&gt;
+         &lt;property expression=&quot;json-eval($.filterScheduleEndDate)&quot; name=&quot;filterScheduleEndDate&quot;/&gt;
+         &lt;ceridiandayforce.init&gt;
+            &lt;username&gt;{$ctx:username}&lt;/username&gt;
+            &lt;password&gt;{$ctx:password}&lt;/password&gt;
+            &lt;clientNamespace&gt;{$ctx:clientNamespace}&lt;/clientNamespace&gt;
+            &lt;apiVersion&gt;{$ctx:apiVersion}&lt;/apiVersion&gt;
+         &lt;/ceridiandayforce.init&gt;
+         &lt;ceridiandayforce.getSchedules&gt;
+            &lt;xRefCode&gt;{$ctx:xRefCode}&lt;/xRefCode&gt;
+            &lt;filterScheduleStartDate&gt;{$ctx:filterScheduleStartDate}&lt;/filterScheduleStartDate&gt;
+            &lt;filterScheduleEndDate&gt;{$ctx:filterScheduleEndDate}&lt;/filterScheduleEndDate&gt;
+         &lt;/ceridiandayforce.getSchedules&gt;
+         &lt;send/&gt;
+      &lt;/inSequence&gt;
+   &lt;/target&gt;
+   &lt;description/&gt;
+&lt;/proxy&gt;
+                                
+```
+
+2.Create a json file named query.json and copy the configurations given below to it:
+
+```json
+{
+  &quot;username&quot;: &quot;DFWSTest&quot;,
+  &quot;password&quot;: &quot;DFWSTest&quot;,
+  &quot;clientNamespace&quot;: &quot;usconfigr57.dayforcehcm.com/Api/ddn&quot;,
+  &quot;apiVersion&quot;: &quot;V1&quot;,
+  &quot;xRefCode&quot;: &quot;42199&quot;,
+  &quot;filterScheduleStartDate&quot;: &quot;2018-02-04T00:00:00&quot;,
+  &quot;filterScheduleEndDate&quot;: &quot;2018-02-18T00:00:00&quot;
+}
+```
+3.Replace the credentials with your values.
+
+4.Execute the following curl command:
+
+```bash
+curl http://localhost:8280/services/query -H &quot;Content-Type: application/json&quot; -d @query.json
+```
+5.Dayforce returns HTTP Code 200 with the following response body
+
+```json
+
+```
+</body>
+</html>

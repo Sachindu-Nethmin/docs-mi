@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>kafka-connector-producer-example.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>---
+search:
+  boost: 2
+---
+
+# Kafka Connector Example
+
+Given below is a sample scenario that demonstrates how to send messages to a Kafka broker via Kafka topics. The publishMessages operation allows you to publish messages to the Kafka brokers via Kafka topics.
+
+## What you&#x27;ll build
+
+Given below is a sample API that illustrates how you can connect to a Kafka broker with the `init` operation and then use the `publishMessages` operation to publish messages via the topic. It exposes Kafka functionalities as a RESTful service. Users can invoke the API using HTTP/HTTPs with the required information.
+
+API has the context `/publishMessages`. It will publish messages via the topic to the Kafka server.
+
+The following diagram illustrates all the required functionality of the Kafka service that you are going to build.
+
+&lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/kafka/kafkaconnectorpublishmessage.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/kafka/kafkaconnectorpublishmessage.png&quot; title=&quot;KafkaConnector&quot; width=&quot;800&quot; alt=&quot;KafkaConnector&quot;/&gt;&lt;/a&gt;
+
+If you do not want to configure this yourself, you can simply [get the project](#get-the-project) and run it.
+
+## Set up kafka
+
+Before you begin, set up Kafka by following the instructions in [Setting up Kafka]({{base_path}}/reference/connectors/kafka-connector/setting-up-kafka/).
+
+## Set up the integration project
+
+Follow the steps below to set up the integration project using the WSO2 Integrator: MI Visual Studio Code extension.
+
+### Create a new project
+
+Follow the steps in the [create integration project]({{base_path}}/develop/create-integration-project/) guide to set up WSO2 MI and create a new integration project. Use a suitable Project Name for your integration.
+
+### Create a connection
+
+1. In the Design View, click the **+View More** button and select **Connection**.
+
+2. In the search bar, type `Kafka` and select the `Kafka connector` from the list.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/kafka/kafka-avro-create-connection.png&quot; title=&quot;Creating a new connection&quot; width=&quot;600&quot; alt=&quot;Creating a new connection&quot;/&gt;
+
+3. In the Connection Configuration pane, enter the following required information:
+    - **Connection Name** - KafkaConnection
+    - **Connection Type** - kafka
+    - **Bootstrap Servers** - localhost:9092
+    - **Key Serializer Class** - org.apache.kafka.common.serialization.StringSerializer
+    - **Value Serializer Class** - org.apache.kafka.common.serialization.StringSerializer
+    - **Pooling Enabled** - false
+
+### Create an API
+
+1. Click on the **API** button in create an integration project pane.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/jira/create-api1.png&quot; title=&quot;Creating a new API&quot; width=&quot;600&quot; alt=&quot;Creating a new API&quot;/&gt;
+
+2. Enter the API Name as `KafkaTransport` and the Context as `/publishMessages`, then click **Create**.
+
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/kafka/kafka-avro-example-1.png&quot; title=&quot;Creating a new API&quot; width=&quot;600&quot; alt=&quot;Creating a new API&quot;/&gt;
+
+3. To add the Kafka connector:
+    - In the **Design View**, click the **+** button.
+    - In the **Mediator** section, search for `Kafka`.
+    - Select the **Kafka** connector and click **Download**
+
+### Implement the API
+
+1. Go to the **Source View** of the API by clicking on the **&lt;&gt;** icon in the top right corner of the **Design View**.
+   &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/jira/source_view.png&quot; title=&quot;Source view of the implemented resource&quot; width=&quot;600&quot; alt=&quot;Source view of the implemented resource&quot;/&gt;
+
+2. Copy and paste the following code in the **Source View** of the API.
+
+??? note &quot;Source view of the implemented resource&quot;
+    ```xml
+        &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;api context=&quot;/publishMessages&quot; name=&quot;KafkaTransport&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;resource methods=&quot;POST&quot; uri-template=&quot;/&quot;&gt;
+        &lt;inSequence&gt;
+            &lt;kafkaTransport.publishMessages configKey=&quot;KafkaConnection&quot;&gt;
+                &lt;topic&gt;test&lt;/topic&gt;
+                &lt;partitionNo&gt;0&lt;/partitionNo&gt;
+                &lt;key&gt;&lt;/key&gt;
+                &lt;keySchema&gt;&lt;/keySchema&gt;
+                &lt;keySchemaId&gt;&lt;/keySchemaId&gt;
+                &lt;keySchemaMetadata&gt;&lt;/keySchemaMetadata&gt;
+                &lt;valueSchema&gt;&lt;/valueSchema&gt;
+                &lt;valueSchemaId&gt;&lt;/valueSchemaId&gt;
+                &lt;keySchemaSubject&gt;&lt;/keySchemaSubject&gt;
+                &lt;keySchemaVersion&gt;&lt;/keySchemaVersion&gt;
+                &lt;keySchemaSoftDeleted&gt;false&lt;/keySchemaSoftDeleted&gt;
+                &lt;valueSchemaSubject&gt;&lt;/valueSchemaSubject&gt;
+                &lt;valueSchemaVersion&gt;&lt;/valueSchemaVersion&gt;
+                &lt;valueSchemaMetadata&gt;&lt;/valueSchemaMetadata&gt;
+                &lt;valueSchemaSoftDeleted&gt;false&lt;/valueSchemaSoftDeleted&gt;
+                &lt;value&gt;&lt;/value&gt;
+                &lt;forwardExistingHeaders&gt;None&lt;/forwardExistingHeaders&gt;
+                &lt;customHeaders&gt;[]&lt;/customHeaders&gt;
+                &lt;customHeaderExpression&gt;&lt;/customHeaderExpression&gt;
+            &lt;/kafkaTransport.publishMessages&gt;
+        &lt;/inSequence&gt;
+        &lt;faultSequence&gt;
+        &lt;/faultSequence&gt;
+        &lt;/resource&gt;
+    &lt;/api&gt;
+    ```
+
+## Get the project
+
+You can download the ZIP file and extract the contents to get the project code.
+
+&lt;a href=&quot;{{base_path}}/assets/attachments/connectors/kafka-connector.zip&quot;&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+&lt;/a&gt;
+
+## Deployment
+
+To deploy and run the project, refer to the [Build and Run]({{base_path}}/develop/deploy-artifacts/#build-and-run) guide.
+
+## Test
+
+Invoke the API as shown below using the MI VSCode Extension.
+
+&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/common/runtime-services.png&quot; title=&quot;Runtime services&quot; width=&quot;600&quot; alt=&quot;Runtime services&quot;/&gt;
+
+**Create a topic**:
+
+Let’s create a topic named `test` with a single partition and only one replica.
+Navigate to the `&lt;KAFKA_HOME&gt;` and run following command. 
+```bash
+bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic test     
+```
+
+**Sample request**:
+
+- Content-Type: application/json
+- Request body:
+  ```json
+  {
+    &quot;name&quot;: &quot;sample&quot;
+  }
+  ```
+  
+**Expected response**: 
+   
+Navigate to the `&lt;KAFKA_HOME&gt;` and run the following command to verify the messages:
+```bash
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
+```
+
+See the following message content:
+```bash
+{&quot;name&quot;:&quot;sample&quot;}
+```
+   
+## What&#x27;s next
+
+* To customize this example for your own scenario, see [Kafka Connector Configuration]({{base_path}}/reference/connectors/kafka-connector/kafka-connector-config/) documentation.
+</body>
+</html>

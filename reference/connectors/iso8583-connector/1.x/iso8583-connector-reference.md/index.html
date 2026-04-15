@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>iso8583-connector-reference.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># ISO8583 Connector Reference
+
+The following operations allow you to work with the ISO8583 Connector. Click an operation name to see parameter details and samples on how to use it.
+
+---
+
+## Initialize the connector
+
+To use the ISO8583 connector, add the &lt;iso8583.init&gt; element in your configuration before connecting with Testserver.
+
+??? note &quot;init&quot;
+    The init operation is used to initialize the connection to ISO8583.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;serverHost&lt;/td&gt;
+            &lt;td&gt;Here the host is localhost.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;serverPort&lt;/td&gt;
+            &lt;td&gt;Here the port is 5010 , The Testserver will start to listen on that port.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;amazonsqs.init&gt;
+       &lt;secretAccessKey&gt;{$ctx:secretAccessKey}&lt;/secretAccessKey&gt;
+        &lt;accessKeyId&gt;{$ctx:accessKeyId}&lt;/accessKeyId&gt;
+        &lt;version&gt;{$ctx:version}&lt;/version&gt;
+        &lt;region&gt;{$ctx:region}&lt;/region&gt;
+        &lt;enableSSL&gt;{$ctx:enableSSL}&lt;/enableSSL&gt;
+        &lt;contentType&gt;{$ctx:contentType}&lt;/contentType&gt;
+        &lt;blocking&gt;{$ctx:blocking}&lt;/blocking&gt;
+    &lt;/amazonsqs.init&gt;
+    ```
+    
+To send the messages, use &lt;/iso8583.sendMessage&gt; operation and using Rest-client to send the XML format messages. In Rest-client set the header application/xml as Content-Type.
+
+POST the body in XML format and XML format message should be in the following structure.
+
+```xml
+&lt;ISOMessage&gt;
+      &lt;data&gt;
+        &lt;field id=&quot;0&quot;&gt;0200&lt;/field&gt;
+        &lt;field id=&quot;3&quot;&gt;568893&lt;/field&gt;
+        &lt;field id=&quot;4&quot;&gt;000000020000&lt;/field&gt;
+        &lt;field id=&quot;7&quot;&gt;0110563280&lt;/field&gt;
+        &lt;field id=&quot;11&quot;&gt;456893&lt;/field&gt;
+        &lt;field id=&quot;44&quot;&gt;DFGHT&lt;/field&gt;
+        &lt;field id=&quot;105&quot;&gt;ABCDEFGHIJ 9871236548&lt;/field&gt;
+      &lt;/data&gt;
+&lt;/ISOMessage&gt;
+```</body>
+</html>

@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>best-practices.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>## Introduction
+
+This guide provides best practices for designing, developing, deploying, and maintaining integration solutions with WSO2 Integrator: MI. It is intended for integration developers, architects, and DevOps engineers aiming to build scalable, secure, and maintainable solutions.
+
+## Development Best Practices
+
+### General development guidelines
+
+- Always use the latest version of the WSO2 Integrator: MI extension for VS Code. It is recommended to update the extension frequently to get the latest features and bug fixes.
+
+- Use the UI provided by the WSO2 Integrator: MI extension for VS Code to create and manage your integration projects. This ensures that your projects are set up correctly and follow best practices. You can use manual editing only for advanced configurations not supported by the UI.
+
+### Create projects
+
+- Create a separate project for each microservice or integration usecase. This approach enhances organization, streamlines artifact management, and facilitates easier maintenance and updates of individual integrations.
+
+- Create a multi-module project for managing multiple related services that need to be deployed together. This allows you to manage dependencies and shared resources effectively.
+
+- Apply semantic versioning to both projects and artifacts to clearly communicate the impact of changes (major, minor, patch). This helps manage updates, track dependencies, and ensure compatibility across integration solutions.
+    - Sample versioning scheme: `1.0.1`, `1.1.0`, `2.0.0`
+    - Include a changelog (a record of changes) in your project to document updates, improvements, and fixes for each version.
+
+### Naming conventions
+
+- Use meaningful names for your projects to identify their purpose easily.
+    - Use a meaningful group ID that reflects your organization or team, or logically groups related projects together. For example, use `com.companyname` or `org.departmentname`. Be sure to give the same group ID to related projects.
+    - Use a meaningful artifact ID that reflects the specific project or module. For example, use `order-service` or `payment-gateway`.
+
+- Follow a consistent naming convention for your artifacts to easily identify their purpose and functionality. For example, use `OrderAPI`, `PaymentSequence`, or `InventoryEndpoint`.
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Type&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Format&lt;/th&gt;
+        &lt;th&gt;Sample&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Project Name&lt;/td&gt;
+            &lt;td&gt;The root directory of the project&#x27;s source code. Make it reflect the project&#x27;s purpose.&lt;/td&gt;
+            &lt;td&gt;&amp;lt;ProjectName&amp;gt;&lt;/td&gt;
+            &lt;td&gt;StudentInformationSystem&lt;/td&gt;
+        &lt;/tr&gt;
+            &lt;tr&gt;
+            &lt;td&gt;Artifacts&lt;/td&gt;
+            &lt;td&gt;The synapse artifacts that are created for your integration projects. These include sequences, endpoints, proxy services, etc.&lt;/td&gt;
+            &lt;td&gt;&amp;lt;ArtifactName&amp;gt;&amp;lt;Type&amp;gt;&lt;/td&gt;
+            &lt;td&gt;GetStudentSequence, SimpleStockQuoteProxyService&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Registry resource folder structure&lt;/td&gt;
+            &lt;td&gt;Organize resources using custom folders that clearly indicate the type or logical category of each resource. Ensure the folder structure is intuitive and reflects the contents, such as grouping schemas, WSDLs, and XSDs into separate, well-named directories for easier management and discovery.&lt;/td&gt;
+            &lt;td&gt;&amp;lt;Project&amp;gt;/&amp;lt;ResourceType&amp;gt;/&amp;lt;subResourceType&amp;gt;&lt;/td&gt;
+            &lt;td&gt;
+                StudentInformationSystem&lt;br&gt;
+                ├── Schema&lt;br&gt;
+                ├── wsdl&lt;br&gt;
+                └── xsd
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;!-- TODO: Add dependency management best practices --&gt;
+&lt;!-- ### Dependency Management --&gt;
+
+
+## Artifacts Best Practices
+
+### Working with APIs
+
+- Choose clear, descriptive names for APIs that accurately reflect their functionality and business domain. Follow a consistent naming convention, such as `StudentAPI`, `OrderAPI`, or `PaymentAPI`, to improve discoverability and maintainability.
+- Apply versioning to APIs to manage changes, communicate updates, and ensure backward compatibility. Document version changes and deprecations clearly.
+- Design and implement a [Fault Sequence]({{base_path}}/reference/mediation-sequences/#fault-sequences) for each API to handle errors consistently and provide clear feedback to consumers. Ensure error responses include relevant details such as error codes, messages, and correlation IDs for easier troubleshooting.
+- Structure APIs to be intuitive and easy to consume. Define resources and operations following RESTful conventions, and use meaningful HTTP methods and status codes.
+- When migrating from older WSO2 MI versions, move logic from the [Out Sequence]({{base_path}}/reference/mediation-sequences/#inout-sequences) to the [In Sequence]({{base_path}}/reference/mediation-sequences/#inout-sequences) to align with current best practices and improve maintainability.
+
+!!!Note
+    Migrating logic from the [Out Sequence]({{base_path}}/reference/mediation-sequences/#inout-sequences) to the [In Sequence]({{base_path}}/reference/mediation-sequences/#inout-sequences) is recommended for consistency and future-proofing your integration flows.
+
+## Mediators &amp; Connectors Best Practices
+
+### General mediator usage
+
+- Add a proper description to each mediator to clarify its purpose and usage within the integration flow.
+- Prefer the [Variable mediator]({{base_path}}/reference/mediators/variable-mediator/) over the [Property mediator]({{base_path}}/reference/mediators/property-mediator/) for storing intermediate values during message processing. The [Variable Mediator]({{base_path}}/reference/mediators/variable-mediator/) is optimized for temporary data storage and reuse within the integration flow, reducing redundant computations and improving performance.
+- Reserve the [Property Mediator]({{base_path}}/reference/mediators/property-mediator/) for controlling message flow, such as setting properties that influence routing, error handling, or other flow-specific logic.
+- Use clear, descriptive variable names to enhance the readability and maintainability of your integration logic.
+- If you want to repeatedly use the same mediation sequence, define it as a [Sequence]({{base_path}}/reference/mediation-sequences/#named-sequences). You can then invoke this reusable sequence from your main sequence, multiple proxy services, or REST APIs. Use the [Call Sequence mediator]({{base_path}}/reference/mediators/sequence-mediator/) to call the saved sequence, or select it as the [InSequence]({{base_path}}/reference/mediation-sequences/#inout-sequences) or [FaultSequence]({{base_path}}/reference/mediation-sequences/#fault-sequences) when configuring a proxy service or REST API. This approach promotes modularity, reduces duplication, and simplifies maintenance across your integration flows.
+
+### General connector usage
+
+- Reuse shared connections across multiple integrations whenever possible to optimize resource usage and enhance performance. Connection pooling is managed per connection, so minimizing the number of distinct connections helps reduce overhead and improve scalability.
+- Create separate connections only when required, such as for high-throughput integrations. Dedicated connections provide isolated connection pools, which can be beneficial for integrations that demand high availability.
+
+### Log mediator
+
+- Use Log mediators as checkpoints in message flows to track and debug integration logic. In development, set the log category to `DEBUG` and configure the global log level for `org.apache.synapse.mediators.builtin.LogMediator` accordingly. Include relevant payload information, request metadata (e.g., user ID, timestamp), and unique identifiers (e.g., correlation IDs) to aid in troubleshooting and tracing requests across services.
+- In production, restrict Log mediators to Fault sequences to avoid excessive logging and performance overhead. Always log key error details such as `ERROR_CODE` and use correlation IDs to link related log entries. Place Log mediators within Fault sequences to ensure error information is captured in `wso2carbon.log`. Set the global log level to `INFO` to enable essential troubleshooting without exposing sensitive or verbose information.
+- Avoid logging sensitive information, such as user credentials or personal data, to protect privacy and comply with data protection regulations. Use descriptive messages and implement structured logging to capture key attributes and context information in a consistent format. Regularly review and adjust log levels to balance visibility and performance.
+- Configure log masking to protect sensitive information in your logs. Follow the [masking sensitive information in logs]({{base_path}}/administer/logging-and-monitoring/logging/masking-sensitive-information-in-logs/) guide to set up appropriate log masking settings and ensure compliance with security and privacy requirements.
+
+### Custom mediator / Ballerina module
+
+- Avoid writing a Class mediator or custom Ballerina module if the required functionality can be achieved using the built-in mediators and connectors of WSO2 Integrator: MI. This reduces maintenance overhead and leverages native features.
+    - Review the [Mediator Catalog]({{base_path}}/reference/mediators/about-mediators/) and [Connectors]({{base_path}}/reference/connectors/connectors-overview/) to understand the capabilities of built-in mediators and connectors. This helps ensure you leverage existing features and avoid unnecessary custom development.
+- If you must implement a Class mediator or a custom Ballerina module, ensure you understand its performance implications and monitor for potential memory leaks or resource issues.
+- Use meaningful and properly structured Java package names for Class mediators, and follow Ballerina module naming conventions for custom modules to maintain clarity and organization.
+- Follow standard Java and Ballerina naming conventions and code best practices when developing Class mediators or Ballerina modules to ensure maintainability and readability.
+- Document the purpose, usage, and configuration of your custom mediator or Ballerina module to help other developers understand and use them effectively.
+
+### HTTP Connector
+
+- Prefer using the HTTP connector for outbound HTTP calls instead of combining endpoints with Call or Send mediators. The HTTP connector provides a more streamlined, configurable, and maintainable approach, supporting advanced features such as connection, retries, and custom headers. This reduces complexity, and ensures better alignment with WSO2 MI best practices.
+- Always use the latest version of the HTTP connector to take advantage of new features.
+
+&lt;!-- TODO: Add Scatter Gather Mediator best practices --&gt;
+&lt;!-- ### Scatter Gather Mediator --&gt;
+
+
+
+### Foreach mediator
+
+- Whenever possible, enable the `Execute Parallel` property in the ForEach mediator to process iterations concurrently. This can significantly improve performance, especially when handling large datasets or making multiple outbound calls. Ensure that your integration logic is thread-safe and that parallel execution does not introduce race conditions or resource contention.
+- Enable the `Continue without aggregation` property in the ForEach mediator to optimize performance. This setting allows the mediator to proceed without waiting for responses from outbound calls made during each iteration, reducing latency and improving throughput in scenarios where response aggregation is not required.
+
+
+### Message transformation
+
+- **PayloadFactory Mediator**: Use when you need to reconstruct the entire message payload into a simple, fixed format. Ideal for scenarios where only a few parameters are extracted from the original message and the output structure is predictable.
+
+- **For-Each + PayloadFactory Mediator**: Use this combination when the original message contains repetitive segments that need to be transformed individually. The For-Each mediator iterates over each segment, and the PayloadFactory mediator constructs the new format for each segment, similar to the For-Each function in XSLT.
+
+- **Data Mapper Mediator**: Use when you need to change the structure of data in a message or convert one data format to another.
+
+- **Enrich Mediator**: Use when only a small part of the message needs to be modified, such as adding or removing an element, without reconstructing the entire payload.
+
+- **XSLT Mediator**: Use for complex transformation logic, including repetitive segments and conditional transformations. Note that XSLT transformations are handled by a third-party engine, which may impact performance.
+
+- **JSON Transform Mediator Best Practices**:
+    - Use the JSON Transform mediator when you need to convert XML payloads to JSON or transform JSON structures within your integration flows. This mediator allows you to define transformation properties locally, enabling scenario-specific configurations rather than relying on global settings.
+    - Leverage the ability to specify a JSON schema in the mediator to validate and correct payloads during transformation. This helps ensure data consistency and prevents errors caused by schema mismatches.
+
+!!!Note
+    When using the XSLT mediator, be aware of potential performance impacts due to the use of a third-party transformation engine.
+
+
+### Expression &amp; data handling
+
+- Prefer the [Synapse Expression Language]({{base_path}}/reference/synapse-properties/synapse-expressions-syntax/) for all JSON data manipulation and transformation tasks. It offers enhanced flexibility, and broader feature support compared to legacy `XPath` and `JSONPath` expressions.
+- Use legacy expressions only when maintaining existing integrations that depend on them, or if a required feature is unavailable in the Synapse Expression Language.
+- Regularly review and refactor older integrations to migrate to Synapse Expression Language where feasible, ensuring consistency and maintainability across your projects.
+- Document any use of legacy expressions, noting the reason for their inclusion and any limitations, to aid future maintenance and upgrades.
+
+&lt;!-- TODO: Add error handling best practices --&gt;
+&lt;!-- ## Error Handling Best Practices --&gt;
+
+## Testing &amp; quality best practices
+
+- **Test Strategy &amp; Planning**: Define a comprehensive test strategy for each project, outlining what needs to be tested, including functional, integration, performance, and security aspects.
+- **Test Plan Creation**: Develop detailed test plans covering all functional scenarios, edge cases, and performance requirements. Include both positive and negative test cases.
+- **WSO2 MI: Integrator Unit Testing**: WSO2 Integrator: MI offers built-in support for unit testing mediation sequences. Develop [unit tests for your integrations]({{base_path}}/develop/creating-unit-test-suite/) to validate individual mediation logic, catch errors early, and ensure ongoing quality as your integration evolves.
+- **Automation Tools**: Use JMeter and SoapUI for API and integration testing. Write automation scripts for repetitive test cases and performance tests. For web applications, automate UI testing using Selenium.
+- **Java Integration Tests**: Whenever possible, implement Java-based integration tests to automate end-to-end scenarios and validate interactions between components.
+- **Isolated &amp; Integrated Testing**: Isolate test scenarios for each product or module. Test them as separate units before writing integration tests that cover cross-product or cross-module flows.
+- **Continuous Testing in SDLC**: Perform tests throughout the Software Development Life Cycle (SDLC), from development to deployment, to catch issues early and ensure ongoing quality.
+- **Test Environment Parity**: Ensure the test environment closely matches the production environment in terms of resource allocation, VM sizes, database configurations, and network resources.
+- **Distributed Testing**: Avoid relying solely on single-node test results. Test across multiple nodes to simulate real-world deployment scenarios.
+- **Custom Solutions Testing**: Test all custom solutions and artifacts thoroughly. Avoid using default server ports when testing custom features to prevent conflicts.
+- **Load &amp; Performance Testing**: Before production deployment, run load tests in development and test environments using data and scenarios that closely replicate production use cases.
+- **Security &amp; Penetration Testing**: Conduct penetration tests on the production setup before go-live. Coordinate with stakeholders to schedule and execute these tests.
+- **User Acceptance Testing (UAT)**: Run UAT rounds against documented requirements to ensure the solution meets customer acceptance criteria and business needs.
+- **Test Documentation**: Document all functional and performance test results in detail. For each test, create a report that includes the steps followed, sample data or requests used, and the outcome (pass/fail, observations, and any issues found).
+    - **Functional Test Results**: Maintain a dedicated document for functional test results. Include test case descriptions, expected outcomes, actual outcomes, and any deviations or bugs identified during testing.
+
+        | Test Case ID      | *Enter Function Name*|
+        |------------------|-----------------|
+        | Description       | *Enter Description*   |
+        | Test Steps        | *Enter Test Steps*    |
+        | Expected Results  | *Enter Expected Results* |
+        | Actual Results    | *Enter Actual Results*   |
+        | Status            | *Enter Status (Pass/Fail)* |
+        | Comments          | *Enter Comments*        |
+
+
+
+    - **Performance Test Results**: Create a separate document for performance test results. Record the test scenarios, load profiles, metrics collected (such as response times, throughput, resource usage), and analysis of the results.
+
+        | Test Case ID             | *Enter Test Case ID*       |
+        |------------------|----------------------------|
+        | Description       | *Enter Description*         |
+        | Test Steps        | *Enter Test Steps*          |
+        | Actual Results    | *Enter Actual Results*      |
+        | Expected Results  | *Enter Expected Results*    |
+        | CPU Usage         | *Enter CPU Usage*           |
+        | Duration          | *Enter Duration*            |
+        | Memory Usage      | *Enter Memory Usage*        |
+        | Status            | *Enter Status (Pass/Fail)* |
+        | Comments          | *Enter Comments*            |
+    
+    - **Test Summary Report**: Prepare a summary document that aggregates all test results. Include the total number of test cases executed, breakdown of passed/failed cases, key observations, and a concise summary of overall system quality and readiness.
+    - **Traceability**: Link each test result to the corresponding requirement or user story to ensure traceability and coverage.
+    - **Review &amp; Sign-off**: Share the test result documents and summary with stakeholders for review and sign-off before proceeding to deployment.
+
+## Deployment Best Practices
+
+- Before deploying to production, optimize your deployment environment based on WSO2 MI performance recommendations. Review and implement the [production deployment guidelines](https://mi.docs.wso2.com/en/latest/install-and-setup/setup/deployment-best-practices/production-deployment-guidelines/) to ensure scalability, reliability, and security. Adjust resource allocations, configure JVM parameters, and fine-tune network and storage settings as outlined in the official documentation.
+
+- **Pre-testing Patches**: Always test patches in a dedicated test environment before applying them to production. This helps identify potential issues and ensures compatibility with your integration solutions.
+
+- **Automated Patch Testing**: Use automated test suites such as JMeter or SoapUI to validate the stability and functionality of patched environments. Automate regression and integration tests to quickly detect any breaking changes.
+
+- **Patch Documentation**: Document all patches applied, including version details, test results, and any issues encountered during testing. Maintain a changelog for traceability and future reference.
+
+- **Scheduled Patch Cycles**: Establish a regular patching schedule and communicate planned maintenance windows to stakeholders. Avoid applying patches during peak business hours to minimize disruption.
+
+- **Rollback Strategy**: Prepare a rollback plan in case a patch introduces unexpected issues. Ensure backups and previous versions are available for quick restoration.
+
+- **Security Patches**: Prioritize security patches and apply them promptly to mitigate vulnerabilities. Validate security fixes through targeted penetration and vulnerability tests in the test environment.
+
+## Security Best Practices
+
+- Use [WSO2 Secret Vault](https://mi.docs.wso2.com/en/latest/install-and-setup/setup/security/encrypting-plain-text/) to securely store and manage sensitive information such as API keys, passwords, and certificates in your integration solutions. This approach ensures that secrets are encrypted at rest and only decrypted at runtime, reducing the risk of unauthorized access and enhancing overall security compliance.
+
+## Migration Best Practices
+
+If you are migrating from an older version of WSO2 Integrator: MI (&amp;lt;4.4.0), your existing configurations and mediators will continue to work in newer MI versions. Migration is optional, only perform it if you want to take advantage of usability and maintainability improvements. If your current mediators meet your requirements and you are satisfied with their behavior, you may continue using them without changes.
+
+For future implementations, adopt the newer mediators and connectors (for example, HTTP Connector, new ForEach, Scatter‑Gather, and the new PayloadFactory) to benefit from improved usability and maintainability.
+
+- The [Out Sequence]({{base_path}}/reference/mediation-sequences/#inout-sequences) in APIs and Proxies are not created by MI VS Code extension by default from version 4.4.0 onwards. Implement the necessary logic in the [In Sequence]({{base_path}}/reference/mediation-sequences/#inout-sequences) to handle outgoing messages.
+
+    ??? &quot;OutSequence Migration Sample&quot;
+
+        === &quot;Legacy Configuration&quot;
+            ```xml
+            &lt;api context=&quot;/weather&quot; name=&quot;WeatherAPI&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+                &lt;resource methods=&quot;GET&quot; uri-template=&quot;/?city={city}&quot;&gt;
+                    &lt;inSequence&gt;
+                        &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;default&quot;&gt;
+                            &lt;format&gt;{city: &quot;$1&quot;, &quot;apiKey&quot;: &quot;$2&quot;}&lt;/format&gt;
+                            &lt;args&gt;
+                                &lt;arg value=&quot;get-property(&#x27;query.param.city&#x27;)&quot; evaluator=&quot;xml&quot; /&gt;
+                                &lt;arg value=&quot;wso2:vault-lookup(&#x27;weather_api_key&#x27;)&quot; evaluator=&quot;xml&quot; /&gt;
+                            &lt;/args&gt;
+                        &lt;/payloadFactory&gt;
+                        &lt;send&gt;
+                            &lt;endpoint key=&quot;WeatherAPI&quot;/&gt;
+                        &lt;/send&gt;
+                    &lt;/inSequence&gt;
+                    &lt;outSequence&gt;
+                        &lt;respond/&gt;
+                    &lt;/outSequence&gt;
+                    &lt;faultSequence/&gt;
+                &lt;/resource&gt;
+            &lt;/api&gt;
+            ```
+
+        === &quot;New Configuration&quot;
+            ```xml
+            &lt;api context=&quot;/weather&quot; name=&quot;WeatherAPI&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+                &lt;resource methods=&quot;GET&quot; uri-template=&quot;/?city={city}&quot;&gt;
+                    &lt;inSequence&gt;
+                        &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;default&quot;&gt;
+                            &lt;format&gt;{city: &quot;$1&quot;, &quot;apiKey&quot;: &quot;$2&quot;}&lt;/format&gt;
+                            &lt;args&gt;
+                                &lt;arg value=&quot;get-property(&#x27;query.param.city&#x27;)&quot; evaluator=&quot;xml&quot; /&gt;
+                                &lt;arg value=&quot;wso2:vault-lookup(&#x27;weather_api_key&#x27;)&quot; evaluator=&quot;xml&quot; /&gt;
+                            &lt;/args&gt;
+                        &lt;/payloadFactory&gt;
+                        &lt;http.post configKey=&quot;WeatherAPIConnection&quot;&gt;
+                            &lt;relativePath&gt;&lt;/relativePath&gt;
+                            &lt;headers&gt;[]&lt;/headers&gt;
+                            &lt;requestBodyType&gt;JSON&lt;/requestBodyType&gt;
+                            &lt;requestBodyJson&gt;${payload}&lt;/requestBodyJson&gt;
+                            &lt;forceScAccepted&gt;false&lt;/forceScAccepted&gt;
+                            &lt;disableChunking&gt;false&lt;/disableChunking&gt;
+                            &lt;forceHttp10&gt;false&lt;/forceHttp10&gt;
+                            &lt;noKeepAlive&gt;false&lt;/noKeepAlive&gt;
+                            &lt;forcePostPutNobody&gt;false&lt;/forcePostPutNobody&gt;
+                            &lt;responseVariable&gt;http_post_1&lt;/responseVariable&gt;
+                            &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+                        &lt;/http.post&gt;
+                        &lt;respond/&gt;
+                    &lt;/inSequence&gt;
+                    &lt;faultSequence/&gt;
+                &lt;/resource&gt;
+            &lt;/api&gt;
+            ```
+
+- [Loopback Mediator]({{base_path}}/reference/mediators/loopback-mediator/) is no longer recommended.
+- Use the [HTTP Connector]({{base_path}}/reference/connectors/http-connector/http-connector-overview/) to invoke external HTTP services instead of the [Call Mediator]({{base_path}}/reference/mediators/call-mediator/) / [Send Mediator]({{base_path}}/reference/mediators/send-mediator/) / [CallOut Mediator]({{base_path}}/reference/mediators/callout-mediator/). The HTTP Connector provides richer configuration options, and better maintainability. Reserve [Call Mediator]({{base_path}}/reference/mediators/call-mediator/) / [Send Mediator]({{base_path}}/reference/mediators/send-mediator/) / [CallOut Mediator]({{base_path}}/reference/mediators/callout-mediator/) for non-HTTP protocols (such as VFS, RabbitMQ, JMS etc.) or legacy scenarios where connectors are not applicable.
+
+    ??? &quot;Call Endpoint to HTTP Connector Migration&quot;
+
+        - The [HTTP Connector]({{base_path}}/reference/connectors/http-connector/http-connector-overview/) exposes built‑in configuration options that replace many values previously set using the Property mediator.
+        - Set these options on the connector operation itself (for example: headers, noKeepAlive etc.), since applying them via Property mediators for HTTP connector is not supported.
+
+        See the example migration below.
+
+        === &quot;Legacy Configuration&quot;
+
+            ```xml
+            &lt;api context=&quot;/weather&quot; name=&quot;WeatherAPI&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+                &lt;resource methods=&quot;GET&quot;&gt;
+                    &lt;inSequence&gt;
+                        &lt;property name=&quot;NO_KEEPALIVE&quot; value=&quot;true&quot; scope=&quot;axis2&quot;/&gt;
+                        &lt;call&gt;
+                            &lt;endpoint key=&quot;WeatherEndpoint&quot;/&gt;
+                        &lt;/call&gt;
+                    &lt;/inSequence&gt;
+                    &lt;faultSequence/&gt;
+                &lt;/resource&gt;
+            &lt;/api&gt;
+            ```
+
+            ```xml
+            &lt;endpoint name=&quot;WeatherEndpoint&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+                &lt;http method=&quot;get&quot; uri-template=&quot;http://weatherapi.com/v1/current.json?key=YOUR_API_KEY&amp;amp;q=London&quot;&gt;
+                    &lt;suspendOnFailure&gt;
+                        &lt;initialDuration&gt;-1&lt;/initialDuration&gt;
+                        &lt;progressionFactor&gt;1&lt;/progressionFactor&gt;
+                    &lt;/suspendOnFailure&gt;
+                    &lt;markForSuspension&gt;
+                        &lt;retriesBeforeSuspension&gt;0&lt;/retriesBeforeSuspension&gt;
+                    &lt;/markForSuspension&gt;
+                &lt;/http&gt;
+            &lt;/endpoint&gt;
+            ```
+
+        === &quot;New Configuration&quot;
+
+            ```xml
+            &lt;api context=&quot;/weather&quot; name=&quot;WeatherAPI&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+                &lt;resource methods=&quot;GET&quot;&gt;
+                    &lt;inSequence&gt;
+                        &lt;http.get configKey=&quot;WeatherAPIConnection&quot;&gt;
+                            &lt;relativePath&gt;/&lt;/relativePath&gt;
+                            &lt;headers&gt;[]&lt;/headers&gt;
+                            &lt;forceScAccepted&gt;false&lt;/forceScAccepted&gt;
+                            &lt;disableChunking&gt;false&lt;/disableChunking&gt;
+                            &lt;forceHttp10&gt;false&lt;/forceHttp10&gt;
+                            &lt;noKeepAlive&gt;true&lt;/noKeepAlive&gt;
+                            &lt;responseVariable&gt;http_get_1&lt;/responseVariable&gt;
+                            &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+                        &lt;/http.get&gt;
+                        &lt;respond /&gt;
+                    &lt;/inSequence&gt;
+                    &lt;faultSequence/&gt;
+                &lt;/resource&gt;
+            &lt;/api&gt;
+            ```
+
+            ```xml
+            &lt;localEntry key=&quot;WeatherAPIConnection&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+                &lt;http.init&gt;
+                    &lt;connectionType&gt;HTTP&lt;/connectionType&gt;
+                    &lt;baseUrl&gt;http://weatherapi.com/v1/current.json?key=YOUR_API_KEY&amp;amp;q=London&lt;/baseUrl&gt;
+                    &lt;authType&gt;None&lt;/authType&gt;
+                    &lt;timeoutAction&gt;Never&lt;/timeoutAction&gt;
+                    &lt;retryCount&gt;0&lt;/retryCount&gt;
+                    &lt;retryDelay&gt;0&lt;/retryDelay&gt;
+                    &lt;suspendInitialDuration&gt;-1&lt;/suspendInitialDuration&gt;
+                    &lt;suspendProgressionFactor&gt;1&lt;/suspendProgressionFactor&gt;
+                    &lt;name&gt;WeatherAPIConnection&lt;/name&gt;
+                &lt;/http.init&gt;
+            &lt;/localEntry&gt;
+            ```
+
+- Use the new [ForEach Mediator]({{base_path}}/reference/mediators/foreach-mediator/) for all scenarios previously handled by the Iterate Mediator or older ForEach. It supports parallel execution, enables external service calls, and offers more flexible configuration.
+
+    ??? &quot;Iterate to ForEach Migration&quot;
+        Map Iterate mediator attributes to new ForEach mediator equivalents as follows:
+        &lt;table&gt;
+            &lt;thead&gt;
+                &lt;tr&gt;
+                    &lt;th&gt;Iterate attribute / element&lt;/th&gt;
+                    &lt;th&gt;Foreach attribute / element mapping&lt;/th&gt;
+                    &lt;th&gt;Notes&lt;/th&gt;
+                &lt;/tr&gt;
+            &lt;/thead&gt;
+            &lt;tbody&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;&lt;code&gt;id=&quot;123&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;Not needed anymore.&lt;/td&gt;
+                    &lt;td&gt;&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;&lt;code&gt;expression=&quot;json-eval(\$.)&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;&lt;code&gt;collection=&quot;${payload}&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;Convert JSONPath/XPath evaluated expression to [Synapse expression]({{base_path}}/reference/synapse-properties/synapse-expressions-syntax/) referencing the iteration collection.&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;&lt;code&gt;sequential=&quot;true|false&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;&lt;code&gt;parallel-execution=&quot;true|false&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;Map sequential to parallel-execution (set &lt;code&gt;parallel-execution=&quot;true&quot;&lt;/code&gt; when &lt;code&gt;sequential=&quot;false&quot;&lt;/code&gt; to enable concurrent processing; set &lt;code&gt;parallel-execution=&quot;false&quot;&lt;/code&gt; when &lt;code&gt;sequential=&quot;true&quot;&lt;/code&gt; to preserve ordering).&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;&lt;code&gt;continueParent=&quot;true|false&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;N/A&lt;/td&gt;
+                    &lt;td&gt;This is not applicable as all iterations are aggregated in the foreach mediator itself.&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;&lt;code&gt;preservePayload=&quot;true|false&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;&lt;code&gt;update-original=&quot;true|false&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;For details on output aggregation and related options, see [ForEach mediator output configurations]({{base_path}}/reference/mediators/foreach-mediator/#output-configurations).&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;&lt;code&gt;attachPath=&quot;true|false&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;N/A&lt;/td&gt;
+                    &lt;td&gt;Attach path is no longer supported. Please use [Enrich mediator]({{base_path}}/reference/mediators/enrich-mediator/) after the foreach mediator.&lt;/td&gt;
+                &lt;/tr&gt;
+            &lt;/tbody&gt;
+        &lt;/table&gt;
+
+        See the example migration below.
+
+        === &quot;Legacy Configuration&quot;
+
+            ```xml
+            &lt;iterate expression=&quot;json-eval($.)&quot;&gt;
+                &lt;target&gt;
+                    &lt;sequence&gt;
+                        &lt;call&gt;
+                            &lt;endpoint key=&quot;PlaceOrderEndpoint&quot;/&gt;
+                        &lt;/call&gt;
+                    &lt;/sequence&gt;
+                &lt;/target&gt;
+            &lt;/iterate&gt;
+            ```
+
+            ```xml
+            &lt;endpoint name=&quot;PlaceOrderEndpoint&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+                &lt;http method=&quot;get&quot; uri-template=&quot;http://localhost:8290/orderapi/placeOrder&quot;&gt;
+                    &lt;suspendOnFailure&gt;
+                        &lt;initialDuration&gt;-1&lt;/initialDuration&gt;
+                        &lt;progressionFactor&gt;1&lt;/progressionFactor&gt;
+                    &lt;/suspendOnFailure&gt;
+                    &lt;markForSuspension&gt;
+                        &lt;retriesBeforeSuspension&gt;0&lt;/retriesBeforeSuspension&gt;
+                    &lt;/markForSuspension&gt;
+                &lt;/http&gt;
+            &lt;/endpoint&gt;
+            ```
+        
+        === &quot;New Configuration&quot;
+
+            ```xml
+            &lt;foreach collection=&quot;${payload}&quot; parallel-execution=&quot;false&quot; update-original=&quot;true&quot; continue-without-aggregation=&quot;false&quot;&gt;
+                &lt;sequence&gt;
+                    &lt;http.get configKey=&quot;OrderAPIConnection&quot;&gt;
+                        &lt;relativePath&gt;/placeOrder&lt;/relativePath&gt;
+                        &lt;headers&gt;[]&lt;/headers&gt;
+                        &lt;forceScAccepted&gt;false&lt;/forceScAccepted&gt;
+                        &lt;disableChunking&gt;false&lt;/disableChunking&gt;
+                        &lt;forceHttp10&gt;false&lt;/forceHttp10&gt;
+                        &lt;noKeepAlive&gt;false&lt;/noKeepAlive&gt;
+                        &lt;responseVariable&gt;http_get_1&lt;/responseVariable&gt;
+                        &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+                    &lt;/http.get&gt;
+                &lt;/sequence&gt;
+            &lt;/foreach&gt;
+            ```
+
+            ```xml
+            &lt;localEntry key=&quot;OrderAPIConnection&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;http.init&gt;
+                &lt;connectionType&gt;HTTP&lt;/connectionType&gt;
+                &lt;baseUrl&gt;http://localhost:8290/orderapi&lt;/baseUrl&gt;
+                &lt;authType&gt;None&lt;/authType&gt;
+                &lt;timeoutAction&gt;Never&lt;/timeoutAction&gt;
+                &lt;retryCount&gt;0&lt;/retryCount&gt;
+                &lt;retryDelay&gt;0&lt;/retryDelay&gt;
+                &lt;suspendInitialDuration&gt;-1&lt;/suspendInitialDuration&gt;
+                &lt;suspendProgressionFactor&gt;1&lt;/suspendProgressionFactor&gt;
+                &lt;name&gt;OrderAPIConnection&lt;/name&gt;
+            &lt;/http.init&gt;
+            &lt;/localEntry&gt;
+            ```
+
+    ??? &quot;Legacy Foreach to New Foreach Migration&quot;
+
+        &lt;table&gt;
+            &lt;thead&gt;
+                &lt;tr&gt;
+                    &lt;th&gt;Legacy attribute / element&lt;/th&gt;
+                    &lt;th&gt;New attribute / element&lt;/th&gt;
+                    &lt;th&gt;Notes&lt;/th&gt;
+                &lt;/tr&gt;
+            &lt;/thead&gt;
+            &lt;tbody&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;&lt;code&gt;id=&quot;123&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;Not needed anymore.&lt;/td&gt;
+                    &lt;td&gt;The [current iteration number]({{base_path}}/reference/mediators/foreach-mediator/#advanced-configurations) can be accessed using a variable in the new foreach mediator.&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;&lt;code&gt;expression=&quot;json-eval(\$.items)&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;&lt;code&gt;collection=&quot;\${payload.items}&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;Convert JSONPath/XPath evaluated expression to [Synapse expression]({{base_path}}/reference/synapse-properties/synapse-expressions-syntax/) referencing the iteration collection.&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;N/A&lt;/td&gt;
+                    &lt;td&gt;&lt;code&gt;parallel-execution=&quot;false|true&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;Set &lt;code&gt;parallel-execution=&quot;false&quot;&lt;/code&gt; when migrating from legacy sequential processing.&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;N/A&lt;/td&gt;
+                    &lt;td&gt;&lt;code&gt;continue-without-aggregation=&quot;false|true&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;Set &lt;code&gt;continue-without-aggregation=&quot;true&quot;&lt;/code&gt; to maintain legacy behavior.&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;N/A&lt;/td&gt;
+                    &lt;td&gt;&lt;code&gt;update-original=&quot;true|false&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;Set &lt;code&gt;update-original=&quot;false&quot;&lt;/code&gt; to maintain legacy behavior.&lt;/td&gt;
+                &lt;/tr&gt;
+            &lt;/tbody&gt;
+        &lt;/table&gt;
+
+        See the example migration below.
+
+        === &quot;Legacy Configuration&quot;
+
+            ```xml
+            &lt;foreach expression=&quot;json-eval($.)&quot;&gt;
+                &lt;sequence&gt;
+                    &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;default&quot;&gt;
+                        &lt;format&gt;{
+                            &quot;id&quot;: &quot;$1&quot;,
+                            &quot;count&quot;: &quot;$2&quot;
+                            }&lt;/format&gt;
+                        &lt;args&gt;
+                            &lt;arg expression=&quot;json-eval($.id)&quot; evaluator=&quot;json&quot;/&gt;
+                            &lt;arg expression=&quot;json-eval($.count)&quot; evaluator=&quot;json&quot;/&gt;
+                        &lt;/args&gt;
+                    &lt;/payloadFactory&gt;
+                &lt;/sequence&gt;
+            &lt;/foreach&gt;
+            ```
+
+        === &quot;New Configuration&quot;
+
+            ```xml
+            &lt;foreach collection=&quot;${payload}&quot; parallel-execution=&quot;false&quot; update-original=&quot;false&quot; continue-without-aggregation=&quot;true&quot;&gt;
+                &lt;sequence&gt;
+                    &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;default&quot;&gt;
+                        &lt;format&gt;{
+                            &quot;id&quot;: &quot;${payload.id}&quot;,
+                            &quot;count&quot;: &quot;${payload.count}&quot;
+                            }&lt;/format&gt;
+                    &lt;/payloadFactory&gt;
+                &lt;/sequence&gt;
+            &lt;/foreach&gt;
+            ```
+
+- Use the [Scatter Gather Mediator]({{base_path}}/reference/mediators/scatter-gather-mediator/) instead of the [Clone Mediator]({{base_path}}/reference/mediators/clone-mediator/) and the [Aggregate Mediator]({{base_path}}/reference/mediators/aggregate-mediator/), which are no longer recommended.
+
+    ??? &quot;Clone &amp; Aggregate to Scatter Gather Migration Sample&quot;
+
+        The Scatter Gather mediator replaces the need for separate Clone and Aggregate mediators.
+
+        The table below maps Clone mediator attributes to their corresponding Scatter Gather mediator attributes.
+        &lt;table&gt;
+            &lt;thead&gt;
+                &lt;tr&gt;
+                    &lt;th&gt;Legacy Clone mediator attribute&lt;/th&gt;
+                    &lt;th&gt;Scatter Gather mediator attribute&lt;/th&gt;
+                    &lt;th&gt;Notes&lt;/th&gt;
+                &lt;/tr&gt;
+            &lt;/thead&gt;
+            &lt;tbody&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;&lt;code&gt;id=&quot;123&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;N/A&lt;/td&gt;
+                    &lt;td&gt;This is not applicable as the cloned message responses are aggregated in the Scatter Gather mediator itself.&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;&lt;code&gt;sequential=&quot;true|false&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;&lt;code&gt;parallel-execution=&quot;true|false&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;Set &lt;code&gt;parallel-execution=&quot;false&quot;&lt;/code&gt; when migrating from legacy sequential processing.&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;&lt;code&gt;continueParent=&quot;true|false&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;N/A&lt;/td&gt;
+                    &lt;td&gt;This is not applicable as all cloned messages are aggregated in the Scatter Gather mediator itself.&lt;/td&gt;
+                &lt;/tr&gt;
+            &lt;/tbody&gt;
+        &lt;/table&gt;
+
+        The table below maps Aggregate mediator attributes to their corresponding Scatter Gather mediator attributes.
+        &lt;table&gt;
+            &lt;thead&gt;
+                &lt;tr&gt;
+                    &lt;th&gt;Legacy Aggregate mediator attribute&lt;/th&gt;
+                    &lt;th&gt;Scatter Gather mediator attribute&lt;/th&gt;
+                    &lt;th&gt;Notes&lt;/th&gt;
+                &lt;/tr&gt;
+            &lt;/thead&gt;
+            &lt;tbody&gt;
+                &lt;tr&gt;
+                    &lt;tr&gt;
+                        &lt;td&gt;&lt;code&gt;id=&quot;123&quot;&lt;/code&gt;&lt;/td&gt;
+                        &lt;td&gt;N/A&lt;/td&gt;
+                        &lt;td&gt;Scatter Gather mediator aggregates responses internally, so an explicit id for aggregation is unnecessary.&lt;/td&gt;
+                    &lt;/tr&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;&lt;code&gt;&amp;lt;onComplete expression=&quot;json-eval(\$)&quot; /&amp;gt;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;&lt;code&gt;&amp;lt;aggregation expression=&quot;\${payload}&quot;&amp;gt;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;Convert JSONPath/XPath evaluated expression to [Synapse expression]({{base_path}}/reference/synapse-properties/synapse-expressions-syntax/).&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;&lt;code&gt;timeout&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;&lt;code&gt;timeout&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;Message Count: &lt;code&gt;min&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;&lt;code&gt;min-messages&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;Message Count: &lt;code&gt;max&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;&lt;code&gt;max-messages&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;&lt;/td&gt;
+                &lt;/tr&gt;
+                &lt;tr&gt;
+                    &lt;td&gt;&lt;code&gt;&amp;lt;correlateOn expression=&quot;xpath | json-eval(JSON-Path)&quot; /&amp;gt;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;&lt;code&gt;condition=&quot;expression&quot;&lt;/code&gt;&lt;/td&gt;
+                    &lt;td&gt;Convert JSONPath/XPath evaluated expression to [Synapse expression]({{base_path}}/reference/synapse-properties/synapse-expressions-syntax/).&lt;/td&gt;
+                &lt;/tr&gt;
+            &lt;/tbody&gt;
+        &lt;/table&gt;
+
+        See the example migration below.
+
+        === &quot;Legacy Configuration&quot;
+
+            ```xml
+            &lt;clone&gt;
+                &lt;target&gt;
+                    &lt;sequence&gt;
+                        &lt;call&gt;
+                            &lt;endpoint key=&quot;vendorA&quot;/&gt;
+                        &lt;/call&gt;
+                    &lt;/sequence&gt;
+                &lt;/target&gt;
+                &lt;target&gt;
+                    &lt;sequence&gt;
+                        &lt;call&gt;
+                            &lt;endpoint key=&quot;vendorB&quot;/&gt;
+                        &lt;/call&gt;
+                    &lt;/sequence&gt;
+                &lt;/target&gt;
+            &lt;/clone&gt;
+            ```
+
+            ```xml
+            &lt;aggregate&gt;
+                &lt;completeCondition&gt;
+                    &lt;messageCount max=&quot;-1&quot; min=&quot;-1&quot;/&gt;
+                &lt;/completeCondition&gt;
+                &lt;onComplete aggregateElementType=&quot;root&quot; expression=&quot;json-eval($)&quot;&gt;
+                    &lt;enrich description=&quot;&quot;&gt;
+                        &lt;source clone=&quot;true&quot; type=&quot;custom&quot; xpath=&quot;$body//jsonArray/jsonElement[not(last &amp;gt; $body//jsonArray/jsonElement/last)]&quot;/&gt;
+                        &lt;target action=&quot;replace&quot; type=&quot;property&quot; property=&quot;enrichedres&quot;/&gt;
+                    &lt;/enrich&gt;
+                    &lt;payloadFactory media-type=&quot;json&quot;&gt;
+                        &lt;format&gt;$1&lt;/format&gt;
+                        &lt;args&gt;
+                            &lt;arg expression=&quot;get-property(&#x27;enrichedres&#x27;)&quot; evaluator=&quot;xml&quot;/&gt;
+                        &lt;/args&gt;
+                    &lt;/payloadFactory&gt;
+                    &lt;respond/&gt;
+                &lt;/onComplete&gt;
+            &lt;/aggregate&gt;
+            ```
+
+        === &quot;New Configuration&quot;
+
+            ```xml
+            &lt;scatter-gather parallel-execution=&quot;false&quot; target=&quot;Body&quot; result-content-type=&quot;JSON&quot;&gt;
+                &lt;aggregation expression=&quot;${payload}&quot;/&gt;
+                &lt;sequence&gt;
+                    &lt;http.get configKey=&quot;VendorA_Connection&quot;&gt;
+                        &lt;relativePath&gt;/getQuote&lt;/relativePath&gt;
+                        &lt;headers&gt;[]&lt;/headers&gt;
+                        &lt;forceScAccepted&gt;false&lt;/forceScAccepted&gt;
+                        &lt;disableChunking&gt;false&lt;/disableChunking&gt;
+                        &lt;forceHttp10&gt;false&lt;/forceHttp10&gt;
+                        &lt;noKeepAlive&gt;false&lt;/noKeepAlive&gt;
+                        &lt;responseVariable&gt;http_get_1&lt;/responseVariable&gt;
+                        &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+                    &lt;/http.get&gt;
+                &lt;/sequence&gt;
+                &lt;sequence&gt;
+                    &lt;http.get configKey=&quot;VendorB_Connection&quot;&gt;
+                        &lt;relativePath&gt;/getQuote&lt;/relativePath&gt;
+                        &lt;headers&gt;[]&lt;/headers&gt;
+                        &lt;forceScAccepted&gt;false&lt;/forceScAccepted&gt;
+                        &lt;disableChunking&gt;false&lt;/disableChunking&gt;
+                        &lt;forceHttp10&gt;false&lt;/forceHttp10&gt;
+                        &lt;noKeepAlive&gt;false&lt;/noKeepAlive&gt;
+                        &lt;responseVariable&gt;http_get_1&lt;/responseVariable&gt;
+                        &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+                    &lt;/http.get&gt;
+                &lt;/sequence&gt;
+            &lt;/scatter-gather&gt;
+            &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;default&quot;&gt;
+                &lt;format xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;${xpath(&quot;$body//jsonArray/jsonElement[not(last &amp;gt; $body//jsonArray/jsonElement/last)]&quot;)}&lt;/format&gt;
+            &lt;/payloadFactory&gt;
+            &lt;respond/&gt;
+            ```
+
+- Use the new [PayloadFactory Mediator]({{base_path}}/reference/mediators/payloadfactory-mediator/) which has been enhanced with templating support.
+
+    ??? &quot;Payload Factory Migration&quot;
+
+        The new PayloadFactory mediator supports inline templating. You can insert [Synapse expressions]({{base_path}}/reference/synapse-properties/synapse-expressions-syntax/) directly in the format string (for example, `${payload.id}`) and remove the `&lt;args&gt;` block and `$1/$2` placeholders. This simplifies templates, improves readability, and avoids the need to define separate `args` entries when converting legacy payloads to the new templating style.
+
+        See the example migration below.
+
+        === &quot;Legacy Configuration&quot;
+
+            ```xml
+            &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;default&quot;&gt;
+                &lt;format&gt;{
+                    &quot;id&quot;: &quot;$1&quot;,
+                    &quot;count&quot;: &quot;$2&quot;
+                    }&lt;/format&gt;
+                &lt;args&gt;
+                    &lt;arg expression=&quot;$ctx:id&quot; evaluator=&quot;xml&quot;/&gt;
+                    &lt;arg expression=&quot;$ctx:count&quot; evaluator=&quot;xml&quot;/&gt;
+                &lt;/args&gt;
+            &lt;/payloadFactory&gt;
+            ```
+        === &quot;New Configuration&quot;
+
+            ```xml
+            &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;default&quot;&gt;
+                &lt;format&gt;{
+                    &quot;id&quot;: &quot;${payload.id}&quot;,
+                    &quot;count&quot;:&quot;${payload.count}&quot;
+                    }&lt;/format&gt;
+            &lt;/payloadFactory&gt;
+            ```
+
+- Use the new [Log Mediator]({{base_path}}/reference/mediators/log-mediator/) which has been enhanced with templating support.
+
+    ??? &quot;Log Mediator Migration&quot;
+
+        The `level` attribute is removed from the new log mediator. Set &lt;code&gt;logFullPayload=&quot;true&quot;&lt;/code&gt; to achieve the same behavior as &lt;code&gt;level=&quot;full&quot;&lt;/code&gt;.
+
+        See the example migration below.
+
+        === &quot;Legacy Configuration&quot;
+
+            ```xml
+            &lt;log category=&quot;INFO&quot; level=&quot;simple&quot;&gt;
+                &lt;property name=&quot;Name&quot; expression=&quot;$ctx:name&quot;/&gt;
+            &lt;/log&gt;
+            ```
+        === &quot;New Configuration&quot;
+
+            ```xml
+            &lt;log category=&quot;INFO&quot; logMessageID=&quot;true&quot; logFullPayload=&quot;false&quot;&gt;
+                &lt;property name=&quot;Name&quot; expression=&quot;$ctx:name&quot;/&gt;
+            &lt;/log&gt;
+            ```</body>
+</html>

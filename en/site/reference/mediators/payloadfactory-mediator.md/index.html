@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>payloadfactory-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>---
+tags:
+  - payload
+  - payloadfactory
+---
+
+# Payload mediator
+
+The **Payload mediator** transforms or replaces the contents of a
+message. That is, you can configure the format of the request or response
+using a template with inline [Synapse expressions]({{base_path}}/reference/synapse-properties/synapse-expressions).
+
+You can use two methods to format the payload using this mediator.
+
+-   Use the **default** template to write the payload in the required format (JSON, XML, or text).
+-   Use the **FreeMarker** template to write the payload. This is particularly useful when 
+    defining complex JSON payloads.
+
+## Syntax
+
+``` java
+&lt;payloadFactory media-type=&quot;xml | json&quot; template-type=&quot;default | freemarker&quot;&gt;
+    &lt;format/&gt;
+&lt;/payloadFactory&gt;
+```
+
+## Configuration
+
+Parameters available to configure the Payload mediator are as follows:
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;
+      Parameter Name
+    &lt;/th&gt;
+    &lt;th&gt;
+      Description
+    &lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      Content Type
+    &lt;/td&gt;
+    &lt;td&gt;
+      This parameter is used to specify whether the message payload should be formatted in JSON, XML, or Text.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      Payload
+    &lt;/td&gt;
+    &lt;td&gt;
+      Define the payload using a template with inline Synapse expressions.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+### Advanced configurations
+
+Parameters available to configure advanced properties of the Payload mediator are as follows:
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;
+      Parameter Name
+    &lt;/th&gt;
+    &lt;th&gt;
+      Description
+    &lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      Template Type
+    &lt;/td&gt;
+    &lt;td&gt;
+      The template type determines how you define a new payload. Select one of the following template types:
+      &lt;ul&gt;
+        &lt;li&gt;
+          &lt;b&gt;default&lt;/b&gt;: If you select this template type, you can define the payload using the normal syntax of the specified media type.
+        &lt;/li&gt;
+        &lt;li&gt;
+          &lt;b&gt;FreeMarker&lt;/b&gt;: If you select this template type, the mediator will accept FreeMarker templates to define the payload.
+        &lt;/li&gt;
+      &lt;/ul&gt;
+            See the examples given below for details.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      Use a Template Resource
+    &lt;/td&gt;
+    &lt;td&gt;
+      If this is selected, you can import or create a template from resources.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+You need to specify the payload format depending on the &lt;b&gt;Template Type&lt;/b&gt; you specified in the mediator configuration.
+
+### Default template
+
+If you select **default** as the **Template Type**, you can define the payload using inline synapse expressions as shown below. This example defines a JSON payload.
+
+```xml
+&lt;payloadFactory description=&quot;Construct payload for addition operation&quot; media-type=&quot;json&quot;&gt;
+    &lt;format&gt;
+        {
+            &quot;AddInteger&quot;: {
+                &quot;Arg1&quot;: ${payload.grocery.arg1}
+                &quot;Arg2&quot;: ${payload.grocery.arg2}
+            }
+        }
+    &lt;/format&gt;
+&lt;/payloadFactory&gt;
+```
+
+### FreeMarker template
+
+The Payload mediator supports [FreeMarker Templates](https://freemarker.apache.org/docs/). If you select **freemarker** as the **Template Type**, you can define the payload as a FreeMarker template. The following example defines a JSON payload.
+
+!!! Note
+    -   FreeMarker version 2.3.30 is tested with WSO2 MI 4.x.x.
+    -   The CDATA will be added automatically when configuring the payload using WSO2 Integrator: MI VSCode extension.
+
+```xml
+&lt;variable name=&quot;customer_id&quot; type=&quot;STRING&quot; value=&quot;43672343&quot;/&gt;
+&lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;freemarker&quot;&gt;
+    &lt;format&gt;&lt;![CDATA[{
+        &quot;name&quot;: &quot;${payload.customer_name}&quot;
+        &quot;customer_id&quot; : &quot;${var.customer_id}&quot;,
+        &quot;axis2 property&quot;: &quot;${axis2.REST_URL_POSTFIX}&quot;,
+        &quot;trp property&quot;: &quot;${trp.Host}&quot;
+        }]]&gt;
+    &lt;/format&gt;
+&lt;/payloadFactory&gt;
+```
+
+When you use the FreeMarker template type as shown above, note that the script is wrapped inside a CDATA tag. This is applicable for all media types when the payload is defined **inline**. If you get the payload as a resource, the CDATA tag does not apply.
+
+The following root variables are available when you format a FreeMarker payload:
+
+&lt;table&gt;
+  &lt;tr&gt;
+    &lt;th&gt;
+      &lt;code&gt;payload&lt;/code&gt;
+    &lt;/th&gt;
+    &lt;td&gt;
+      This variable represents the current payload in the message context. It can be JSON, XML, or TEXT. Regardless of the payload type, the payload variable is a &lt;a href=&quot;https://freemarker.apache.org/docs/pgui_datamodel_parent.html#autoid_32&quot;&gt;FreeMarker Hash type container&lt;/a&gt;.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;th&gt;
+      &lt;code&gt;var&lt;/code&gt;
+    &lt;/th&gt;
+    &lt;td&gt;
+      You can use the var variable to access variables. For example, if you have a variable named &lt;code&gt;customer_id&lt;/code&gt;, you can get the variable in the FreeMarker template by using &lt;code&gt;var.customer_id&lt;/code&gt;.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;th&gt;
+      &lt;code&gt;ctx&lt;/code&gt;
+    &lt;/th&gt;
+    &lt;td&gt;
+      You can use the ctx variable to access properties with the &#x27;default&#x27; scope. For example, if you have a property named &lt;code&gt;endpoint_status&lt;/code&gt; in the default scope, you can get the property in the FreeMarker template by using &lt;code&gt;ctx.endpoint_status&lt;/code&gt;.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;th&gt;
+      &lt;code&gt;axis2&lt;/code&gt;
+    &lt;/th&gt;
+    &lt;td&gt;
+      This represents all the axis2 properties.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+    &lt;th&gt;
+      &lt;code&gt;trp&lt;/code&gt;
+    &lt;/th&gt;
+    &lt;td&gt;
+      This variable represents transport headers. You can access transport header values in the same way as accessing properties.
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+See the [Freemarker examples](#examples-using-the-freemarker-template) for details.
+
+## Examples: Using the default template
+
+### Using XML
+
+!!! Note
+    When you need to access XML with custom namespaces, you need to first assign the result to a variable and then use it in the Payload mediator.
+    ```xml
+    &lt;variable name=&quot;symbol&quot; type=&quot;STRING&quot; expression=&quot;${xpath(&#x27;//m0:Code&#x27;)}&quot; xmlns:m0=&quot;http://services.samples&quot;/&gt;
+    ```
+
+```xml
+&lt;proxy name=&quot;RespondMediatorProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;http https&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+     &lt;target&gt;
+        &lt;inSequence&gt;
+            &lt;variable name=&quot;symbol&quot; type=&quot;STRING&quot; expression=&quot;${xpath(&#x27;//m0:Code&#x27;)}&quot; xmlns:m0=&quot;http://services.samples&quot;/&gt;
+            &lt;!-- using Payload mediator to transform the message --&gt;
+            &lt;payloadFactory media-type=&quot;xml&quot;&gt;
+                &lt;format&gt;
+                    &lt;m:getQuote xmlns:m=&quot;http://services.samples&quot;&gt;
+                        &lt;m:request&gt;
+                            &lt;m:symbol&gt;${var.symbol}&lt;/m:symbol&gt;
+                        &lt;/m:request&gt;
+                    &lt;/m:getQuote&gt;
+                &lt;/format&gt;
+            &lt;/payloadFactory&gt;
+            &lt;respond/&gt;
+        &lt;/inSequence&gt;
+     &lt;/target&gt;
+&lt;/proxy&gt;
+```
+
+### Using JSON
+
+```xml
+&lt;payloadFactory media-type=&quot;json&quot;&gt;
+    &lt;format&gt;
+        {
+            &quot;coordinates&quot;: null,
+            &quot;created_at&quot;: &quot;Fri Jun 24 17:43:26 +0000 2011&quot;,
+            &quot;truncated&quot;: false,
+            &quot;favorited&quot;: false,
+            &quot;id_str&quot;: &quot;${payload.entities.hashtags[0].text}&quot;,
+            &quot;entities&quot;: {
+                &quot;urls&quot;: [
+
+                ],
+                &quot;hashtags&quot;: [
+                    {
+                        &quot;text&quot;: &quot;${payload.entities.hashtags.text}&quot;,
+                        &quot;indices&quot;: [
+                            35,
+                            45
+                        ]
+                    }
+                ],
+                &quot;user_mentions&quot;: [
+
+                ]
+            },
+            &quot;in_reply_to_user_id_str&quot;: null,
+            &quot;contributors&quot;: null,
+            &quot;text&quot;: &quot;${payload.user.id}&quot;,
+            &quot;retweet_count&quot;: 0,
+            &quot;id&quot;: &quot;##&quot;,
+            &quot;in_reply_to_status_id_str&quot;: null,
+            &quot;geo&quot;: null,
+            &quot;retweeted&quot;: false,
+            &quot;in_reply_to_user_id&quot;: null,
+            &quot;source&quot;: &quot;&amp;lt;a href=\&quot;http://sites.google.com/site/yorufukurou/\rel=\&quot;nofollow\&quot;&amp;gt;YoruFukurou&amp;lt;/a&amp;gt;&quot;,
+            &quot;in_reply_to_screen_name&quot;: null,
+            &quot;user&quot;: {
+                &quot;id_str&quot;: &quot;##&quot;,
+                &quot;id&quot;: &quot;##&quot;
+            },
+            &quot;place&quot;: null,
+            &quot;in_reply_to_status_id&quot;: null
+        }
+    &lt;/format&gt;
+&lt;/payloadFactory&gt;
+```
+
+### Suppressing the namespace
+
+To prevent the MI from adding the default Synapse namespace in
+an element in the payload format, use &lt;code&gt;xmlns=&quot;&quot;&lt;/code&gt; as shown in the following example.
+
+``` java
+&lt;ser:getPersonByUmid xmlns:ser=&quot;http://service.directory.com&quot;&gt;
+    &lt;umid xmlns=&quot;&quot;&gt;sagara&lt;/umid&gt;
+&lt;/ser:getPersonByUmid&gt;     
+```
+
+### Including a complete SOAP envelope as the format
+
+In the following configuration, an entire SOAP envelope is added as the
+format defined inline. This is useful when you want to generate the
+result of the Payload mediator as a complete SOAP message with
+SOAP headers.
+
+```xml
+&lt;payloadFactory media-type=&quot;xml&quot;&gt; 
+    &lt;format&gt; 
+        &lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt; 
+            &lt;soapenv:Body&gt; 
+                &lt;error&gt; 
+                &lt;mes&gt;${payload.message}&lt;/mes&gt;
+                &lt;/error&gt; 
+            &lt;/soapenv:Body&gt; 
+        &lt;/soapenv:Envelope&gt; 
+    &lt;/format&gt; 
+&lt;/payloadFactory&gt;
+```
+
+### Uploading a file to an HTTP endpoint via a multipart request
+
+The below example configuration uses VFS to upload the file in the
+specified location to the given HTTP endpoint via an HTTP multipart
+request.
+
+```xml
+&lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
+       name=&quot;smooksample&quot;
+       startOnLoad=&quot;true&quot;
+       statistics=&quot;disable&quot;
+       trace=&quot;disable&quot;
+       transports=&quot;vfs&quot;&gt;
+   &lt;target&gt;
+      &lt;inSequence&gt;
+         &lt;enrich&gt;
+            &lt;source clone=&quot;true&quot; type=&quot;body&quot;/&gt;
+            &lt;target property=&quot;originalBody&quot; type=&quot;property&quot;/&gt;
+         &lt;/enrich&gt;
+         &lt;payloadFactory media-type=&quot;xml&quot;&gt;
+            &lt;format&gt;
+               &lt;root xmlns=&quot;&quot;&gt;
+                  &lt;customFieldOne&gt;ABC&lt;/customFieldOne&gt;
+                  &lt;customFieldTwo&gt;DEF&lt;/customFieldTwo&gt;
+                  &lt;file xmlns=&quot;http://org.apache.axis2/xsd/form-data&quot;
+                        charset=&quot;US-ASCII&quot;
+                        content-type=&quot;text/plain&quot;
+                        filename=&quot;${headers.FILE_NAME}&quot;
+                        name=&quot;file1&quot;&gt;${properties.synapse.originalBody}&lt;/file&gt;
+               &lt;/root&gt;
+            &lt;/format&gt;
+         &lt;/payloadFactory&gt;
+         &lt;header name=&quot;Content-Type&quot; scope=&quot;transport&quot; value=&quot;multipart/form-data&quot;/&gt;
+         &lt;property name=&quot;messageType&quot;
+                   scope=&quot;axis2&quot;
+                   type=&quot;STRING&quot;
+                   value=&quot;multipart/form-data&quot;/&gt;
+         &lt;property name=&quot;OUT_ONLY&quot; scope=&quot;default&quot; type=&quot;STRING&quot; value=&quot;true&quot;/&gt;
+         &lt;call&gt;
+            &lt;endpoint&gt;
+               &lt;address format=&quot;rest&quot; uri=&quot;http://localhost:3000/upload/&quot;/&gt;
+            &lt;/endpoint&gt;
+         &lt;/call&gt;
+      &lt;/inSequence&gt;
+   &lt;/target&gt;
+   &lt;parameter name=&quot;transport.PollInterval&quot;&gt;5&lt;/parameter&gt;
+   &lt;parameter name=&quot;transport.vfs.FileURI&quot;&gt;file:///&lt;YOUR_FILE_LOCATION&gt;&lt;/parameter&gt;
+   &lt;parameter name=&quot;transport.vfs.ContentType&quot;&gt;application/octet-stream&lt;/parameter&gt;
+   &lt;parameter name=&quot;transport.vfs.ActionAfterProcess&quot;&gt;DELETE&lt;/parameter&gt;
+   &lt;parameter name=&quot;transport.vfs.FileNamePattern&quot;&gt;.*\..*&lt;/parameter&gt;
+   &lt;description/&gt;
+&lt;/proxy&gt;
+```
+
+In the above example, the following property mediator configuration sets
+the message type as &lt;code&gt;multipart/form-data&lt;/code&gt; .
+
+```xml
+&lt;property name=&quot;messageType&quot;
+    scope=&quot;axis2&quot;
+    type=&quot;STRING&quot;
+    value=&quot;multipart/form-data&quot;/&gt;
+```
+
+The below &lt;code&gt;file&lt;/code&gt; parameter of the Payload mediator defines the HTTP multipart request.
+
+!!! Tip
+    Do not change the &lt;code&gt;http://org.apache.axis2/xsd/form-data&lt;/code&gt; namespace.
+
+```xml
+&lt;file xmlns=&quot;http://org.apache.axis2/xsd/form-data&quot;
+    charset=&quot;US-ASCII&quot;
+    content-type=&quot;text/plain&quot;
+    filename=&quot;${headers.FILE_NAME}&quot;
+    name=&quot;file1&quot;&gt;${properties.synapse.originalBody}&lt;/file&gt;
+```
+
+Also, the below property mediator configuration sets the content of the
+uploaded file.
+
+```xml
+&lt;header name=&quot;Content-Type&quot; scope=&quot;transport&quot; value=&quot;multipart/form-data&quot;/&gt;
+```
+
+### Adding a literal value
+
+To have a literal value, you need to enclose the synapse expression with double quotes(&lt;code&gt;&quot;${expression}&quot;&lt;/code&gt;). This allows you to consider the expression result as a literal string and to stop processing it.
+
+```xml
+&lt;api context=&quot;/payload&quot; name=&quot;payload&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;resource methods=&quot;POST&quot; uri-template=&quot;/&quot;&gt;
+        &lt;inSequence&gt;
+            &lt;payloadFactory media-type=&quot;json&quot;&gt;
+                &lt;format&gt;{&quot;newValue&quot; : &quot;${xpath(&#x27;//pet&#x27;)}&quot;}&lt;/format&gt;
+            &lt;/payloadFactory&gt;
+            &lt;respond /&gt;
+        &lt;/inSequence&gt;
+        &lt;faultSequence&gt;
+        &lt;/faultSequence&gt;
+    &lt;/resource&gt;
+&lt;/api&gt;
+```
+
+Following is a sample payload (i.e., &lt;code&gt;request.xml&lt;/code&gt; file), which you can process using the above configuration.
+
+**request.xml**
+
+```xml
+&lt;pet&gt;&lt;name&gt;John&lt;/name&gt;&lt;age&gt;5&lt;/age&gt;&lt;/pet&gt;
+```
+
+You can use the below sample cURL command to send the request to the
+above configuration.
+
+```bash
+curl -d @request.xml http://localhost:8280/payload -H &quot;Content-Type: application/xml&quot; -v
+```
+
+You view the below output:
+
+```json
+{
+    &quot;newValue&quot;: &quot;&lt;pet&gt;&lt;name&gt;John&lt;/name&gt;&lt;age&gt;5&lt;/age&gt;&lt;/pet&gt;&quot;
+}
+```
+
+!!! Info
+    If you do not use double quotes(&lt;code&gt;&quot;${expression}&quot;&lt;/code&gt;) in the Payload mediator of the above configuration, you view the output as follows:
+
+    ```json
+    {
+        &quot;newValue&quot;: {
+            &quot;pet&quot;: {
+                &quot;name&quot;: &quot;John&quot;,
+                &quot;age&quot;: 5
+            }
+        }
+    }
+    ```
+
+If you want to evaluate a valid JSON object as a string, you can use double quotes(&lt;code&gt;&quot;${expression}&quot;&lt;/code&gt;) in the Payload mediator as indicated below,
+
+```xml
+&lt;payloadFactory media-type=&quot;json&quot;&gt;
+    &lt;format&gt; { &quot;message&quot;:{ &quot;payload_string&quot;: &quot;${payload.dataObject}&quot; } }
+    &lt;/format&gt;
+&lt;/payloadFactory&gt; 
+```
+
+### Adding a custom SOAP header
+
+You can add custom SOAP headers to a request by using Payload
+Mediator in a proxy service as shown in the example below.
+
+```xml
+&lt;proxy
+    xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;StockQuoteProxy&quot;
+    transports=&quot;https http&quot;
+    startOnLoad=&quot;true&quot;
+    trace=&quot;disable&quot;&gt;
+    &lt;description/&gt;
+    &lt;target&gt;
+        &lt;endpoint&gt;
+            &lt;address uri=&quot;http://localhost:9001/services/SimpleStockQuoteService&quot;/&gt;
+        &lt;/endpoint&gt;
+        &lt;inSequence&gt;
+            &lt;log level=&quot;full&quot;/&gt;
+            &lt;payloadFactory media-type=&quot;xml&quot;&gt;
+                &lt;format&gt;
+                    &lt;soapenv:Envelope
+                        xmlns:soapenv=&quot;http://www.w3.org/2003/05/soap-envelope&quot;
+                        xmlns:xsd=&quot;http://services.samples/xsd&quot;
+                        xmlns:ser=&quot;http://services.samples&quot;&gt;
+                        &lt;soapenv:Header&gt;
+                            &lt;ser:authenticationRequest&gt;
+                                &lt;userName xmlns=&quot;&quot;&gt;${payload.data.username}&lt;/userName&gt;
+                                &lt;password xmlns=&quot;&quot;&gt;${payload.data.password}&lt;/password&gt;
+                            &lt;/ser:authenticationRequest&gt;
+                        &lt;/soapenv:Header&gt;
+                        &lt;soapenv:Body&gt;
+                            &lt;ser:getQuote&gt;
+                                &lt;ser:request&gt;
+                                    &lt;xsd:symbol&gt;${var.request.symbol}&lt;/xsd:symbol&gt;
+                                &lt;/ser:request&gt;
+                            &lt;/ser:getQuote&gt;
+                        &lt;/soapenv:Body&gt;
+                    &lt;/soapenv:Envelope&gt;
+                &lt;/format&gt;
+            &lt;/payloadFactory&gt;
+            &lt;respond/&gt;
+        &lt;/inSequence&gt;
+        &lt;faultSequence&gt;
+            &lt;sequence key=&quot;errorHandler&quot;/&gt;
+        &lt;/faultSequence&gt;
+    &lt;/target&gt;
+    &lt;publishWSDL preservePolicy=&quot;false&quot; uri=&quot;file:repository/samples/resources/proxy/sample_proxy_1.wsdl&quot;/&gt;
+&lt;/proxy&gt;
+```
+
+```xml
+&lt;sequence xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;errorHandler&quot;&gt;
+    &lt;log level=&quot;full&quot;&gt;
+        &lt;property name=&quot;MESSAGE&quot; value=&quot;Executing default &quot;fault&quot; sequence&quot;/&gt;
+        &lt;property name=&quot;ERROR_CODE&quot; expression=&quot;get-property(&#x27;ERROR_CODE&#x27;)&quot;/&gt;
+        &lt;property name=&quot;ERROR_MESSAGE&quot; expression=&quot;get-property(&#x27;ERROR_MESSAGE&#x27;)&quot;/&gt;
+    &lt;/log&gt;
+    &lt;drop/&gt;
+&lt;/sequence&gt;
+```
+
+## Examples: Using the FreeMarker template
+
+### XML to JSON transformation
+
+This example shows how an XML payload can be converted to a JSON payload using a freemarker template.
+
+-   Input Payload
+    ```xml
+    &lt;user&gt;
+        &lt;first_name&gt;John&lt;/first_name&gt;
+        &lt;last_name&gt;Deo&lt;/last_name&gt;
+        &lt;age&gt;35&lt;/age&gt;
+        &lt;location&gt;
+            &lt;state code=&quot;NY&quot;&gt;New York&lt;/state&gt;
+            &lt;city&gt;Manhattan&lt;/city&gt;
+        &lt;/location&gt;
+    &lt;/user&gt;
+    ```
+
+-   Output Payload
+    ```json
+    {
+        &quot;Name&quot;: &quot;John Doe&quot;,
+        &quot;Age&quot;: 35,
+        &quot;Address&quot;: &quot;Manhattan, NY&quot;
+    }
+    ```
+
+-   FreeMarker Tamplate
+    ```json
+    {
+        &quot;Name&quot;: &quot;${payload.user.first_name} ${payload.user.last_name}&quot;,
+        &quot;Age&quot;: &quot;${payload.user.age}&quot;,
+        &quot;Address&quot;: &quot;${payload.user.location.city},${payload.user.location.state.@code}&quot;
+    }
+    ```
+
+-   Synapse Code
+    ```xml
+    &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;freemarker&quot;&gt;
+        &lt;format&gt;
+            &lt;![CDATA[{
+                &quot;Name&quot;: &quot;${payload.user.first_name} ${payload.user.last_name}&quot;,
+                &quot;Age&quot;: ${payload.user.age},
+                &quot;Address&quot;: &quot;${payload.user.location.city},${payload.user.location.state.@code}&quot;
+            }]]&gt;
+        &lt;/format&gt;
+    &lt;/payloadFactory&gt;
+    ```
+
+You can get more info on how to use XML payloads from [FreeMarker&#x27;s official documentation](https://freemarker.apache.org/docs/xgui.html).
+
+### JSON to XML transformation
+
+This example shows how a JSON payload can be converted to an XML payload using a freemarker template.
+
+-   Input Payload
+    ```json
+    {
+    &quot;first_name&quot;: &quot;John&quot;,
+    &quot;last_name&quot;: &quot;Deo&quot;,
+    &quot;age&quot;: 35,
+        &quot;location&quot;: {
+            &quot;state&quot;: {
+                &quot;code&quot;: &quot;NY&quot;,
+                &quot;name&quot;: &quot;New York&quot;
+            },
+            &quot;city&quot;: &quot;Manhattan&quot;
+        }
+    }
+    ```
+
+-   Output Payload
+    ```xml
+    &lt;user&gt;
+        &lt;Name&gt;John Deo&lt;/Name&gt;
+        &lt;Age&gt;35&lt;/Age&gt;
+        &lt;Address&gt;Manhattan, NY&lt;/Address&gt;
+    &lt;/user&gt;
+    ```
+
+-   FreeMarker Tamplate
+    ```xml
+    &lt;user&gt;
+        &lt;Name&gt;${payload.first_name} ${payload.last_name}&lt;/Name&gt;
+        &lt;Age&gt;${payload.age}&lt;/Age&gt;
+        &lt;Address&gt;${payload.location.city}, ${payload.location.state.code}&lt;/Address&gt;
+    &lt;/user&gt;
+    ```
+
+-   Synapse Code
+    ```xml
+    &lt;payloadFactory media-type=&quot;xml&quot; template-type=&quot;freemarker&quot;&gt;
+        &lt;format&gt;&lt;![CDATA[&lt;user&gt;
+        &lt;Name&gt;${payload.first_name} ${payload.last_name}&lt;/Name&gt;
+        &lt;Age&gt;${payload.age}&lt;/Age&gt;
+        &lt;Address&gt;${payload.location.city}, ${payload.location.state.code}&lt;/Address&gt;
+        &lt;/user&gt;]]&gt;
+        &lt;/format&gt;
+    &lt;/payloadFactory&gt;
+    ```
+
+### JSON to JSON transformation
+
+This example shows how a JSON payload is transformed into another JSON format using a freemarker template.
+
+-   Input Payload
+    ```json
+    {
+    &quot;first_name&quot;: &quot;John&quot;,
+    &quot;last_name&quot;: &quot;Deo&quot;,
+    &quot;age&quot;: 35,
+    &quot;location&quot;: {
+            &quot;state&quot;: {
+                &quot;code&quot;: &quot;NY&quot;,
+                &quot;name&quot;: &quot;New York&quot;
+            },
+            &quot;city&quot;: &quot;Manhattan&quot;
+        }
+    }
+    ```
+
+-   Output Payload
+    ```json
+    {
+        &quot;Name&quot;: &quot;John Doe&quot;,
+        &quot;Age&quot;: 35,
+        &quot;Address&quot;: &quot;Manhattan, NY&quot;
+    }
+    ```
+
+-   FreeMarker Tamplate
+    ```json
+    {
+        &quot;Name&quot;: &quot;${payload.first_name} ${payload.last_name}&quot;,
+        &quot;Age&quot;: &quot;${payload.age}&quot;,
+        &quot;Address&quot;: &quot;${payload.location.city}, ${payload.location.state.code}&quot;
+    }
+    ```
+
+-   Synapse Code
+    ```xml
+    &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;freemarker&quot;&gt;
+        &lt;format&gt;
+            &lt;![CDATA[{
+                &quot;Name&quot;: &quot;${payload.first_name} ${payload.last_name}&quot;,
+                &quot;Age&quot;: ${payload.age},
+                &quot;Address&quot;: &quot;${payload.location.city}, ${payload.location.state.code}&quot;
+            }]]&gt;
+        &lt;/format&gt;
+    &lt;/payloadFactory&gt;
+    ```
+
+### Handling arrays
+
+#### XML arrays
+
+This example shows how to loop through an XML array in the input payload and then transform the data using a freemarker template.
+
+-   Input Payload
+    ```xml
+    &lt;people&gt;
+        &lt;person&gt;
+            &lt;id&gt;1&lt;/id&gt;
+            &lt;first_name&gt;Veronika&lt;/first_name&gt;
+            &lt;last_name&gt;Lacroux&lt;/last_name&gt;
+        &lt;/person&gt;
+        &lt;person&gt;
+            &lt;id&gt;2&lt;/id&gt;
+            &lt;first_name&gt;Trescha&lt;/first_name&gt;
+            &lt;last_name&gt;Campaigne&lt;/last_name&gt;
+        &lt;/person&gt;
+        &lt;person&gt;
+            &lt;id&gt;3&lt;/id&gt;
+            &lt;first_name&gt;Mayor&lt;/first_name&gt;
+            &lt;last_name&gt;Moscrop&lt;/last_name&gt;
+        &lt;/person&gt;
+    &lt;/people&gt;
+    ```
+
+-   Output Payload
+    ```xml
+    &lt;people&gt;
+        &lt;person&gt;
+            &lt;index&gt;1&lt;/index&gt;
+            &lt;name&gt;Veronika Lacroux&lt;/first_name&gt;
+        &lt;/person&gt;
+        &lt;person&gt;
+            &lt;index&gt;2&lt;/index&gt;
+            &lt;name&gt;Trescha Campaigne&lt;/name&gt;
+        &lt;/person&gt;
+        &lt;person&gt;
+            &lt;index&gt;3&lt;/index&gt;
+            &lt;name&gt;Mayor Moscrop&lt;/name&gt;
+        &lt;/person&gt;
+    &lt;/people&gt;
+    ```
+
+    Note that, we have looped through the person list in the input XML, and received a person list in the output. However, the name attribute in the output is a combination of the first_name and last_name attributes from the input.
+
+-   FreeMarker Tamplate
+    ```xml
+    &lt;people&gt;
+        &lt;#list payload.people.person as person&gt;
+        &lt;person&gt;
+            &lt;index&gt;${person.id}&lt;/index&gt;
+            &lt;name&gt;${person.first_name} ${person.last_name}&lt;/name&gt;
+        &lt;/person&gt;
+        &lt;/#list&gt;
+    &lt;/people&gt;
+    ```
+
+    In this FreeMarker template, we are using the list directive. This is used to loop through a list in the input and transform it into another structure in the output. You can get more information about the list directive from [FreeMarker documentation](https://freemarker.apache.org/docs/ref_directive_list.html).
+
+-   Synapse Code
+    ```xml
+    &lt;payloadFactory media-type=&quot;xml&quot; template-type=&quot;freemarker&quot;&gt;
+        &lt;format&gt;
+            &lt;![CDATA[&lt;people&gt;
+            &lt;#list payload.people.person as person&gt;
+            &lt;person&gt;
+                &lt;index&gt;${person.id}&lt;/index&gt;
+                &lt;name&gt;${person.first_name} ${person.last_name}&lt;/name&gt;
+            &lt;/person&gt;
+            &lt;/#list&gt;
+            &lt;/people&gt;]]&gt;
+        &lt;/format&gt;
+    &lt;/payloadFactory&gt;
+    ```
+
+#### JSON arrays
+
+This example shows how to loop through a JSON array in the input payload and then transform the data using a freemarker template.
+
+-   Input Payload
+    ```json
+    [
+        {
+            &quot;id&quot;:1,
+            &quot;first_name&quot;:&quot;Veronika&quot;,
+            &quot;last_name&quot;:&quot;Lacroux&quot;
+        },
+        {
+            &quot;id&quot;:2,
+            &quot;first_name&quot;:&quot;Trescha&quot;,
+            &quot;last_name&quot;:&quot;Campaigne&quot;
+        },
+        {
+            &quot;id&quot;:3,
+            &quot;first_name&quot;:&quot;Mayor&quot;,
+            &quot;last_name&quot;:&quot;Moscrop&quot;
+        }
+    ]
+    ```
+
+-   FreeMarker Tamplate
+    ```xml
+    &lt;people&gt;
+    &lt;#list payload as person&gt;
+    &lt;person&gt;
+        &lt;index&gt;${person.id}&lt;/index&gt;
+        &lt;name&gt;${person.first_name} ${person.last_name}&lt;/name&gt;
+    &lt;/person&gt;
+    &lt;/#list&gt;
+    &lt;/people&gt;
+    ```
+
+    As you can see here, it is almost the same as the XML list. You have to use an identical syntax to loop through a JSON array.
+
+-   Synapse Code
+    ```xml
+    &lt;payloadFactory media-type=&quot;xml&quot; template-type=&quot;freemarker&quot;&gt;
+        &lt;format&gt;
+            &lt;![CDATA[&lt;people&gt;
+            &lt;#list payload as person&gt;
+            &lt;person&gt;
+                &lt;index&gt;${person.id}&lt;/index&gt;
+                &lt;name&gt;${person.first_name} ${person.last_name}&lt;/name&gt;
+            &lt;/person&gt;
+            &lt;/#list&gt;
+            &lt;/people&gt;]]&gt;
+        &lt;/format&gt;
+    &lt;/payloadFactory&gt;
+    ```
+
+### Generating CSV payloads
+
+Using FreeMarker templates, it is straightforward to generate text payloads. The payload you generate could be plain text, a CSV, or EDI, and any other text related format. In this example, we are showing how to transform an XML payload into a CSV payload. 
+
+-   Input Payload
+    ```xml
+    &lt;people&gt;
+        &lt;person&gt;
+            &lt;id&gt;1&lt;/id&gt;
+            &lt;first_name&gt;Veronika&lt;/first_name&gt;
+            &lt;last_name&gt;Lacroux&lt;/last_name&gt;
+        &lt;/person&gt;
+        &lt;person&gt;
+            &lt;id&gt;2&lt;/id&gt;
+            &lt;first_name&gt;Trescha&lt;/first_name&gt;
+            &lt;last_name&gt;Campaigne&lt;/last_name&gt;
+        &lt;/person&gt;
+        &lt;person&gt;
+            &lt;id&gt;3&lt;/id&gt;
+            &lt;first_name&gt;Mayor&lt;/first_name&gt;
+            &lt;last_name&gt;Moscrop&lt;/last_name&gt;
+        &lt;/person&gt;
+    &lt;/people&gt;
+    ```
+
+-   Output Payload
+    ```
+    ID,First Name, Last Name
+    1,Veronika,Lacroux
+    2,Trescha,Campaigne
+    3,Mayor,Moscrop
+    ```
+
+    In this output, we have converted the person list in the XML payload into a CSV payload.
+
+-   FreeMarker Tamplate
+    ```
+    ID,First Name, Last Name
+    &lt;#list payload.people.person as person&gt;
+    ${person.id},${person.first_name},${person.last_name}
+    &lt;/#list&gt;
+    ```
+
+    In this template, we define the CSV structure and fill it by looping through the payload list. If the input payload is JSON, there will not be a significant difference in this template. See the example on [Handling Arrays](#handling-arrays) to understand the difference between JSON and XML array traversing.
+
+-   Synapse Code
+    ```xml
+    &lt;payloadFactory media-type=&quot;text&quot; template-type=&quot;freemarker&quot;&gt;
+        &lt;format&gt;&lt;![CDATA[ID,First Name, Last Name
+                &lt;#list payload.people.person as person&gt;
+                ${person.id},${person.first_name},${person.last_name}
+                &lt;/#list&gt;]]&gt;
+        &lt;/format&gt;
+    &lt;/payloadFactory&gt;
+    ```
+
+    If you don’t know the CSV column names and the number of columns, you can use a FreeMarker template like the following to generate a CSV for the given XML. 
+
+    ```xml
+    &lt;#list payload.people.person[0]?children?filter(c -&gt; c?node_type == &#x27;element&#x27;) as c&gt;${c?node_name}&lt;#sep&gt;,&lt;/#list&gt;
+    &lt;#list payload.people.person as person&gt;
+    &lt;#list person?children?filter(c -&gt; c?node_type == &#x27;element&#x27;) as c&gt;${c}&lt;#sep&gt;,&lt;/#list&gt;
+    &lt;/#list&gt;
+    ```
+### XML to EDI transformation
+
+This example shows how an XML payload can be converted to an EDI format using a freemarker template. In this example, we have referenced the freemarker template as a registry resource.
+See the instructions on how to [build and run](#build-and-run) this example.
+
+=== &quot;XMLtoEDI - Proxy&quot; 
+    ```xml 
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy name=&quot;xml-to-edi-proxy&quot; startOnLoad=&quot;true&quot; transports=&quot;http https&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;payloadFactory media-type=&quot;text&quot; template-type=&quot;freemarker&quot;&gt;
+                    &lt;format key=&quot;conf:custom/template.ftl&quot;/&gt;
+                &lt;/payloadFactory&gt;
+                &lt;respond/&gt;
+            &lt;/inSequence&gt;
+            &lt;faultSequence/&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;template.ftl - Registry Resource&quot;
+    ```injectedfreemarker 
+    &lt;#-- Assign * as element separator --&gt;
+    &lt;#assign element_separator=&quot;*&quot;&gt;
+    &lt;#-- Assign ! as segment terminator --&gt;
+    &lt;#assign segment_terminator=&quot;!&quot;&gt;
+    &lt;#-- Interchange Control Header --&gt;
+    ISA${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Authorization_Information_Qualifier}${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Authorization_Information}${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Security_Information_Qualifier}${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Security_Information}${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Interchange_ID_Qualifier[0]}${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Interchange_Sender_ID}${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Interchange_ID_Qualifier[1]}${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Interchange_Receiver_ID}${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Interchange_Date}${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Interchange_Time}${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Interchange_Control_Standards_ID}${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Interchange_Control_Version_Nbr}${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Interchange_Control_Number}${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Acknowledgment_Request}${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Test_Indicator}${element_separator}${payload.UniversalTransaction.Interchange_Control_Header.Subelement_Separator}${segment_terminator}
+    &lt;#-- Functional_Group_Header --&gt;
+    GS${element_separator}${payload.UniversalTransaction.Functional_Group_Header.Functional_Identifier_Code}${element_separator}${payload.UniversalTransaction.Functional_Group_Header.Application_Senders_Code}${element_separator}${payload.UniversalTransaction.Functional_Group_Header.Application_Receivers_Code}${element_separator}${payload.UniversalTransaction.Functional_Group_Header.Date}${element_separator}${payload.UniversalTransaction.Functional_Group_Header.Time}${element_separator}${payload.UniversalTransaction.Functional_Group_Header.Group_Control_Number}${element_separator}${payload.UniversalTransaction.Functional_Group_Header.Responsible_Agency_Code}${element_separator}${payload.UniversalTransaction.Functional_Group_Header.Industry_ID}${segment_terminator}
+    &lt;#-- Transaction_Set_Header --&gt;
+    ST${element_separator}${payload.UniversalTransaction.Transaction_Set_Header.Transaction_Set_Identifier_Code}${element_separator}${payload.UniversalTransaction.Transaction_Set_Header.Transaction_Set_Control_Number}${segment_terminator}
+    &lt;#-- Begin_Invoice --&gt;
+    BIG${element_separator}${payload.UniversalTransaction.Begin_Invoice.Invoice_Date}${element_separator}${payload.UniversalTransaction.Begin_Invoice.Invoice_Number}${element_separator}${payload.UniversalTransaction.Begin_Invoice.PO_Date[0]!&#x27;&#x27;}${element_separator}${payload.UniversalTransaction.Begin_Invoice.PO_Number}${element_separator}${payload.UniversalTransaction.Begin_Invoice.Release_Number[0]!&#x27;&#x27;}${element_separator}${payload.UniversalTransaction.Begin_Invoice.Changed_Order_Sequence[0]!&#x27;&#x27;}${element_separator}${payload.UniversalTransaction.Begin_Invoice.Transaction_Type_Code[0]!&#x27;&#x27;}${segment_terminator}
+    &lt;#-- Currency --&gt;
+    CUR${element_separator}${payload.UniversalTransaction.Currency.Entity_Identifier_Code}${element_separator}${payload.UniversalTransaction.Currency.Currency_Code}${segment_terminator}
+    &lt;#-- Reference_Identification --&gt;
+    &lt;#list payload.UniversalTransaction.Reference_Identification as ref&gt;
+      &lt;#assign REF=&quot;REF${element_separator}${ref.Reference_Identification_Qualifier[0]!&#x27;&#x27;}${element_separator}${ref.Reference_Identification[0]!&#x27;&#x27;}${segment_terminator}&quot;&gt;
+    ${REF}
+    &lt;/#list&gt;
+    &lt;#-- Name --&gt;
+    &lt;#list payload.UniversalTransaction.Name as name&gt;
+      &lt;#assign N1=&quot;N1${element_separator}${name.Entity_Identifier_Code[0]!&#x27;&#x27;}${element_separator}${name.Name[0]!&#x27;&#x27;}${segment_terminator}&quot;&gt;
+    ${N1}
+    &lt;/#list&gt;
+    &lt;#-- Total --&gt;
+    TDS${element_separator}${payload.UniversalTransaction.Total_invoice_amount}${segment_terminator}
+    &lt;#-- Service, Promotion, Allowance, or Charge Information  --&gt;
+    &lt;#list payload.UniversalTransaction.SAC_Information as sac&gt;
+      &lt;#assign SAC=&quot;SAC${element_separator}${sac.Allowance_or_Charge_Indicator[0]!&#x27;&#x27;}${element_separator}${sac.Service_or_Charge_Code[0]!&#x27;&#x27;}${element_separator}${sac.SAC_03[0]!&#x27;&#x27;}${element_separator}${sac.SAC_04[0]!&#x27;&#x27;}${element_separator}${sac.Amount[0]!&#x27;&#x27;}${element_separator}${sac.Description[0]!&#x27;&#x27;}${segment_terminator}&quot;&gt;
+    ${SAC}
+    &lt;/#list&gt;
+    &lt;#-- Transaction_Set_Trailer --&gt;
+    SE${element_separator}${payload.UniversalTransaction.Transaction_Set_Trailer.Number_of_Included_Segments}${element_separator}${payload.UniversalTransaction.Transaction_Set_Trailer.Transaction_Set_Control_Number}${segment_terminator}
+    &lt;#-- Functional_Group_Trailer --&gt;
+    GE${element_separator}${payload.UniversalTransaction.Functional_Group_Trailer.Number_of_Transaction_Sets_Incl}${element_separator}${payload.UniversalTransaction.Functional_Group_Trailer.Group_Control_Number}${segment_terminator}
+    &lt;#-- Interchange_Control_Trailer --&gt;
+    IEA${element_separator}${payload.UniversalTransaction.Interchange_Control_Trailer.Nbr_of_Included_Functional_Groups}${element_separator}${payload.UniversalTransaction.Interchange_Control_Trailer.Interchange_Control_Number}${segment_terminator}
+    ```
+=== &quot;Request Payload&quot;        
+    ```xml  
+    &lt;UniversalTransaction&gt;
+      &lt;Interchange_Control_Header&gt;
+          &lt;Authorization_Information_Qualifier&gt;00&lt;/Authorization_Information_Qualifier&gt;
+          &lt;Authorization_Information&gt;&lt;/Authorization_Information&gt;
+          &lt;Security_Information_Qualifier&gt;00&lt;/Security_Information_Qualifier&gt;
+          &lt;Security_Information&gt;&lt;/Security_Information&gt;
+          &lt;Interchange_ID_Qualifier&gt;ZZ&lt;/Interchange_ID_Qualifier&gt;
+          &lt;Interchange_Sender_ID&gt;XXXXXXXXX&lt;/Interchange_Sender_ID&gt;
+          &lt;Interchange_ID_Qualifier&gt;01&lt;/Interchange_ID_Qualifier&gt;
+          &lt;Interchange_Receiver_ID&gt;834469876&lt;/Interchange_Receiver_ID&gt;
+          &lt;Interchange_Date&gt;200221&lt;/Interchange_Date&gt;
+          &lt;Interchange_Time&gt;1946&lt;/Interchange_Time&gt;
+          &lt;Interchange_Control_Standards_ID&gt;U&lt;/Interchange_Control_Standards_ID&gt;
+          &lt;Interchange_Control_Version_Nbr&gt;00401&lt;/Interchange_Control_Version_Nbr&gt;
+          &lt;Interchange_Control_Number&gt;100015519&lt;/Interchange_Control_Number&gt;
+          &lt;Acknowledgment_Request&gt;1&lt;/Acknowledgment_Request&gt;
+          &lt;Test_Indicator&gt;P&lt;/Test_Indicator&gt;
+          &lt;Subelement_Separator&gt;&gt;&lt;/Subelement_Separator&gt;
+      &lt;/Interchange_Control_Header&gt;
+      &lt;Functional_Group_Header&gt;
+          &lt;Functional_Identifier_Code&gt;IN&lt;/Functional_Identifier_Code&gt;
+          &lt;Application_Senders_Code&gt;XXXXXXXXX&lt;/Application_Senders_Code&gt;
+          &lt;Application_Receivers_Code&gt;834469876&lt;/Application_Receivers_Code&gt;
+          &lt;Date&gt;20200221&lt;/Date&gt;
+          &lt;Time&gt;1946&lt;/Time&gt;
+          &lt;Group_Control_Number&gt;100014444&lt;/Group_Control_Number&gt;
+          &lt;Responsible_Agency_Code&gt;X&lt;/Responsible_Agency_Code&gt;
+          &lt;Industry_ID&gt;004010&lt;/Industry_ID&gt;
+      &lt;/Functional_Group_Header&gt;
+      &lt;Transaction_Set_Header&gt;
+          &lt;Transaction_Set_Identifier_Code&gt;810&lt;/Transaction_Set_Identifier_Code&gt;
+          &lt;Transaction_Set_Control_Number&gt;100014444&lt;/Transaction_Set_Control_Number&gt;
+      &lt;/Transaction_Set_Header&gt;
+      &lt;Begin_Invoice&gt;
+          &lt;Invoice_Date&gt;20200221&lt;/Invoice_Date&gt;
+          &lt;Invoice_Number&gt;E064784444&lt;/Invoice_Number&gt;
+          &lt;PO_Date&gt;&lt;/PO_Date&gt;
+          &lt;PO_Number&gt;X1055555&lt;/PO_Number&gt;
+          &lt;Release_Number&gt;&lt;/Release_Number&gt;
+          &lt;Changed_Order_Sequence&gt;&lt;/Changed_Order_Sequence&gt;
+          &lt;Transaction_Type_Code&gt;&lt;/Transaction_Type_Code&gt;
+      &lt;/Begin_Invoice&gt;
+      &lt;Currency&gt;
+          &lt;Entity_Identifier_Code&gt;BY&lt;/Entity_Identifier_Code&gt;
+          &lt;Currency_Code&gt;USD&lt;/Currency_Code&gt;
+      &lt;/Currency&gt;
+      &lt;Reference_Identification&gt;
+          &lt;Reference_Identification_Qualifier&gt;BM&lt;/Reference_Identification_Qualifier&gt;
+          &lt;Reference_Identification&gt;999749873334&lt;/Reference_Identification&gt;
+      &lt;/Reference_Identification&gt;
+      &lt;Name&gt;
+          &lt;Entity_Identifier_Code&gt;CN&lt;/Entity_Identifier_Code&gt;
+          &lt;Name&gt;G0205016&lt;/Name&gt;
+      &lt;/Name&gt;
+      &lt;Name&gt;
+          &lt;Entity_Identifier_Code&gt;CN2&lt;/Entity_Identifier_Code&gt;
+          &lt;Name&gt;G0305017&lt;/Name&gt;
+      &lt;/Name&gt;
+      &lt;Total_invoice_amount&gt;8550&lt;/Total_invoice_amount&gt;
+      &lt;SAC_Information&gt;
+          &lt;Allowance_or_Charge_Indicator&gt;C&lt;/Allowance_or_Charge_Indicator&gt;
+          &lt;Service_or_Charge_Code&gt;D500&lt;/Service_or_Charge_Code&gt;
+          &lt;SAC_03&gt;ZZ&lt;/SAC_03&gt;
+          &lt;SAC_04&gt;HDLG&lt;/SAC_04&gt;
+          &lt;Amount&gt;800&lt;/Amount&gt; 
+          &lt;Description&gt;HANDLING&lt;/Description&gt;
+      &lt;/SAC_Information&gt;
+      &lt;Transaction_Set_Trailer&gt;
+          &lt;Number_of_Included_Segments&gt;15&lt;/Number_of_Included_Segments&gt; 
+          &lt;Transaction_Set_Control_Number&gt;100015519&lt;/Transaction_Set_Control_Number&gt;
+      &lt;/Transaction_Set_Trailer&gt;
+      &lt;Functional_Group_Trailer&gt;
+          &lt;Number_of_Transaction_Sets_Incl&gt;1&lt;/Number_of_Transaction_Sets_Incl&gt;
+          &lt;Group_Control_Number&gt;100015511&lt;/Group_Control_Number&gt;
+      &lt;/Functional_Group_Trailer&gt;
+      &lt;Interchange_Control_Trailer&gt;
+          &lt;Nbr_of_Included_Functional_Groups&gt;1&lt;/Nbr_of_Included_Functional_Groups&gt;
+          &lt;Interchange_Control_Number&gt;100015511&lt;/Interchange_Control_Number&gt;
+      &lt;/Interchange_Control_Trailer&gt;
+    &lt;/UniversalTransaction&gt;
+    ```
+
+#### Build and run
+
+1. Launch Visual Studio Code with the WSO2 Integrator: MI for VS Code extension (MI for VS Code) installed.
+
+    !!! info
+        Follow the [Install WSO2 Integrator: MI for VS Code]({{base_path}}/develop/mi-for-vscode/install-wso2-mi-for-vscode) documentation for a complete installation guide.
+
+2. Create an [integration project]({{base_path}}/develop/create-integration-project/).
+3. Create the artifacts (proxy service, registry resource) with the configurations given above.
+4. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+5. Send a POST request to the &lt;code&gt;xml-to-edi-proxy&lt;/code&gt; with the above given payload.
+	
+-   Output Payload
+    ```text
+    ISA*00**00**ZZ*XXXXXXXXX*01*834469876*200221*1946*U*00401*100015519*1*P*&gt;!
+    GS*IN*XXXXXXXXX*834469876*20200221*1946*100014444*X*004010!
+    ST*810*100014444!
+    BIG*20200221*E064784444**X1055555***!
+    CUR*BY*USD!
+    REF*BM*999749873334!
+    N1*CN*G0205016!
+    N1*CN2*G0305017!
+    TDS*8550!
+    SAC*C*D500*ZZ*HDLG*800*HANDLING!
+    SE*15*100015519!
+    GE*1*100015511!
+    IEA*1*100015511!
+    ```
+    
+### Accessing variables and properties
+
+This example shows how to access variables and properties using the following variables: &lt;code&gt;var&lt;/code&gt;, &lt;code&gt;ctx&lt;/code&gt;, &lt;code&gt;axis2&lt;/code&gt;, and &lt;code&gt;trp&lt;/code&gt;.
+
+-   FreeMarker Tamplate
+    ```json
+    {
+    &quot;variable&quot; : &quot;${var.user_id}&quot;,
+    &quot;ctx property&quot; : &quot;${ctx.user_name}&quot;,
+    &quot;axis2 property&quot;: &quot;${axis2.REST_URL_POSTFIX}&quot;,
+    &quot;trp property&quot;: &quot;${trp.Host}&quot;
+    }
+    ```
+
+    In this freemarker template, we have referenced the variable named &lt;code&gt;user_id&lt;/code&gt;, default scoped property named &lt;code&gt;user_name&lt;/code&gt;, the axis2 scoped property named &lt;code&gt;REST_URL_POSTFIX&lt;/code&gt;, and the transport header &lt;code&gt;Host&lt;/code&gt;. The output is returned as a JSON object.
+
+-   Output Payload
+    ```json
+    {
+    &quot;variable&quot; : &quot;567865&quot;,
+    &quot;ctx property&quot;: &quot;john&quot;,
+    &quot;axis2 property&quot;: &quot;/demo&quot;,
+    &quot;trp property&quot;: &quot;localhost:8290&quot;
+    }
+    ```
+
+-   Synapse Code
+    ```xml
+    &lt;variable name=&quot;user_id&quot; type=&quot;STRING&quot; value=&quot;567865&quot;/&gt;
+    &lt;property name=&quot;user_name&quot; scope=&quot;default&quot; type=&quot;STRING&quot; value=&quot;john&quot;/&gt;
+    &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;freemarker&quot;&gt;
+        &lt;format&gt;&lt;![CDATA[{
+            &quot;variable&quot; : &quot;${var.user_id}&quot;,
+            &quot;ctx property&quot; : &quot;${ctx.user_name}&quot;,
+            &quot;axis2 property&quot;: &quot;${axis2.REST_URL_POSTFIX}&quot;,
+            &quot;trp property&quot;: &quot;${trp.Host}&quot;
+            }]]&gt;
+        &lt;/format&gt;
+    &lt;/payloadFactory&gt;
+    ```
+
+### Handling optional values
+
+Some of the input parameters you specify in the FreeMarker template (payload, properties, and variables) may be optional. This
+means that the value can be null or empty during runtime. It is important to handle optional parameters in the FreeMarker template to avoid runtime issues due to null or empty values. FreeMarker
+[documentation](https://freemarker.apache.org/docs/dgui_template_exp.html#dgui_template_exp_missing)
+describes methods for handling optional parameters properly. The following example shows how to handle optional values in a
+FreeMarker template by using the **Default value operator** described in the FreeMarker documentation.
+
+-   Input Payload
+    ```json
+    {
+    &quot;first_name&quot;: &quot;John&quot;,
+    &quot;age&quot;: 35
+    }
+    ```
+-   FreeMarker Tamplate
+    ```
+    {
+    &quot;Name&quot;: &quot;${payload.first_name} ${payload.last_name ! &quot;&quot; }&quot;,
+    &quot;Age&quot;: ${payload.age}
+    }
+    ```
+
+-   Output Payload
+    ```json
+    {
+    &quot;Name&quot;: &quot;John &quot;,
+    &quot;Age&quot;: 35
+    }
+    ```
+
+-   Synapse Code
+    ```xml
+    &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;freemarker&quot;&gt;
+        &lt;format&gt;&lt;![CDATA[{
+        &quot;Name&quot;: &quot;${payload.first_name} ${payload.last_name ! &quot;&quot; }&quot;,
+        &quot;Age&quot;: ${payload.age}
+         }]]&gt;
+        &lt;/format&gt;
+    &lt;/payloadFactory&gt;
+    ```
+
+In this example, The FreeMarker template is expecting a property named &lt;code&gt;last_name&lt;/code&gt; from the input payload. However, the 
+payload does not contain that property. To handle that, the
+&lt;code&gt;${payload.last_name ! &quot;&quot; }&lt;/code&gt; syntax is used in the template. This syntax replaces the &lt;code&gt;last_name&lt;/code&gt; value with an empty 
+string if it is not present in the input payload.
+</body>
+</html>

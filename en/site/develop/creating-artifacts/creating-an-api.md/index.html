@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>creating-an-api.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Create an API
+
+Follow these instructions to create an [API]({{base_path}}/reference/synapse-properties/rest-api-properties) artifact in the WSO2 Integrator: MI for Visual Studio Code extension (MI for VS Code).
+
+## Create an API artifact
+
+{!includes/creating-project.md!}
+
+    Hereafter, this project will be referred to as `&lt;PROJECT_NAME&gt;`.
+
+3. To add a new API, navigate to **WSO2 Integrator: MI Project Explorer**.
+
+4. Click on the **+** icon to open the **Add Artifact** pane.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/add-artifact-icon.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/add-artifact-icon.png&quot; alt=&quot;add artifact&quot; width=&quot;40%&quot;&gt;&lt;/a&gt;
+
+5. On the **Add artifact** pane, click **API** under **Create an Integration** to open the **API Form**.
+
+6. Provide details for the API artifact.
+    
+     &lt;table&gt;
+        &lt;thead&gt;
+           &lt;tr&gt;
+              &lt;th&gt;Field&lt;/th&gt;
+              &lt;th&gt;Description&lt;/th&gt;
+           &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+           &lt;tr&gt;
+              &lt;td&gt;**Name**&lt;/td&gt;
+              &lt;td&gt;The name of the API artifact.&lt;/td&gt;
+           &lt;/tr&gt;
+           &lt;tr&gt;
+              &lt;td&gt;**Context**&lt;/td&gt;
+              &lt;td&gt;The context for the API. For example, &lt;code&gt;/healthcare&lt;/code&gt;. 
+              &lt;div class=&quot;admonition note&quot;&gt;
+              &lt;p class=&quot;admonition-title&quot;&gt;Note&lt;/p&gt;
+              &lt;p&gt;
+              &lt;ul&gt;
+                 &lt;li&gt;This value will be automatically populated with the same value you provided for the API **Name**, or you can update it with a different name.&lt;/li&gt; 
+                 &lt;li&gt;The API context should be unique for each API.&lt;/li&gt;
+                 &lt;li&gt;It is not recommended to use &lt;code&gt;/service&lt;/code&gt; as the API context because it is preserved for Proxy services.&lt;/li&gt;
+              &lt;/ul&gt;
+              &lt;/p&gt;
+              &lt;/div&gt;
+              &lt;/td&gt;
+           &lt;/tr&gt;
+           &lt;tr&gt;
+         &lt;td&gt;**Generate API From**&lt;/td&gt;
+         &lt;td&gt;
+             Select one of the given options:
+             &lt;ul&gt;
+                 &lt;li&gt;**None**: This option is selected by default. Use it to create a new API artifact from scratch.&lt;/li&gt;
+                 &lt;li&gt;**From OpenAPI definition**: Select this option to generate the API artifact from an existing Swagger definition (YAML/JSON file). The Synapse configuration (XML) of the API will be generated using the Swagger definition.&lt;/li&gt;
+                 &lt;li&gt;**From WSDL file**: Select this option to generate Synapse API from a Web Services Description Language (WSDL) endpoint.&lt;/li&gt;
+             &lt;/ul&gt;
+         &lt;/td&gt;
+         &lt;/tr&gt;
+        &lt;/tbody&gt;
+     &lt;/table&gt;
+
+    - If you selected **None** under **Generate API From**, you can start creating an API from scratch.
+
+        &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/generate-api.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/generate-api.png&quot; alt=&quot;generate API from wsdl file&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    -  If you selected **From OpenAPI definition** under **Generate API From**, enter the details of your custom Swagger file:
+
+        &lt;table&gt;
+            &lt;tr&gt;
+                &lt;th&gt;
+                    Parameter
+                &lt;/th&gt;
+                &lt;th&gt;
+                    Description
+                &lt;/th&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+                &lt;td&gt;
+                    Swagger File
+                &lt;/td&gt;
+                &lt;td&gt;
+                    Click &lt;b&gt;Select Location&lt;/b&gt; and select a file for OpenAPI definition. This field is required.
+                &lt;/td&gt;
+            &lt;/tr&gt;
+            &lt;tr&gt;
+                &lt;td&gt;
+                    Save Swagger Definition
+                &lt;/td&gt;
+                &lt;td&gt;
+                    Check this to save the Swagger definition.&lt;/br&gt;
+                &lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/table&gt;
+
+        &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/generate-api-from-openapi-definition.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/generate-api-from-openapi-definition.png&quot; alt=&quot;generate API from openAPI definition&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    - If you selected **From WSDL file** under **Generate API From**, enter the following information:
+
+        &lt;table&gt;&lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th&gt;Parameter&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+          &lt;/tr&gt;&lt;/thead&gt;
+        &lt;tbody&gt;
+          &lt;tr&gt;
+            &lt;td&gt;WSDL Type&lt;/td&gt;
+            &lt;td&gt;Select &lt;b&gt;File&lt;/b&gt; to generate API from a WSDL file or a ZIP file containing a valid WSDL file, or select &lt;b&gt;URL&lt;/b&gt; to generate the API using a remote WSDL file.&lt;/td&gt;
+          &lt;/tr&gt;
+          &lt;tr&gt;
+            &lt;td&gt;WSDL File&lt;/td&gt;
+            &lt;td&gt;Browse and select the WSDL file or ZIP file that contains a valid WSDL file.&lt;/td&gt;
+          &lt;/tr&gt;
+          &lt;tr&gt;
+            &lt;td&gt;WSDL URL&lt;/td&gt;
+            &lt;td&gt;Give the remote location of the SOAP Service WSDL file as a valid URL.&lt;/td&gt;
+          &lt;/tr&gt;
+          &lt;tr&gt;
+            &lt;td&gt;SOAP Endpoint&lt;/td&gt;
+            &lt;td&gt;Give the actual SOAP Backend URL. (This should return a valid WSDL when invoked with &lt;code&gt;?wsdl&lt;/code&gt;.)&lt;/td&gt;
+          &lt;/tr&gt;
+        &lt;/tbody&gt;
+        &lt;/table&gt;
+
+        &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/generate-api-from-wsdl-file.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/generate-api-from-wsdl-file.png&quot; alt=&quot;generate API from wsdl file&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+        !!! Note
+            - The current SOAP to REST generation has some limitations.
+            - Go to the &lt;a target=&quot;_blank&quot; href=&quot;https://github.com/wso2/soap-to-rest/blob/main/limitations.md&quot;&gt;Limitations of SOAP to REST Feature&lt;/a&gt; documentation for more details on these limitations.
+            - All the generated REST services are not production-ready and require manual review and necessary edits using MI for VS Code.
+            - Additionally, since using a dot `.` in XML element names is not considered a best practice, you may need to manually modify the generated SOAP payload to remove or adjust the dot notation.
+
+7. Once you complete the **API Form**, click **Create**.
+
+!!! info
+    You can switch to the default Visual Studio Code **Explorer** to view the folder structure.
+
+    - The newly-created API will be stored in the `&lt;PROJECT_NAME&gt;/src/main/wso2mi/artifacts/apis` folder of your integration project. 
+    - A Swagger file for the API will be generated in the `&lt;PROJECT_NAME&gt;/src/main/wso2mi/resources/api-definitions` folder.
+
+- The created APIs will be displayed in **Project Overview**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/available-apis.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/available-apis.png&quot; alt=&quot;available-apis&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+## Add new API resources
+
+When you create the API, an API resource is created by default. If you want to add a new resource:
+
+1. Click **+ Resource** on the **Service Designer** to open the **Add API Resource** pane.
+
+2. Add the required details.
+
+3. Click **Create**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/add-resource.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/add-resource.png&quot; alt=&quot;add new API resource&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+!!! Info &quot;Default API resource&quot;
+
+    Each API can have at most one default resource. Any request received
+        by the API but does not match any of the enclosed resources
+        definitions will be dispatched to the default resource of the API.
+        In the following example, if a DELETE request is received by `SampleAPI` on the `/payments` URL, the request will be
+        dispatched to the default resource as none of the resources in SampleAPI are configured to handle DELETE requests.
+
+    === &quot;SampleAPI&quot;
+        ```xml
+        &lt;api name=&quot;SampleAPI&quot; context=&quot;/payments&quot;&gt;
+        &lt;resource url-mapping=&quot;/list&quot; methods=&quot;GET&quot; inSequence=&quot;seq1&quot;/&gt;
+        &lt;resource uri-template=&quot;/edit/{userId}&quot; methods=&quot;PUT POST&quot;&gt;
+            &lt;inSequence&gt;
+                 &lt;log/&gt;
+                 &lt;send&gt;
+                      &lt;endpoint key=&quot;BackendService&quot;/&gt;
+                 &lt;/send&gt;
+            &lt;/inSequence&gt;
+        &lt;/resource&gt;
+        &lt;resource inSequence=&quot;seq2&quot;/&gt;
+        &lt;/api&gt;
+        ```    
+
+The created API resources will be available in **Service Designer** under **Available Resources** for each created API.
+
+&lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/available-resources.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/available-resources.png&quot; alt=&quot;available-resources&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+&lt;!--
+
+## Update metadata
+
+When you create the API artifact from MI for VS Code extension, the metadata files will be created and stored under the `&lt;PROJECT_NAME&gt;/src/main/wso2mi/resources/metadata` folder.
+
+!!! note
+    You can view the below folder structure by [switching]({{base_path}}/develop/mi-for-vscode/mi-for-vscode-overview/#mi-project-explorer) to the VS Code default **Explorer** view.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/metadata-folder.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/metadata-folder.png&quot; alt=&quot;Metadata folder&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+The service&#x27;s metadata is used by the API management runtime to generate the API proxy for the integration service (which is this API).
+
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;
+            Parameter
+        &lt;/th&gt;
+        &lt;th&gt;
+            Description
+        &lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;
+            description
+        &lt;/td&gt;
+        &lt;td&gt;
+            Explain the purpose of the API.
+        &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;
+            serviceUrl
+        &lt;/td&gt;
+        &lt;td&gt;
+            This is the URL of the API when it gets deployed in the WSO2 Integrator: MI. You (as the integration developer) may not know this URL during development. Therefore, you can parameterize the URL to be resolved later using environment variables. By default, the &lt;code&gt;{MI_HOST}&lt;/code&gt; and &lt;code&gt;{MI_PORT}&lt;/code&gt; values are parameterized with placeholders.&lt;/br&gt;&lt;/br&gt;
+            You can configure the serviceUrl in the following ways:
+            &lt;ul&gt;
+                &lt;li&gt;
+                    Add the complete URL without parameters. For example: &lt;code&gt;http://localhost:8290/healthcare&lt;/code&gt;.&lt;/br&gt;
+                &lt;/li&gt;
+                &lt;li&gt;
+                    Parameterize using the host and port combination. For example: &lt;code&gt;http://{MI_HOST}:{MI_PORT}/healthcare&lt;/code&gt;.
+                &lt;/li&gt;
+                &lt;li&gt;
+                    Parameterize using a preconfigured URL. For example: &lt;code&gt;http://{MI_URL}/healthcare&lt;/code&gt;.
+                &lt;/li&gt;
+            &lt;/ul&gt;
+        &lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+
+!!! Tip
+    See the [Service Catalog API documentation](https://apim.docs.wso2.com/en/latest/reference/product-apis/service-catalog-apis/service-catalog-v1/service-catalog-v1/) for more information on the metadata in the YAML file.
+
+--&gt;
+
+## Design the integration
+
+1. Open the **Resource View** of the API resource.
+
+    1. Go to **MI Project Explorer** &gt; **APIs**.
+    2. Under the API you created, click the API resource to open the **Resource View** of the API resource.
+
+2. Click on the **+** icon below the API resource to open the palette.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/open-palette.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/open-palette.png&quot; alt=&quot;open-palette&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. Add the required mediators and connectors to the API resource and design the integration flow.
+
+## Update configurations
+
+### Update the API configurations
+
+1. Go to **Project Overview**.
+
+2. Under **APIs**, select the API you want to edit. This will open the **Service Designer**.
+
+3. On the **Service Designer**, click the **Edit** icon to edit the API. 
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/edit-api-interface.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/edit-api-interface.png&quot; alt=&quot;available-apis&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    This will open the **Edit API** pane.
+
+4. Once you edit, click **Save Changes**.
+
+    See the complete list of [API configurations]({{base_path}}/reference/synapse-properties/rest-api-properties/#rest-api-properties) you can configure.
+
+### Update the API resource configurations
+
+1. Go to **Project Overview**.
+
+2. Under **APIs**, select the API you want to edit. This will open the **Service Designer**.
+
+3. On the **Service Designer**, click on the API resource to go to the **Resource View** of the API resource.
+
+4. Click the **Edit** icon to edit the API resource.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/edit-api-resource-interface.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/edit-api-resource-interface.png&quot; alt=&quot;available-apis&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    This will open the **Edit API Resource** pane.
+
+5. Once you edit, click **Update**.
+
+    See the complete list of [API Resource configurations]({{base_path}}/reference/synapse-properties/rest-api-properties/#rest-api-resource-properties) you can configure.
+
+## Source view
+
+Click the **Show Source** (**&lt;/&gt;**) icon located in the top right corner of the VS Code to view the XML-based synapse configuration (source code) of the API.
+
+&lt;a href=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/qsg/show-source-view.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/mi-for-vscode/qsg/show-source-view.png&quot; alt=&quot;Show source view&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+You can update the API using this view.
+
+&lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/source-view.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/source-view.png&quot; alt=&quot;source view&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+## Swagger view
+
+1. Go to **Service Designer**.
+
+2. Click **OpenAPI Spec** to view the API definition of your API.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/open-api-spec.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/open-api-spec.png&quot; alt=&quot;OpenAPI spec&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+You can interact with the API using the **Swagger View**.
+
+!!! Note
+    If you have created the API by adding a custom Swagger definition, this view displays the API&#x27;s default Swagger definition, not the custom one you have added.
+
+## Enable CORS
+
+To enable CORS for your API, follow these steps:
+
+1. Go to **Project Overview**.
+
+2. Under **APIs**, select the API you want to edit. This will open the **Service Designer**.
+
+3. On the **Service Designer**, click the **Edit** icon to edit the API.
+
+4. In the **Edit API** pane, navigate to the **CORS** section.
+
+5. Enable CORS by toggling the checkbox.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/cors-enabled.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/create-rest-api/cors-enabled.png&quot; alt=&quot;CORS enabled&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+6. Configure the allowed origins, methods, and headers as per your requirements.
+
+7. Click **Save Changes**.
+
+## Examples
+
+Follow our examples on APIs: 
+
+- [Using a Simple Rest API]({{base_path}}/learn/examples/rest-api-examples/introduction-rest-api)
+- [Working with Query Parameters]({{base_path}}/learn/examples/rest-api-examples/setting-query-params-outgoing-messages)
+- [Exposing a SOAP Endpoint as a RESTful API]({{base_path}}/learn/examples/rest-api-examples/enabling-rest-to-soap)
+- [Exposing Non-HTTP Services as RESTful APIs]({{base_path}}/learn/examples/rest-api-examples/configuring-non-http-endpoints)
+- [Handling Non Matching Resources]({{base_path}}/learn/examples/rest-api-examples/handling-non-matching-resources)
+- [Handling HTTP Status Codes]({{base_path}}/learn/examples/rest-api-examples/setting-https-status-codes)
+- [Manipulating Content Types]({{base_path}}/learn/examples/rest-api-examples/transforming-content-type)
+- [Securing a REST API with JWT (Self Contained) Access Tokens]({{base_path}}/learn/examples/rest-api-examples/securing-rest-apis-with-jwt-access-tokens)
+- [Securing a REST API with Basic Auth]({{base_path}}/learn/examples/rest-api-examples/securing-rest-apis)
+- [Special Cases]({{base_path}}/learn/examples/rest-api-examples/special-cases)
+    </body>
+</html>

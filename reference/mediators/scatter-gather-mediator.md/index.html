@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>scatter-gather-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Scatter Gather Mediator
+
+The **Scatter Gather Mediator** can be used to clone a message into several messages and aggregate the responses. It resembles the [Scatter-Gather enterprise integration pattern]({{base_path}}/learn/enterprise-integration-patterns/message-routing/scatter-gather/).
+
+## Syntax
+
+```xml
+&lt;scatter-gather parallel-execution=(true | false) target=(Body | Variable) target-variable=(string) result-content-type=(JSON | XML) result-enclosing-element=(string)&gt;
+    &lt;aggregation expression=&quot;expression&quot; condition=&quot;expression&quot; timeout=&quot;long&quot; min-messages=&quot;expression&quot; max-messages=&quot;expression&quot;/&gt;
+        &lt;sequence&gt;
+        (mediator)+
+        &lt;/sequence&gt;+
+&lt;/scatter-gather&gt;
+```
+## Configuration
+
+The parameters available to configure the Scatter Gather mediator are as follows.
+
+### General Configurations
+
+&lt;table&gt;
+   &lt;thead&gt;
+      &lt;tr class=&quot;header&quot;&gt;
+         &lt;th&gt;Parameter Name&lt;/th&gt;
+         &lt;th&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+   &lt;/thead&gt;
+   &lt;tbody&gt;
+      &lt;tr class=&quot;odd&quot;&gt;
+         &lt;td&gt;&lt;strong&gt;Parallel Execution&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;
+            Specifies whether the sequences should execute in parallel or sequentially. 
+            &lt;ul&gt;
+               &lt;li&gt;&lt;strong&gt;True&lt;/strong&gt;: Executes the sequences in parallel. (Default)&lt;/li&gt;
+               &lt;li&gt;&lt;strong&gt;False&lt;/strong&gt;: Executes the sequences sequentially.&lt;/li&gt;
+            &lt;/ul&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+   &lt;/tbody&gt;
+&lt;/table&gt;
+
+### Aggregate Configurations
+
+&lt;table&gt;
+   &lt;thead&gt;
+      &lt;tr&gt;
+         &lt;th&gt;Parameter Name&lt;/th&gt;
+         &lt;th&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+   &lt;/thead&gt;
+   &lt;tbody&gt;
+      &lt;tr class=&quot;odd&quot;&gt;
+         &lt;td&gt;&lt;strong&gt;Content Type&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;
+            Specifies the format of the aggregated result. Supported values:
+            &lt;ul&gt;
+               &lt;li&gt;&lt;strong&gt;JSON&lt;/strong&gt;: Aggregates results in JSON format. (Default)&lt;/li&gt;
+               &lt;li&gt;&lt;strong&gt;XML&lt;/strong&gt;: Aggregates results in XML format.&lt;/li&gt;
+            &lt;/ul&gt;
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;even&quot;&gt;
+         &lt;td&gt;&lt;strong&gt;Result Enclosing Element Name&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;Specifies the name of the root element wrapping the aggregation result. Applicable only when &lt;strong&gt;Content Type&lt;/strong&gt; is XML.&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;odd&quot;&gt;
+         &lt;td&gt;&lt;strong&gt;Aggregate Entire Payloads&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;
+            By default, the entire message payload is aggregated across all flows. If you prefer to aggregate only specific parts of the payload, disable this option and specify the required portions using an expression.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;even&quot;&gt;
+         &lt;td&gt;&lt;strong&gt;Partial payload to Aggregate&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;
+            Specifies the expression that defines which part of the message payload should be aggregated.
+            This parameter is applicable only when &lt;strong&gt;Aggregate Entire Payloads&lt;/strong&gt; is disabled.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;odd&quot;&gt;
+         &lt;td&gt;&lt;strong&gt;Filter Messages for Aggregation&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;
+            By default, all messages are aggregated. Enable this option to filter messages based on a specified condition before aggregation.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr class=&quot;even&quot;&gt;
+         &lt;td&gt;&lt;strong&gt;Condition&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;
+            Defines the condition used to filter which responses should be included in the final aggregation.
+            To prevent indefinite waiting, either a &lt;strong&gt;Completion Timeout&lt;/strong&gt; or a &lt;strong&gt;Minimum flows to complete&lt;/strong&gt; value must be configured under &lt;a href=&quot;{{base_path}}/reference/mediators/scatter-gather-mediator/#advanced-configurations&quot;&gt;Advanced configurations&lt;/a&gt;.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+   &lt;/tbody&gt;
+&lt;/table&gt;
+
+### Advanced Configurations
+
+&lt;table&gt;
+   &lt;thead&gt;
+      &lt;tr&gt;
+         &lt;th&gt;Parameter Name&lt;/th&gt;
+         &lt;th&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+   &lt;/thead&gt;
+   &lt;tbody&gt;
+      &lt;tr&gt;
+         &lt;td&gt;&lt;strong&gt;Completion Timeout&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;
+            Specifies the maximum duration (in milliseconds) to wait for flows to complete aggregation before timing out.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;&lt;strong&gt;Minimum flows to complete&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;
+            Specifies the minimum number of flows that must be completed before aggregation can proceed.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;&lt;strong&gt;Maximum flows to complete&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;
+            Specifies the maximum number of flows that should be processed for aggregation.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+   &lt;/tbody&gt;
+&lt;/table&gt;
+
+### Output Configurations
+
+&lt;table&gt;
+   &lt;thead&gt;
+      &lt;tr&gt;
+         &lt;th&gt;Parameter Name&lt;/th&gt;
+         &lt;th&gt;Description&lt;/th&gt;
+      &lt;/tr&gt;
+   &lt;/thead&gt;
+   &lt;tbody&gt;
+      &lt;tr&gt;
+         &lt;td&gt;&lt;strong&gt;Overwrite Message Body&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;
+            By default, replaces the message body with the aggregated response from the Scatter Gather mediator.
+            You can disable this option and specify a variable name to store the aggregated response instead.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+         &lt;td&gt;&lt;strong&gt;Output Variable Name&lt;/strong&gt;&lt;/td&gt;
+         &lt;td&gt;
+            Specifies the variable name to store the output of the Scatter Gather mediator.
+            This is applicable only when &lt;strong&gt;Overwrite Message Body&lt;/strong&gt; is disabled.
+         &lt;/td&gt;
+      &lt;/tr&gt;
+   &lt;/tbody&gt;
+&lt;/table&gt;
+
+## Example
+
+In this example, the Scatter Gather mediator execute the sequences parallelly and replace the message body with the aggregated JSON result.
+
+```xml
+&lt;scatter-gather parallel-execution=&quot;true&quot; target=&quot;Body&quot; result-content-type=&quot;JSON&quot;&gt;
+   &lt;aggregation expression=&quot;${payload}&quot; /&gt;
+   &lt;sequence&gt;
+      &lt;log category=&quot;INFO&quot;&gt;
+         &lt;message&gt;Processing message in clone path 1&lt;/message&gt;
+      &lt;/log&gt;
+      &lt;payloadFactory media-type=&quot;json&quot; template-type=&quot;default&quot;&gt;
+         &lt;format&gt;{
+                &quot;requestId&quot;: ${payload.requestId},
+                &quot;pet&quot;: {
+                &quot;name&quot;: &quot;pet2&quot;,
+                &quot;type&quot;: &quot;cat&quot;
+                },
+                &quot;status&quot;: true
+                }&lt;/format&gt;
+      &lt;/payloadFactory&gt;
+   &lt;/sequence&gt;
+   &lt;sequence&gt;
+      &lt;log category=&quot;INFO&quot;&gt;
+         &lt;message&gt;Processing message in clone path 2&lt;/message&gt;
+      &lt;/log&gt;
+      &lt;call&gt; 
+         &lt;endpoint&gt;
+            &lt;http method=&quot;post&quot; uri-template=&quot;http://localhost:5454/api/pet&quot;/&gt;
+         &lt;/endpoint&gt;
+      &lt;/call&gt;
+   &lt;/sequence&gt;
+&lt;/scatter-gather&gt;
+```
+
+In this example, the Scatter Gather work in sequential mode and save the aggregated XML result to a variable named &lt;code&gt;servicesResult&lt;/code&gt;.
+
+```xml
+&lt;scatter-gather parallel-execution=&quot;false&quot; target=&quot;Variable&quot; target-variable=&quot;servicesResult&quot; result-content-type=&quot;XML&quot; result-enclosing-element=&quot;AggregatedResults&quot;&gt;
+   &lt;aggregation expression=&quot;xpath(&#x27;$body/node()&#x27;)&quot; /&gt;
+   &lt;sequence&gt;
+      &lt;log category=&quot;INFO&quot;&gt;
+         &lt;message&gt;Processing message in clone path 1&lt;/message&gt;
+      &lt;/log&gt;
+      &lt;call&gt;
+         &lt;endpoint&gt;
+            &lt;address uri=&quot;http://service1.example.com&quot; /&gt;
+         &lt;/endpoint&gt;
+      &lt;/call&gt;
+   &lt;/sequence&gt;
+   &lt;sequence&gt;
+      &lt;log category=&quot;INFO&quot;&gt;
+         &lt;message&gt;Processing message in clone path 2&lt;/message&gt;
+      &lt;/log&gt;
+      &lt;call&gt;
+         &lt;endpoint&gt;
+            &lt;address uri=&quot;http://service2.example.com&quot; /&gt;
+         &lt;/endpoint&gt;
+      &lt;/call&gt;
+   &lt;/sequence&gt;
+&lt;/scatter-gather&gt;
+```
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>mongo-data-service.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Expose a Mongo Datasource
+
+This example demonstrates how Mongo data can be exposed as a data service.
+These data services are compatible with MongoDB Java Driver version 4.9.1.
+
+## Prerequisites
+
+Let&#x27;s create a simple Mongo database that stores employee information.
+
+1.  Download and set up a &lt;b&gt;MongoDB&lt;/b&gt; server.
+2.  Use the following commands to create the database.
+
+    ```bash
+    mongosh
+    use employeesdb
+    db.createCollection(&quot;employees&quot;)
+    db.things.insert( { id: 1, name: &quot;Document1&quot; } )
+    db.employees.insert( { id: 1, name: &quot;Sam&quot; } )
+    db.employees.insert( { id: 2, name: &quot;Mark&quot; } )
+    db.employees.insert( { id: 3, name: &quot;Steve&quot; } )
+    db.employees.insert( { id: 4, name: &quot;Jack&quot; } )
+    ```
+
+## Synapse configuration
+Given below is the data service configuration you need to build. See the instructions on how to [build and run](#build-and-run) this example.
+
+```xml
+&lt;data name=&quot;MongoDB&quot; transports=&quot;http https local&quot;&gt;
+   &lt;config enableOData=&quot;false&quot; id=&quot;MongoDB&quot;&gt;
+      &lt;property name=&quot;mongoDB_servers&quot;&gt;localhost&lt;/property&gt;
+      &lt;property name=&quot;mongoDB_database&quot;&gt;employeesdb&lt;/property&gt;
+      &lt;property name=&quot;mongoDB_read_preference&quot;&gt;PRIMARY&lt;/property&gt;
+   &lt;/config&gt;
+   &lt;query id=&quot;mongo_insert&quot; useConfig=&quot;MongoDB&quot;&gt;
+      &lt;expression&gt;employees.insert(&quot;{id:#, name:#}&quot;)&lt;/expression&gt;
+      &lt;param name=&quot;id&quot; optional=&quot;false&quot; sqlType=&quot;INTEGER&quot;/&gt;
+      &lt;param name=&quot;name&quot; optional=&quot;false&quot; sqlType=&quot;STRING&quot;/&gt;
+   &lt;/query&gt;
+   &lt;query id=&quot;mongo_find&quot; useConfig=&quot;MongoDB&quot;&gt;
+      &lt;expression&gt;employees.find()&lt;/expression&gt;
+      &lt;result element=&quot;Documents&quot; rowName=&quot;Document&quot;&gt;
+         &lt;element column=&quot;document&quot; name=&quot;Data&quot; xsdType=&quot;string&quot;/&gt;
+      &lt;/result&gt;
+    &lt;/query&gt;
+   &lt;operation name=&quot;mongo_insert_op&quot;&gt;
+      &lt;call-query href=&quot;mongo_insert&quot;&gt;
+         &lt;with-param name=&quot;id&quot; query-param=&quot;id&quot;/&gt;
+         &lt;with-param name=&quot;name&quot; query-param=&quot;name&quot;/&gt;
+      &lt;/call-query&gt;
+   &lt;/operation&gt;
+   &lt;operation name=&quot;mongo_find_op&quot;&gt;
+      &lt;call-query href=&quot;mongo_find&quot;/&gt;
+   &lt;/operation&gt;
+   &lt;resource method=&quot;POST&quot; path=&quot;insert/{id}&quot;&gt;
+      &lt;call-query href=&quot;mongo_insert&quot;&gt;
+         &lt;with-param name=&quot;id&quot; query-param=&quot;id&quot;/&gt;
+         &lt;with-param name=&quot;name&quot; query-param=&quot;name&quot;/&gt;
+      &lt;/call-query&gt;
+   &lt;/resource&gt;
+   &lt;resource method=&quot;GET&quot; path=&quot;find&quot;&gt;
+      &lt;call-query href=&quot;mongo_find&quot;/&gt;
+   &lt;/resource&gt;
+&lt;/data&gt;
+```
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+
+2. [Create the data service]({{base_path}}/develop/creating-artifacts/data-services/creating-data-services) with the configurations given above.
+3. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI. 
+
+Let&#x27;s try out this sample by invoking the `find` resource in the data service to GET data. Shown below is the [curl](http://curl.haxx.se/) command to send the GET request:
+
+```bash
+curl -X GET http://localhost:8290/services/MongoDB/find
+```
+
+This generates a response as follows.
+
+```bash
+&lt;Documents xmlns=&quot;http://ws.wso2.org/dataservice&quot;&gt;
+  &lt;Document&gt;
+    &lt;Data&gt;{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5fd21a7dc9b921afa1c9b83c&quot;} , &quot;id&quot; : 1.0 , &quot;name&quot; : &quot;Sam&quot;}&lt;/Data&gt;
+  &lt;/Document&gt;
+  &lt;Document&gt;
+    &lt;Data&gt;{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5fd21a87c9b921afa1c9b83d&quot;} , &quot;id&quot; : 2.0 , &quot;name&quot; : &quot;Mark&quot;}&lt;/Data&gt;
+  &lt;/Document&gt;
+  &lt;Document&gt;
+    &lt;Data&gt;{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5fd21a90c9b921afa1c9b83e&quot;} , &quot;id&quot; : 3.0 , &quot;name&quot; : &quot;Steve&quot;}&lt;/Data&gt;
+  &lt;/Document&gt;
+  &lt;Document&gt;
+    &lt;Data&gt;{ &quot;_id&quot; : { &quot;$oid&quot; : &quot;5fd21a9fc9b921afa1c9b83f&quot;} , &quot;id&quot; : 4.0 , &quot;name&quot; : &quot;Jack&quot;}&lt;/Data&gt;
+  &lt;/Document&gt;
+&lt;/Documents&gt;
+```
+</body>
+</html>

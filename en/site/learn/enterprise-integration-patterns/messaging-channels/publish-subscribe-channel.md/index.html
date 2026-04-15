@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>publish-subscribe-channel.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Publish-Subscribe Channel
+
+This page explains how you can implement a sample scenario of Publish-Subscribe Channel EIP using WSO2 Integrator: MI.
+
+## Introduction to Publish-Subscribe Channel
+
+The Publish-Subscribe Channel EIP receives messages from the input channel, and then splits and transmits them among its subscribers through the output channel. Each subscriber has only one output channel. For more information, go to Publish Subscribe Channel. 
+
+!!! info
+    For more information, see the [Publish subscribe channel](https://www.enterpriseintegrationpatterns.com/patterns/messaging/PublishSubscribeChannel.html) documentation.
+
+![Publish subscribe solution ]({{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-channels/publish-subscribe-solution.gif)
+
+## Sample scenario
+
+The example scenario depicts an inventory for stocks and demonstrates how the EIP distributes a sent message among several subscribers. It includes multiple instances of the SimpleStockQuoteService. When a message is added to the WSO2 MI, it is transmitted to these server instances, each of which acts as a subscriber through the ActiveMQ topic.
+
+The diagram below depicts how to simulate the example scenario using WSO2 MI.
+
+![Publish-Subscribe Channel sample scenario]({{base_path}}/assets/img/learn/enterprise-integration-patterns/messaging-channels/publish-subscribe-channel.png)
+
+Before digging into implementation details, let&#x27;s take a look at the relationship between the example scenario and the Publish-Subscribe Channel EIP by comparing their core components.
+
+| Publish-Subscribe Channel EIP            | Publish-Subscribe Channel Example Scenario            |
+|------------------------------------------|-------------------------------------------------------|
+| Subscriber                               | SimpleStockQuoteService                               |
+| Publisher Subscriber Channel             | ActiveMQ topic                                        |
+| Publisher                                | StockQuoteProxy                                       |
+
+## Synapse configurations of the artifacts
+
+=== &quot;StockQuoteProxy&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy name=&quot;StockQuoteProxy&quot; transports=&quot;http&quot; startOnLoad=&quot;true&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+                &lt;property name=&quot;FORCE_SC_ACCEPTED&quot; value=&quot;true&quot; scope=&quot;axis2&quot;/&gt;
+                &lt;call&gt;
+                    &lt;endpoint&gt;
+                        &lt;address uri=&quot;jms:/SimpleStockQuoteService?transport.jms.ConnectionFactoryJNDIName=TopicConnectionFactory&amp;amp;java.naming.factory.initial=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;amp;java.naming.provider.url=tcp://localhost:61616&amp;amp;transport.jms.DestinationType=topic&quot;/&gt;
+                    &lt;/endpoint&gt;
+                &lt;/call&gt;
+            &lt;/inSequence&gt;
+        &lt;/target&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;SimpleStockQuoteService1&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy name=&quot;SimpleStockQuoteService1&quot; transports=&quot;jms&quot; startOnLoad=&quot;true&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+            &lt;log level=&quot;custom&quot;&gt;
+                    &lt;property name=&quot;Subscriber1&quot; value=&quot;I am Subscriber1&quot;/&gt;
+                &lt;/log&gt;
+                &lt;drop/&gt;
+            &lt;/inSequence&gt;
+        &lt;/target&gt;
+        &lt;parameter name=&quot;transport.jms.ContentType&quot;&gt;
+            &lt;rules&gt;
+                &lt;jmsProperty&gt;contentType&lt;/jmsProperty&gt;
+                &lt;default&gt;application/xml&lt;/default&gt;
+            &lt;/rules&gt;
+        &lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.jms.ConnectionFactory&quot;&gt;myTopicConnectionFactory&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.jms.DestinationType&quot;&gt;topic&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.jms.Destination&quot;&gt;SimpleStockQuoteService&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;SimpleStockQuoteService2&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy name=&quot;SimpleStockQuoteService2&quot; transports=&quot;jms&quot; startOnLoad=&quot;true&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;target&gt;
+            &lt;inSequence&gt;
+                    &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+            &lt;log level=&quot;custom&quot;&gt;
+                        &lt;property name=&quot;Subscriber2&quot; value=&quot;I am Subscriber2&quot;/&gt;
+                    &lt;/log&gt;
+                    &lt;drop/&gt;
+                &lt;/inSequence&gt;
+        &lt;/target&gt;
+        &lt;parameter name=&quot;transport.jms.ContentType&quot;&gt;
+            &lt;rules&gt;
+            &lt;jmsProperty&gt;contentType&lt;/jmsProperty&gt;
+            &lt;default&gt;application/xml&lt;/default&gt;
+            &lt;/rules&gt;
+        &lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.jms.ConnectionFactory&quot;&gt;myTopicConnectionFactory&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.jms.DestinationType&quot;&gt;topic&lt;/parameter&gt;
+        &lt;parameter name=&quot;transport.jms.Destination&quot;&gt;SimpleStockQuoteService&lt;/parameter&gt;
+    &lt;/proxy&gt;
+    ```
+
+### How the implementation works
+
+Let&#x27;s break down the key components of the configuration:
+
+- **StockQuoteProxy**: Forwards stock quote requests from clients to a JMS topic, enabling asynchronous processing.
+- **SimpleStockQuoteService1**: Subscribes to the JMS topic, logs a custom message, and drops the message.
+- **SimpleStockQuoteService2**: Similar to **SimpleStockQuoteService1**, it subscribes to the JMS topic, logs a different custom message, and drops the message.
+
+## Set up the sample scenario
+
+Follow the below instructions to simulate this sample scenario.
+
+{!includes/eip-set-up.md!}
+
+3. Download the artifacts of the sample.
+
+    &lt;a href=&quot;{{base_path}}/assets/attachments/learn/enterprise-integration-patterns/publish-subscribe-channel.zip&quot;&gt;
+        &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;
+    &lt;/a&gt;
+
+4. Import the artifacts to WSO2 MI.
+
+    Click **File** -&gt; **Open Folder** -&gt; Select the extracted ZIP file to import the downloaded ZIP file.
+
+5. Start the project in the WSO2 MI server.
+
+    For instructions, go to [Build and Run]({{base_path}}/develop/deploy-artifacts/#build-and-run) Documentation.
+
+6. Set up and Start [ActiveMQ]({{base_path}}/install-and-setup/setup/brokers/configure-with-activemq).
+
+!!!note
+    Make sure to configure the relevant [JMS parameters]({{base_path}}/reference/synapse-properties/transport-parameters/jms-transport-parameters) in the `deployment.toml` file.
+    ```
+    [[transport.jms.listener]]
+    name = &quot;myTopicConnectionFactory&quot;
+    parameter.initial_naming_factory = &quot;org.apache.activemq.jndi.ActiveMQInitialContextFactory&quot;
+    parameter.provider_url = &quot;tcp://localhost:61616&quot;
+    parameter.connection_factory_name = &quot;TopicConnectionFactory&quot;
+    parameter.connection_factory_type = &quot;topic&quot;
+
+    [[transport.jms.sender]]
+    name = &quot;myTopicSender&quot;
+    parameter.initial_naming_factory = &quot;org.apache.activemq.jndi.ActiveMQInitialContextFactory&quot;
+    parameter.provider_url = &quot;tcp://localhost:61616&quot;
+    parameter.connection_factory_name = &quot;TopicConnectionFactory&quot;
+    parameter.connection_factory_type = &quot;topic&quot;
+    ```
+## Execute the sample
+
+Send the following request to the service using SoapUI (or any other SOAP client).
+
+```xml
+POST http://localhost:8290/services/StockQuoteProxy
+
+Accept-Encoding: gzip,deflate
+Content-Type: text/xml;charset=UTF-8
+SOAPAction: &quot;urn:getQuote&quot;
+Connection: Keep-Alive
+
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+&lt;soapenv:Body&gt;
+    &lt;ser:getQuote&gt;
+        &lt;ser:request&gt;
+            &lt;xsd:symbol&gt;IBM&lt;/xsd:symbol&gt;
+        &lt;/ser:request&gt;
+    &lt;/ser:getQuote&gt;
+&lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+```
+
+## Analyze the output
+
+When you execute the command above, the request is sent to the StockQuoteProxy. Notice the following processed server log in WSO2 MI output:
+
+```log
+[2024-08-13 09:40:05,276]  INFO {LogMediator} - {proxy:SimpleStockQuoteService1} Subscriber1 = I am Subscriber1
+[2024-08-13 09:40:05,276]  INFO {LogMediator} - {proxy:SimpleStockQuoteService2} Subscriber2 = I am Subscriber2
+```
+</body>
+</html>

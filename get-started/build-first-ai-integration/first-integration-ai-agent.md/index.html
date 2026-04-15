@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>first-integration-ai-agent.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Build an AI Agent
+
+In the previous tutorial, you learned how to build a RAG application. In this tutorial, you’ll learn how to create an AI agent.
+
+## What you&#x27;ll build
+PineValley Bank is introducing an AI-powered agent designed to assist users in making informed investment decisions and creating investment accounts tailored to their specific needs. This AI agent utilizes a knowledge base and a Large Language Model (LLM) to analyze user queries, provide personalized investment recommendations, and guide users through the account creation process. By integrating this AI agent into the `CustomerService` API deployed in WSO2 Integrator: MI, PineValley Bank aims to deliver seamless and efficient customer service, enhancing user satisfaction and experience.
+
+### Tools Used by the AI Agent
+1. **GetBankDocumentsTool**: Accesses PineValley Bank&#x27;s documents from the knowledge base.
+2. **CustomerInfoTool**: Retrieves customer information from PineValley Bank&#x27;s internal database.
+3. **InvestmentCreationTool**: Facilitates the creation of new investment accounts.
+
+&lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/what_you_will_build.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/what_you_will_build.png&quot; alt=&quot;Create New Project&quot; width=&quot;60%&quot;&gt;&lt;/a&gt;
+
+Now, it&#x27;s time to design the AI agent flow. Follow the steps below to create the agent integration.
+
+## What you&#x27;ll learn
+
+- How to build an AI agent using WSO2 Integrator: MI.
+
+## Prerequisites
+
+1. You need Visual Studio Code (VS Code) with the &lt;a target=&quot;_blank&quot; href=&quot;https://marketplace.visualstudio.com/items?itemName=WSO2.micro-integrator&quot;&gt;WSO2 Integrator: MI for VS Code&lt;/a&gt; extension installed.
+
+    !!! Info
+        See the [Install WSO2 Integrator: MI for VS Code]({{base_path}}/develop/mi-for-vscode/install-wso2-mi-for-vscode/) documentation to learn how to install WSO2 Integrator: MI for VS Code.
+
+2. You must have completed the **Build a Knowledge Base** tutorial under **Build your first AI Integration** before proceeding. Start the [Build a Knowledge Base]({{base_path}}/get-started/build-first-ai-integration/first-integration-knowledge-base/) tutorial if you haven’t completed it yet.
+
+Follow the instructions below to modify the existing project to add the RAG functionality.
+
+## Step 1 - Create a new API
+
+To develop the above scenario, let&#x27;s get started with creating a new API in the existing `BankIntegration` project.
+
+1. Click on the add new API (`+`) icon in the `APIs` in the **WSO2 Integrator: MI Project Explorer** to create a new API.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/rag/create_new_api.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/rag/create_new_api.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+2. Create a new API named `CustomerServiceAPI` by giving the name in the **Create API** form. Click **Create** to create the API.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/create_api.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/create_api.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. In the **Service Designer** pane, modify the resource `Method` to `POST`. 
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/edit_resource.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/edit_resource.gif&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+## Step 2 - Design the integration
+
+1. Open the **Resource View** of the newly created API resource by clicking the `POST /chat` resource under **Available resources** in the **Service Designer**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/select_resource.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/select_resource.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+2. After opening the **Resource View**, click on the **Start** node on the canvas to set an input payload for the integration flow.
+
+    !!! Note
+        Setting an input payload for the integration flow is not mandatory. However, it is recommended, as it will be used to enable expression suggestions, which you will explore in later steps of this tutorial.
+
+    Click **Add Request**, provide the following JSON payload, then click **Add**. Finally, click **Save** to complete the input payload setup.
+
+    ```json
+    {
+        &quot;userID&quot;: &quot;C567&quot;,
+        &quot;query&quot;: &quot;What can I invest in?&quot;
+    }
+    ```
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/set_start_payload.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/set_start_payload.gif&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. Click on the **+** icon on the canvas to open the **Mediator Palette**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_new_mediator.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_new_mediator.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+4. Select `Agent` operation from the **AI** category in the **Mediator Palette**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/select_agent_operation.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/select_agent_operation.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+5. Fill the form with the following details and click **Add** to add the RAG Chat operation to the integration flow.
+
+    We are going to reuse the same connections that we created in the previous tutorial.
+
+    **LLM Connection**: `OPENAI_CONN`  
+    **Memory Connection**: `FILE_MEMORY_CONN`  
+    **User ID**: `payload.userID` (with `EX` enabled)  
+    **Role**: `PineValley Bank Customer Assistant`  
+    **Instructions**:
+    ```text
+    Your task is to recommend suitable investment products based on customer data,  
+    assist with onboarding, and create investment accounts for requested products.  
+
+    After creating the investment account, it will be sent to the manager for approval.  
+    Once it is approved, it will get activated.  
+
+    Use tools to retrieve official PineValley Bank documents like brochures and guidelines.  
+    Provide clear, compliant explanations and step-by-step guidance.  
+
+    Always base recommendations on retrieved information and ask for clarification if needed.  
+    Products include Tax Free Saving Account, High-Interest Savings Account, and more.  
+
+    Ensure all interactions are professional, accurate, and regulatory-compliant.
+    ```  
+    **User Query/Prompt**: `${payload}`  *(Tip: Click the `fx` icon next to the `User Query/Prompt` field, select **Payload** from the expression panel, choose `payload`, and click **Add** to insert this expression.)*  
+    **Overwrite Message Body**: `true`
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_agent_operation.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_agent_operation.gif&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    Now that we added the `Agent` operation, we need to add tools to the agent.    
+    
+6. To proceed with this tutorial, we will mock the Bank&#x27;s API to retrieve customer information and create investment accounts. Let&#x27;s start by creating a mock API to fetch customer details. This mock API will serve as a tool for the AI agent to access customer information during the integration process. 
+
+    1. Click on the **+** icon located just after the **APIs** to add a new API.
+
+        &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/rag/create_new_api.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/rag/create_new_api.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    2. Create a new API named `BankMockAPI` by giving the name in the **Create API** form. Click **Create** to create the API.
+
+    3. In the **Service Designer** pane of the `BankMockAPI`, modify the `Resource Path` to `/customerInfo` and `Method` to `POST`
+
+    4. Open the diagram view by clicking on `POST /customerInfo` under **Available resources** in the **Service Designer**.  
+
+    5. Click on the **+** icon on the canvas to open the **Mediator Palette**.  
+
+    6. Select `Payload` mediator from the **Favourites** category in the **Mediator Palette**.  
+        Give the following as the payload.
+
+        ```json
+        {
+        &quot;userID&quot;: &quot;C567&quot;,
+        &quot;name&quot;: &quot;John Doe&quot;,
+        &quot;age&quot;: 30,
+        &quot;investmentGoal&quot;: &quot;Long-term growth&quot;
+        }
+        ```  
+        Click **Add** to add the payload to the integration flow.  
+        Now, we need to add a **Respond** mediator to respond to the client.
+
+        &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/create_mock_customer_info_api.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/create_mock_customer_info_api.gif&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+        Now that we have created the mock API to retrieve customer information, let&#x27;s proceed to create another mock API for handling investment account creation.
+
+    7. Go to **Service Designer**  of the `BankMockAPI`.  
+
+        &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/goto_mockAPI_serviceDesigner.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/goto_mockAPI_serviceDesigner.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    8. In the **Service Designer** pane, select the **+ Resource** icon to add a new resource.  
+        Set the following details in the **Create Resource** form.  
+        **Resource Path**: `/createInvestmentAccount`  
+        **Method**: `POST`.
+
+    9. Open the diagram view by clicking on `POST /createInvestmentAccount` under **Available resources** in the **Service Designer**.
+
+    10. Click on the **+** icon on the canvas to open the **Mediator Palette**.
+
+    11. Select `Payload` mediator from the **Favourites** category in the **Mediator Palette**.  
+        Give the following as the payload.
+
+        ```json
+        {
+        &quot;accountID&quot;: &quot;INV12345&quot;,
+        &quot;status&quot;: &quot;Pending Approval&quot;
+        }
+        ```  
+
+    11. Click **Add** to add the payload to the integration flow.  
+
+    12. Now, we need to add a **Respond** mediator to respond to the client.
+
+    Now that we have created the mock API to create investment accounts, let&#x27;s proceed to add the tools to the agent.
+
+7. Open the `POST /` resource of the `CustomerServiceAPI` again.
+
+8. Click on the **+** icon located inside the **Agent** operation to open the **Mediator Palette** to add a `Tool`.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/click_add_tool.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/click_add_tool.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+9. Select `POST` from the **HTTP** category in the **Mediator Palette**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/select_http_post.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/select_http_post.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+10. Let&#x27;s configure the tool with the following details.
+
+    **Tool Name**: `CustomerInfoTool`  
+    **Tool Description**: `Get customer information from PineValley Bank&#x27;s internal database`
+
+11. Once you have filled the above details, we need to create a connection to the `MockCustomerInfoAPI` we created earlier.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/select_create_mock_api_connection.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/select_create_mock_api_connection.png&quot; alt=&quot;Create New Project&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+12. Select `HTTP` from the **Add New Connection** page.
+
+13. Fill the form with the following details and click **Add** to add the connection.  
+
+    **Connection Name**: `BankMockAPI_CONN`  
+    **Base URL**: `http://localhost:8290/bankmockapi`
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_mock_api_connection.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_mock_api_connection.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    Click **Add** to add the connection.
+
+    
+
+14. In the **HTTP POST Tool** configuration, set the **Relative Path** as `/customerInfo`.
+
+    Now, we need to configure the request payload in the tool configuration.
+
+15. Click on the magic (&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/ai_button.png&quot; alt=&quot;Value from AI button&quot; class=&quot;inline-icon&quot;&gt;) in the `Request Body` field.  
+    
+    !!! Note
+        Clicking on the (&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/ai_button.png&quot; alt=&quot;Value from AI button&quot; class=&quot;inline-icon&quot;&gt;) action designates the field as an argument for the tool, enabling the AI to populate the field with the necessary values dynamically.  
+        After clicking the magic button, a new input field will appear where you can provide a description for the argument. This description helps the AI understand what needs to be filled for the argument.  
+
+    Enter the following description in the new field that appears:  
+    ```text
+    Provide the customer ID in the following format: {userID: &quot;C567&quot;}
+    ```  
+    Click **Add** to add the tool.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/fill_getCustomerInfo_tool.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/fill_getCustomerInfo_tool.gif&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    Next, let&#x27;s add another tool to get the bank documents from the knowledge base.
+
+16. Click on the **+** icon located inside the **Agent** operation to open the **Mediator Palette** to add a `Tool`.
+
+17. Select `Get From Knowledge` from the **AI** category in the **Mediator Palette**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/select_getFromKnowledge_tool.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/select_getFromKnowledge_tool.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;  
+
+18. Let&#x27;s configure the tool with the following details.
+
+    **Tool Name**: `GetBankDocumentsTool`  
+    **Tool Description**: `Get the PineValley bank documents from the knowledge base`  
+    **Vector Store Connection**: `KB_CONN`  
+    **Embedding Model Connection**: `OPENAI_CONN`  
+
+19. Click on the magic (&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/ai_button.png&quot; alt=&quot;Value from AI button&quot; class=&quot;inline-icon&quot;&gt;) in the `Input` field.  
+    We can leave the default description as it is.  
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/fill_getFromKnowledge_tool.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/fill_getFromKnowledge_tool.gif&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+    Next, let&#x27;s add the final tool to create the investment account.
+
+20. Click on the **+** icon located inside the **Agent** operation to open the **Mediator Palette** to add a `Tool`.
+
+    !!! Info
+        See the [Adding MCP Tools](#adding-mcp-tools) section to learn how to add MCP tools to the agent.
+
+21. Select `POST` from the **HTTP** category in the **Mediator Palette**.
+
+22. Let&#x27;s configure the tool with the following details.
+
+    **Tool Name**: `InvestmentCreationTool`  
+    **Tool Description**: `Create investment account for the customer`  
+    **Connection**: `BankMockAPI_CONN`  
+    **Relative Path**: `/createInvestmentAccount`  
+    **Request Body**:  
+    Click on the magic (&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/ai_button.png&quot; alt=&quot;Value from AI button&quot; class=&quot;inline-icon&quot;&gt;) in the `Request Body` field.  
+    Enter the following description in the new field that appears:  
+    ```text
+    Provide the investment account details in the following format: {&quot;userID&quot;:&quot;C567&quot;, &quot;investmentType&quot;:&quot;HISA&quot;, &quot;initialDeposit&quot;:5000, &quot;investmentGoal&quot;:&quot;Long-term growth&quot;}
+    ```
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_createInvestment_tool.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_createInvestment_tool.png&quot; alt=&quot;Create New Project&quot; width=&quot;25%&quot;&gt;&lt;/a&gt;
+
+    Finally, click **Add** to add the tool.  
+
+    Next, add the `Respond` mediator to finalize the integration flow and send a response back to the client.
+
+20. Click on the **+** icon located just after the **Agent** operation to open the **Mediator Palette** to add a `Respond` mediator.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_respond_mediator.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_respond_mediator.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+You have successfully updated the integration flow to implement the customer assistance agent.  
+For reference, you can review the configured API.
+
+??? &quot;Customer Service API&quot;
+
+    !!! info
+        You can view the source view by clicking on the **Show Source** (`&lt;/&gt;`) icon located in the top right corner of the VS Code.
+
+    === &quot;Design View&quot;
+        &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/agent_completed.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/agent_completed.png&quot; alt=&quot;ai datamapping api&quot; width=&quot;70%&quot;&gt;&lt;/a&gt;
+
+    === &quot;Source View&quot;
+        ```xml
+        &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+        &lt;api context=&quot;/customerserviceapi&quot; name=&quot;CustomerServiceAPI&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+            &lt;resource methods=&quot;POST&quot; uri-template=&quot;/&quot;&gt;
+                &lt;inSequence&gt;
+                    &lt;ai.agent&gt;
+                        &lt;connections&gt;
+                            &lt;llmConfigKey&gt;OPENAI_CONN&lt;/llmConfigKey&gt;
+                            &lt;memoryConfigKey&gt;FILE_MEMORY_CONN&lt;/memoryConfigKey&gt;
+                        &lt;/connections&gt;
+                        &lt;sessionId&gt;{${payload.userID}}&lt;/sessionId&gt;
+                        &lt;role&gt;PineValley Bank Customer Assistant&lt;/role&gt;
+                        &lt;instructions&gt;Your task is to recommend suitable investment products based on customer data,
+                            assist with onboarding, and create investment accounts for requested products.
+                            After creating the investment account, it will be sent to the manager for approval.
+                            Once it is approved, it will get activated.
+                            Use tools to retrieve official PineValley Bank documents like brochures and guidelines.
+                            Provide clear, compliant explanations and step-by-step guidance.
+                            Always base recommendations on retrieved information and ask for clarification if needed.
+                            Products include Tax Free Saving Account, High-Interest Savings Account, and more.
+                            Ensure all interactions are professional, accurate, and regulatory-compliant.
+        &lt;/instructions&gt;
+                        &lt;prompt&gt;${payload.query}&lt;/prompt&gt;
+                        &lt;responseVariable&gt;ai_agent_1&lt;/responseVariable&gt;
+                        &lt;overwriteBody&gt;true&lt;/overwriteBody&gt;
+                        &lt;modelName&gt;gpt-4o&lt;/modelName&gt;
+                        &lt;temperature&gt;0.7&lt;/temperature&gt;
+                        &lt;maxTokens&gt;4069&lt;/maxTokens&gt;
+                        &lt;topP&gt;1&lt;/topP&gt;
+                        &lt;frequencyPenalty&gt;0&lt;/frequencyPenalty&gt;
+                        &lt;maxHistory&gt;10&lt;/maxHistory&gt;
+                        &lt;toolExecutionTimeout&gt;10&lt;/toolExecutionTimeout&gt;
+                        &lt;tools&gt;
+                            &lt;tool name=&quot;CustomerInfoTool&quot; template=&quot;http_post_tool_1&quot; resultExpression=&quot;${vars.http_post_759.payload}&quot; description=&quot;Get customer information from PineValley Bank&#x27;s internal database&quot;/&gt;
+                            &lt;tool name=&quot;GetBankDocumentsTool&quot; template=&quot;ai_getFromKnowledge_tool_1&quot; resultExpression=&quot;${vars.ai_getFromKnowledge_571.payload}&quot; description=&quot;Get the PineValley bank documents from the knowledge base&quot;/&gt;
+                            &lt;tool name=&quot;InvestmentCreationTool&quot; template=&quot;http_post_tool_2&quot; resultExpression=&quot;${vars.http_post_809.payload}&quot; description=&quot;Create investment account for the customer&quot;/&gt;
+                        &lt;/tools&gt;
+                    &lt;/ai.agent&gt;
+                    &lt;respond/&gt;
+                &lt;/inSequence&gt;
+                &lt;faultSequence&gt;
+                &lt;/faultSequence&gt;
+            &lt;/resource&gt;
+        &lt;/api&gt;
+        ```
+
+## Step 3 - Run the integration
+
+Now that you have updated the integration, it&#x27;s time to deploy the integration to the WSO2 Integrator: MI server runtime.
+
+Click the **Build and Run** icon located in the top right corner of VS Code.
+
+&lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/build_and_run.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/build_and_run.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+## Step 4 - Test the integration service
+
+1. Once the **Runtime Services** interface is open, select the `CustomerServiceAPI`, and click the **Try It** button.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/select_tryout.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/select_tryout.png&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+2. Select the `/` resource and click **Try it Out** to test the API.   
+
+    Let&#x27;s first ask the agent about the investment options available.
+
+    ```json
+    {
+        &quot;userID&quot;: &quot;001&quot;,
+        &quot;query&quot;: &quot;What can I invest in?&quot;
+    }
+    ```
+    Give the above payload in the **Request Body** and click **Execute**.  
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/tryout_agent_1.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/tryout_agent_1.gif&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;  
+
+    You should see a response similar to the one below.
+
+    ```json
+    {
+    &quot;content&quot;: &quot;Based on the PineValley Bank documents, here are some investment options available to you:\n\n1. **High-Interest Savings Account (HISA)**:\n   - Offers a competitive interest rate of 3.5% per annum.\n   - Minimum balance required is $1,000.\n   - Provides unlimited and free withdrawals.\n   - Suitable for US residents aged 18 and older.\n\n2. **Tax-Free Savings Account (TFSA)**:\n   - Allows tax-free growth on savings and investment earnings.\n   - Contributions are not tax-deductible, but all withdrawals are tax-free.\n   - The contribution limit for 2025 is $7,000 (subject to change annually).\n   - Suitable for Canadian residents aged 18 and older, with a valid SIN.\n   - Investment options include GICs, stocks, ETFs, mutual funds, and cash deposits.\n\nIf you have specific preferences or goals, please let me know so I can provide more tailored recommendations.&quot;,
+    &quot;tokenUsage&quot;: {
+        &quot;inputTokenCount&quot;: 21688,
+        &quot;outputTokenCount&quot;: 221,
+        &quot;totalTokenCount&quot;: 21909
+    },
+    &quot;finishReason&quot;: &quot;STOP&quot;,
+    &quot;toolExecutions&quot;: [
+        {
+        &quot;request&quot;: {
+            &quot;id&quot;: &quot;call_U209o5wZyxrHTas7oNWn8vdZ&quot;,
+            &quot;name&quot;: &quot;ai_getFromKnowledge_tool_1&quot;,
+            &quot;arguments&quot;: &quot;{\&quot;input\&quot;:\&quot;investment options PineValley Bank\&quot;}&quot;
+        },
+        &quot;result&quot;: &quot;[{\&quot;score\&quot;:0.7656985474367457,\&quot;embeddingId\&quot;:\&quot;dd2d5a41-baed-4755-be81-82d5f49599a9\&quot;,\&quot;embedding\&quot;:[...],\&quot;embedded\&quot;:{\&quot;text\&quot;:\&quot;Article: Overview of Tax-Free Savings Account (TFSA)\\nDocument Title: PineValley Bank – TFSA Product Brochure\\nLast Updated: March 2025\\nDocument Type: Product Brochure\\nApplies To: All eligible Canadian residents aged 18 and older\\n\\nProduct Summary\\nA Tax-Free Savings Account (TFSA) allows you to grow your savings and investment earnings tax-free. Contributions are not tax-deductible, but withdrawals (including any gains) are completely tax-free.\\n\\nWho Is It For?\\n\\n- Individuals looking to save or invest with flexibility\\n- Customers with short- or long-term financial goals\\n- Those who want to earn interest, dividends, or capital gains tax-free\\n\\nKey Features\\n\\n- Contribution Limit (2025): $7,000 (subject to change annually by CRA)\\n- Unused Contribution Room: Carries forward indefinitely\\n- Withdrawals: Tax-free and can be re-contributed the following year\\n- Investment Options: GICs, stocks, ETFs, mutual funds, cash deposits\\n- Eligibility: Canadian residents, 18+ years old, with valid SIN\\n\\nRegulatory Guidelines\\n\\n- Must comply with Canada Revenue Agency (CRA) limits and rules\\n- Over-contributions are subject to a 1% monthly penalty\\n- TFSA earnings do not affect federal income-tested benefits\\n\\nOnboarding Requirements\\nTo open a TFSA with PineValley Bank:\\n\\n1. Provide proof of age (e.g., driver’s license or passport)\\n2. Upload your Social Insurance Number (SIN)\\n3. Complete a Risk Tolerance Questionnaire\\n4. Agree to TFSA terms &amp; conditions via e-signature\\n\\nEstimated completion time: 15–20 minutes\\n\\nFAQs\\n\\nQ: Can I open more than one TFSA account?\\nA: Yes, but your total contributions across all accounts cannot exceed your CRA limit.\\n\\nQ: What happens if I withdraw money?\\nA: Withdrawals are tax-free and re-added to your contribution room the next year.\\n\\nQ: Can I transfer my TFSA from another institution?\\nA: Yes. We support direct TFSA transfers without affecting your contribution room.\&quot;,\&quot;metadata\&quot;:{\&quot;index\&quot;:\&quot;0\&quot;}}}]&quot;
+        }
+    ]
+    }
+    ```
+
+    In the response above, the agent utilized the `GetBankDocumentsTool` to retrieve information about the investment options available at PineValley Bank. It then formulated an answer based on the retrieved data to address the user&#x27;s query effectively.  
+
+    Now let&#x27;s ask the agent to create an investment account for High-Interest Savings Account.
+
+    ```json
+    {
+        &quot;userID&quot;: &quot;001&quot;,
+        &quot;query&quot;: &quot;I want to create a High-Interest Savings Account with an initial deposit of $5000.&quot;
+    }
+    ```
+    Give the above payload in the **Request Body** and click **Execute**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/tryout_agent_2.gif&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/tryout_agent_2.gif&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;  
+
+    You should see a response similar to the one below.
+
+    ```json
+    {
+    &quot;content&quot;: &quot;Your High-Interest Savings Account (HISA) with an initial deposit of $5,000 has been successfully created and is currently pending approval. Here are the details:\n\n- **Account ID**: INV12345\n- **Status**: Pending Approval\n\nOnce the account is approved by the manager, it will become active. If you have any further questions or need assistance, feel free to ask!&quot;,
+    &quot;tokenUsage&quot;: {
+        &quot;inputTokenCount&quot;: 48122,
+        &quot;outputTokenCount&quot;: 126,
+        &quot;totalTokenCount&quot;: 48248
+    },
+    &quot;finishReason&quot;: &quot;STOP&quot;,
+    &quot;toolExecutions&quot;: [
+        {
+        &quot;request&quot;: {
+            &quot;id&quot;: &quot;call_ZuOsW99DaaQLv8LJd49jj55C&quot;,
+            &quot;name&quot;: &quot;http_post_tool_2&quot;,
+            &quot;arguments&quot;: &quot;{\&quot;requestBodyJson\&quot;:\&quot;{\\\&quot;userID\\\&quot;:\\\&quot;001\\\&quot;,\\\&quot;investmentType\\\&quot;:\\\&quot;HISA\\\&quot;,\\\&quot;initialDeposit\\\&quot;:5000,\\\&quot;investmentGoal\\\&quot;:\\\&quot;Long-term growth\\\&quot;}\&quot;}&quot;
+        },
+        &quot;result&quot;: &quot;{\&quot;accountID\&quot;:\&quot;INV12345\&quot;,\&quot;status\&quot;:\&quot;Pending Approval\&quot;}&quot;
+        }
+    ]
+    }
+    ```
+
+    Here is the response from the agent extracted from the above response:
+
+    ```markdown
+    Your High-Interest Savings Account (HISA) with an initial deposit of $5,000 has been successfully created and is currently pending approval. Here are the details:  
+    - **Account ID**: INV12345  
+    - **Status**: Pending Approval  
+      
+    Once the account is approved by the manager, it will become active. If you have any further questions or need assistance, feel free to ask!
+    ```
+
+    In the response above, the agent utilized the `InvestmentCreationTool` to create a High-Interest Savings Account with an initial deposit of $5000. The account is currently pending approval, and once approved, it will become active.
+    The agent also provided the account ID for reference.  
+    This demonstrates how the agent can assist users in creating investment accounts and provide real-time updates on the status of their requests.
+
+You have now learned how to create an AI agent to enhance your integration flow with automating tasks using AI.
+
+## Adding MCP Tools 
+
+1. Click on the **+** icon located inside the **Agent** operation to open the **Mediator Palette** to add a `Tool`.
+
+2. Click on **Add MCP Tools** on the **Mediator Palette**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_mcp_tools.jpeg&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_mcp_tools.jpeg&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. If a `MCP Connection` already exists in your project, you can select it from the **Connection** dropdown. If not, click on **+ Add New Connection**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_new_connection_mcp.jpeg&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_new_connection_mcp.jpeg&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+4. Choose **MCP** as the `Connection Type`.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/connection_type_mcp.jpeg&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/connection_type_mcp.jpeg&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+5. Fill in the required parameters including the Connection Name, URL of the MCP Server and Auth Configurations(if exists). Click on **Add**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_mcp_connection.jpeg&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/add_mcp_connection.jpeg&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+6. Select the connection you just created from the `Connection` dropdown. Given that all parameters of the connection are correct, the palette should list all available tools in the selected MCP Server.
+
+7. Click the checkboxes of the tools you wish to add to the agent and click on **Add**.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/select_mcp_tools.jpeg&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/get-started/build-first-ai-integration/agent/select_mcp_tools.jpeg&quot; alt=&quot;Create New Project&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+## What&#x27;s Next?  
+
+You have now completed this tutorial series, where you learned how to build a complete integration flow step by step. Throughout this journey, you have explored how to create AI chatbot, build a knowledge base, build RAG application, and develop an AI agent to enhance your integration flow.
+
+Now, you can explore advanced integration scenarios, applying what you’ve learned to real-world use cases and expanding your expertise in WSO2 Integrator: MI.
+
+Try more [tutorials and examples]({{base_path}}/learn/learn-overview/).
+
+{% raw %}
+&lt;style&gt;
+.language-bash {
+    color: var(--md-feedback-button-color) !important;
+}
+.language-bash .hljs-string, .hljs-keyword {
+    color: var(--md-feedback-button-color) !important;
+}
+.language-bash .hljs-variable {
+    font-weight: 600;
+    color: rgb(45, 116, 215) !important;
+}
+&lt;/style&gt;
+{% endraw %}
+</body>
+</html>

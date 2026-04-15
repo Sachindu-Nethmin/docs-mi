@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>composed-message-processor.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Composed Message Processor
+
+This page explains how you can implement a sample scenario of Composed Message Processor using WSO2 Integrator: MI.
+
+## Introduction to Composed Message Processor
+
+The Composed Msg. Processor EIP is used to process a composite message. It maintains the overall message flow when processing a message consisting of multiple elements, each of which might require different processing. The Composed Message Processor splits the message up, routes the sub-messages to the appropriate destinations, and then aggregates the responses back into a single message. 
+
+!!! info
+    For more information, see the [Composed Message Processor](http://www.eaipatterns.com/DistributionAggregate.html) documentation.
+
+![Distribution aggregate]({{base_path}}/assets/img/learn/enterprise-integration-patterns/message-routing/distribution-aggregate.gif)
+
+## Sample scenario
+
+This sample scenario demonstrates splitting a message into several requests, which are then routed to different servers, merged together, and sent back to the client. In this scenario, each server instance acts as an inventory controller. The user can have multiple requests in a single request message. The Iterate Mediator processes the request message and splits it. The request content is identified using the Switch mediator and the routing destination is decided. The Call mediator then sends the request message to the respective location (endpoint). The response, which will be sent from different endpoints, will be merged together using the Aggregate mediator before sending back to the client.
+
+The diagram below depicts how to simulate the sample scenario using WSO2 MI.
+
+![Composed message processor sample scenario]({{base_path}}/assets/img/learn/enterprise-integration-patterns/message-routing/composed-message-processor-example-scenario.png)
+
+Before digging into implementation details, let&#x27;s take a look at the relationship between the sample scenario and the Composed Msg. Processor EIP by comparing their core components.
+
+| Composed Message Processor EIP            | Composed Message Processor Sample Scenario            |
+|-------------------------------------------|-------------------------------------------------------|
+| New Order                                 | Stock Quote Request                                   |
+| Splitter                                  | Iterate Mediator                                      |
+| Router                                    | Switch Mediator                                       |
+| Widget/Gadget Inventory                   | Stock Quote Service Instance                          |
+| Aggregator                                | Aggregate Mediator                                    |
+| Validated Order                           | Aggregated Stock Quote Response                       |
+
+## Synapse configuration of the artifacts
+
+=== &quot;Proxy Service&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;proxy name=&quot;ComposedMessageProxy&quot; startOnLoad=&quot;true&quot; transports=&quot;http https&quot;
+       xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+       &lt;target&gt;
+          &lt;inSequence&gt;
+             &lt;log level=&quot;full&quot;/&gt;
+             &lt;iterate attachPath=&quot;//m0:getQuote&quot; expression=&quot;//m0:getQuote/m0:request&quot;
+                preservePayload=&quot;true&quot; xmlns:m0=&quot;http://services.samples&quot;&gt;
+                &lt;target&gt;
+                   &lt;sequence&gt;
+                      &lt;switch source=&quot;//m1:symbol&quot; xmlns:m1=&quot;http://services.samples/xsd&quot;&gt;
+                         &lt;case regex=&quot;IBM&quot;&gt;
+                            &lt;call&gt;
+                               &lt;endpoint key=&quot;SimpleStockQuoteService1&quot;/&gt;
+                            &lt;/call&gt;
+                         &lt;/case&gt;
+                         &lt;case regex=&quot;WSO2&quot;&gt;
+                            &lt;call&gt;
+                               &lt;endpoint key=&quot;SimpleStockQuoteService2&quot;/&gt;
+                            &lt;/call&gt;
+                         &lt;/case&gt;
+                         &lt;default&gt;
+                            &lt;drop/&gt;
+                         &lt;/default&gt;
+                      &lt;/switch&gt;
+                   &lt;/sequence&gt;
+                &lt;/target&gt;
+             &lt;/iterate&gt;
+             &lt;aggregate&gt;
+                &lt;completeCondition&gt;
+                   &lt;messageCount/&gt;
+                &lt;/completeCondition&gt;
+                &lt;onComplete expression=&quot;//m0:getQuoteResponse&quot;
+                   xmlns:m0=&quot;http://services.samples&quot;&gt;
+                   &lt;respond/&gt;
+                &lt;/onComplete&gt;
+             &lt;/aggregate&gt;
+          &lt;/inSequence&gt;
+          &lt;faultSequence&gt;
+             &lt;log level=&quot;full&quot;&gt;
+                &lt;property name=&quot;MESSAGE&quot; value=&quot;Executing default &amp;#34;fault&amp;#34; sequence&quot;/&gt;
+                &lt;property name=&quot;ERROR_CODE&quot; expression=&quot;get-property(&#x27;ERROR_CODE&#x27;)&quot;/&gt;
+                &lt;property name=&quot;ERROR_MESSAGE&quot; expression=&quot;get-property(&#x27;ERROR_MESSAGE&#x27;)&quot;/&gt;
+             &lt;/log&gt;
+             &lt;drop/&gt;
+          &lt;/faultSequence&gt;
+       &lt;/target&gt;
+    &lt;/proxy&gt;
+    ```
+=== &quot;SimpleStockQuoteService1&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;endpoint name=&quot;SimpleStockQuoteService1&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+    &lt;/endpoint&gt;
+    ```
+=== &quot;SimpleStockQuoteService2&quot;
+    ```xml
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;endpoint name=&quot;SimpleStockQuoteService2&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;address uri=&quot;http://localhost:9001/services/SimpleStockQuoteService&quot;/&gt;
+    &lt;/endpoint&gt;
+    ```
+
+Let&#x27;s investigate the elements of the synapse configuration in detail. 
+
+- The iterate mediator - The Iterate mediator takes each child element of the element specified in its XPath expression and applies the sequence flow inside the Iterate mediator. In this example, it takes each `getQuote` request specified in the incoming request and forwards this request to the target endpoint.
+- The Switch mediator - Observes the message and filters out the message content to the given XPath expression.
+- The Call mediator in switch mediator - When a matching case is found, the Call mediator will route the message to the endpoint indicated in the address URI.
+- The Aggregate mediator - The Aggregate mediator merge the response messages for requests made by the Iterate or Clone mediators. The completion condition specifies the minimum or maximum number of messages to be collected. When all messages are aggregated, the sequence inside `onComplete` is run.
+
+## Set up the sample scenario
+
+Follow the below instructions to simulate this sample scenario.
+
+{!includes/eip-set-up.md!}
+
+3. Set up the back-end service:
+
+    1. Download the [back-end service](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/axis2Server.zip).
+    2. Extract the downloaded zip file.
+    3. Open a terminal, and navigate to the `axis2Server/bin/` directory inside the extracted folder.
+    4. Execute the following command to start the axis2server with the SimpleStockQuote back-end service:
+
+    === &quot;On MacOS/Linux&quot;
+        ```bash
+        sh axis2server.sh
+        ```
+    === &quot;On Windows&quot;
+        ```bash
+        axis2server.bat
+        ```
+
+4. In `tcpmon` application, navigate to **Admin** tab. Add listener to port `9001` and set the **target hostname** to `localhost` and **target port** to `9000` in each instance.
+
+5. Download the artifacts of the sample.
+
+    &lt;a href=&quot;{{base_path}}/assets/attachments/learn/enterprise-integration-patterns/ComposedMessageProcessor.zip&quot;&gt;
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/download-zip.png&quot; width=&quot;200&quot; alt=&quot;Download ZIP&quot;&gt;&lt;/a&gt;
+
+6. Import the artifacts to WSO2 MI.
+
+    Click **File** -&gt; **Open Folder** -&gt; Select the extracted ZIP file to import the downloaded ZIP file.
+
+7. Start the project in the WSO2 MI server.
+
+    For instructions, go to [Build and Run]({{base_path}}/develop/deploy-artifacts/#build-and-run) Documentation.
+
+
+## Execute the sample
+
+Send the following request using a SOAP client such as SoapUI. 
+
+```
+POST /services/ComposedMessageProxy HTTP/1.1
+Host: localhost:8290
+SOAPAction: urn:getQuote
+Content-Type: text/xml
+
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+   &lt;soapenv:Header/&gt;
+   &lt;soapenv:Body&gt;
+      &lt;ser:getQuote&gt;
+         &lt;ser:request&gt;
+            &lt;xsd:symbol&gt;IBM&lt;/xsd:symbol&gt;
+         &lt;/ser:request&gt;
+          &lt;ser:request&gt;
+            &lt;xsd:symbol&gt;WSO2&lt;/xsd:symbol&gt;
+         &lt;/ser:request&gt;
+         &lt;ser:request&gt;
+            &lt;xsd:symbol&gt;IBM&lt;/xsd:symbol&gt;
+         &lt;/ser:request&gt;
+      &lt;/ser:getQuote&gt;
+   &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+```
+
+Note that the three responses are merged together. 
+
+## Analyze the output
+
+The WSO2 Integrator: MI returns the following response to the client.
+
+```xml
+&lt;?xml version=&#x27;1.0&#x27; encoding=&#x27;UTF-8&#x27;?&gt;
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot;&gt;
+    &lt;soapenv:Body&gt;
+        &lt;ns:getQuoteResponse xmlns:ns=&quot;http://services.samples&quot;&gt;
+            &lt;ns:return xmlns:ax21=&quot;http://services.samples/xsd&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:type=&quot;ax21:GetQuoteResponse&quot;&gt;
+                &lt;ax21:change&gt;4.2567397658365085&lt;/ax21:change&gt;
+                &lt;ax21:earnings&gt;-9.8034892952617&lt;/ax21:earnings&gt;
+                &lt;ax21:high&gt;-162.3225923122293&lt;/ax21:high&gt;
+                &lt;ax21:last&gt;163.48677303848953&lt;/ax21:last&gt;
+                &lt;ax21:lastTradeTimestamp&gt;Mon Aug 12 11:19:39 IST 2024&lt;/ax21:lastTradeTimestamp&gt;
+                &lt;ax21:low&gt;171.36732605650354&lt;/ax21:low&gt;
+                &lt;ax21:marketCap&gt;1.3723952872154225E7&lt;/ax21:marketCap&gt;
+                &lt;ax21:name&gt;IBM Company&lt;/ax21:name&gt;
+                &lt;ax21:open&gt;171.36840817756675&lt;/ax21:open&gt;
+                &lt;ax21:peRatio&gt;24.575108752678478&lt;/ax21:peRatio&gt;
+                &lt;ax21:percentageChange&gt;-2.7153822026906984&lt;/ax21:percentageChange&gt;
+                &lt;ax21:prevClose&gt;-156.7639266994703&lt;/ax21:prevClose&gt;
+                &lt;ax21:symbol&gt;IBM&lt;/ax21:symbol&gt;
+                &lt;ax21:volume&gt;6393&lt;/ax21:volume&gt;
+            &lt;/ns:return&gt;
+        &lt;/ns:getQuoteResponse&gt;
+        &lt;ns:getQuoteResponse xmlns:ns=&quot;http://services.samples&quot;&gt;
+            &lt;ns:return xmlns:ax21=&quot;http://services.samples/xsd&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:type=&quot;ax21:GetQuoteResponse&quot;&gt;
+                &lt;ax21:change&gt;4.137238142311592&lt;/ax21:change&gt;
+                &lt;ax21:earnings&gt;-9.737213228851822&lt;/ax21:earnings&gt;
+                &lt;ax21:high&gt;188.01788750650937&lt;/ax21:high&gt;
+                &lt;ax21:last&gt;179.18269241208367&lt;/ax21:last&gt;
+                &lt;ax21:lastTradeTimestamp&gt;Mon Aug 12 11:19:39 IST 2024&lt;/ax21:lastTradeTimestamp&gt;
+                &lt;ax21:low&gt;-178.95891051374818&lt;/ax21:low&gt;
+                &lt;ax21:marketCap&gt;5.7739167109927885E7&lt;/ax21:marketCap&gt;
+                &lt;ax21:name&gt;IBM Company&lt;/ax21:name&gt;
+                &lt;ax21:open&gt;-177.25685611512893&lt;/ax21:open&gt;
+                &lt;ax21:peRatio&gt;-17.465156717842763&lt;/ax21:peRatio&gt;
+                &lt;ax21:percentageChange&gt;-2.334630569879786&lt;/ax21:percentageChange&gt;
+                &lt;ax21:prevClose&gt;-177.2116837536581&lt;/ax21:prevClose&gt;
+                &lt;ax21:symbol&gt;IBM&lt;/ax21:symbol&gt;
+                &lt;ax21:volume&gt;16175&lt;/ax21:volume&gt;
+            &lt;/ns:return&gt;
+        &lt;/ns:getQuoteResponse&gt;
+        &lt;ns:getQuoteResponse xmlns:ns=&quot;http://services.samples&quot;&gt;
+            &lt;ns:return xmlns:ax21=&quot;http://services.samples/xsd&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xsi:type=&quot;ax21:GetQuoteResponse&quot;&gt;
+                &lt;ax21:change&gt;-2.3486472346147655&lt;/ax21:change&gt;
+                &lt;ax21:earnings&gt;-8.88812398482074&lt;/ax21:earnings&gt;
+                &lt;ax21:high&gt;159.55424697569694&lt;/ax21:high&gt;
+                &lt;ax21:last&gt;153.32568814109163&lt;/ax21:last&gt;
+                &lt;ax21:lastTradeTimestamp&gt;Mon Aug 12 11:19:39 IST 2024&lt;/ax21:lastTradeTimestamp&gt;
+                &lt;ax21:low&gt;-152.99149353893569&lt;/ax21:low&gt;
+                &lt;ax21:marketCap&gt;5.537991838624418E7&lt;/ax21:marketCap&gt;
+                &lt;ax21:name&gt;WSO2 Company&lt;/ax21:name&gt;
+                &lt;ax21:open&gt;-151.3649278746529&lt;/ax21:open&gt;
+                &lt;ax21:peRatio&gt;23.872718076100966&lt;/ax21:peRatio&gt;
+                &lt;ax21:percentageChange&gt;-1.3894438584780746&lt;/ax21:percentageChange&gt;
+                &lt;ax21:prevClose&gt;169.03505818416824&lt;/ax21:prevClose&gt;
+                &lt;ax21:symbol&gt;WSO2&lt;/ax21:symbol&gt;
+                &lt;ax21:volume&gt;7119&lt;/ax21:volume&gt;
+            &lt;/ns:return&gt;
+        &lt;/ns:getQuoteResponse&gt;
+    &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+```
+</body>
+</html>

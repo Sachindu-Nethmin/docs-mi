@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>guaranteed-delivery-with-failover.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Implement a Guaranteed Delivery with Failover
+
+WSO2 Integrator: MI ensures guaranteed delivery with the failover message store and scheduled failover message forwarding processor. The topics in the following section describe how you can set up guaranteed message delivery with failover configurations.
+
+The following diagram illustrates a scenario where a failover message
+store and a scheduled failover message forwarding processor is used
+to ensure guaranteed delivery:
+
+![guaranteed delivery]({{base_path}}/assets/img/integrate/tutorials/guaranteed-delivery-failover/guaranteed-delivery.png)
+
+In this scenario, the original message store fails due to, either network
+failure, message store crash, or system shutdown for maintenance. The
+failover message store is the solution for the original message
+store failure. So now the store mediator sends messages to the failover
+message store. Then, when the original message store is available again,
+the messages sent to the failover message store need to be
+forwarded to the original message store. The **scheduled failover message forwarding processor**
+is used for this purpose. The scheduled failover message
+forwarding processor is almost the same as the scheduled message
+forwarding processor. The only difference is that the scheduled message
+forwarding processor forwards messages to a defined endpoint, whereas
+the scheduled failover message forwarding processor forwards messages to
+the original message store where message was supposed to be
+temporarily stored.
+
+## Synapse Configurations
+
+Given below are the synapse configurations that are required for mediating the above use case.
+
+See the instructions on how to [build and run](#build-and-run) this example.
+
+- **Message Stores**
+
+    === &quot;Failover message store&quot;
+        ```xml
+        &lt;messageStore name=&quot;failover&quot;/&gt;  
+        ```
+    === &quot;Message Store&quot;        
+        ```xml
+        &lt;messageStore  
+            class=&quot;org.apache.synapse.message.store.impl.jms.JmsStore&quot; name=&quot;Original&quot;&gt;  
+            &lt;parameter name=&quot;store.failover.message.store.name&quot;&gt;failover&lt;/parameter&gt;  
+            &lt;parameter name=&quot;store.producer.guaranteed.delivery.enable&quot;&gt;true&lt;/parameter&gt;  
+            &lt;parameter name=&quot;java.naming.factory.initial&quot;&gt;org.apache.activemq.jndi.ActiveMQInitialContextFactory&lt;/parameter&gt;  
+            &lt;parameter name=&quot;java.naming.provider.url&quot;&gt;tcp://localhost:61616&lt;/parameter&gt;  
+            &lt;parameter name=&quot;store.jms.JMSSpecVersion&quot;&gt;1.1&lt;/parameter&gt;  
+        &lt;/messageStore&gt;
+        ```
+
+- **Message Processors**
+
+    === &quot;Scheduled message forwarding processor&quot;
+        ```xml
+        &lt;messageProcessor name=&quot;ForwardMessageProcessor&quot; class=&quot;org.apache.synapse.message.processor.impl.forwarder.ScheduledMessageForwardingProcessor&quot; targetEndpoint=&quot;SimpleStockQuoteService&quot; messageStore=&quot;Original&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+               &lt;parameter name=&quot;interval&quot;&gt;1000&lt;/parameter&gt;
+               &lt;parameter name=&quot;client.retry.interval&quot;&gt;1000&lt;/parameter&gt;
+               &lt;parameter name=&quot;max.delivery.attempts&quot;&gt;4&lt;/parameter&gt;
+               &lt;parameter name=&quot;is.active&quot;&gt;true&lt;/parameter&gt;
+               &lt;parameter name=&quot;max.delivery.drop&quot;&gt;Disabled&lt;/parameter&gt;
+               &lt;parameter name=&quot;member.count&quot;&gt;1&lt;/parameter&gt;
+        &lt;/messageProcessor&gt;
+        ```
+    === &quot;Scheduled failover message forwarding processor&quot;
+        ```xml
+        &lt;messageProcessor name=&quot;FailoverMessageProcessor&quot; class=&quot;org.apache.synapse.message.processor.impl.failover.FailoverScheduledMessageForwardingProcessor&quot; messageStore=&quot;failover&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+               &lt;parameter name=&quot;interval&quot;&gt;1000&lt;/parameter&gt;
+               &lt;parameter name=&quot;client.retry.interval&quot;&gt;60000&lt;/parameter&gt;
+               &lt;parameter name=&quot;max.delivery.attempts&quot;&gt;1000&lt;/parameter&gt;
+               &lt;parameter name=&quot;is.active&quot;&gt;true&lt;/parameter&gt;
+               &lt;parameter name=&quot;max.delivery.drop&quot;&gt;Disabled&lt;/parameter&gt;
+               &lt;parameter name=&quot;member.count&quot;&gt;1&lt;/parameter&gt;
+               &lt;parameter name=&quot;message.target.store.name&quot;&gt;Original&lt;/parameter&gt;
+        &lt;/messageProcessor&gt; 
+        ```
+
+- **Proxy configurations**
+
+    === &quot;Proxy Service&quot;
+        ```xml
+        &lt;proxy name=&quot;Proxy1&quot; transports=&quot;https http&quot; startOnLoad=&quot;true&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;    
+              &lt;target&gt;  
+                &lt;inSequence&gt;  
+                 &lt;property name=&quot;SOAPAction&quot; value=&quot;urn:getQuote&quot; scope=&quot;transport&quot;/&gt;
+                 &lt;property name=&quot;messageType&quot; value=&quot;text/xml&quot; scope=&quot;axis2&quot;/&gt;
+                 &lt;property name=&quot;FORCE_SC_ACCEPTED&quot; value=&quot;true&quot; scope=&quot;axis2&quot;/&gt;  
+                 &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;  
+                 &lt;log level=&quot;full&quot;/&gt;  
+                 &lt;store messageStore=&quot;Original&quot;/&gt;  
+                &lt;/inSequence&gt;  
+              &lt;/target&gt;  
+        &lt;/proxy&gt;   
+        ```
+    === &quot;Endpoint&quot;
+        ```xml
+        &lt;endpoint name=&quot;SimpleStockQuoteService&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;  
+          &lt;address uri=&quot;http://127.0.0.1:9000/services/SimpleStockQuoteService&quot;/&gt;  
+        &lt;/endpoint&gt;
+        ```
+
+The synapse configurations used above are as follows:
+
+- **Failover message store**
+  
+    In this example, an in-memory message store is used to create the failover message store. This step does not involve any special configuration.
+
+- **Original message store**
+  
+    In this example, a JMS message store is used to create the original message store.  When creating the original message store, you need to enable guaranteed delivery on the producer side. To do this, set the following parameters in the message store configuration:&lt;/br&gt;
+  `&lt;parameter name=&quot;store.failover.message.store.name&quot;&gt;failover&lt;/parameter&gt;`  
+  `&lt;parameter name=&quot;store.producer.guaranteed.delivery.enable&quot;&gt;true&lt;/parameter&gt;`
+
+- **Endpoint for the scheduled message forwarding processor**
+
+    In this example, the `SimpleStockquote` service is used as the back-end service.
+
+- **Scheduled failover message forwarding processor**
+
+    When creating the scheduled failover message forwarding processor, you need to specify the following two mandatory parameters that are important in the failover scenario.
+        
+    * Source Message Store
+    * Target Message Store
+
+    The scheduled failover message forwarding processor sends messages from the failover store to the original store when it is available in the failover scenario. In this configuration, the source message store should be the failover message store and the target message store should be the original message store.
+
+- **Proxy service**
+
+    A proxy service is used to send messages to the original message store via the store mediator.
+
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+3. Create the [proxy service]({{base_path}}/develop/creating-artifacts/creating-a-proxy-service), [message stores]({{base_path}}/develop/creating-artifacts/creating-a-message-store), and [message processors]({{base_path}}/develop/creating-artifacts/creating-a-message-processor) with the configurations given above.
+4. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+Set up the broker:
+
+1.  [Configure a broker]({{base_path}}/install-and-setup/setup/transport-configurations/configuring-transports/#configuring-the-jms-transport) with your WSO2 Integrator: MI instance. Let&#x27;s use Active MQ for this example.
+2.  Start the broker.
+3.  Start the WSO2 Integrator: MI (after starting the broker).
+
+Set up the back-end service:
+
+1. Download the [back-end service](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/axis2Server.zip).
+2. Extract the downloaded zip file.
+3. Open a terminal and navigate to the `axis2Server/bin/` directory inside the extracted folder.
+4. Execute the following command to start the axis2server with the SimpleStockQuote back-end service:
+
+    === &quot;On MacOS/Linux&quot;   
+          ```bash
+          sh axis2server.sh
+          ```
+    === &quot;On Windows&quot;         
+          ```bash
+          axis2server.bat
+          ```
+
+Invoke the proxy service (`http://localhost:8290/services/Proxy1`) with the following payload:
+
+```xml
+&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ser=&quot;http://services.samples&quot; xmlns:xsd=&quot;http://services.samples/xsd&quot;&gt;
+   &lt;soapenv:Header/&gt;
+   &lt;soapenv:Body&gt;
+      &lt;ser:getQuote&gt;
+         &lt;ser:request&gt;
+            &lt;xsd:symbol&gt;IBM&lt;/xsd:symbol&gt;
+         &lt;/ser:request&gt;
+      &lt;/ser:getQuote&gt;
+   &lt;/soapenv:Body&gt;
+&lt;/soapenv:Envelope&gt;
+```
+
+You will see the following response in the back-end service console:
+
+```bash
+INFO  [wso2/stockquote_service] - Stock quote service invoked.
+INFO  [wso2/stockquote_service] - Generating getQuote response for IBM
+INFO  [wso2/stockquote_service] - Stock quote generated.
+```
+
+To test the failover scenario, shut down the JMS broker (i.e., the original message store) 
+and send a few messages to the proxy service.
+
+You will see that the messages are not sent to the backend since the
+original message store is not available. You will also see that the
+messages are stored in the failover message store.
+
+If you analyze the Console log, you will see the failover
+message processor trying to forward messages to the original message
+store periodically. Once the original message store is available, you
+will see that the scheduled failover message forwarding processor sends
+the messages to the original store and that the scheduled message
+forwarding processor then forwards the messages to the back-end service.</body>
+</html>

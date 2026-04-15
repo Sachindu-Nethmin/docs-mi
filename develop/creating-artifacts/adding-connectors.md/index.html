@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>adding-connectors.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Add Connectors
+
+You can develop configurations with connectors, and deploy the configurations and connectors as composite application archive (CAR) files in WSO2 Integrator: MI.
+
+## Instructions
+
+See the topics given below.
+
+### Import connectors
+
+The following methods allow you to import connectors into the project.
+
+#### Method 1: Add connectors from the Connector Store
+
+1. Navigate to the **Project Overview** page.
+2. Click on **Add artifact**.
+   
+    &lt;a href=&quot;{{base_path}}/assets/img/develop/create-artifacts/add-artifact-icon.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/develop/create-artifacts/add-artifact-icon.png&quot; alt=&quot;add artifact&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+3. Click **+ View More** under **Create an Integration**.
+4. Select **Connections** under **Other Artifacts** to open the **Connector Store** form.
+   
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/connections-artifact.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/connections-artifact.png&quot; alt=&quot;connections artifact&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+5. Choose the desired connection. This will ask for the addition of dependencies to the project. Clicking **Yes** will add the connector to the project.
+
+#### Method 2: Import connectors
+
+1. Navigate to the mediation flow to which the connector operation should be added.
+2. Click the **+** icon in the relevant location of the mediation flow to open the mediator palette.
+3. Click on **+ Add Module** and then select the **+ Import Module** option.
+
+   &lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/import-connector.gif&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/import-connector.gif&quot; alt=&quot;import connector&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+!!! Note
+    The imported connector will be stored in the `&lt;PROJECT_HOME&gt;/src/main/wso2mi/resources/connectors` folder location.
+
+#### Method 3: Import connections
+
+1. Navigate to the **Project Overview** page.
+2. Click on **Add artifact**.
+3. Click **+ View More** under **Create an Integration**.
+4. Select **Connections** under **Other Artifacts** to open the **Connector Store** form.
+5. Select the relevant option to either import a connection using an **OpenAPI definition** or a **gRPC (Proto) definition**.
+
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/new-import-connector.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/new-import-connector.png&quot; alt=&quot;import connector&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+6. From the options appearing,
+    - Select **Import Using OpenAPI** to import a connector using an OpenAPI definition.
+    - Select **Upload Connector ZIP file** to import a connector using a ZIP file.
+
+    &lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/import-connector-options.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/import-connector-options.png&quot; alt=&quot;import connector options&quot; width=&quot;80%&quot;&gt;&lt;/a&gt;
+
+#### Method 3: Directly add connectors to the project
+
+If you have already downloaded the connector, in the project file structure you can add the connector file into the directory `&lt;PROJECT_HOME&gt;/src/main/wso2mi/resources/connectors`.
+
+
+### Remove connectors
+
+1. Navigate to a sequence. 
+2. Click the **+** icon. 
+3. In the mediator palette, scroll down to the chosen connector.
+4. Click on the delete icon to delete the connector from the project. 
+
+   &lt;a href=&quot;{{base_path}}/assets/img/integrate/connectors/delete-connector.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/delete-connector.png&quot; alt=&quot;delete connector&quot; width=&quot;30%&quot;&gt;&lt;/a&gt;
+
+!!! Info
+    In addition to the above methods, you can enable a connector by creating a configuration file in the `&lt;MI_HOME&gt;/repository/deployment/server/synapse-configs/default/imports` directory with the following configurations. Replace the value of the `name` property with the name of your connector, and name the configuration file `{org.wso2.carbon.connector}&lt;CONNECTOR_NAME&gt;.xml` (for example, `{org.wso2.carbon.connector}salesforce.xml`).
+    ```xml
+        &lt;import xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
+        name=&quot;salesforce&quot;
+        package=&quot;org.wso2.carbon.connector&quot;
+        status=&quot;enabled&quot;/&gt;
+    ```
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>transforming-content-type.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># How to Transform Content Types
+This section describes how you can transform the content type of a message using an API. In this scenario, the API exposes a REST back-end service that accepts and returns XML and JSON messages for HTTP methods as follows:
+    
+-  GET - Response is in JSON format.
+-  POST - Accepts JSON request and returns response in XML format.
+-  DELETE - Empty request body is required. Returns response in XML format.
+    
+## Synapse configuration
+    
+Following is a sample REST API configuration that we can used to implement this scenario. See the instructions on how to [build and run](#build-and-run) this example.
+
+=== &quot;REST API&quot;
+     ```xml
+     &lt;api xmlns=&quot;http://ws.apache.org/ns/synapse&quot; name=&quot;HealthcareService&quot; context=&quot;/healthcare&quot;&gt;
+         &lt;resource methods=&quot;POST&quot; url-mapping=&quot;/appointment/reserve&quot;&gt;
+             &lt;inSequence&gt;
+                 &lt;property name=&quot;REST_URL_POSTFIX&quot; scope=&quot;axis2&quot; action=&quot;remove&quot;/&gt;
+                 &lt;call&gt;
+                     &lt;endpoint key=&quot;GrandOaks&quot; /&gt;
+                 &lt;/call&gt;
+                 &lt;log level=&quot;full&quot;/&gt;
+                 &lt;property name=&quot;messageType&quot; value=&quot;application/xml&quot; scope=&quot;axis2&quot;/&gt;
+                 &lt;respond/&gt;
+             &lt;/inSequence&gt;
+         &lt;/resource&gt;
+         &lt;resource methods=&quot;GET&quot; uri-template=&quot;/appointments/{appointmentNo}&quot;&gt;
+             &lt;inSequence&gt;
+                 &lt;call&gt;
+                     &lt;endpoint key=&quot;HealthCare&quot; /&gt;
+                 &lt;/call&gt;
+                 &lt;log level=&quot;full&quot;/&gt;
+                 &lt;property name=&quot;messageType&quot; value=&quot;application/json&quot; scope=&quot;axis2&quot;/&gt;
+                 &lt;respond/&gt;
+             &lt;/inSequence&gt;
+         &lt;/resource&gt;
+         &lt;resource methods=&quot;DELETE&quot; uri-template=&quot;/appointments/{appointmentNo}&quot;&gt;
+             &lt;inSequence&gt;
+                 &lt;call&gt;
+                     &lt;endpoint key=&quot;HealthCare&quot; /&gt;
+                 &lt;/call&gt;
+                 &lt;log level=&quot;full&quot;/&gt;
+                 &lt;property name=&quot;messageType&quot; value=&quot;application/xml&quot; scope=&quot;axis2&quot;/&gt;
+                 &lt;respond/&gt;
+             &lt;/inSequence&gt;
+         &lt;/resource&gt;
+     &lt;/api&gt;
+     ```
+=== &quot;GrandOaks Endpoint&quot;
+     ```xml
+     &lt;endpoint name=&quot;GrandOaks&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+         &lt;address uri=&quot;http://localhost:9090/grandoaks/categories/surgery/reserve&quot;/&gt;
+     &lt;/endpoint&gt;
+     ```
+=== &quot;HealthCare Endpoint&quot;
+     ```xml
+     &lt;endpoint name=&quot;HealthCare&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+         &lt;address uri=&quot;http://localhost:9090/healthcare&quot;/&gt;
+     &lt;/endpoint&gt;
+     ```
+    
+## Build and run
+
+Create the artifacts:
+
+{!includes/build-and-run.md!}
+3. [Create the rest API]({{base_path}}/develop/creating-artifacts/creating-an-api) with the configurations given above.
+4. [Deploy the artifacts]({{base_path}}/develop/deploy-artifacts) in your WSO2 Integrator: MI.
+
+Set up the back-end service:
+
+1. Download the [Hospital-Service-2.0.0-JDK11.jar](https://github.com/wso2-docs/WSO2_EI/blob/master/Back-End-Service/Hospital-Service-JDK11-2.0.0.jar).
+2. Open a terminal, navigate to the location of the downloaded service, and run it using the following command:
+
+    ```bash
+    java -jar Hospital-Service-2.0.0-JDK11.jar
+    ```
+
+Sending an **HTTP POST request**:
+
+1. Create the `request.json` file as follows:
+    ```json
+    {
+        &quot;patient&quot;: {
+        &quot;name&quot;: &quot;John Doe&quot;,
+        &quot;dob&quot;: &quot;1940-03-19&quot;,
+        &quot;ssn&quot;: &quot;234-23-525&quot;,
+        &quot;address&quot;: &quot;California&quot;,
+        &quot;phone&quot;: &quot;8770586755&quot;,
+        &quot;email&quot;: &quot;johndoe@gmail.com&quot;
+        },
+        &quot;doctor&quot;: &quot;thomas collins&quot;,
+        &quot;hospital&quot;: &quot;grand oak community hospital&quot;,
+        &quot;appointment_date&quot;: &quot;2025-04-02&quot;
+    }
+    ```
+
+2. Following is the cURL command to send an HTTP POST request to the API:
+
+    !!! Tip
+        The context of the API is ‘/healthcare’. For every HTTP method, a url-mapping or uri-template is defined, and the URL to call the methods differ with the defined mapping or template.
+        
+    ```bash
+    curl -v -H &quot;Content-Type: application/json&quot; -X POST -d @request.json http://localhost:8290/healthcare/appointment/reserve
+    ```
+
+    The response from backend to the WSO2 Integrator: MI will be:
+
+    ```json
+    {
+       &quot;appointmentNumber&quot;: 1,
+       &quot;doctor&quot;: {
+          &quot;name&quot;: &quot;thomas collins&quot;,
+          &quot;hospital&quot;: &quot;grand oak community hospital&quot;,
+          &quot;category&quot;: &quot;surgery&quot;,
+          &quot;availability&quot;: &quot;9.00 a.m - 11.00 a.m&quot;,
+          &quot;fee&quot;: 7000
+       },
+       &quot;patient&quot;: {
+          &quot;name&quot;: &quot;John Doe&quot;,
+          &quot;dob&quot;: &quot;1940-03-19&quot;,
+          &quot;ssn&quot;: &quot;234-23-525&quot;,
+          &quot;address&quot;: &quot;California&quot;,
+          &quot;phone&quot;: &quot;8770586755&quot;,
+          &quot;email&quot;: &quot;johndoe@gmail.com&quot;
+       },
+       &quot;fee&quot;: 7000,
+       &quot;confirmed&quot;: false,
+       &quot;appointmentDate&quot;: &quot;2025-04-02&quot;
+    }
+    ```
+
+    The WSO2 Integrator: MI transform the response to XML and send it back to client as:
+
+    ```xml
+    &lt;jsonObject&gt;
+       &lt;appointmentNumber&gt;1&lt;/appointmentNumber&gt;
+       &lt;doctor&gt;
+          &lt;name&gt;thomas collins&lt;/name&gt;
+          &lt;hospital&gt;grand oak community hospital&lt;/hospital&gt;
+          &lt;category&gt;surgery&lt;/category&gt;
+          &lt;availability&gt;9.00 a.m - 11.00 a.m&lt;/availability&gt;
+          &lt;fee&gt;7000.0&lt;/fee&gt;
+       &lt;/doctor&gt;
+       &lt;patient&gt;
+          &lt;name&gt;John Doe&lt;/name&gt;
+          &lt;dob&gt;1940-03-19&lt;/dob&gt;
+          &lt;ssn&gt;234-23-525&lt;/ssn&gt;
+          &lt;address&gt;California&lt;/address&gt;
+          &lt;phone&gt;8770586755&lt;/phone&gt;
+          &lt;email&gt;johndoe@gmail.com&lt;/email&gt;
+       &lt;/patient&gt;
+       &lt;fee&gt;7000.0&lt;/fee&gt;
+       &lt;confirmed&gt;false&lt;/confirmed&gt;
+       &lt;appointmentDate&gt;2025-04-02&lt;/appointmentDate&gt;
+    &lt;/jsonObject&gt;
+    ```
+
+Sending an **HTTP GET request**:
+
+1.  Following is the CURL command to send a **GET request** to the API:
+    
+    ```bash
+    curl -v -X GET http://localhost:8290/healthcare/appointments/1
+    ```
+    
+2.  The response for the request will be:
+    
+    ```json
+    {
+       &quot;appointmentNumber&quot;: 1,
+       &quot;doctor&quot;: {
+          &quot;name&quot;: &quot;thomas collins&quot;,
+          &quot;hospital&quot;: &quot;grand oak community hospital&quot;,
+          &quot;category&quot;: &quot;surgery&quot;,
+          &quot;availability&quot;: &quot;9.00 a.m - 11.00 a.m&quot;,
+          &quot;fee&quot;: 7000
+       },
+       &quot;patient&quot;: {
+          &quot;name&quot;: &quot;John Doe&quot;,
+          &quot;dob&quot;: &quot;1940-03-19&quot;,
+          &quot;ssn&quot;: &quot;234-23-525&quot;,
+          &quot;address&quot;: &quot;California&quot;,
+          &quot;phone&quot;: &quot;8770586755&quot;,
+          &quot;email&quot;: &quot;johndoe@gmail.com&quot;
+       },
+       &quot;fee&quot;: 7000,
+       &quot;confirmed&quot;: false,
+       &quot;appointmentDate&quot;: &quot;2025-04-02&quot;
+    }
+    ```
+
+Sending an **HTTP DELETE request**:
+
+1.  Following is the cURL command for sending an HTTP DELETE request:
+  
+    ```bash
+    curl -v -X DELETE http://localhost:8290/healthcare/appointments/1
+    ```
+        
+    This request will be sent to the back end, and the order with the specified ID will be deleted. The response to the WSO2 Integrator: MI from backend will be as follows:
+
+    ```json
+    {&quot;status&quot;:&quot;Appointment is successfully removed&quot;}
+    ```
+
+2.  The WSO2 Integrator: MI transform the response to XML and sends it back to the client as follows:
+
+    ```xml
+    &lt;jsonObject&gt;&lt;status&gt;Appointment is successfully removed&lt;/status&gt;&lt;/jsonObject&gt;
+    ```
+</body>
+</html>

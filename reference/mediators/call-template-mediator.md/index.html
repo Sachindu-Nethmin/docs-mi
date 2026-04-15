@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>call-template-mediator.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Call Template Mediator
+
+The Call Template mediator allows you to construct a sequence by passing values into a **sequence template**.
+
+!!! Info
+    This is currently only supported for special types of mediators such as the [Iterator]({{base_path}}/reference/mediators/iterate-mediator) and [Aggregate Mediators]({{base_path}}/reference/mediators/aggregate-mediator), where actual XPath operations are performed on a different SOAP message, and not on the message coming into the mediator.
+
+## Syntax
+
+``` java
+&lt;call-template target=&quot;string&quot;&gt;
+   &lt;!-- parameter values will be passed on to a sequence template --&gt;
+   (
+    &lt;!--passing plain static values --&gt;
+   &lt;with-param name=&quot;string&quot; value=&quot;string&quot; /&gt; |
+    &lt;!--passing xpath expressions --&gt;
+   &lt;with-param name=&quot;string&quot; value=&quot;{string}&quot; /&gt; |
+    &lt;!--passing dynamic xpath expressions where values will be compiled dynamically--&gt;
+   &lt;with-param name=&quot;string&quot; value=&quot;{{string}}&quot; /&gt; |
+   ) *
+   &lt;!--this is the in-line sequence of the template    --&gt;
+ &lt;/call-template&gt;
+```
+
+You use the `target` attribute to specify the sequence template you want to use. The `&lt;with-param&gt;` element is used to parse parameter values to the target sequence template. The parameter names should be the same as the names specified in target template. The parameter value can contain a string, an XPath expression (passed in with curly braces { }), or a dynamic XPath expression (passed in with double curly braces) of which the values are compiled dynamically.
+
+## Configuration
+
+The parameters available to configure the Call-Template mediator are as follows.
+
+| Parameter Name      | Description                                                                                                             |
+|---------------------|-------------------------------------------------------------------------------------------------------------------------|
+| **Target Template** | The sequence template to which values should be passed. You can select a template from the **Available Templates** list |
+
+When a target template is selected, the parameter section will be displayed as shown below if the sequence template selected has any parameters. This enables parameter values to be parsed into the sequence template selected.
+
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&quot;header&quot;&gt;
+&lt;th&gt;Parameter Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Parameter Name&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;The name of the parameter.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Parameter Type&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;The type of the parameter. Possible values are as follows.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Value&lt;/strong&gt;: Select this to define the parameter value as a static value. This value should be entered in the &lt;strong&gt;Value/ Expression&lt;/strong&gt; parameter.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Expression&lt;/strong&gt;: Select this to define the parameter value as a dynamic value. The XPath expression to calculate the parameter value should be entered in the &lt;strong&gt;Value/Expression&lt;/strong&gt; parameter.&lt;/li&gt;
+&lt;/ul&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;odd&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Value / Expression&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;The parameter value. This can be a static value, or an XPath expression to calculate a dynamic value depending on the value you selected for the &lt;strong&gt;Parameter Type&lt;/strong&gt; parameter.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&quot;even&quot;&gt;
+&lt;td&gt;&lt;strong&gt;Action&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Click &lt;strong&gt;Delete&lt;/strong&gt; &lt;strong&gt;&lt;/strong&gt; to delete a parameter.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+  &lt;td&gt;
+    &lt;b&gt;onError&lt;/b&gt;
+  &lt;/td&gt;
+  &lt;td&gt;
+    Use this parameter to specify the error handling sequence that should be called if there is an error when the Call Template logic is executed.
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+## Examples
+
+Following examples demonstrate different use cases of the Call Template mediator.
+
+### Example 1
+
+The following four Call Template mediator configurations populate a
+sequence template named HelloWorld_Logger with the &quot;hello world&quot; text
+in four different languages.
+
+``` xml
+&lt;call-template target=&quot;HelloWorld_Logger&quot;&gt;
+    &lt;with-param name=&quot;message&quot; value=&quot;HELLO WORLD!!!!!!&quot; /&gt;
+&lt;/call-template&gt;
+```
+
+``` xml
+&lt;call-template target=&quot;HelloWorld_Logger&quot;&gt;
+    &lt;with-param name=&quot;message&quot; value=&quot;Bonjour tout le monde!!!!!!&quot; /&gt;
+&lt;/call-template&gt;
+```
+
+``` xml
+&lt;call-template target=&quot;HelloWorld_Logger&quot;&gt;
+    &lt;with-param name=&quot;message&quot; value=&quot;Ciao a tutti!!!!!!!&quot; /&gt;
+&lt;/call-template&gt;
+```
+
+``` xml
+&lt;call-template target=&quot;HelloWorld_Logger&quot;&gt;
+    &lt;with-param name=&quot;message&quot; value=&quot;???????!!!!!!!&quot; /&gt;
+&lt;/call-template&gt;
+```
+
+The sequence template can be configured as follows to log any greetings
+message passed to it by the Call Template mediator. Thus, due to the
+availability of the Call Template mediator, you are not required to have
+the message entered in all four languages included in the sequence
+template configuration itself.
+
+``` java
+&lt;template name=&quot;HelloWorld_Logger&quot;&gt;
+   &lt;parameter name=&quot;message&quot;/&gt;
+   &lt;sequence&gt;
+        &lt;log level=&quot;custom&quot;&gt;
+              &lt;property expression=&quot;$func:message&quot; name=&quot;GREETING_MESSAGE&quot;/&gt;
+    &lt;/log&gt;
+   &lt;/sequence&gt;
+&lt;/template&gt;
+```
+
+### Example 2
+
+The following Call Template mediator configuration populates a sequence template named `Testtemp` with a dynamic XPath expression.
+
+``` xml
+&lt;call-template target=&quot;Testtemp&quot;&gt;
+    &lt;with-param name=&quot;message_store&quot; value=&quot;&lt;MESSAGE_STORE_NAME&gt;&quot; /&gt;
+&lt;/call-template&gt;
+```
+
+The following `Testtemp` template includes a dynamic XPath expression to save messages in a message store, which is
+dynamically set via the message context.
+
+``` java
+&lt;template name=&quot;Testtemp&quot;&gt;
+        &lt;parameter name=&quot;message_store&quot;/&gt;
+        &lt;sequence&gt;
+            &lt;log level=&quot;custom&quot;&gt;
+                &lt;property expression=&quot;$func:message_store&quot;
+                    name=&quot;STORENAME&quot;
+                    xmlns:ns=&quot;http://org.apache.synapse/xsd&quot;
+                    xmlns:ns2=&quot;http://org.apache.synapse/xsd&quot; xmlns:soapenv=&quot;http://www.w3.org/2003/05/soap-envelope&quot;/&gt;
+            &lt;/log&gt;
+            &lt;store messageStore=&quot;{$func:message_store}&quot;
+                xmlns:ns=&quot;http://org.apache.synapse/xsd&quot;
+                xmlns:ns2=&quot;http://org.apache.synapse/xsd&quot; xmlns:soapenv=&quot;http://www.w3.org/2003/05/soap-envelope&quot;/&gt;
+        &lt;/sequence&gt;
+    &lt;/template&gt;
+```
+
+### Example 3
+
+Consider an example where the sequence template is configured to log the greeting message that is passed from the mediation sequence in the REST API. According to the sequence template, a value for the greeting message is mandatory. 
+
+```xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;template name=&quot;sequence-temp&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;parameter isMandatory=&quot;true&quot; defaultValue=&quot;Welcome&quot; name=&quot;greeting_message&quot;/&gt;
+    &lt;sequence&gt;
+        &lt;log level=&quot;custom&quot;&gt;
+            &lt;property expression=&quot;$func:greeting_message&quot; name=&quot;greeting&quot;/&gt;
+        &lt;/log&gt;
+    &lt;/sequence&gt;
+&lt;/template&gt;
+```
+
+However, in the following example, the Call template mediator in the REST API is not passing a greeting message to the template. Also, a &lt;b&gt;default&lt;/b&gt; greeting message is not defined in the template. In this scenario, an error will get triggered when the REST API calls the template. If you need to handle this error, or in general any error that may occur at execution of the mediation logic inside the template, you can add the &#x27;onError&#x27; parameter to the Call Template mediator and call an error-handling sequence.
+
+=== &quot;Call Template&quot;
+    ```xml 
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;api context=&quot;/test&quot; name=&quot;test&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        ......
+          &lt;call-template target=&quot;sequence-temp&quot; onError=&quot;error-handling-sequence&quot; /&gt;
+        ........
+    &lt;/api&gt;
+    ```
+=== &quot;error-handling-sequence&quot;     
+    ```xml 
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;sequence name=&quot;error-handling-sequence&quot; trace=&quot;disable&quot; xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+        &lt;log level=&quot;custom&quot;&gt;
+            &lt;property name=&quot;faultMessage&quot; value=&quot;Call Template Error&quot;/&gt;
+        &lt;/log&gt;
+    &lt;/sequence&gt;
+    ```</body>
+</html>

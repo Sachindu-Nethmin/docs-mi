@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>exporting-artifacts.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body>## Exporting Integration Logic as a CApp
+
+**CApp (Carbon Application)** is the deployable artifact on the integration runtime. Let us see how we can export integration logic we developed into a CApp along with the connector. 
+
+### Creating Connector Exporter Project
+
+To bundle a Connector into a CApp, a `Connector Exporter Project` is required. 
+
+1. Navigate to **File** -&gt; **New** -&gt; **Other** -&gt; **WSO2** -&gt; **Extensions** -&gt; **Project Types** -&gt; **Connector Exporter Project**.&lt;/br&gt;
+   
+    &lt;a href=&quot;https://apim.docs.wso2.com/en/4.1.0/assets/img/integrate/connectors/connector-exporter-project-1.jpg&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;https://apim.docs.wso2.com/en/4.1.0/assets/img/integrate/connectors/connector-exporter-project-1.jpg&quot; title=&quot;Add Connector Exporter Project&quot; width=&quot;60%&quot; alt=&quot;Add Connector Exporter Project&quot; /&gt;&lt;/a&gt;
+
+2. Enter a name for the Connector Exporter Project. 
+
+3. In the next screen select, **Specify the parent from workspace** and select the specific Integration Project you created from the dropdown.&lt;/br&gt;
+    &lt;a href=&quot;https://apim.docs.wso2.com/en/4.1.0/assets/img/integrate/connectors/connector-exporter-project-naming.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;https://apim.docs.wso2.com/en/4.1.0/assets/img/integrate/connectors/connector-exporter-project-naming.png&quot; title=&quot;Naming Connector Exporter Project&quot; width=&quot;60%&quot; alt=&quot;Naming Connector Exporter Project&quot; /&gt;&lt;/a&gt;
+
+4. Now you need to add the Connector to Connector Exporter Project that you just created. Right-click the Connector Exporter Project and select, **New** -&gt; **Add Remove Connectors** -&gt; **Add Connector** -&gt; **Add from Workspace** -&gt; **Connector**
+
+5. Once you are directed to the workspace, it displays all the connectors that exist in the workspace. You can select the relevant connector and click **Ok**.&lt;/br&gt;
+
+    &lt;a href=&quot;https://apim.docs.wso2.com/en/4.1.0/assets/img/integrate/connectors/adding-connector-to-exporter-project-3.jpg&quot;
+   class=&quot;glightbox&quot;&gt;
+  &lt;img src=&quot;https://apim.docs.wso2.com/en/4.1.0/assets/img/integrate/connectors/adding-connector-to-exporter-project-3.jpg&quot;
+       title=&quot;Selecting Connector from Workspace&quot;
+       width=&quot;60%&quot;
+       alt=&quot;Selecting Connector from Workspace&quot; /&gt;
+&lt;/a&gt;
+
+### Creating a Composite Application Project
+
+To export the `Integration Project` as a CApp, a `Composite Application Project` needs to be created. Usually, when an Integration project is created, this project can be created as part of that project by Integration Studio. If not, you can specifically create it by navigating to  **File** -&gt; **New** -&gt; **Other** -&gt; **WSO2** -&gt; **Distribution** -&gt; **Composite Application Project**. 
+
+### Exporting the Composite Application Project
+
+1. Right-click the Composite Application Project and click **Export Composite Application Project**.&lt;/br&gt;
+   
+    &lt;img src=&quot;https://apim.docs.wso2.com/en/4.1.0/assets/img/integrate/connectors/capp-project1.jpg&quot; title=&quot;Export as a Carbon Application&quot; width=&quot;40%&quot; alt=&quot;Export as a Carbon Application&quot; /&gt;
+
+2. Select an **Export Destination** where you want to save the .car file. 
+
+3. In the next **Create a deployable CAR file** screen, select both the created Integration Project and the Connector Exporter Project to save and click **Finish**. The CApp is created at the specified location provided at the previous step.&lt;/br&gt;
+   
+    &lt;a href=&quot;https://apim.docs.wso2.com/en/4.1.0/assets/img/integrate/connectors/saving-projects.png&quot; class=&quot;glightbox&quot;&gt;&lt;img src=&quot;https://apim.docs.wso2.com/en/4.1.0/assets/img/integrate/connectors/saving-projects.png&quot; title=&quot;Create a deployable CAR file&quot; width=&quot;80%&quot; alt=&quot;Create a deployable CAR file&quot; /&gt;&lt;/a&gt;
+</body>
+</html>

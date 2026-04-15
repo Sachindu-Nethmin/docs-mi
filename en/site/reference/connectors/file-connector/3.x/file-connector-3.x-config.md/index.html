@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>file-connector-3.x-config.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># File Connector Reference
+
+The following operations allow you to work with the File Connector version 3. Click an operation name to see parameter details and samples on how to use it.
+
+??? note &quot;append&quot;
+    The append operation appends content to an existing file in a specified location.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;destination&lt;/td&gt;
+            &lt;td&gt;The location of the file for which content needs to be appended.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;inputContent&lt;/td&gt;
+            &lt;td&gt;The content to be appended.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;position&lt;/td&gt;
+            &lt;td&gt;Position to append the content. If you provide a valid position, content will be appended to that position. Otherwise, content will be appended at the end of the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;encoding&lt;/td&gt;
+            &lt;td&gt;The encoding that is supported. Possible values are US-ASCII, UTF-8, and UTF-16.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setTimeout&lt;/td&gt;
+            &lt;td&gt;The timeout value on the JSC (Java Secure Channel) session in milliseconds. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setPassiveMode&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to enable passive mode.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setSoTimeout&lt;/td&gt;
+            &lt;td&gt;The socket timeout value for the FTP client. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setUserDirIsRoot&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to use root as the user directory.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setStrictHostKeyChecking&lt;/td&gt;
+            &lt;td&gt;Sets the requirement to use host key checking. E.g., no.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sftpIdentities&lt;/td&gt;
+            &lt;td&gt;Location of the private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;Passphrase of the private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;fileconnector.append&gt;
+        &lt;destination&gt;{$ctx:destination}&lt;/destination&gt;
+        &lt;inputContent&gt;{$ctx:inputContent}&lt;/inputContent&gt;
+        &lt;position&gt;{$ctx:position}&lt;/position&gt;
+        &lt;encoding&gt;{$ctx:encoding}&lt;/encoding&gt;
+        &lt;setTimeout&gt;{$ctx:setTimeout}&lt;/setTimeout&gt;
+        &lt;setPassiveMode&gt;{$ctx:setPassiveMode}&lt;/setPassiveMode&gt;
+        &lt;setSoTimeout&gt;{$ctx:setSoTimeout}&lt;/setSoTimeout&gt;
+        &lt;setUserDirIsRoot&gt;{$ctx:setUserDirIsRoot}&lt;/setUserDirIsRoot&gt;
+        &lt;setStrictHostKeyChecking&gt;{$ctx:setStrictHostKeyChecking}&lt;/setStrictHostKeyChecking&gt;
+        &lt;sftpIdentities&gt;{$ctx:sftpIdentities}&lt;/sftpIdentities&gt;
+        &lt;sftpIdentityPassphrase&gt;{$ctx:sftpIdentityPassphrase}&lt;/sftpIdentityPassphrase&gt;
+    &lt;/fileconnector.append&gt;
+    ```
+    
+    **Sample request**
+    
+    Following is a sample REST/JSON request that can be handled by the append operation.
+    ```json
+        {
+            &quot;destination&quot;:&quot;/home/vive/Desktop/file/append.txt&quot;,
+            &quot;inputContent&quot;:&quot;Add Append Text.&quot;
+        }
+    ```
+
+
+??? note &quot;archive&quot;
+    The archive operation archives files or folders. This operation supports the ZIP archive type.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;source&lt;/td&gt;
+            &lt;td&gt;The location of the file. This can be a file on the local physical file system or a file on an FTP server. 
+                &lt;ul&gt;
+                    &lt;li&gt;For local files, the URI format is [file://]absolute-path, where absolute-path is a valid absolute file name for the local platform. UNC names are supported under Windows (e.g., file:///home/user/test or file:///C:/Windows).&lt;/li&gt; 
+                    &lt;li&gt;For files on a FTP server, the URI format is ftp://[ username[: password]@] hostname[: port][ relative-path] (e.g., ftp://myusername:mypassword@somehost/pub/downloads/test.txt).&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;destination&lt;/td&gt;
+            &lt;td&gt;The location of the archived file with the file name. (e.g., file:///home/user/test/test.zip)&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;inputContent&lt;/td&gt;
+            &lt;td&gt;The input content that needs to be archived.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;fileName&lt;/td&gt;
+            &lt;td&gt;The name of the file where input content needs to be archived.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setTimeout&lt;/td&gt;
+            &lt;td&gt;The timeout value on the JSC (Java Secure Channel) session in milliseconds. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setPassiveMode&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to enable passive mode.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setSoTimeout&lt;/td&gt;
+            &lt;td&gt;The socket timeout value for the FTP client. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setUserDirIsRoot&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to use root as the user directory.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setStrictHostKeyChecking&lt;/td&gt;
+            &lt;td&gt;Sets the requirement to use host key checking. E.g., no.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;includeSubDirectories&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to include the sub directories.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sftpIdentities&lt;/td&gt;
+            &lt;td&gt;Location of the private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;Passphrase of the private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    &gt; NOTE: To make an archive operation, you can provide either the source or inputContent. If inputContent is provided as the parameter, we need to specify fileName. Otherwise, it will use the default fileName (output.txt).
+
+    **Sample configuration**
+
+    ```xml
+    &lt;fileconnector.archives&gt;
+        &lt;source&gt;{$ctx:source}&lt;/source&gt;
+        &lt;destination&gt;{$ctx:destination}&lt;/destination&gt;
+        &lt;inputContent&gt;{$ctx:inputContent}&lt;/inputContent&gt;
+        &lt;fileName&gt;{$ctx:fileName}&lt;/fileName&gt;
+        &lt;setTimeout&gt;{$ctx:setTimeout}&lt;/setTimeout&gt;
+        &lt;setPassiveMode&gt;{$ctx:setPassiveMode}&lt;/setPassiveMode&gt;
+        &lt;setSoTimeout&gt;{$ctx:setSoTimeout}&lt;/setSoTimeout&gt;
+        &lt;setUserDirIsRoot&gt;{$ctx:setUserDirIsRoot}&lt;/setUserDirIsRoot&gt;
+        &lt;setStrictHostKeyChecking&gt;{$ctx:setStrictHostKeyChecking}&lt;/setStrictHostKeyChecking&gt;
+        &lt;includeSubDirectories&gt;{$ctx:includeSubDirectories}&lt;/includeSubDirectories&gt;
+        &lt;sftpIdentities&gt;{$ctx:sftpIdentities}&lt;/sftpIdentities&gt;
+        &lt;sftpIdentityPassphrase&gt;{$ctx:sftpIdentityPassphrase}&lt;/sftpIdentityPassphrase&gt;
+    &lt;/fileconnector.archives&gt;
+    ```
+
+    **Sample request**
+
+    Following is a sample REST/JSON request that can be handled by the archive operation.
+    ```json
+    {
+        &quot;source&quot;:&quot;/home/vive/Desktop/file&quot;,
+        &quot;destination&quot;:&quot;/home/user/test/file.zip&quot;,
+        &quot;includeSubDirectories&quot;:&quot;true&quot;
+    }
+    ```
+
+
+??? note &quot;copy&quot;
+    The copy operation copies files from one location to another. This operation can be used when you want to copy any kind of files and large files as well. You can also copy particular files with specified file patterns.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;source&lt;/td&gt;
+            &lt;td&gt;The location of the file. This can be a file on the local physical file system or a file on an FTP server.
+                &lt;ul&gt;
+                    &lt;li&gt;For local files, the URI format is [file://]absolute-path, where absolute-path is a valid absolute file name for the local platform. UNC names are supported under Windows (e.g., file:///home/user/test or file:///C:/Windows).&lt;/li&gt;
+                    &lt;li&gt;For files on a FTP server, the URI format is ftp://[ username[: password]@] hostname[: port][ relative-path] (e.g., ftp://myusername:mypassword@somehost/pub/downloads/test.txt).&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;destination&lt;/td&gt;
+            &lt;td&gt;The location of the archived file with the file name. (e.g., file:///home/user/test/test.zip)&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;filePattern&lt;/td&gt;
+            &lt;td&gt;The pattern of the files to be copied. (e.g., [a-zA-Z][a-zA-Z]*.(txt|xml|jar))&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setTimeout&lt;/td&gt;
+            &lt;td&gt;The timeout value on the JSC (Java Secure Channel) session in milliseconds. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setPassiveMode&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to enable passive mode.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setSoTimeout&lt;/td&gt;
+            &lt;td&gt;The socket timeout value for the FTP client. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setUserDirIsRoot&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to use root as the user directory.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setStrictHostKeyChecking&lt;/td&gt;
+            &lt;td&gt;Sets the requirement to use host key checking. E.g., no.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;includeParentDirectory&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to include the parent directory.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sourceSftpIdentities&lt;/td&gt;
+            &lt;td&gt;Location of the source&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sourceSftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;Passphrase of the source&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;targetSftpIdentities&lt;/td&gt;
+            &lt;td&gt;Location of the target&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;targetSftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;Passphrase of the target&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;includeSubDirectories&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to include the sub directories.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;fileconnector.copy&gt;
+        &lt;source&gt;{$ctx:source}&lt;/source&gt;
+        &lt;destination&gt;{$ctx:destination}&lt;/destination&gt;
+	    &lt;filePattern&gt;{$ctx:filePattern}&lt;/filePattern&gt;
+        &lt;setTimeout&gt;{$ctx:setTimeout}&lt;/setTimeout&gt;
+        &lt;setPassiveMode&gt;{$ctx:setPassiveMode}&lt;/setPassiveMode&gt;
+        &lt;setSoTimeout&gt;{$ctx:setSoTimeout}&lt;/setSoTimeout&gt;
+        &lt;setUserDirIsRoot&gt;{$ctx:setUserDirIsRoot}&lt;/setUserDirIsRoot&gt;
+        &lt;setStrictHostKeyChecking&gt;{$ctx:setStrictHostKeyChecking}&lt;/setStrictHostKeyChecking&gt;
+	    &lt;includeParentDirectory&gt;{$ctx:includeParentDirectory}&lt;/includeParentDirectory&gt;
+	    &lt;sourceSftpIdentities&gt;{$ctx:sftpIdentities}&lt;/sourceSftpIdentities&gt;
+        &lt;sourceSftpIdentityPassphrase&gt;{$ctx:sourceSftpIdentityPassphrase}&lt;/sourceSftpIdentityPassphrase&gt;
+        &lt;targetSftpIdentities&gt;{$ctx:targetSftpIdentities}&lt;/targetSftpIdentities&gt;
+        &lt;targetSftpIdentityPassphrase&gt;{$ctx:targetSftpIdentityPassphrase}&lt;/targetSftpIdentityPassphrase&gt;
+        &lt;includeSubDirectories&gt;{$ctx:includeSubDirectories}&lt;/includeSubDirectories&gt;
+    &lt;/fileconnector.copy&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;source&quot;:&quot;/home/vive/Desktop/file&quot;,
+        &quot;destination&quot;:&quot;/home/user/test/fileCopy&quot;,
+        &quot;filePattern&quot;:&quot;.*\.xml&quot;,
+        &quot;includeParentDirectory&quot;:&quot;false&quot;,
+        &quot;includeSubDirectories&quot;:&quot;false&quot;
+    }
+    ```
+
+
+??? note &quot;create&quot;
+    The create operation creates a file or folder in a specified location. When creating a file, you can either create the file with content or without content.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;filePath&lt;/td&gt;
+            &lt;td&gt;The location of the file. This can be a file on the local physical file system or a file on an FTP server.
+                &lt;ul&gt;
+                    &lt;li&gt;For local files, the URI format is [file://]absolute-path, where absolute-path is a valid absolute file name for the local platform. UNC names are supported under Windows (e.g., file:///home/user/test or file:///C:/Windows).&lt;/li&gt;
+                    &lt;li&gt;For files on a FTP server, the URI format is ftp://[ username[: password]@] hostname[: port][ relative-path] (e.g., ftp://myusername:mypassword@somehost/pub/downloads/test.txt).&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;inputContent&lt;/td&gt;
+            &lt;td&gt;The content of the file.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;encoding&lt;/td&gt;
+            &lt;td&gt;The encoding that is supported. Possible values are US-ASCII, UTF-8, and UTF-16.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;isBinaryContent&lt;/td&gt;
+            &lt;td&gt;Set to true if input content should be handled as binary data. Input content is expected to be base64 encoded binary content.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setTimeout&lt;/td&gt;
+            &lt;td&gt;The timeout value on the JSC (Java Secure Channel) session in milliseconds. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setPassiveMode&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to enable passive mode.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setSoTimeout&lt;/td&gt;
+            &lt;td&gt;The socket timeout value for the FTP client. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setUserDirIsRoot&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to use root as the user directory.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setStrictHostKeyChecking&lt;/td&gt;
+            &lt;td&gt;Sets the requirement to use host key checking. E.g., no.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sftpIdentities&lt;/td&gt;
+            &lt;td&gt;Location of the private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;Passphrase of the private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;fileconnector.create&gt;
+        &lt;filePath&gt;{$ctx:filePath}&lt;/filePath&gt;
+        &lt;inputContent&gt;{$ctx:inputContent}&lt;/inputContent&gt;
+	    &lt;encoding&gt;{$ctx:encoding}&lt;/encoding&gt;
+	    &lt;isBinaryContent&gt;{$ctx:isBinaryContent}&lt;/isBinaryContent&gt;
+        &lt;setTimeout&gt;{$ctx:setTimeout}&lt;/setTimeout&gt;
+        &lt;setPassiveMode&gt;{$ctx:setPassiveMode}&lt;/setPassiveMode&gt;
+        &lt;setSoTimeout&gt;{$ctx:setSoTimeout}&lt;/setSoTimeout&gt;
+        &lt;setUserDirIsRoot&gt;{$ctx:setUserDirIsRoot}&lt;/setUserDirIsRoot&gt;
+        &lt;setStrictHostKeyChecking&gt;{$ctx:setStrictHostKeyChecking}&lt;/setStrictHostKeyChecking&gt;
+        &lt;sftpIdentities&gt;{$ctx:sftpIdentities}&lt;/sftpIdentities&gt;
+        &lt;sftpIdentityPassphrase&gt;{$ctx:sftpIdentityPassphrase}&lt;/sftpIdentityPassphrase&gt;
+    &lt;/fileconnector.create&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;filePath&quot;:&quot;sftp://UserName:Password@Host/home/connectors/create.txt&quot;,
+        &quot;inputContent&quot;:&quot;InputContent Text&quot;,
+        &quot;encoding&quot;:&quot;UTF8&quot;
+    }
+    ```
+
+
+??? note &quot;delete&quot;
+    The delete operation deletes a file or folder from the file system.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;source&lt;/td&gt;
+            &lt;td&gt;The location of the file. This can be a file on the local physical file system or a file on an FTP server.
+                &lt;ul&gt;
+                    &lt;li&gt;For local files, the URI format is [file://]absolute-path, where absolute-path is a valid absolute file name for the local platform. UNC names are supported under Windows (e.g., file:///home/user/test or file:///C:/Windows).&lt;/li&gt;
+                    &lt;li&gt;For files on a FTP server, the URI format is ftp://[ username[: password]@] hostname[: port][ relative-path] (e.g., ftp://myusername:mypassword@somehost/pub/downloads/test.txt).&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;filePattern&lt;/td&gt;
+            &lt;td&gt;The pattern of the files to be deleted.(e.g., [a-zA-Z][a-zA-Z]*.(txt|xml|jar)).&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setTimeout&lt;/td&gt;
+            &lt;td&gt;The timeout value on the JSC (Java Secure Channel) session in milliseconds. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setPassiveMode&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to enable passive mode.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setSoTimeout&lt;/td&gt;
+            &lt;td&gt;The socket timeout value for the FTP client. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setUserDirIsRoot&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to use root as the user directory.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setStrictHostKeyChecking&lt;/td&gt;
+            &lt;td&gt;Sets the requirement to use host key checking. E.g., no.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;includeSubDirectories&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to include the sub directories.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;deleteContainerFolders&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to delete the container folders.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sftpIdentities&lt;/td&gt;
+            &lt;td&gt;Location of the private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;Passphrase of the private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;fileconnector.delete&gt;
+        &lt;source&gt;{$ctx:source}&lt;/source&gt;
+        &lt;filePattern&gt;{$ctx:filePattern}&lt;/filePattern&gt;
+	    &lt;setTimeout&gt;{$ctx:setTimeout}&lt;/setTimeout&gt;
+        &lt;setPassiveMode&gt;{$ctx:setPassiveMode}&lt;/setPassiveMode&gt;
+        &lt;setSoTimeout&gt;{$ctx:setSoTimeout}&lt;/setSoTimeout&gt;
+        &lt;setUserDirIsRoot&gt;{$ctx:setUserDirIsRoot}&lt;/setUserDirIsRoot&gt;
+        &lt;setStrictHostKeyChecking&gt;{$ctx:setStrictHostKeyChecking}&lt;/setStrictHostKeyChecking&gt;
+        &lt;includeSubDirectories&gt;{$ctx:includeSubDirectories}&lt;/includeSubDirectories&gt;
+        &lt;deleteContainerFolders&gt;{$ctx:deleteContainerFolders}&lt;/deleteContainerFolders&gt;
+        &lt;sftpIdentities&gt;{$ctx:sftpIdentities}&lt;/sftpIdentities&gt;
+        &lt;sftpIdentityPassphrase&gt;{$ctx:sftpIdentityPassphrase}&lt;/sftpIdentityPassphrase&gt;
+    &lt;/fileconnector.delete&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;source&quot;:&quot;/home/vive/Desktop/file&quot;,
+        &quot;filePattern&quot;:&quot;.*\.txt&quot;,
+        &quot;includeSubDirectories&quot;:&quot;true&quot;
+    }
+    ```
+
+
+??? note &quot;isFileExist&quot;
+    The isFileExist operation checks the existence of a file in a specified location. This operation returns true if the file exists and returns false if the file does not exist in the specified location.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;source&lt;/td&gt;
+            &lt;td&gt;The location of the file. This can be a file on the local physical file system or a file on an FTP server.
+                &lt;ul&gt;
+                    &lt;li&gt;For local files, the URI format is [file://]absolute-path, where absolute-path is a valid absolute file name for the local platform. UNC names are supported under Windows (e.g., file:///home/user/test or file:///C:/Windows).&lt;/li&gt;
+                    &lt;li&gt;For files on a FTP server, the URI format is ftp://[ username[: password]@] hostname[: port][ relative-path] (e.g., ftp://myusername:mypassword@somehost/pub/downloads/test.txt).&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setTimeout&lt;/td&gt;
+            &lt;td&gt;The timeout value on the JSC (Java Secure Channel) session in milliseconds. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setPassiveMode&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to enable passive mode.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setSoTimeout&lt;/td&gt;
+            &lt;td&gt;The socket timeout value for the FTP client. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setUserDirIsRoot&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to use root as the user directory.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setStrictHostKeyChecking&lt;/td&gt;
+            &lt;td&gt;Sets the requirement to use host key checking. E.g., no.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sftpIdentities&lt;/td&gt;
+            &lt;td&gt;The location of the private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;sftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;The passphrase of the private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;fileconnector.isFileExist&gt;
+        &lt;source&gt;{$ctx:source}&lt;/source&gt;
+        &lt;setTimeout&gt;{$ctx:setTimeout}&lt;/setTimeout&gt;
+        &lt;setPassiveMode&gt;{$ctx:setPassiveMode}&lt;/setPassiveMode&gt;
+        &lt;setSoTimeout&gt;{$ctx:setSoTimeout}&lt;/setSoTimeout&gt;
+        &lt;setUserDirIsRoot&gt;{$ctx:setUserDirIsRoot}&lt;/setUserDirIsRoot&gt;
+        &lt;setStrictHostKeyChecking&gt;{$ctx:setStrictHostKeyChecking}&lt;/setStrictHostKeyChecking&gt;
+        &lt;sftpIdentities&gt;{$ctx:sftpIdentities}&lt;/sftpIdentities&gt;
+        &lt;sftpIdentityPassphrase&gt;{$ctx:sftpIdentityPassphrase}&lt;/sftpIdentityPassphrase&gt;
+    &lt;/fileconnector.isFileExist&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;source&quot;:&quot;/home/vive/Desktop/file/test.txt&quot;
+    }
+    ```
+
+
+??? note &quot;listFileZip&quot;
+    The listFileZip operation lists all the file paths inside a compressed file. This operation supports the ZIP archive type.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;source&lt;/td&gt;
+            &lt;td&gt;The location of the file. This can be a file on the local physical file system or a file on an FTP server.
+                &lt;ul&gt;
+                    &lt;li&gt;For local files, the URI format is [file://]absolute-path, where absolute-path is a valid absolute file name for the local platform. UNC names are supported under Windows (e.g., file:///home/user/test or file:///C:/Windows).&lt;/li&gt;
+                    &lt;li&gt;For files on a FTP server, the URI format is ftp://[ username[: password]@] hostname[: port][ relative-path] (e.g., ftp://myusername:mypassword@somehost/pub/downloads/test.txt).&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setTimeout&lt;/td&gt;
+            &lt;td&gt;The timeout value on the JSC (Java Secure Channel) session in milliseconds. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setPassiveMode&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to enable passive mode.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setSoTimeout&lt;/td&gt;
+            &lt;td&gt;The socket timeout value for the FTP client. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setUserDirIsRoot&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to use root as the user directory.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setStrictHostKeyChecking&lt;/td&gt;
+            &lt;td&gt;Sets the requirement to use host key checking. E.g., no.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;fileconnector.listFileZip&gt;
+        &lt;source&gt;{$ctx:source}&lt;/source&gt;
+        &lt;setTimeout&gt;{$ctx:setTimeout}&lt;/setTimeout&gt;
+        &lt;setPassiveMode&gt;{$ctx:setPassiveMode}&lt;/setPassiveMode&gt;
+        &lt;setSoTimeout&gt;{$ctx:setSoTimeout}&lt;/setSoTimeout&gt;
+        &lt;setUserDirIsRoot&gt;{$ctx:setUserDirIsRoot}&lt;/setUserDirIsRoot&gt;
+        &lt;setStrictHostKeyChecking&gt;{$ctx:setStrictHostKeyChecking}&lt;/setStrictHostKeyChecking&gt;
+    &lt;/fileconnector.listFileZip&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;source&quot;:&quot;/home/vive/Desktop/file/test.zip&quot;
+    }
+    ```
+
+
+??? note &quot;move&quot;
+    The  move operation moves a file or folder from one location to another.
+
+    **Info**: The move operation can only move a file/folder within the same server. For example, you can move a file/folder from one local location to another local location, or from one remote location to another remote location on the same server. You cannot use the move operation to move a file/folder between different servers. If you want to move a file/folder from a local location to a remote location or vice versa, use the copy operation followed by delete operation instead of using the move operation.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;source&lt;/td&gt;
+            &lt;td&gt;The location of the file. This can be a file on the local physical file system or a file on an FTP server.
+                &lt;ul&gt;
+                    &lt;li&gt;For local files, the URI format is [file://]absolute-path, where absolute-path is a valid absolute file name for the local platform. UNC names are supported under Windows (e.g., file:///home/user/test or file:///C:/Windows).&lt;/li&gt;
+                    &lt;li&gt;For files on a FTP server, the URI format is ftp://[ username[: password]@] hostname[: port][ relative-path] (e.g., ftp://myusername:mypassword@somehost/pub/downloads/test.txt).&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;destination&lt;/td&gt;
+            &lt;td&gt;The location where the file has to be moved to.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setTimeout&lt;/td&gt;
+            &lt;td&gt;The timeout value on the JSC (Java Secure Channel) session in milliseconds. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setPassiveMode&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to enable passive mode.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setSoTimeout&lt;/td&gt;
+            &lt;td&gt;The socket timeout value for the FTP client. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setUserDirIsRoot&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to use root as the user directory.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setStrictHostKeyChecking&lt;/td&gt;
+            &lt;td&gt;Sets the requirement to use host key checking. E.g., no.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;includeParentDirectory&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to include the parent directory.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;includeSubDirectories&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to include the sub directories.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setAvoidPermission&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to skip the file permission check.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sourceSftpIdentities&lt;/td&gt;
+            &lt;td&gt;Location of the source&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sourceSftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;Passphrase of the source&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;targetSftpIdentities&lt;/td&gt;
+            &lt;td&gt;Location of the target&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;targetSftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;Passphrase of the target&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;fileconnector.move&gt;
+        &lt;source&gt;{$ctx:source}&lt;/source&gt;
+        &lt;destination&gt;{$ctx:destination}&lt;/destination&gt;
+        &lt;setTimeout&gt;{$ctx:setTimeout}&lt;/setTimeout&gt;
+        &lt;setPassiveMode&gt;{$ctx:setPassiveMode}&lt;/setPassiveMode&gt;
+        &lt;setSoTimeout&gt;{$ctx:setSoTimeout}&lt;/setSoTimeout&gt;
+        &lt;setUserDirIsRoot&gt;{$ctx:setUserDirIsRoot}&lt;/setUserDirIsRoot&gt;
+        &lt;setStrictHostKeyChecking&gt;{$ctx:setStrictHostKeyChecking}&lt;/setStrictHostKeyChecking&gt;
+        &lt;filePattern&gt;{$ctx:filePattern}&lt;/filePattern&gt;
+	    &lt;includeParentDirectory&gt;{$ctx:includeParentDirectory}&lt;/includeParentDirectory&gt;
+        &lt;includeSubDirectories&gt;{$ctx:includeSubDirectories}&lt;/includeSubDirectories&gt;
+        &lt;setAvoidPermission&gt;{$ctx:setAvoidPermission}&lt;/setAvoidPermission&gt;
+	    &lt;sourceSftpIdentities&gt;{$ctx:sftpIdentities}&lt;/sourceSftpIdentities&gt;
+        &lt;sourceSftpIdentityPassphrase&gt;{$ctx:sourceSftpIdentityPassphrase}&lt;/sourceSftpIdentityPassphrase&gt;
+        &lt;targetSftpIdentities&gt;{$ctx:targetSftpIdentities}&lt;/targetSftpIdentities&gt;
+        &lt;targetSftpIdentityPassphrase&gt;{$ctx:targetSftpIdentityPassphrase}&lt;/targetSftpIdentityPassphrase&gt;
+    &lt;/fileconnector.move&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;source&quot;:&quot;/home/vive/Desktop/file&quot;,
+        &quot;destination&quot;:&quot;/home/vive/Desktop/move&quot;,
+        &quot;filePattern&quot;:&quot;.*\.txt&quot;,
+        &quot;includeParentDirectory&quot;:&quot;true&quot;,
+        &quot;includeSubDirectories&quot;:&quot;true&quot;
+    }
+    ```
+
+
+??? note &quot;read&quot;
+    The read operation reads content from an existing file in a specified location.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;source&lt;/td&gt;
+            &lt;td&gt;The location of the file. This can be a file on the local physical file system or a file on an FTP server. 
+                &lt;ul&gt;
+                    &lt;li&gt;For local files, the URI format is [file://]absolute-path, where absolute-path is a valid absolute file name for the local platform. UNC names are supported under Windows (e.g., file:///home/user/test or file:///C:/Windows).&lt;/li&gt; 
+                    &lt;li&gt;For files on a FTP server, the URI format is ftp://[ username[: password]@] hostname[: port][relative-path] (e.g., ftp://myusername:mypassword@somehost/pub/downloads/test.txt).&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;filePattern&lt;/td&gt;
+            &lt;td&gt;The pattern of the file to be read.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentType&lt;/td&gt;
+            &lt;td&gt;Content type of the files processsed by the connector.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;streaming&lt;/td&gt;
+            &lt;td&gt;The streaming mode. This can be either true or false.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setTimeout&lt;/td&gt;
+            &lt;td&gt;The timeout value on the JSC (Java Secure Channel) session in milliseconds. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setPassiveMode&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to enable passive mode.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setSoTimeout&lt;/td&gt;
+            &lt;td&gt;The socket timeout value for the FTP client. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setUserDirIsRoot&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to use root as the user directory.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setStrictHostKeyChecking&lt;/td&gt;
+            &lt;td&gt;Sets the requirement to use host key checking. E.g., no.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;includeParentDirectory&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to include the parent directory.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sftpIdentities&lt;/td&gt;
+            &lt;td&gt;Location of the private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;Passphrase of the private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Info**: To enable streaming for large files, you have to add the following message builder and formatter in the &lt;ESB_HOME&gt;/repository/conf/axis2/axis2.xml file:
+    * Add &lt;messageFormatter contentType=&quot;application/file&quot; class=&quot;org.wso2.carbon.relay.ExpandingMessageFormatter&quot;/&gt; under message formatters.
+    * Add &lt;messageBuilder contentType=&quot;application/file&quot; class=&quot;org.apache.axis2.format.BinaryBuilder&quot;/&gt; under message builders.
+
+    **Sample configuration**
+    
+    ```xml
+    &lt;fileconnector.read&gt;
+        &lt;source&gt;{$ctx:source}&lt;/source&gt;
+        &lt;filePattern&gt;{$ctx:filePattern}&lt;/filePattern&gt;
+        &lt;contentType&gt;{$ctx:contentType}&lt;/contentType&gt;
+        &lt;setTimeout&gt;{$ctx:setTimeout}&lt;/setTimeout&gt;
+        &lt;setPassiveMode&gt;{$ctx:setPassiveMode}&lt;/setPassiveMode&gt;
+        &lt;setSoTimeout&gt;{$ctx:setSoTimeout}&lt;/setSoTimeout&gt;
+        &lt;setUserDirIsRoot&gt;{$ctx:setUserDirIsRoot}&lt;/setUserDirIsRoot&gt;
+        &lt;setStrictHostKeyChecking&gt;{$ctx:setStrictHostKeyChecking}&lt;/setStrictHostKeyChecking&gt;
+        &lt;sftpIdentities&gt;{$ctx:sftpIdentities}&lt;/sftpIdentities&gt;
+        &lt;sftpIdentityPassphrase&gt;{$ctx:sftpIdentityPassphrase}&lt;/sftpIdentityPassphrase&gt;
+    &lt;/fileconnector.read&gt;
+    ```
+    
+    **Sample request**
+
+    ```json
+    {
+        &quot;source&quot;:&quot;/home/vive/Desktop/file&quot;,
+        &quot;contentType&quot;:&quot;application/xml&quot;,
+        &quot;filePattern&quot;:&quot;.*\.xml&quot;,
+        &quot;streaming&quot;:&quot;false&quot;
+    }
+    ```
+
+
+??? note &quot;search&quot;
+    The search operation finds a file or folder based on a given file pattern or directory pattern in a specified location.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;source&lt;/td&gt;
+            &lt;td&gt;The location of the file. This can be a file on the local physical file system or a file on an FTP server. 
+                &lt;ul&gt;
+                    &lt;li&gt;For local files, the URI format is [file://]absolute-path, where absolute-path is a valid absolute file name for the local platform. UNC names are supported under Windows (e.g., file:///home/user/test or file:///C:/Windows).&lt;/li&gt; 
+                    &lt;li&gt;For files on a FTP server, the URI format is ftp://[ username[: password]@] hostname[: port][ relative-path] (e.g., ftp://myusername:mypassword@somehost/pub/downloads/test.txt).&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;filePattern&lt;/td&gt;
+            &lt;td&gt;The pattern of the file to be read.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;recursiveSearch&lt;/td&gt;
+            &lt;td&gt;Whether you are searching recursively (the possible values are True or False).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setTimeout&lt;/td&gt;
+            &lt;td&gt;The timeout value on the JSC (Java Secure Channel) session in milliseconds. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setPassiveMode&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to enable passive mode.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setSoTimeout&lt;/td&gt;
+            &lt;td&gt;The socket timeout value for the FTP client. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setUserDirIsRoot&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to use root as the user directory.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setStrictHostKeyChecking&lt;/td&gt;
+            &lt;td&gt;Sets the requirement to use host key checking. E.g., no.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;includeParentDirectory&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to include the parent directory.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+    
+    ```xml
+    &lt;fileconnector.search&gt;
+        &lt;source&gt;{$ctx:source}&lt;/source&gt;
+        &lt;filePattern&gt;{$ctx:filePattern}&lt;/filePattern&gt;
+	    &lt;recursiveSearch&gt;{$ctx:recursiveSearch}&lt;/recursiveSearch&gt;
+        &lt;setTimeout&gt;{$ctx:setTimeout}&lt;/setTimeout&gt;
+        &lt;setPassiveMode&gt;{$ctx:setPassiveMode}&lt;/setPassiveMode&gt;
+        &lt;setSoTimeout&gt;{$ctx:setSoTimeout}&lt;/setSoTimeout&gt;
+        &lt;setUserDirIsRoot&gt;{$ctx:setUserDirIsRoot}&lt;/setUserDirIsRoot&gt;
+        &lt;setStrictHostKeyChecking&gt;{$ctx:setStrictHostKeyChecking}&lt;/setStrictHostKeyChecking&gt;
+    &lt;/fileconnector.search&gt;
+    ```
+    
+    **Sample request**
+    ```json
+    {
+        &quot;source&quot;:&quot;/home/vive/Desktop/file&quot;,
+        &quot;filePattern&quot;:&quot;.*\.xml&quot;,
+        &quot;recursiveSearch&quot;:&quot;true&quot;
+    }
+    ```
+
+
+??? note &quot;unzip&quot;
+    The unzip operation decompresses zip file. This operation supports ZIP archive type.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;source&lt;/td&gt;
+            &lt;td&gt;The location of the file. This can be a file on the local physical file system or a file on an FTP server. 
+                &lt;ul&gt;
+                    &lt;li&gt;For local files, the URI format is [file://]absolute-path, where absolute-path is a valid absolute file name for the local platform. UNC names are supported under Windows (e.g., file:///home/user/test or file:///C:/Windows).&lt;/li&gt; 
+                    &lt;li&gt;For files on a FTP server, the URI format is ftp://[ username[: password]@] hostname[: port][ relative-path] (e.g., ftp://myusername:mypassword@somehost/pub/downloads/test.txt).&lt;/li&gt;
+                &lt;/ul&gt;
+            &lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;destination&lt;/td&gt;
+            &lt;td&gt;The location of the decompressed file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setTimeout&lt;/td&gt;
+            &lt;td&gt;The timeout value on the JSC (Java Secure Channel) session in milliseconds. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setPassiveMode&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to enable passive mode.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setSoTimeout&lt;/td&gt;
+            &lt;td&gt;The socket timeout value for the FTP client. E.g., 100000.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setUserDirIsRoot&lt;/td&gt;
+            &lt;td&gt;Set to true if you want to use root as the user directory.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;setStrictHostKeyChecking&lt;/td&gt;
+            &lt;td&gt;Sets the requirement to use host key checking. E.g., no.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sourceSftpIdentities&lt;/td&gt;
+            &lt;td&gt;Location of the source&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sourceSftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;Passphrase of the source&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;targetSftpIdentities&lt;/td&gt;
+            &lt;td&gt;Location of the target&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;targetSftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;Passphrase of the target&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+    
+    ```xml
+    &lt;fileconnector.unzip&gt;
+        &lt;source&gt;{$ctx:source}&lt;/source&gt;
+        &lt;destination&gt;{$ctx:destination}&lt;/destination&gt;
+        &lt;setTimeout&gt;{$ctx:setTimeout}&lt;/setTimeout&gt;
+        &lt;setPassiveMode&gt;{$ctx:setPassiveMode}&lt;/setPassiveMode&gt;
+        &lt;setSoTimeout&gt;{$ctx:setSoTimeout}&lt;/setSoTimeout&gt;
+        &lt;setUserDirIsRoot&gt;{$ctx:setUserDirIsRoot}&lt;/setUserDirIsRoot&gt;
+        &lt;setStrictHostKeyChecking&gt;{$ctx:setStrictHostKeyChecking}&lt;/setStrictHostKeyChecking&gt;
+	    &lt;sourceSftpIdentities&gt;{$ctx:sftpIdentities}&lt;/sourceSftpIdentities&gt;
+        &lt;sourceSftpIdentityPassphrase&gt;{$ctx:sourceSftpIdentityPassphrase}&lt;/sourceSftpIdentityPassphrase&gt;
+        &lt;targetSftpIdentities&gt;{$ctx:targetSftpIdentities}&lt;/targetSftpIdentities&gt;
+        &lt;targetSftpIdentityPassphrase&gt;{$ctx:targetSftpIdentityPassphrase}&lt;/targetSftpIdentityPassphrase&gt;
+    &lt;/fileconnector.unzip&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+        &quot;source&quot;:&quot;/home/vive/Desktop/file/test.zip&quot;,
+        &quot;destination&quot;:&quot;/home/vive/Desktop/file/test&quot;
+    }
+    ```
+
+
+??? note &quot;ftpOverProxy&quot;
+    The ftpOverProxy operation connects to a FTP server through a proxy.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;proxyHost&lt;/td&gt;
+            &lt;td&gt;The host name of the proxy.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;proxyPort&lt;/td&gt;
+            &lt;td&gt;The port number of the proxy.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;proxyUsername&lt;/td&gt;
+            &lt;td&gt;The user name of the proxy.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;proxyPassword&lt;/td&gt;
+            &lt;td&gt;The password of the proxy.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ftpUsername&lt;/td&gt;
+            &lt;td&gt;The username of the FTP server.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ftpPassword&lt;/td&gt;
+            &lt;td&gt;The password of the FTP server.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ftpServer&lt;/td&gt;
+            &lt;td&gt;The FTP server name.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;ftpPort&lt;/td&gt;
+            &lt;td&gt;The port number of the FTP server.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;targetPath&lt;/td&gt;
+            &lt;td&gt;The target path. For example, if the file path is ftp://myusername:mypassword@somehost/pub/downloads/testProxy.txt, the targetPath will be pub/downloads/.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;targetFile&lt;/td&gt;
+            &lt;td&gt;The name of the file (e.g., if the path is like &quot;ftp://myusername:mypassword@somehost/pub/downloads/testProxy.txt&quot;, then targetPath will be &quot;testProxy.txt&quot;).&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;keepAliveTimeout&lt;/td&gt;
+            &lt;td&gt;The time to wait between sending control connection keep alive messages when processing file upload or download.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;controlKeepAliveReplyTimeout&lt;/td&gt;
+            &lt;td&gt;The time to wait for control keep-alive message replies.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;binaryTransfer&lt;/td&gt;
+            &lt;td&gt;Set the file type to be transferred.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;localActive&lt;/td&gt;
+            &lt;td&gt;Set the current data connection mode to either ACTIVE_LOCAL_DATA_CONNECTION_MODE or PASSIVE_LOCAL_DATA_CONNECTION_MODE.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;fileconnector.ftpOverProxy&gt;
+        &lt;proxyHost&gt;{$ctx:proxyHost}&lt;/proxyHost&gt;
+        &lt;proxyPort&gt;{$ctx:proxyPort}&lt;/proxyPort&gt;
+        &lt;proxyUsername&gt;{$ctx:proxyUsername}&lt;/proxyUsername&gt;
+        &lt;proxyPassword&gt;{$ctx:proxyPassword}&lt;/proxyPassword&gt;
+        &lt;ftpUsername&gt;{$ctx:ftpUsername}&lt;/ftpUsername&gt;
+        &lt;ftpPassword&gt;{$ctx:ftpPassword}&lt;/ftpPassword&gt;
+        &lt;ftpServer&gt;{$ctx:ftpServer}&lt;/ftpServer&gt;
+        &lt;ftpPort&gt;{$ctx:ftpPort}&lt;/ftpPort&gt;
+        &lt;targetPath&gt;{$ctx:targetPath}&lt;/targetPath&gt;
+        &lt;targetFile&gt;{$ctx:targetFile}&lt;/targetFile&gt;
+        &lt;keepAliveTimeout&gt;{$ctx:keepAliveTimeout}&lt;/keepAliveTimeout&gt;
+        &lt;controlKeepAliveReplyTimeout&gt;{$ctx:controlKeepAliveReplyTimeout}&lt;/controlKeepAliveReplyTimeout&gt;
+        &lt;binaryTransfer&gt;{$ctx:binaryTransfer}&lt;/binaryTransfer&gt;
+        &lt;localActive&gt;{$ctx:localActive}&lt;/localActive&gt;
+    &lt;/fileconnector.ftpOverProxy&gt;
+    ```
+
+    **Sample request**
+    
+    ```json
+    {
+        &quot;proxyHost&quot;:&quot;SampleProxy&quot;,
+        &quot;proxyPort&quot;:&quot;3128&quot;,
+        &quot;proxyUsername&quot;:&quot;wso2&quot;,
+        &quot;proxyPassword&quot;:&quot;Password&quot;,
+        &quot;ftpUsername&quot;:&quot;primary&quot;,
+        &quot;ftpPassword&quot;:&quot;Password&quot;,
+        &quot;ftpServer&quot;:&quot;192.168.56.6&quot;,
+        &quot;ftpPort&quot;:&quot;21&quot;,
+        &quot;targetFile&quot;:&quot;/home/primary/res&quot;
+    }
+    ```
+
+
+??? note &quot;send&quot;
+    The send operation sends a file to a specified location.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;address&lt;/td&gt;
+            &lt;td&gt;The address where the file has to be sent.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;append&lt;/td&gt;
+            &lt;td&gt;Set this to true if you want to append the response to the response file.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    &gt; **Note**: To send a VFS file, you have to specify the following properties in your configuration:
+    ```
+             &lt;property name=&quot;OUT_ONLY&quot; value=&quot;true&quot;/&gt;
+             &lt;property name=&quot;ClientApiNonBlocking&quot; value=&quot;true&quot; scope=&quot;axis2&quot; action=&quot;remove&quot;/&gt;
+    ```
+
+    **Sample configuration**
+    
+    ```xml
+    &lt;fileconnector.send&gt;
+        &lt;address&gt;{$ctx:address}&lt;/address&gt;
+	    &lt;append&gt;{$ctx:append}&lt;/append&gt;
+    &lt;/fileconnector.send&gt;
+    ```
+
+    **Sample request**
+    
+    ```json
+    {
+        &quot;address&quot;:&quot;/home/vive/Desktop/file/outTest&quot;,
+        &quot;append&quot;:&quot;true&quot;
+    }
+    ```
+
+
+??? note &quot;getSize&quot;
+    The getSize operation returns the size of a file.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;source&lt;/td&gt;
+            &lt;td&gt;The location of the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+    
+    ```xml
+    &lt;fileconnector.getSize&gt;
+        &lt;source&gt;{$ctx:source}&lt;/source&gt;
+    &lt;/fileconnector.getSize&gt;
+    ```
+
+    **Sample request**
+    
+    ```json
+    {
+        &quot;source&quot;:&quot;/home/vive/Desktop/file/outTest/sample.txt&quot;
+    }
+    ```
+
+
+??? note &quot;getLastModifiedTime&quot;
+    The getLastModifiedTime operation returns last modified time of a file/folder.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;source&lt;/td&gt;
+            &lt;td&gt;The location of the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+    
+    ```xml
+    &lt;fileconnector.getLastModifiedTime&gt;
+        &lt;source&gt;{$ctx:source}&lt;/source&gt;
+    &lt;/fileconnector.getLastModifiedTime&gt;
+    ```
+
+    **Sample request**
+    
+    ```json
+    {
+        &quot;source&quot;:&quot;/home/vive/Desktop/file/outTest/sample.txt&quot;
+    }
+    ```
+
+
+??? note &quot;splitFile&quot;
+    The splitFile operation splits a file into multiple chunks.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;source&lt;/td&gt;
+            &lt;td&gt;The location of the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;destination&lt;/td&gt;
+            &lt;td&gt;The location to write the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;chunkSize&lt;/td&gt;
+            &lt;td&gt;The chunk size in bytes to split the file. This is to split the file based on chunk size. You should provide either chunkSize or numberOfLines to split the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;numberOfLines&lt;/td&gt;
+            &lt;td&gt;The number of lines per file. This is to split the file based on the number of lines. You should provide either chunkSize or numberOfLines to split the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;xpathExpression&lt;/td&gt;
+            &lt;td&gt;Defines a pattern in order to select a set of nodes in XML document.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sourceSftpIdentities&lt;/td&gt;
+            &lt;td&gt;Location of the source&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sourceSftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;Passphrase of the source&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;targetSftpIdentities&lt;/td&gt;
+            &lt;td&gt;Location of the target&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;targetSftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;Passphrase of the target&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+    
+    ```xml
+    &lt;fileconnector.splitFile&gt;
+        &lt;source&gt;{$ctx:source}&lt;/source&gt;
+        &lt;destination&gt;{$ctx:destination}&lt;/destination&gt;
+        &lt;chunkSize&gt;{$ctx:chunkSize}&lt;/chunkSize&gt;
+	    &lt;numberOfLines&gt;{$ctx:numberOfLines}&lt;/numberOfLines&gt;
+	    &lt;xpathExpression&gt;{$ctx:xpathExpression}&lt;/xpathExpression&gt;
+	    &lt;sourceSftpIdentities&gt;{$ctx:sftpIdentities}&lt;/sourceSftpIdentities&gt;
+        &lt;sourceSftpIdentityPassphrase&gt;{$ctx:sourceSftpIdentityPassphrase}&lt;/sourceSftpIdentityPassphrase&gt;
+        &lt;targetSftpIdentities&gt;{$ctx:targetSftpIdentities}&lt;/targetSftpIdentities&gt;
+        &lt;targetSftpIdentityPassphrase&gt;{$ctx:targetSftpIdentityPassphrase}&lt;/targetSftpIdentityPassphrase&gt;
+    &lt;/fileconnector.splitFile&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+        &quot;source&quot;:&quot;/home/vive/Desktop/file/outTest/sample.txt&quot;,
+        &quot;destination&quot;:&quot;/home/vive/Desktop/file/outTest/&quot;,
+        &quot;chunkSize&quot;:&quot;4096&quot;,
+        &quot;xpathExpression&quot;:&quot;//products/product&quot;
+    }
+    ```
+
+
+??? note &quot;mergeFiles&quot;
+    The mergeFiles operation merges multiple chunks into a single file.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;source&lt;/td&gt;
+            &lt;td&gt;The location of the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;destination&lt;/td&gt;
+            &lt;td&gt;The location to write the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;filePattern&lt;/td&gt;
+            &lt;td&gt;The pattern of the file to be read.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sourceSftpIdentities&lt;/td&gt;
+            &lt;td&gt;Location of the source&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;sourceSftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;Passphrase of the source&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;targetSftpIdentities&lt;/td&gt;
+            &lt;td&gt;Location of the target&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+	    &lt;tr&gt;
+            &lt;td&gt;targetSftpIdentityPassphrase&lt;/td&gt;
+            &lt;td&gt;Passphrase of the target&#x27;s private key.&lt;/td&gt;
+            &lt;td&gt;Optional&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;fileconnector.mergeFiles&gt;
+        &lt;source&gt;{$ctx:source}&lt;/source&gt;
+        &lt;destination&gt;{$ctx:destination}&lt;/destination&gt;
+        &lt;filePattern&gt;{$ctx:filePattern}&lt;/filePattern&gt;
+	    &lt;sourceSftpIdentities&gt;{$ctx:sftpIdentities}&lt;/sourceSftpIdentities&gt;
+        &lt;sourceSftpIdentityPassphrase&gt;{$ctx:sourceSftpIdentityPassphrase}&lt;/sourceSftpIdentityPassphrase&gt;
+        &lt;targetSftpIdentities&gt;{$ctx:targetSftpIdentities}&lt;/targetSftpIdentities&gt;
+        &lt;targetSftpIdentityPassphrase&gt;{$ctx:targetSftpIdentityPassphrase}&lt;/targetSftpIdentityPassphrase&gt;
+    &lt;/fileconnector.mergeFiles&gt;
+    ```
+    
+    **Sample request**
+    
+    ```json
+    {
+        &quot;source&quot;:&quot;/home/vive/Desktop/file/outTest/&quot;,
+        &quot;destination&quot;:&quot;/home/vive/Desktop/file/outTest/sample.txt&quot;,
+        &quot;filePattern&quot;:&quot;*.txt*&quot;
+    }
+    ```
+
+
+??? note &quot;readSpecifiedLines&quot;
+    The readSpecifiedLines operation reads specific lines between given line numbers from a file.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;source&lt;/td&gt;
+            &lt;td&gt;The location of the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;contentType&lt;/td&gt;
+            &lt;td&gt;Content type of the files processed by the connector.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;start&lt;/td&gt;
+            &lt;td&gt;Read from this line number.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;end&lt;/td&gt;
+            &lt;td&gt;Read up to this line number.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;fileconnector.readSpecifiedLines&gt;
+        &lt;source&gt;{$ctx:source}&lt;/source&gt;
+        &lt;contentType&gt;{$ctx:contentType}&lt;/contentType&gt;
+        &lt;start&gt;{$ctx:start}&lt;/start&gt;
+        &lt;end&gt;{$ctx:end}&lt;/end&gt;
+    &lt;/fileconnector.readSpecifiedLines&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;source&quot;:&quot;/home/vive/Desktop/file/outTest/sampleText.txt&quot;,
+        &quot;start&quot;:&quot;5&quot;,
+        &quot;end&quot;:&quot;25&quot;
+    }
+    ```
+
+
+??? note &quot;readALine&quot;
+    The readALine operation reads a specific line from a file.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;source&lt;/td&gt;
+            &lt;td&gt;The location of the file.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;lineNumber&lt;/td&gt;
+            &lt;td&gt;Line number to read.&lt;/td&gt;
+            &lt;td&gt;Yes&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configuration**
+
+    ```xml
+    &lt;fileconnector.readALine&gt;
+        &lt;source&gt;{$ctx:source}&lt;/source&gt;
+        &lt;lineNumber&gt;{$ctx:lineNumber}&lt;/lineNumber&gt;
+    &lt;/fileconnector.readALine&gt;
+    ```
+    
+    **Sample request**
+
+    ```json
+    {
+        &quot;source&quot;:&quot;/home/vive/Desktop/file/outTest/sampleText.txt&quot;,
+        &quot;lineNumber&quot;:&quot;5&quot;
+    }
+    ```
+
+
+
+### Sample configuration in a scenario
+
+The following is a sample proxy service that illustrates how to connect to the File connector and use the create operation to create a file. You can use this sample as a template for using other operations in this category.
+
+**Sample Proxy**
+```xml
+&lt;proxy xmlns=&quot;http://ws.apache.org/ns/synapse&quot;
+       name=&quot;FileConnector_create&quot;
+       transports=&quot;https,http&quot;
+       statistics=&quot;disable&quot;
+       trace=&quot;disable&quot;
+       startOnLoad=&quot;true&quot;&gt;
+   &lt;target&gt;
+      &lt;inSequence&gt;
+         &lt;property name=&quot;source&quot; expression=&quot;json-eval($.source)&quot;/&gt;
+         &lt;property name=&quot;inputContent&quot; expression=&quot;json-eval($.inputContent)&quot;/&gt;
+         &lt;property name=&quot;encoding&quot; expression=&quot;json-eval($.encoding)&quot;/&gt;
+         &lt;property name=&quot;setTimeout&quot; expression=&quot;json-eval($.setTimeout)&quot;/&gt;
+         &lt;property name=&quot;setPassiveMode&quot; expression=&quot;json-eval($.setPassiveMode)&quot;/&gt;
+         &lt;property name=&quot;setSoTimeout&quot; expression=&quot;json-eval($.setSoTimeout)&quot;/&gt;
+         &lt;property name=&quot;setStrictHostKeyChecking&quot;
+                   expression=&quot;json-eval($.setStrictHostKeyChecking)&quot;/&gt;
+         &lt;property name=&quot;setUserDirIsRoot&quot; expression=&quot;json-eval($.setUserDirIsRoot)&quot;/&gt;
+         &lt;fileconnector.create&gt;
+            &lt;source&gt;{$ctx:source}&lt;/source&gt;
+            &lt;inputContent&gt;{$ctx:inputContent}&lt;/inputContent&gt;
+            &lt;encoding&gt;{$ctx:encoding}&lt;/encoding&gt;
+            &lt;setTimeout&gt;{$ctx:setTimeout}&lt;/setTimeout&gt;
+            &lt;setPassiveMode&gt;{$ctx:setPassiveMode}&lt;/setPassiveMode&gt;
+            &lt;setSoTimeout&gt;{$ctx:setSoTimeout}&lt;/setSoTimeout&gt;
+            &lt;setUserDirIsRoot&gt;{$ctx:setUserDirIsRoot}&lt;/setUserDirIsRoot&gt;
+            &lt;setStrictHostKeyChecking&gt;{$ctx:setStrictHostKeyChecking}&lt;/setStrictHostKeyChecking&gt;
+         &lt;/fileconnector.create&gt;
+         &lt;respond/&gt;
+      &lt;/inSequence&gt;
+   &lt;/target&gt;
+   &lt;description/&gt;
+&lt;/proxy&gt;         
+```
+
+**Note**: For more information on how this works in an actual scenario, see [File Connector Example]({{base_path}}/reference/connectors/file-connector/3.x/file-connector-3.x-example).
+</body>
+</html>

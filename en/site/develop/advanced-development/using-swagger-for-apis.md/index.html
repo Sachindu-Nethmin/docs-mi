@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>using-swagger-for-apis.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Using Swagger Documents
+
+API documentation is important to guide the users on what they can do using specific APIs. 
+
+When you create a REST API artifact or a RESTful data service from the WSO2 Integrator: MI VS Code Extension, a default Swagger 3.0 (OpenAPI) definition is generated. For [REST API]({{base_path}}/develop/creating-artifacts/creating-an-api) artifacts, you can also attach an additional custom Swagger definition for the API.
+
+## Swagger documents of API artifacts
+
+If your REST API is deployed, copy the following URLs (with your API details) to your browser:
+
+!!! Note
+    -   If you have a custom Swagger definition attached to the API, the following URLs will return the custom definition and not the default Swagger definition of the API.
+    -   Both swagger 2.0 and OpenAPI definitions are supported as the custom swagger definition.     
+
+
+-   To access the `swagger.json` file, use the following URL:
+
+    ```bash
+    http://&lt;MI_HOST&gt;:8290/&lt;API_NAME&gt;?swagger.json
+    ```
+
+    **Example**: 
+    ```bash
+    http://localhost:8290/HealthcareAPI?swagger.json
+    ```
+
+-   To access the `swagger.yaml` file, use the following URL:
+
+    ```bash
+    http://&lt;MI_HOST&gt;:8290/&lt;API_NAME&gt;?swagger.yaml
+    ```
+
+    **Example**: 
+    ```bash
+    http://localhost:8290/HealthcareAPI?swagger.yaml
+    ```
+
+!!! Note
+    -   If you are using a versioned API, include the version in the `&lt;API_NAME&gt;` parameter. For example, if the API name is `HealthcareAPI` and the version is `1.0.0`, use `HealthcareAPI:v1.0.0` as the `&lt;API_NAME&gt;`. Eg: `http://localhost:8290/HealthcareAPI:v1.0.0?swagger.json`
+
+!!! Tip
+    -   Replace `&lt;MI_HOST&gt;` with `localhost`. If you are using a public IP, the respective IP address or domain needs to be specified. 
+    -   Replace `&lt;API_NAME&gt;` with your API&#x27;s name. The API name is case sensitive.
+
+## Swagger documents of RESTful data services
+
+If your RESTful data service is deployed, copy the following URLs to your browser:
+
+-   To access the `swagger.json` file, use the following URL:
+
+    ```bash
+    http://&lt;MI_HOST&gt;:8290/services/&lt;DATA_SERVICE&gt;?swagger.json
+    ```
+
+    **Example**: 
+    ```bash
+    http://localhost:8290/services/RDBMSDataService?swagger.json
+    ```
+
+-   To access the `swagger.yaml` file, use the following URL:
+
+    ```bash
+    http://&lt;MI_HOST&gt;:8290/services/&lt;DATA_SERVICE&gt;?swagger.yaml
+    ```
+
+    **Example**: 
+    ```bash
+    http://localhost:8290/services/RDBMSDataService?swagger.yaml
+    ```
+
+!!! Tip
+    -   Replace `&lt;MI_HOST&gt;` with `localhost`. If you are using a public IP, the respective IP address or domain needs to be specified. 
+    -   Replace `&lt;DATA_SERVICE&gt;` with your service name. The service name is case sensitive.
+</body>
+</html>

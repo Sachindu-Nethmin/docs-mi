@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>google-firebase-configuration.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Google Firebase Connector Reference
+
+## Initializing Google Firebase Connector
+
+```
+&lt;googlefirebase.init&gt;
+```
+
+```
+&lt;googlefirebase.init&gt;
+    &lt;accountType&gt;{$ctx:accountType}&lt;/accountType&gt;
+    &lt;projectId&gt;{$ctx:projectId}&lt;/projectId&gt;
+    &lt;privateKeyId&gt;{$ctx:privateKeyId}&lt;/privateKeyId&gt;
+    &lt;privateKey&gt;{$ctx:privateKey}&lt;/privateKey&gt;
+    &lt;clientEmail&gt;{$ctx:clientEmail}&lt;/clientEmail&gt;
+    &lt;clientId&gt;{$ctx:clientId}&lt;/clientId&gt;
+    &lt;authUri&gt;{$ctx:authUri}&lt;/authUri&gt;
+    &lt;tokenUri&gt;{$ctx:tokenUri}&lt;/tokenUri&gt;
+    &lt;authProviderCertUrl&gt;{$ctx:authProviderCertUrl}&lt;/authProviderCertUrl&gt;
+    &lt;clientCertUrl&gt;{$ctx:clientCertUrl}&lt;/clientCertUrl&gt;
+&lt;/googlefirebase.init&gt;
+```
+
+**NOTE:**
+The parameters under `&lt;init&gt;` section of the configuration above are referring to the credentials we obtained from Google Firebase. The parameters are mapped to the keys contained in the Json file that you have downloaded from Firebase.  
+
+```
+accountType --&gt; type
+projectId --&gt; project_id
+privateKeyId --&gt; private_key_id
+privateKey --&gt; private_key
+clientEmail --&gt; client_email
+clientId --&gt; client_id
+authUri --&gt; auth_uri
+tokenUri --&gt; token_uri
+authProviderCertUrl --&gt; auth_provider_x509_cert_url
+clientCertUrl --&gt; client_x509_cert_url
+```
+&lt;br/&gt;
+
+## Sending Cloud Messaging messages to Firebase 
+
+```
+&lt;googlefirebase.sendMessage&gt;
+```
+
+It allows you to send Firebase Cloud Messaging messages to end-user devices. Specifically, you can send messages to individual devices, named topics, or condition statements that match one or more topics. The Admin FCM API enables constructing message payloads tailored to different target platforms (Android, iOS and Web). If a message payload contains configuration options for multiple platforms, the FCM service customizes the message for each platform when delivering. Firebase Cloud Messaging (FCM) offers different types of FCM messages. With FCM, you can send two types of messages to clients:
+
+* Notification messages, sometimes thought of as &quot;display messages.&quot;
+* Data messages, which are handled by the client app.
+
+For more info, see [https://firebase.google.com/docs/cloud-messaging/concept-options](https://firebase.google.com/docs/cloud-messaging/concept-options)
+
+```
+&lt;googlefirebase.sendMessage&gt;
+    &lt;messagingType&gt;{$ctx:messagingType}&lt;/messagingType&gt;
+    &lt;dryRunMode&gt;{$ctx:dryRunMode}&lt;/dryRunMode&gt;
+    &lt;registrationToken&gt;{$ctx:registrationToken}&lt;/registrationToken&gt;
+    &lt;topicName&gt;{$ctx:topicName}&lt;/topicName&gt;
+    &lt;condition&gt;{$ctx:condition}&lt;/condition&gt;
+    &lt;dataFieldsOfMessage&gt;{$ctx:dataFieldsOfMessage}&lt;/dataFieldsOfMessage&gt;
+    &lt;notificationTitle&gt;{$ctx:notificationTitle}&lt;/notificationTitle&gt;
+    &lt;notificationBody&gt;{$ctx:notificationBody}&lt;/notificationBody&gt;
+    &lt;androidPriority&gt;{$ctx:androidPriority}&lt;/androidPriority&gt;
+    &lt;timeToLiveDuration&gt;{$ctx:timeToLiveDuration}&lt;/timeToLiveDuration&gt;
+    &lt;restrictedPackageName&gt;{$ctx:restrictedPackageName}&lt;/restrictedPackageName&gt;
+    &lt;collapseKey&gt;{$ctx:collapseKey}&lt;/collapseKey&gt;
+    &lt;dataFieldsOfAndroidConfig&gt;{$ctx:dataFieldsOfAndroidConfig}&lt;/dataFieldsOfAndroidConfig&gt;
+    &lt;androidNotificationTitle&gt;{$ctx:androidNotificationTitle}&lt;/androidNotificationTitle&gt;
+    &lt;androidNotificationBody&gt;{$ctx:androidNotificationBody}&lt;/androidNotificationBody&gt;
+    &lt;androidClickAction&gt;{$ctx:androidClickAction}&lt;/androidClickAction&gt;
+    &lt;androidIcon&gt;{$ctx:androidIcon}&lt;/androidIcon&gt;
+    &lt;androidColor&gt;{$ctx:androidColor}&lt;/androidColor&gt;
+    &lt;androidTag&gt;{$ctx:androidTag}&lt;/androidTag&gt;
+    &lt;androidSound&gt;{$ctx:androidSound}&lt;/androidSound&gt;
+    &lt;androidTitleLocalizationKey&gt;{$ctx:androidTitleLocalizationKey}&lt;/androidTitleLocalizationKey&gt;
+    &lt;androidBodyLocalizationKey&gt;{$ctx:androidBodyLocalizationKey}&lt;/androidBodyLocalizationKey&gt;
+    &lt;androidTitleLocalizationArgs&gt;{$ctx:androidTitleLocalizationArgs}&lt;/androidTitleLocalizationArgs&gt;
+    &lt;androidBodyLocalizationArgs&gt;{$ctx:androidBodyLocalizationArgs}&lt;/androidBodyLocalizationArgs&gt;
+    &lt;apnsHeaders&gt;{$ctx:apnsHeaders}&lt;/apnsHeaders&gt;
+    &lt;apnsCustomData&gt;{$ctx:apnsCustomData}&lt;/apnsCustomData&gt;
+    &lt;apnsBadge&gt;{$ctx:apnsBadge}&lt;/apnsBadge&gt;
+    &lt;apnsSound&gt;{$ctx:apnsSound}&lt;/apnsSound&gt;
+    &lt;apnsContentAvailable&gt;{$ctx:apnsContentAvailable}&lt;/apnsContentAvailable&gt;
+    &lt;apnsCategory&gt;{$ctx:apnsCategory}&lt;/apnsCategory&gt;
+    &lt;apnsThreadId&gt;{$ctx:apnsThreadId}&lt;/apnsThreadId&gt;
+    &lt;apnsAlertTitle&gt;{$ctx:apnsAlertTitle}&lt;/apnsAlertTitle&gt;
+    &lt;apnsAlertBody&gt;{$ctx:apnsAlertBody}&lt;/apnsAlertBody&gt;
+    &lt;webPushHeaders&gt;{$ctx:webPushHeaders}&lt;/webPushHeaders&gt;
+    &lt;webPushData&gt;{$ctx:webPushData}&lt;/webPushData&gt;
+    &lt;webPushNotificationTitle&gt;{$ctx:webPushNotificationTitle}&lt;/webPushNotificationTitle&gt;
+    &lt;webPushNotificationBody&gt;{$ctx:webPushNotificationBody}&lt;/webPushNotificationBody&gt;
+    &lt;webPushNotificationIcon&gt;{$ctx:webPushNotificationIcon}&lt;/webPushNotificationIcon&gt;
+    &lt;webPushNotificationBadge&gt;{$ctx:webPushNotificationBadge}&lt;/webPushNotificationBadge&gt;
+    &lt;webPushNotificationImage&gt;{$ctx:webPushNotificationImage}&lt;/webPushNotificationImage&gt;
+    &lt;webPushNotificationLanguage&gt;{$ctx:webPushNotificationLanguage}&lt;/webPushNotificationLanguage&gt;
+    &lt;webPushNotificationTag&gt;{$ctx:webPushNotificationTag}&lt;/webPushNotificationTag&gt;
+    &lt;webPushNotificationDirection&gt;{$ctx:webPushNotificationDirection}&lt;/webPushNotificationDirection&gt;
+    &lt;webPushNotificationRenotify&gt;{$ctx:webPushNotificationRenotify}&lt;/webPushNotificationRenotify&gt;
+    &lt;webPushNotificationInteraction&gt;{$ctx:webPushNotificationInteraction}&lt;/webPushNotificationInteraction&gt;
+    &lt;webPushNotificationSilent&gt;{$ctx:webPushNotificationSilent}&lt;/webPushNotificationSilent&gt;
+    &lt;webPushNotificationTimestamp&gt;{$ctx:webPushNotificationTimestamp}&lt;/webPushNotificationTimestamp&gt;
+    &lt;webPushNotificationVibrate&gt;{$ctx:webPushNotificationVibrate}&lt;/webPushNotificationVibrate&gt;
+&lt;/googlefirebase.sendMessage&gt;
+```
+
+
+**Properties**
+
+* messagingType - This will define the messaging type. It must contain exactly one of the &quot;token&quot;, &quot;topic&quot; or &quot;condition&quot; value.
+* registrationToken - If you specify &quot;messagingType&quot; as token, you must provide this value. FCM API allows you to send messages to individual devices by specifying a registration token for the target device. Registration tokens are strings generated by the client FCM SDKs for each end-user client app instance.
+* topicName - If you specify &quot;messagingType&quot; as topic, you must provide this value. Name of the topic. Based on the publish/subscribe model, FCM topic messaging allows you to send a message to multiple devices that have opted in to a particular topic. You compose topic messages as needed, and FCM handles routing and delivering the message reliably to the right devices.
+* condition - If you specify &quot;messagingType&quot; as condition, you must provide this value. And if you want to send a message to a combination of topics, you must specify this value. This is done by specifying a condition, which is a boolean expression that specifies the target topics.
+* dryRunMode - It is used to send FCM messages in the dry run mode. It performs all the usual validations on the messages sent in this mode, but they are not actually delivered to the target devices.
+* dataFieldsOfMessage - It defines key-value pair to the message as a data field. Eg: &quot;key1:value1,key2:value2&quot;
+* notificationTitle - Sets the notification information (notification title) to be included in the message.
+* notificationBody - Sets the notification information (notification body) to be included in the message
+* androidPriority - Message priority. Must be one of &quot;normal&quot; and &quot;high&quot; values.
+* timeToLiveDuration - The time-to-live duration of the message. This is how long the message will be kept in FCM storage if the target devices are offline. Maximum allowed is 4 weeks, which is also the default. Set to 0 to send the message immediately (fire and forget).
+restrictedPackageName - Package name of the application where the registration tokens must match in order to receive the message.
+* collapseKey - An identifier of a group of messages that can be collapsed, so that only the last message gets sent when delivery can be resumed. A maximum of 4 different collapse keys is allowed at any given time.
+* dataFieldsOfAndroidConfig - A map of key-value pairs where each key and value are strings. If specified, overrides the data field set on the &quot;dataFieldsOfMessage&quot; property (top-level message). Eg: &quot;key1:value1, key2:value2&quot;,
+* androidNotificationTitle - Sets notification title that is specific to Android notifications.
+* androidNotificationBody - Sets notification body that is specific to Android notifications.
+* androidClickAction - Sets the action associated with a user click on the notification. If specified, an activity with a matching Intent Filter is launched when a user clicks on the notification.
+* androidIcon - The notification icon. If not specified, FCM displays the launcher icon specified in your app manifest.
+* androidColor - The notification&#x27;s icon color, expressed in #rrggbb format.
+* androidTag - Identifier used to replace existing notifications in the notification drawer. If not specified, each request creates a new notification. If specified and a notification with the same tag is already being shown, the new notification replaces the existing one in the notification drawer.
+* androidSound - The sound to play when the device receives the notification. Supports default or the filename of a sound resource bundled in the app.
+* androidTitleLocalizationKey - The key of the title string in the app&#x27;s string resources to use to localize the title text to the user&#x27;s current localization.
+* androidBodyLocalizationKey - The key of the body string in the app&#x27;s string resources to use to localize the body text to the user&#x27;s current localization.
+* androidTitleLocalizationArgs - A list of string values to be used in place of the format specifiers in &quot;androidTitleLocalizationKey&quot; to use to localize the title text to the user&#x27;s current localization.
+* androidBodyLocalizationArgs - A list of string values to be used in place of the format specifiers in &quot;androidBodyLocalizationKey&quot; to use to localize the body text to the user&#x27;s current localization.
+* apnsHeaders - HTTP request headers defined in Apple Push Notification Service. Refer to APNS request headers for supported headers. Eg: &quot;header1:value1, header2:value2&quot;
+* apnsCustomData - A map of key-value pairs where each key and value are strings. If specified, overrides the data field set on the &quot;dataFieldsOfMessage&quot; (top-level message). Eg: &quot;key1:value1, key2:value2&quot;
+* apnsBadge - Include this key when you want the system to modify the badge of your app icon. If this key is not included in the dictionary, the badge is not changed. To remove the badge, set the value of this key to 0.
+* apnsSound - Include this key when you want the system to play a sound. The value of this key is the name of a sound file.
+apnsContentAvailable - Include this key with a value of 1 to configure a background update notification. When this key is present, the system wakes up your app in the background and delivers the notification to its app delegate.
+* apnsCategory - Provide this key with a string value that represents the notification’s type.
+* apnsThreadId - Provide this key with a string value that represents the app-specific identifier for grouping notifications.
+* apnsAlertTitle - Include this key when you want the system to display a standard alert. A short string describing the purpose of the notification.
+* apnsAlertBody - Include this key when you want the system to display a standard alert. The text of the alert message.
+* webPushHeaders - Adds the given key-value pair as a Webpush HTTP header. Refer to WebPush specification for supported headers. Eg:&quot;header1:value1,header2:value2&quot;
+* webPushData - A map of key-value pairs where each key and value are strings. If specified, overrides the data field set on the &quot;dataFieldsOfMessage&quot; (top-level message). Eg: &quot;key1:value1, key2:value2&quot;
+* webPushNotificationTitle - The title of the notification. This title overrides the corresponding field on the &quot;notificationTitle&quot; (top-level message notification).
+* webPushNotificationBody - The body of the notification. This body overrides the corresponding field on the &quot;notificationBody&quot; (top-level message notification).
+* webPushNotificationIcon - It contains the URL of an icon to be displayed as part of the web notification.
+* webPushNotificationBadge - The URL of the image used to represent the notification when there is not enough space to display the notification itself.
+* webPushNotificationImage - The URL of an image to be displayed as part of the notification.
+* webPushNotificationLanguage - Sets the language of the notification.
+* webPushNotificationTag - Sets an identifying tag on the notification. The idea of notification tags is that more than one notification can share the same tag, linking them together. One notification can then be programmatically replaced with another to avoid the users&#x27; screen being filled up with a huge number of similar notifications.
+* webPushNotificationDirection - The text direction of the notification.
+* webPushNotificationRenotify - Specifies whether the user should be notified after a new notification replaces an old one.
+* webPushNotificationInteraction - A Boolean indicating that a notification should remain active until the user clicks or dismisses it, rather than closing automatically.
+* webPushNotificationSilent - Specifies whether the notification should be silent. i.e., no sounds or vibrations should be issued, regardless of the device settings.
+* webPushNotificationTimestamp - Specifies the time at which a notification is created or applicable.
+* webPushNotificationVibrate - Specifies a vibration pattern for devices with vibration hardware to emit.
+
+
+**Sample message**
+
+```
+{
+   &quot;accountType&quot;: &quot;service_account&quot;,
+   &quot;projectId&quot;: &quot;wso2-42209&quot;,
+   &quot;privateKeyId&quot;: &quot;8d4ed1af9c0dsfdsfgdgdgsf55a7197b0ac9afe&quot;,
+   &quot;privateKey&quot;: &quot;-----BEGIN PRIVATE KEY-----\nMIIEvQIBdasfsggdgfhfjjkljlC3wkCC\nGKRvlPH1wqXPMhhsWEMH0k9OgiQ+XMdfsfnjgntenjtQ2VtTmCNBWyg/r+ff59KuqhQBs\nHy3ixWbSYW5XYd0ww6fT/UOH1dLYKSKLidEO6v2Rd2Xh+bxSwqi3IuyjuDy8WBJ6\n5NlV1HdKC5jZWrGZjVgooAHFs5WxhnTiYVWL4egOjzPzBiujWIJGfZCL91oPlqyf\nS4hn+JYh3yhOoCy2MpeDsreAcy9LuPdiR3u7Kqb49/e6pGf0Z2KjL4375OUEEK6S\nCixuZQPFHlnqXi6OcmsLqa+A0kmjkLlVHPe9iH6n5Ku7Ikd+P+7ycRS2W8SF6+fg\nIt7oO9LpAgMBAAECggEACQy65kOIq+W2gFYcSfLHjhwqj/FKiaexd94l91slYPpV\n44v2ghxpOqmDTFRNA1rdgTM0NlFbFnCx8wc3TWOuZTN+0RoMHouPZo2GKX7Epepg\nSiVNW9NSaVQZHbTuAHV8ST41U7M4AyG+t6i1JEx2recStG+QCfqi2/xV2V0kN6ZL\neUdGIznl6CmfOdz2mU9JDOVLMpGBEfjEv8B9QukO0odTAJTTlP/XFHVbjHn14B+O\nn2YSIqzXD0aBAJxsecxkDwRsXP3wlg0viAu/wa8b7m6vKMJPYTf85/TThiZNloer\nl1PHuvLfCSlgV0XltyMoUzcNBw8mQgP7ggq4bR1etQKBgQDdGixkmQNIs8X78qAC\nonH6dFG8lUbDbOQCmM1UgijyZHiUNCC0pO6tKCHv9XVkhv845xdv+uIBtxixnETT\njiAQchiy+KaBEUrFY2XPkJt4XKTY8hOhg60IMk4fD9QIl8GUMqp/6ut4YcFe3ldL\nPXWQBsKXLWH7G4GV7Cb9OwEsRQKBgQDDG/Amuxc5vodv78DGDop1BIixW4FXqowD\nYs7LCbzSCTeZ3NF3gqXkF8GJRmBj6GOkrOBfleeffyjeVAuyX/K6PbXUFzrn0bHi\nYG1zDLMXUZEIguK3aJwl3sDnqNYr5GK92Yt6nMmZwXY/0E60b54PJpg1oKy8hfug\nZBC/N8mgVQKBgCn4BeUyhkUOms4wR984Jpp76ef6Deyahs1XY+JespcQKzM2kd64\nT/XeYFLELPxgA6Ixe2luHehlcPKFzyq5F60He1i9ih2FwsOlEnZL5Lb8Hu5vRPqr\nm/SqV9ndj0nyRHR1CZguZ3P6WlI/siI+EEq+fcFkg+y+U+K5aM04nghhAoGBAKSR\n+TPCFWoYgobxVMn6U+E2LNJkm6nFagolGsZ59TG4opR+hJRot+K4Av/2Q7GhwAKT\n60HU4KVRDbjSbXdMpSFgkfFOktocrw2CRm+Ho7wkidADDpajfyoWROJiMByfrIX0\nbEjE3Ot7GnHjE6/wggLHjBWX7HusC72TCekwdjptAoGAZO2GhJq72eaKs4WoaQys\nkzUTlYxzeP3/hOJbJiD/p2VJkNfwSV5AkOYcPFAyEV5kydA7DwzAKLGaTk9a04Wx\nWXm7wCSVm8QMCYirFU7HTpjnge96fSpO12w6tQ0PB2EIVZ4hFVRVW3sy1i67saqi\nzbNQ+/qgESIWS+7KXf2otwQ=\n-----END PRIVATE KEY-----\n&quot;,
+   &quot;clientEmail&quot;: &quot;firebase-adminsdk-yr45b@wso2-42209.iam.gserviceaccount.com&quot;,
+   &quot;clientId&quot;: &quot;1080514883273363474&quot;,
+   &quot;authUri&quot;: &quot;https://accounts.google.com/o/oauth2/auth&quot;,
+   &quot;tokenUri&quot;: &quot;https://oauth2.googleapis.com/token&quot;,
+   &quot;authProviderCertUrl&quot;: &quot;https://www.googleapis.com/oauth2/v1/certs&quot;,
+   &quot;clientCertUrl&quot;: &quot;https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-yr86b%40wso2-42209.iam.gserviceaccount.com&quot;,
+   &quot;messagingType&quot;:&quot;token&quot;,
+   &quot;dryRunMode&quot;:false,
+   &quot;registrationToken&quot;:&quot;dTOJJxAyOBA:APA91bG776j90xEViBzejzy-Ije_FzAAudqY7T67Z52jEsPiANkTA4R5-C7xkx-DkOAzrw9s_YXbTjrbLttiO5rOUsYxcBTYZ684C74aCg6oQWzqrfC9fvSMmDXHR8v_8dPuH1eYIvv1&quot;,
+   &quot;topicName&quot;:&quot;test2&quot;,
+   &quot;condition&quot;:&quot;&#x27;test2&#x27; in topics&quot;,
+   &quot;dataFieldsOfMessage&quot;:&quot;key1:value1,key2:value2&quot;,
+   &quot;notificationTitle&quot;:&quot;test title&quot;,
+   &quot;notificationBody&quot;:&quot;test body&quot;,
+   &quot;androidPriority&quot;:&quot;normal&quot;,
+   &quot;timeToLiveDuration&quot;:&quot;123&quot;,
+   &quot;restrictedPackageName&quot;:&quot;com.google.firebase.quickstart.fcm&quot;,
+   &quot;collapseKey&quot;:&quot;test-key&quot;,
+   &quot;dataFieldsOfAndroidConfig&quot;:&quot;key3:value3,key4:value4&quot;,
+   &quot;androidNotificationTitle&quot;:&quot;Android Notification title&quot;,
+   &quot;androidNotificationBody&quot;:&quot;Android Notification body&quot;,
+   &quot;androidClickAction&quot;:&quot;android.intent.action.SHOW_APP_INFO&quot;,
+   &quot;androidIcon&quot;:&quot;@mipmap/ic_launcher&quot;,
+   &quot;androidColor&quot;:&quot;#112233&quot;,
+   &quot;androidTag&quot;:&quot;test-tag&quot;,
+   &quot;androidSound&quot;:&quot;@raw/bryan_sample&quot;,
+   &quot;androidTitleLocalizationKey&quot;:&quot;notification_title_string&quot;,
+   &quot;androidBodyLocalizationKey&quot;:&quot;notification_message_string&quot;,
+   &quot;androidTitleLocalizationArgs&quot;:&quot;t-arg2,t-arg3&quot;,
+   &quot;androidBodyLocalizationArgs&quot;:&quot;b-arg2,b-arg3&quot;,
+   &quot;apnsHeaders&quot;:&quot;header1:value1,header2:value2&quot;,
+   &quot;apnsCustomData&quot;:&quot;key5:value5,key6:value6&quot;,
+   &quot;apnsBadge&quot;:&quot;42&quot;,
+   &quot;apnsSound&quot;:&quot;apnsSound&quot;,
+   &quot;apnsContentAvailable&quot;:true,
+   &quot;apnsCategory&quot;:&quot;category&quot;,
+   &quot;apnsThreadId&quot;:&quot;Thread-Id&quot;,
+   &quot;apnsAlertTitle&quot;:&quot;alert-title&quot;,
+   &quot;apnsAlertBody&quot;:&quot;alert-body&quot;,
+   &quot;webPushHeaders&quot;:&quot;header3:value3,header4:value4&quot;,
+   &quot;webPushData&quot;:&quot;key7:value7,key8:value8&quot;,
+   &quot;webPushNotificationTitle&quot;:&quot;web-notification-title&quot;,
+   &quot;webPushNotificationBody&quot;:&quot;web-notification-body&quot;,
+   &quot;webPushNotificationIcon&quot;:&quot;https://img.icons8.com/color/2x/baby-app.png&quot;,
+   &quot;webPushNotificationBadge&quot;:&quot;https://img.icons8.com/color/2x/ipad.png&quot;,
+   &quot;webPushNotificationImage&quot;:&quot;https://img.icons8.com/color/2x/ios-photos.png&quot;,
+   &quot;webPushNotificationLanguage&quot;:&quot;TA&quot;,
+   &quot;webPushNotificationTag&quot;:&quot;web-Tag&quot;,
+   &quot;webPushNotificationDirection&quot;:&quot;AUTO&quot;,
+   &quot;webPushNotificationRenotify&quot;:true,
+   &quot;webPushNotificationInteraction&quot;:false,
+   &quot;webPushNotificationSilent&quot;:false,
+   &quot;webPushNotificationTimestamp&quot;:&quot;100&quot;,
+   &quot;webPushNotificationVibrate&quot;:&quot;200,100,200&quot;
+ }
+```
+&lt;br/&gt;
+
+## Subscribe a device to a Firebase topic
+
+```
+&lt;googlefirebase.subscribeToTopic&gt;
+```
+
+```
+&lt;googlefirebase.subscribeToTopic&gt;
+    &lt;topicName&gt;{$ctx:topicName}&lt;/topicName&gt;
+    &lt;tokenList&gt;{$ctx:tokenList}&lt;/tokenList&gt;
+&lt;/googlefirebase.subscribeToTopic&gt;
+```
+
+**Properties**
+
+* topicName - The topic name that need to be subscribe by devices.
+* tokenList - List of registration tokens as comma separated values which are generated by the client FCM SDKs for each end-user client app instance. (Eg:- &quot;YOUR_REGISTRATION_TOKEN_1,YOUR_REGISTRATION_TOKEN_2, ----,YOUR_REGISTRATION_TOKEN_n&quot;)
+
+**Sample request**
+
+```
+{
+  &quot;accountType&quot;: &quot;service_account&quot;,
+  &quot;projectId&quot;: &quot;Test-42xx9&quot;,
+  &quot;privateKeyId&quot;: &quot;8d4ed1afsfsg56jiyu5ggfhgc02b3055a7197b0ac9afe&quot;,
+  &quot;privateKey&quot;: &quot;-----BEGIN PRIVATE KEY-----\nMI3sfsgfgdhgdhgogxD9TEC3wkCC\nGKRvlPH1wqXPMhhsWEMHdhhghghgNBWyg/r+ff59KuqhQBs\nHy3ixWbSYW5XYd0ww6fT/UOH1dLYKSKLidEO6v2Rd2Xh+bxSwqi3IuyjuDy8WBJ6\asafrfrsfrsgtyuy\nS4hn+hfhgfhf/e6pGf0Z2KjL4375OUEEK6S\nCixuZQPFHlnqXi6OcmsLqa+A0kmjkLlVHPe9iH6n5Ku7Ikd+P+7ycRS2W8SF6+fg\nIt7oO9LpAgMBAAECggEACQy65kOIq+W2gFYcSfLHjhwqj/FKiaexd94l91slYPpV\n44v2ghxpOqmDTFRNA1rdgTM0NlFbFnCx8wc3TWOuZTN+0RoMHouPZo2GKX7Epepg\nSiVNW9NSaVQZHbTuAHV8ST41U7M4AyG+t6i1JEx2recStG+QCfqi2/xV2V0kN6ZL\neUdGIznl6CmfOdz2mU9JDOVLMpGBEfjEv8B9QukO0odTAJTTlP/XFHVbjHn14B+O\nn2YSIqzXD0aBAJxsecxkDwRsXP3wlg0viAu/wa8b7m6vKMJPYTf85/TThiZNloer\nl1PHuvLfCSlgV0XltyMoUzcNBw8mQgP7ggq4bR1etQKBgQDdGixkmQNIs8X78qAC\nonH6dFG8lUbDbOQCmM1UgijyZHiUNCC0pO6tKCHv9XVkhv845xdv+uIBtxixnETT\njiAQchiy+KaBEUrFY2XPkJt4XKTY8hOhg60IMk4fD9QIl8GUMqp/6ut4YcFe3ldL\nPXWQBsKXLWH7G4GV7Cb9OwEsRQKBgQDDG/Amuxc5vodv78DGDop1BIixW4FXqowD\nYs7LCbzSCTeZ3NF3gqXkF8GJRmBj6GOkrOBfleeffyjeVAuyX/K6PbXUFzrn0bHi\nYG1zDLMXUZEIguK3aJwl3sDnqNYr5GK92Yt6nMmZwXY/0E60b54PJpg1oKy8hfug\nZBC/N8mgVQKBgCn4BeUyhkUOms4wR984Jpp76ef6Deyahs1XY+JespcQKzM2kd64\nT/XeYFLELPxgA6Ixe2luHehlcPKFzyq5F60He1i9ih2FwsOlEnZL5Lb8Hu5vRPqr\nm/SqV9ndj0nyRHR1CZguZ3P6WlI/siI+EEq+fcFkg+y+U+K5aM04nghhAoGBAKSR\n+TPCFWoYgobxVMn6U+E2LNJkm6nFagolGsZ59TG4opR+hJRot+K4Av/2Q7GhwAKT\n60HU4KVRDbjSbXdMpSFgkfFOktocrw2CRm+Ho7wkidADDpajfyoWROJiMByfrIX0\nbEjE3Ot7GnHjE6/wggLHjBWX7HusC72TCekwdjptAoGAZO2GhJq72eaKs4WoaQys\nkzUTlYxzeP3/hOJbJiD/p2VJkNfwSV5AkOYcPFAyEV5kydA7DwzAKLGaTk9a04Wx\nWXm7wCSVm8QMCYirFU7HTpjnge96fSpO12w6tQ0PB2EIVZ4hFVRVW3sy1i67saqi\nzbNQ+/qgESIWS+7KXf2otwQ=\n-----END PRIVATE KEY-----\n&quot;,
+  &quot;clientEmail&quot;: &quot;firebase-adminsdk-yr86b@Test-42xx9.iam.gserviceaccount.com&quot;,
+  &quot;clientId&quot;: &quot;10805155677889363474&quot;,
+  &quot;authUri&quot;: &quot;https://accounts.google.com/o/oauth2/auth&quot;,
+  &quot;tokenUri&quot;: &quot;https://oauth2.googleapis.com/token&quot;,
+  &quot;authProviderCertUrl&quot;: &quot;https://www.googleapis.com/oauth2/v1/certs&quot;,
+  &quot;clientCertUrl&quot;: &quot;https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-yr86b%40Test-42xx9.iam.gserviceaccount.com&quot;,
+  &quot;topicName&quot;:&quot;test2&quot;,
+  &quot;tokenList&quot;:&quot;dlDIxxxxxxxxxxxxBHM:APA9cdfgdghhfjhjjkgkjkjklolooOI6ri8bwHafgNXDjX2n2kKwo4fK8hmuoamVddJfAwWr4xymkLZea_wVfLlENk,dlAIxxxxxxxxxxxxBHM:APAxvvfsojnwgfgwnwkww8bwHafgNXDjX2n2kKwo4fK8hmuRTBJJbksea_wVfLlENk&quot;
+}
+```
+
+**Sample Response**
+
+```
+{
+    &quot;Result&quot;: {
+        &quot;SuccessCount&quot;:1,
+        &quot;FailureCount&quot;:0,
+        &quot;Errors&quot;:[]
+    }
+}
+```
+&lt;br/&gt;
+
+## Unsubscribe a device from a Firebase topic
+
+```
+&lt;googlefirebase.unsubscribeFromTopic&gt;
+```
+
+This operation allows you to unsubscribe devices from a topic by passing list of registration tokens. Registration tokens are strings generated by the client FCM SDKs for each end-user client app instance.
+
+```
+&lt;googlefirebase.unsubscribeFromTopic&gt;
+    &lt;topicName&gt;{$ctx:topicName}&lt;/topicName&gt;
+    &lt;tokenList&gt;{$ctx:tokenList}&lt;/tokenList&gt;
+&lt;/googlefirebase.unsubscribeFromTopic&gt;
+```
+
+**Properties**
+
+* topicName - The topic name that need to be subscribe by devices.
+* tokenList - List of registration tokens as comma separated values which are generated by the client FCM SDKs for each end-user client app instance. (Eg:- &quot;YOUR_REGISTRATION_TOKEN_1,YOUR_REGISTRATION_TOKEN_2, ----,YOUR_REGISTRATION_TOKEN_n&quot;)
+
+**Sample request**
+
+```
+{
+  &quot;accountType&quot;: &quot;service_account&quot;,
+  &quot;projectId&quot;: &quot;Test-42xx9&quot;,
+  &quot;privateKeyId&quot;: &quot;8d4ed1afsfsg56jiyu5ggfhgc02b3055a7197b0ac9afe&quot;,
+  &quot;privateKey&quot;: &quot;-----BEGIN PRIVATE KEY-----\nMI3sfsgfgdhgdhgogxD9TEC3wkCC\nGKRvlPH1wqXPMhhsWEMHdhhghghgNBWyg/r+ff59KuqhQBs\nHy3ixWbSYW5XYd0ww6fT/UOH1dLYKSKLidEO6v2Rd2Xh+bxSwqi3IuyjuDy8WBJ6\asafrfrsfrsgtyuy\nS4hn+hfhgfhf/e6pGf0Z2KjL4375OUEEK6S\nCixuZQPFHlnqXi6OcmsLqa+A0kmjkLlVHPe9iH6n5Ku7Ikd+P+7ycRS2W8SF6+fg\nIt7oO9LpAgMBAAECggEACQy65kOIq+W2gFYcSfLHjhwqj/FKiaexd94l91slYPpV\n44v2ghxpOqmDTFRNA1rdgTM0NlFbFnCx8wc3TWOuZTN+0RoMHouPZo2GKX7Epepg\nSiVNW9NSaVQZHbTuAHV8ST41U7M4AyG+t6i1JEx2recStG+QCfqi2/xV2V0kN6ZL\neUdGIznl6CmfOdz2mU9JDOVLMpGBEfjEv8B9QukO0odTAJTTlP/XFHVbjHn14B+O\nn2YSIqzXD0aBAJxsecxkDwRsXP3wlg0viAu/wa8b7m6vKMJPYTf85/TThiZNloer\nl1PHuvLfCSlgV0XltyMoUzcNBw8mQgP7ggq4bR1etQKBgQDdGixkmQNIs8X78qAC\nonH6dFG8lUbDbOQCmM1UgijyZHiUNCC0pO6tKCHv9XVkhv845xdv+uIBtxixnETT\njiAQchiy+KaBEUrFY2XPkJt4XKTY8hOhg60IMk4fD9QIl8GUMqp/6ut4YcFe3ldL\nPXWQBsKXLWH7G4GV7Cb9OwEsRQKBgQDDG/Amuxc5vodv78DGDop1BIixW4FXqowD\nYs7LCbzSCTeZ3NF3gqXkF8GJRmBj6GOkrOBfleeffyjeVAuyX/K6PbXUFzrn0bHi\nYG1zDLMXUZEIguK3aJwl3sDnqNYr5GK92Yt6nMmZwXY/0E60b54PJpg1oKy8hfug\nZBC/N8mgVQKBgCn4BeUyhkUOms4wR984Jpp76ef6Deyahs1XY+JespcQKzM2kd64\nT/XeYFLELPxgA6Ixe2luHehlcPKFzyq5F60He1i9ih2FwsOlEnZL5Lb8Hu5vRPqr\nm/SqV9ndj0nyRHR1CZguZ3P6WlI/siI+EEq+fcFkg+y+U+K5aM04nghhAoGBAKSR\n+TPCFWoYgobxVMn6U+E2LNJkm6nFagolGsZ59TG4opR+hJRot+K4Av/2Q7GhwAKT\n60HU4KVRDbjSbXdMpSFgkfFOktocrw2CRm+Ho7wkidADDpajfyoWROJiMByfrIX0\nbEjE3Ot7GnHjE6/wggLHjBWX7HusC72TCekwdjptAoGAZO2GhJq72eaKs4WoaQys\nkzUTlYxzeP3/hOJbJiD/p2VJkNfwSV5AkOYcPFAyEV5kydA7DwzAKLGaTk9a04Wx\nWXm7wCSVm8QMCYirFU7HTpjnge96fSpO12w6tQ0PB2EIVZ4hFVRVW3sy1i67saqi\nzbNQ+/qgESIWS+7KXf2otwQ=\n-----END PRIVATE KEY-----\n&quot;,
+  &quot;clientEmail&quot;: &quot;firebase-adminsdk-yr86b@Test-42xx9.iam.gserviceaccount.com&quot;,
+  &quot;clientId&quot;: &quot;10805155677889363474&quot;,
+  &quot;authUri&quot;: &quot;https://accounts.google.com/o/oauth2/auth&quot;,
+  &quot;tokenUri&quot;: &quot;https://oauth2.googleapis.com/token&quot;,
+  &quot;authProviderCertUrl&quot;: &quot;https://www.googleapis.com/oauth2/v1/certs&quot;,
+  &quot;clientCertUrl&quot;: &quot;https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-yr86b%40Test-42xx9.iam.gserviceaccount.com&quot;,
+  &quot;topicName&quot;:&quot;test2&quot;,
+  &quot;tokenList&quot;:&quot;dlDIxxxxxxxxxxxxBHM:APA9cdfgdghhfjhjjkgkjkjklolooOI6ri8bwHafgNXDjX2n2kKwo4fK8hmuoamVddJfAwWr4xymkLZea_wVfLlENk,dlAIxxxxxxxxxxxxBHM:APAxvvfsojnwgfgwnwkww8bwHafgNXDjX2n2kKwo4fK8hmuRTBJJbksea_wVfLlENk&quot;
+}
+```
+
+**Sample Response**
+
+```
+{
+    &quot;Result&quot;: {
+        &quot;SuccessCount&quot;:1,
+        &quot;FailureCount&quot;:0,
+        &quot;Errors&quot;:[]
+    }
+}
+```
+
+</body>
+</html>

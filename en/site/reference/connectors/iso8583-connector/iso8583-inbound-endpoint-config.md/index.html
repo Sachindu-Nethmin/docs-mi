@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>iso8583-inbound-endpoint-config.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># ISO8583 Inbound Endpoint Reference
+
+The following operations allow you to work with the ISO8583 Inbound Endpoint. Click an operation name to see parameter details and samples on how to use it.
+
+ISO8583 Inbound endpoint allows the ISO8583 standard messages through the WSO2 integration runtime. ISO8583 is a message standard that is used in financial transactions. There are various versions of the ISO8583 standard. The Inbound Endpoint is developed based on the 1987 and 1993 versions of the standard. For more information about ISO8583 Standard, go to ISO8583 Documentation.
+
+!!!Note
+    ISO8583 version 1993 support is available only with ISO8583 Inbound Endpoint v1.1.1 and above.
+
+The WSO2 ISO8583 inbound endpoint acts as a message consumer. Since it is a listening inbound, it is listening on port 5000. When a client is connected on port 5000, the WSO2 ISO8583 Inbound Endpoint starts to consume the ISO8583 standard messages and inject the messages in XML format into sequence.
+
+In order to use the ISO8583 inbound endpoint, you need to do the following: 
+
+- Download the inbound `org.wso2.carbon.inbound.iso8583-1.1.1.jar` file from the [EI Connector Store](https://store.wso2.com/connector/esb-inbound-iso8583). 
+- Download the `jpos-1.9.4.jar` from the [http://mvnrepository.com/artifact/org.jpos/jpos/1.9.4](http://mvnrepository.com/artifact/org.jpos/jpos/1.9.4). 
+- Download `jdom-1.1.3.jar` from [http://mvnrepository.com/artifact/org.jdom/jdom/1.1.3](http://mvnrepository.com/artifact/org.jdom/jdom/1.1.3). 
+- Download `commons-cli-1.3.1.jar` from [http://mvnrepository.com/artifact/commons-cli/commons-cli/1.3.1](http://mvnrepository.com/artifact/commons-cli/commons-cli/1.3.1). 
+
+Copy the .jar files to the &lt;PRODUCT_HOME&gt;/lib directory.
+
+&gt; **Note**: `jpos` is the third party library, and `jposdef.xml` has the field definitions of the standard ISO8583 Messages. According to the field definitions, each and every ISO8583 message that  comes from the client will be unpacked and the fields of the ISO8583 standard messages will be identified.
+
+To handle the concurrent messages in ISO8583 inbound endpoint, you need to create the threadpool and it can contain a varying amount of threads. The number of threads in the pool is determined by these variables:
+
+- `corePoolSize`: The number of threads to keep in the pool, even if they are idle.
+- `maximumPoolSize`: The maximum number of threads to allow in the pool.
+
+Another parameter in `threadPool` configuration is `keepAliveTime`, which is the maximum time that excess idle threads will be alive for new tasks before terminating. 
+
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;th&gt;Display Name&lt;/th&gt;
+        &lt;th&gt;Parameter Name&lt;/th&gt;
+        &lt;th&gt;Description&lt;/th&gt;
+        &lt;th&gt;Default Value&lt;/th&gt;
+        &lt;th&gt;Required&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Port&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;port&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Port number on which to listen for incoming messages&lt;/td&gt;
+        &lt;td&gt;&lt;/td&gt;
+        &lt;td&gt;Yes&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Act as proxy&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;isProxy&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Determine whether the ISO8583 Inbound endpoint act as a proxy to another service&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;false&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Length of the ISO header&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;headerLength&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Length of the ISO header&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;0&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Core Threads&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;coreThreads&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Number of core threads in the thread pool&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;1&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Maximum Threads&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;maxThreads&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Maximum number of threads in the thread pool&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;3&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Idle Thread Keep Alive Timeout (s)&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;keepAliveTime&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Maximum time that excess idle threads will wait for new tasks before terminating&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;1&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;Queue Length&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;queueLength&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;Number of tasks that can be queued before the thread pool starts rejecting tasks&lt;/td&gt;
+        &lt;td&gt;&lt;code&gt;1&lt;/code&gt;&lt;/td&gt;
+        &lt;td&gt;No&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+
+**Sample configuration**
+
+```xml
+&lt;inboundEndpoint
+        class=&quot;org.wso2.carbon.inbound.iso8583.listening.ISO8583MessageConsumer&quot;
+        name=&quot;custom_listener&quot; onError=&quot;fault&quot; sequence=&quot;request&quot; suspend=&quot;false&quot;&gt;
+        &lt;parameters&gt;
+            &lt;parameter name=&quot;sequential&quot;&gt;true&lt;/parameter&gt;
+            &lt;parameter name=&quot;inbound.behavior&quot;&gt;listening&lt;/parameter&gt;
+            &lt;parameter name=&quot;port&quot;&gt;5000&lt;/parameter&gt;
+        &lt;/parameters&gt;
+&lt;/inboundEndpoint&gt;
+```
+
+&gt; **Note**: To send ISO8583 Standard messages to an inbound endpoint, you can use Java client applications. The client needs to produce the ISO8583 Standard messages and get the acknowledgement from the inbound endpoint.
+
+A Sample test client program is provided in https://github.com/wso2-docs/CONNECTORS/tree/master/ISO8583/ISO8583TestClient. You can use this sample client to test the inbound endpoint.
+</body>
+</html>

@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>fhir-connector-config.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># FHIR Connector Reference
+
+The FHIR Connector allows you to work with resources in [FHIR](http://www.hl7.org/fhir/index.html), which are the modular components of FHIR. The connector uses the [FHIR RESTFul API](http://www.hl7.org/fhir/http.html)  to interact with FHIR.
+
+## Initializing the connector
+
+Before you start performing various operations with the connector, make sure to import the FHIR certificate to your ESB client keystore.
+
+To use the FHIR connector, add the  &lt;fhir.init&gt;  element in your configuration before carrying out any other FHIR operations.
+
+For more information on authentication/security of the FHIR REST API, see http://www.hl7.org/implement/standards/fhir/security.html.
+
+??? note &quot;fhir.init&quot;
+    The fhir.init operation initializes the connector to interact with the FHIR REST API.
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;base&lt;/td&gt;
+            &lt;td&gt;The service root URL.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;fhir.init&gt;
+        &lt;base&gt;{$ctx:base}&lt;/base&gt;
+    &lt;fhir.init&gt;
+    ```
+
+---
+
+### Conformance
+
+??? note &quot;getConformance&quot;
+    The conformance interaction retrieves the server&#x27;s conformance statement that defines how it supports resources. The conformance interaction retrieves the server&#x27;s conformance statement that defines how it supports resources, For that use fhir.getConformance and specify the following properties. For more information, see [FHIR API documentation](http://www.hl7.org/implement/standards/fhir/http.html#conformance).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;base&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#root&quot;&gt;service root URL&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;th&gt;format&lt;/th&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#mime-type&quot;&gt;Mime Type&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;id, content, lastUpdated, profile, query, security, tag, text, filter&lt;/td&gt;
+            &lt;td&gt;These are the optional parameters and are common search parameters for all resources.&lt;/td&gt;
+            &lt;td&gt;Optional.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;fhir.getConformance&gt;
+        &lt;base&gt;{$ctx:base}&lt;/base&gt;
+        &lt;format&gt;{$ctx:format}&lt;/format&gt;
+        &lt;id&gt;{$ctx:id}&lt;/id&gt;
+        &lt;content&gt;{$ctx:content}&lt;/content&gt;
+        &lt;lastUpdated&gt;{$ctx:lastUpdated}&lt;/lastUpdated&gt;
+        &lt;profile&gt;{$ctx:profile}&lt;/profile&gt;
+        &lt;query&gt;{$ctx:query}&lt;/query&gt;
+        &lt;security&gt;{$ctx:security}&lt;/security&gt;
+        &lt;tag&gt;{$ctx:tag}&lt;/tag&gt;
+        &lt;text&gt;{$ctx:text}&lt;/text&gt;
+        &lt;filter&gt;{$ctx:filter}&lt;/filter&gt;
+    &lt;/fhir.getConformance&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;base&quot;: &quot;https://open-api.fhir.me&quot;,
+        &quot;format&quot;: &quot;json&quot;,
+        &quot;id&quot;:&quot;%s(id)&quot;,
+        &quot;content&quot;:&quot;%s(content)&quot;,
+        &quot;lastUpdated&quot;:&quot;%s(lastUpdated)&quot;,
+        &quot;profile&quot;:&quot;%s(profile)&quot;,
+        &quot;query&quot;:&quot;%s(query)&quot;,
+        &quot;security&quot;:&quot;%s(security)&quot;,
+        &quot;tag&quot;:&quot;%s(tag)&quot;,
+        &quot;text&quot;:&quot;%s(text)&quot;,
+        &quot;filter&quot;:&quot;%s(filter)&quot;
+    }
+    ```
+
+### Resources
+
+??? note &quot;create&quot;
+    To creates a new resource in a server-assigned location, use fhir.create and specify the following properties. For more information, see related [FHIR API documentation](http://www.hl7.org/implement/standards/fhir/http.html#create).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;base&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#root&quot;&gt;service root URL&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;type&lt;/td&gt;
+            &lt;td&gt;The name of a resource type (e.g., &quot;Patient&quot;).&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;format&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#mime-type&quot;&gt;Mime Type&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;fhir.create&gt;
+        &lt;base&gt;{$ctx:base}&lt;/base&gt;
+        &lt;type&gt;{$ctx:type}&lt;/type&gt;
+        &lt;format&gt;{$ctx:format}&lt;/format&gt;
+    &lt;/fhir.create&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;base&quot;: &quot;https://open-api.fhir.me&quot;,
+        &quot;type&quot;: &quot;Patient&quot;,
+        &quot;format&quot;: &quot;json&quot;
+    }
+    ```
+
+??? note &quot;update&quot;
+    To create a new current version for an existing resource or create an initial version if no resource already exists for the given id, use fhir.update and specify the following properties. For more information, see related [FHIR API documentation](http://www.hl7.org/implement/standards/fhir/http.html#update).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;base&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#root&quot;&gt;service root URL&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;type&lt;/td&gt;
+            &lt;td&gt;The name of a resource type (e.g., &quot;Patient&quot;).&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;idToUpdate&lt;/td&gt;
+            &lt;td&gt;The element of a particular resource. If no id element is provided, or the value is wrong, the server SHALL respond with a HTTP 400 error code, and SHOULD provide an operation outcome identifying the issue.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;format&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#mime-type&quot;&gt;Mime Type&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;fhir.update&gt;
+        &lt;base&gt;{$ctx:base}&lt;/base&gt;
+        &lt;type&gt;{$ctx:type}&lt;/type&gt;
+        &lt;idToUpdate&gt;{$ctx:idToUpdate}&lt;/idToUpdate&gt;
+        &lt;format&gt;{$ctx:format}&lt;/format&gt;
+    &lt;/fhir.update&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;base&quot;: &quot;https://open-api.fhir.me&quot;,
+        &quot;type&quot;: &quot;Patient&quot;,
+        &quot;idToUpdate&quot;:&quot;1032702&quot;,
+        &quot;format&quot;: &quot;json&quot;
+    }
+    ```
+
+??? note &quot;conditionalUpdate&quot;
+    The conditional update interaction allows a client to update an existing resource based on some identification criteria, rather than by logical id, For this use fhir.conditionalUpdate and specify the following properties. For more information, see related [FHIR API documentation](http://www.hl7.org/implement/standards/fhir/http.html#update).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;base&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#root&quot;&gt;service root URL&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;type&lt;/td&gt;
+            &lt;td&gt;The name of a resource type (e.g., &quot;Patient&quot;).&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;format&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#mime-type&quot;&gt;Mime Type&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;id, content, lastUpdated, profile, query, security, tag, text, filter&lt;/td&gt;
+            &lt;td&gt;These are the optional parameters and are common search parameters for all resources.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;fhir.conditionalUpdate&gt;
+        &lt;base&gt;{$ctx:base}&lt;/base&gt;
+        &lt;type&gt;{$ctx:type}&lt;/type&gt;
+        &lt;format&gt;{$ctx:format}&lt;/format&gt;
+        &lt;id&gt;{$ctx:id}&lt;/id&gt;
+        &lt;content&gt;{$ctx:content}&lt;/content&gt;
+        &lt;lastUpdated&gt;{$ctx:lastUpdated}&lt;/lastUpdated&gt;
+        &lt;profile&gt;{$ctx:profile}&lt;/profile&gt;
+        &lt;query&gt;{$ctx:query}&lt;/query&gt;
+        &lt;security&gt;{$ctx:security}&lt;/security&gt;
+        &lt;tag&gt;{$ctx:tag}&lt;/tag&gt;
+        &lt;text&gt;{$ctx:text}&lt;/text&gt;
+        &lt;filter&gt;{$ctx:filter}&lt;/filter&gt;
+    &lt;/fhir.conditionalUpdate&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;base&quot;: &quot;https://open-api.fhir.me&quot;,
+        &quot;type&quot;: &quot;Patient&quot;,
+        &quot;format&quot;: &quot;json&quot;,
+        &quot;id&quot;:&quot;%s(id)&quot;,
+        &quot;content&quot;:&quot;%s(content)&quot;,
+        &quot;lastUpdated&quot;:&quot;%s(lastUpdated)&quot;,
+        &quot;profile&quot;:&quot;%s(profile)&quot;,
+        &quot;query&quot;:&quot;%s(query)&quot;,
+        &quot;security&quot;:&quot;%s(security)&quot;,
+        &quot;tag&quot;:&quot;%s(tag)&quot;,
+        &quot;text&quot;:&quot;%s(text)&quot;,
+        &quot;filter&quot;:&quot;%s(filter)&quot;
+    }
+    ```
+
+??? note &quot;delete&quot;
+    To removes an existing resource, use fhir.delete and specify the following properties. For more information, see related [FHIR API documentation](http://www.hl7.org/implement/standards/fhir/http.html#delete).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;base&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#root&quot;&gt;service root URL&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;type&lt;/td&gt;
+            &lt;td&gt;The name of a resource type (e.g., &quot;Patient&quot;).&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;idToUpdate&lt;/td&gt;
+            &lt;td&gt;The element of a particular resource. If no id element is provided, or the value is wrong, the server SHALL respond with a HTTP 400 error code, and SHOULD provide an operation outcome identifying the issue.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;fhir.delete&gt;
+        &lt;base&gt;{$ctx:base}&lt;/base&gt;
+        &lt;type&gt;{$ctx:type}&lt;/type&gt;
+        &lt;idToDelete&gt;{$ctx:idToDelete}&lt;/idToDelete&gt;
+    &lt;/fhir.delete&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;base&quot;: &quot;https://open-api.fhir.me&quot;,
+        &quot;type&quot;: &quot;Patient&quot;,
+        &quot;idToDelete&quot;:&quot;1032782&quot;,
+        &quot;format&quot;: &quot;json&quot;
+    }
+    ```
+
+??? note &quot;conditionalDelete&quot;
+    The conditional delete interaction allows a client to delete an existing resource based on some selection criteria, rather than by a specific logical id, For this use fhir.conditionalDelete and specify the following properties. For more information, see related [FHIR API documentation](http://www.hl7.org/implement/standards/fhir/http.html#delete).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;base&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#root&quot;&gt;service root URL&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;type&lt;/td&gt;
+            &lt;td&gt;The name of a resource type (e.g., &quot;Patient&quot;).&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;format&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#mime-type&quot;&gt;Mime Type&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;id, content, lastUpdated, profile, query, security, tag, text, filter&lt;/td&gt;
+            &lt;td&gt;These are the optional parameters and are common search parameters for all resources.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;fhir.conditionalDelete&gt;
+        &lt;base&gt;{$ctx:base}&lt;/base&gt;
+        &lt;type&gt;{$ctx:type}&lt;/type&gt;
+        &lt;format&gt;{$ctx:format}&lt;/format&gt;
+        &lt;id&gt;{$ctx:id}&lt;/id&gt;
+        &lt;content&gt;{$ctx:content}&lt;/content&gt;
+        &lt;lastUpdated&gt;{$ctx:lastUpdated}&lt;/lastUpdated&gt;
+        &lt;profile&gt;{$ctx:profile}&lt;/profile&gt;
+        &lt;query&gt;{$ctx:query}&lt;/query&gt;
+        &lt;security&gt;{$ctx:security}&lt;/security&gt;
+        &lt;tag&gt;{$ctx:tag}&lt;/tag&gt;
+        &lt;text&gt;{$ctx:text}&lt;/text&gt;
+        &lt;filter&gt;{$ctx:filter}&lt;/filter&gt;
+    &lt;/fhir.conditionalDelete&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;base&quot;: &quot;https://open-api.fhir.me&quot;,
+        &quot;type&quot;: &quot;Patient&quot;,
+        &quot;format&quot;: &quot;json&quot;,
+        &quot;id&quot;:&quot;%s(id)&quot;,
+        &quot;content&quot;:&quot;%s(content)&quot;,
+        &quot;lastUpdated&quot;:&quot;%s(lastUpdated)&quot;,
+        &quot;profile&quot;:&quot;%s(profile)&quot;,
+        &quot;query&quot;:&quot;%s(query)&quot;,
+        &quot;security&quot;:&quot;%s(security)&quot;,
+        &quot;tag&quot;:&quot;%s(tag)&quot;,
+        &quot;text&quot;:&quot;%s(text)&quot;,
+        &quot;filter&quot;:&quot;%s(filter)&quot;
+    }
+    ```
+
+??? note &quot;readResource&quot;
+    To accesses the current contents of a resource, use fhir.readResource and specify the following properties. For more information, see related [FHIR API documentation](http://www.hl7.org/implement/standards/fhir/http.html#read).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;base&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#root&quot;&gt;service root URL&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;type&lt;/td&gt;
+            &lt;td&gt;The name of a resource type (e.g., &quot;Patient&quot;).&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;format&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#mime-type&quot;&gt;Mime Type&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;fhir.readResource&gt;
+        &lt;base&gt;{$ctx:base}&lt;/base&gt;
+        &lt;type&gt;{$ctx:type}&lt;/type&gt;
+        &lt;format&gt;{$ctx:format}&lt;/format&gt;
+    &lt;/fhir.readResource&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;base&quot;: &quot;https://open-api.fhir.me&quot;,
+        &quot;type&quot;: &quot;Patient&quot;,
+        &quot;format&quot;: &quot;json&quot;
+    }
+    ```
+
+??? note &quot;readSpecificResourceById&quot;
+    To accesses the current contents of a resource, use fhir.readSpecificResourceById and specify the following properties. For more information, see related [FHIR API documentation](http://www.hl7.org/implement/standards/fhir/http.html#read).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;base&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#root&quot;&gt;service root URL&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;type&lt;/td&gt;
+            &lt;td&gt;The name of a resource type (e.g., &quot;Patient&quot;).&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;id&lt;/td&gt;
+            &lt;td&gt;The possible values for the logical Id.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;format&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#mime-type&quot;&gt;Mime Type&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;summary&lt;/td&gt;
+            &lt;td&gt;The search parameter _summary can be used when reading a resource. It can have the values true, false, text &amp; data.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;fhir.readSpecificResourceById&gt;
+        &lt;base&gt;{$ctx:base}&lt;/base&gt;
+        &lt;type&gt;{$ctx:type}&lt;/type&gt;
+        &lt;id&gt;{$ctx:id}&lt;/id&gt;
+        &lt;format&gt;{$ctx:format}&lt;/format&gt;
+        &lt;summary&gt;{$ctx:summary}&lt;/summary&gt; 
+    &lt;/fhir.readSpecificResourceById&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;base&quot;: &quot;https://open-api.fhir.me&quot;,
+        &quot;type&quot;: &quot;Patient&quot;,
+        &quot;id&quot;:&quot;1032702&quot;,
+        &quot;format&quot;: &quot;json&quot;,
+        &quot;summary&quot;: &quot;true&quot;
+    }
+    ```
+
+??? note &quot;vReadResource&quot;
+    To preforms a version specific read of the resource, use fhir.vReadResource and specify the following properties. For more information, see related [FHIR API documentation](http://www.hl7.org/implement/standards/fhir/http.html#vread).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;base&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#root&quot;&gt;service root URL&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;type&lt;/td&gt;
+            &lt;td&gt;The name of a resource type (e.g., &quot;Patient&quot;).&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;logicalId&lt;/td&gt;
+            &lt;td&gt;The possible values for the logical Id.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;format&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#mime-type&quot;&gt;Mime Type&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;versionId&lt;/td&gt;
+            &lt;td&gt;The Version Id (&quot;vid&quot;) is an opaque identifier that conforms to the same format requirements as a Logical Id.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;fhir.vReadResource&gt;
+        &lt;base&gt;{$ctx:base}&lt;/base&gt;
+        &lt;type&gt;{$ctx:type}&lt;/type&gt;
+        &lt;logicalId&gt;{$ctx:logicalId}&lt;/logicalId&gt;
+        &lt;versionId&gt;{$ctx:versionId}&lt;/versionId&gt;
+        &lt;format&gt;{$ctx:format}&lt;/format&gt;
+    &lt;/fhir.vReadResource&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;base&quot;: &quot;https://open-api.fhir.me&quot;,
+        &quot;type&quot;: &quot;Patient&quot;,
+        &quot;logicalId&quot;:&quot;1032702&quot;,
+        &quot;versionId&quot;:&quot;107748&quot;,
+        &quot;format&quot;: &quot;json&quot;
+    }
+    ```
+
+### History
+
+??? note &quot;history&quot;
+    To retrieves the history of a particular resource supported by the system , use fhir.history and specify the following properties. For more information, see related [FHIR API documentation](http://www.hl7.org/implement/standards/fhir/http.html#history).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;base&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#root&quot;&gt;service root URL&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;type&lt;/td&gt;
+            &lt;td&gt;The name of a resource type (e.g., &quot;Patient&quot;).&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;idForHistory&lt;/td&gt;
+            &lt;td&gt;The id of the history that needs to be retrieved.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;format&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#mime-type&quot;&gt;Mime Type&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;id, content, lastUpdated, profile, query, security, tag, text, filter&lt;/td&gt;
+            &lt;td&gt;These are the optional parameters and are common search parameters for all resources.&lt;/td&gt;
+            &lt;td&gt;Optional.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;fhir.history&gt;
+        &lt;base&gt;{$ctx:base}&lt;/base&gt;
+        &lt;type&gt;{$ctx:type}&lt;/type&gt;
+        &lt;idForHistory&gt;{$ctx:idForHistory}&lt;/idForHistory&gt;
+        &lt;format&gt;{$ctx:format}&lt;/format&gt;
+        &lt;id&gt;{$ctx:id}&lt;/id&gt;
+        &lt;content&gt;{$ctx:content}&lt;/content&gt;
+        &lt;lastUpdated&gt;{$ctx:lastUpdated}&lt;/lastUpdated&gt;
+        &lt;profile&gt;{$ctx:profile}&lt;/profile&gt;
+        &lt;query&gt;{$ctx:query}&lt;/query&gt;
+        &lt;security&gt;{$ctx:security}&lt;/security&gt;
+        &lt;tag&gt;{$ctx:tag}&lt;/tag&gt;
+        &lt;text&gt;{$ctx:text}&lt;/text&gt;
+        &lt;filter&gt;{$ctx:filter}&lt;/filter&gt;
+    &lt;/fhir.history&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;base&quot;: &quot;https://open-api.fhir.me&quot;,
+        &quot;type&quot;: &quot;Patient&quot;,
+        &quot;idForHistory&quot;:1032702&quot;,
+        &quot;format&quot;: &quot;json&quot;,
+        &quot;id&quot;:&quot;%s(id)&quot;,
+        &quot;content&quot;:&quot;%s(content)&quot;,
+        &quot;lastUpdated&quot;:&quot;%s(lastUpdated)&quot;,
+        &quot;profile&quot;:&quot;%s(profile)&quot;,
+        &quot;query&quot;:&quot;%s(query)&quot;,
+        &quot;security&quot;:&quot;%s(security)&quot;,
+        &quot;tag&quot;:&quot;%s(tag)&quot;,
+        &quot;text&quot;:&quot;%s(text)&quot;,
+        &quot;filter&quot;:&quot;%s(filter)&quot;
+    }
+    ```
+
+??? note &quot;historyAll&quot;
+    To retrieves the history of all resources supported by the system , use fhir.historyAll and specify the following properties. For more information, see related [FHIR API documentation](http://www.hl7.org/implement/standards/fhir/http.html#history).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;base&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#root&quot;&gt;service root URL&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;format&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#mime-type&quot;&gt;Mime Type&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;id, content, lastUpdated, profile, query, security, tag, text, filter&lt;/td&gt;
+            &lt;td&gt;These are the optional parameters and are common search parameters for all resources.&lt;/td&gt;
+            &lt;td&gt;Optional.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;fhir.historyAll&gt;
+        &lt;base&gt;{$ctx:base}&lt;/base&gt;
+        &lt;format&gt;{$ctx:format}&lt;/format&gt;
+        &lt;id&gt;{$ctx:id}&lt;/id&gt;
+        &lt;content&gt;{$ctx:content}&lt;/content&gt;
+        &lt;lastUpdated&gt;{$ctx:lastUpdated}&lt;/lastUpdated&gt;
+        &lt;profile&gt;{$ctx:profile}&lt;/profile&gt;
+        &lt;query&gt;{$ctx:query}&lt;/query&gt;
+        &lt;security&gt;{$ctx:security}&lt;/security&gt;
+        &lt;tag&gt;{$ctx:tag}&lt;/tag&gt;
+        &lt;text&gt;{$ctx:text}&lt;/text&gt;
+        &lt;filter&gt;{$ctx:filter}&lt;/filter&gt;
+    &lt;/fhir.historyAll&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;base&quot;: &quot;https://open-api.fhir.me&quot;,
+        &quot;format&quot;: &quot;json&quot;,
+        &quot;id&quot;:&quot;%s(id)&quot;,
+        &quot;content&quot;:&quot;%s(content)&quot;,
+        &quot;lastUpdated&quot;:&quot;%s(lastUpdated)&quot;,
+        &quot;profile&quot;:&quot;%s(profile)&quot;,
+        &quot;query&quot;:&quot;%s(query)&quot;,
+        &quot;security&quot;:&quot;%s(security)&quot;,
+        &quot;tag&quot;:&quot;%s(tag)&quot;,
+        &quot;text&quot;:&quot;%s(text)&quot;,
+        &quot;filter&quot;:&quot;%s(filter)&quot;
+    }
+    ```
+
+??? note &quot;historyType&quot;
+    To retrieves the history of all resources of a given type supported by the system , use fhir.historyType and specify the following properties. For more information, see related [FHIR API documentation](http://www.hl7.org/implement/standards/fhir/http.html#history).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/td&gt;
+            &lt;th&gt;Description&lt;/td&gt;
+            &lt;th&gt;Required&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;base&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#root&quot;&gt;service root URL&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;type&lt;/td&gt;
+            &lt;td&gt;The name of a resource type (e.g., &quot;Patient&quot;).&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;format&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#mime-type&quot;&gt;Mime Type&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;id, content, lastUpdated, profile, query, security, tag, text, filter&lt;/td&gt;
+            &lt;td&gt;These are the optional parameters and are common search parameters for all resources.&lt;/td&gt;
+            &lt;td&gt;Optional.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;fhir.historyType&gt;
+        &lt;base&gt;{$ctx:base}&lt;/base&gt;
+        &lt;type&gt;{$ctx:type}&lt;/type&gt;
+        &lt;format&gt;{$ctx:format}&lt;/format&gt;
+        &lt;id&gt;{$ctx:id}&lt;/id&gt;
+        &lt;content&gt;{$ctx:content}&lt;/content&gt;
+        &lt;lastUpdated&gt;{$ctx:lastUpdated}&lt;/lastUpdated&gt;
+        &lt;profile&gt;{$ctx:profile}&lt;/profile&gt;
+        &lt;query&gt;{$ctx:query}&lt;/query&gt;
+        &lt;security&gt;{$ctx:security}&lt;/security&gt;
+        &lt;tag&gt;{$ctx:tag}&lt;/tag&gt;
+        &lt;text&gt;{$ctx:text}&lt;/text&gt;
+        &lt;filter&gt;{$ctx:filter}&lt;/filter&gt;
+    &lt;/fhir.historyType&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;base&quot;: &quot;https://open-api.fhir.me&quot;,
+        &quot;type&quot;:&quot;Patient&quot;
+        &quot;format&quot;: &quot;json&quot;,
+        &quot;id&quot;:&quot;%s(id)&quot;,
+        &quot;content&quot;:&quot;%s(content)&quot;,
+        &quot;lastUpdated&quot;:&quot;%s(lastUpdated)&quot;,
+        &quot;profile&quot;:&quot;%s(profile)&quot;,
+        &quot;query&quot;:&quot;%s(query)&quot;,
+        &quot;security&quot;:&quot;%s(security)&quot;,
+        &quot;tag&quot;:&quot;%s(tag)&quot;,
+        &quot;text&quot;:&quot;%s(text)&quot;,
+        &quot;filter&quot;:&quot;%s(filter)&quot;
+    }
+    ```
+
+### Search
+
+??? note &quot;search&quot;
+    To search from a particular resource supported by the system , use fhir.search and specify the following properties. For more information, see related [FHIR API documentation on search operation](http://www.hl7.org/implement/standards/fhir/http.html#search) and [filter operation](http://www.hl7.org/implement/standards/fhir/search.html#filter).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;base&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#root&quot;&gt;service root URL&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;type&lt;/td&gt;
+            &lt;td&gt;The name of a resource type (e.g., &quot;Patient&quot;).&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;format&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#mime-type&quot;&gt;Mime Type&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;id, content, lastUpdated, profile, query, security, tag, text, filter&lt;/td&gt;
+            &lt;td&gt;These are the optional parameters and are common search parameters for all resources.&lt;/td&gt;
+            &lt;td&gt;Optional.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;fhir.search&gt;
+        &lt;base&gt;{$ctx:base}&lt;/base&gt;
+        &lt;type&gt;{$ctx:type}&lt;/type&gt;
+        &lt;format&gt;{$ctx:format}&lt;/format&gt;
+        &lt;id&gt;{$ctx:id}&lt;/id&gt;
+        &lt;content&gt;{$ctx:content}&lt;/content&gt;
+        &lt;lastUpdated&gt;{$ctx:lastUpdated}&lt;/lastUpdated&gt;
+        &lt;profile&gt;{$ctx:profile}&lt;/profile&gt;
+        &lt;query&gt;{$ctx:query}&lt;/query&gt;
+        &lt;security&gt;{$ctx:security}&lt;/security&gt;
+        &lt;tag&gt;{$ctx:tag}&lt;/tag&gt;
+        &lt;text&gt;{$ctx:text}&lt;/text&gt;
+        &lt;filter&gt;{$ctx:filter}&lt;/filter&gt;
+    &lt;/fhir.search&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;base&quot;: &quot;https://open-api.fhir.me&quot;,
+        &quot;type&quot;: &quot;Patient&quot;,
+        &quot;format&quot;: &quot;json&quot;,
+        &quot;id&quot;:&quot;%s(id)&quot;,
+        &quot;content&quot;:&quot;%s(content)&quot;,
+        &quot;lastUpdated&quot;:&quot;%s(lastUpdated)&quot;,
+        &quot;profile&quot;:&quot;%s(profile)&quot;,
+        &quot;query&quot;:&quot;%s(query)&quot;,
+        &quot;security&quot;:&quot;%s(security)&quot;,
+        &quot;tag&quot;:&quot;%s(tag)&quot;,
+        &quot;text&quot;:&quot;%s(text)&quot;,
+        &quot;filter&quot;:&quot;%s(filter)&quot;
+    }
+    ```
+
+??? note &quot;searchPost&quot;
+    To search from a particular resource supported by the system , use fhir.searchPost and specify the following properties. For more information, see related [FHIR API documentation on the search operation](http://www.hl7.org/implement/standards/fhir/http.html#search).
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Parameter Name&lt;/th&gt;
+            &lt;th&gt;Description&lt;/th&gt;
+            &lt;th&gt;Required&lt;/th&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;base&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#root&quot;&gt;service root URL&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;type&lt;/td&gt;
+            &lt;td&gt;The name of a resource type (e.g., &quot;Patient&quot;).&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;format&lt;/td&gt;
+            &lt;td&gt;The &lt;a href=&quot;http://www.hl7.org/implement/standards/fhir/http.html#mime-type&quot;&gt;Mime Type&lt;/a&gt;.&lt;/td&gt;
+            &lt;td&gt;Yes.&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;id, content, lastUpdated, profile, query, security, tag, text, filter&lt;/td&gt;
+            &lt;td&gt;These are the optional parameters and are common search parameters for all resources.&lt;/td&gt;
+            &lt;td&gt;Optional.&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+    **Sample configurations**
+
+    ```xml
+    &lt;fhir.historyAll&gt;
+        &lt;base&gt;{$ctx:base}&lt;/base&gt;
+        &lt;format&gt;{$ctx:format}&lt;/format&gt;
+        &lt;id&gt;{$ctx:id}&lt;/id&gt;
+        &lt;content&gt;{$ctx:content}&lt;/content&gt;
+        &lt;lastUpdated&gt;{$ctx:lastUpdated}&lt;/lastUpdated&gt;
+        &lt;profile&gt;{$ctx:profile}&lt;/profile&gt;
+        &lt;query&gt;{$ctx:query}&lt;/query&gt;
+        &lt;security&gt;{$ctx:security}&lt;/security&gt;
+        &lt;tag&gt;{$ctx:tag}&lt;/tag&gt;
+        &lt;text&gt;{$ctx:text}&lt;/text&gt;
+        &lt;filter&gt;{$ctx:filter}&lt;/filter&gt;
+    &lt;/fhir.historyAll&gt;
+    ```
+
+    **Sample request**
+
+    ```json
+    {
+        &quot;base&quot;: &quot;https://open-api.fhir.me&quot;,
+        &quot;type&quot;: &quot;Patient&quot;,
+        &quot;format&quot;: &quot;json&quot;,
+        &quot;id&quot;:&quot;%s(id)&quot;,
+        &quot;content&quot;:&quot;%s(content)&quot;,
+        &quot;lastUpdated&quot;:&quot;%s(lastUpdated)&quot;,
+        &quot;profile&quot;:&quot;%s(profile)&quot;,
+        &quot;query&quot;:&quot;%s(query)&quot;,
+        &quot;security&quot;:&quot;%s(security)&quot;,
+        &quot;tag&quot;:&quot;%s(tag)&quot;,
+        &quot;text&quot;:&quot;%s(text)&quot;,
+        &quot;filter&quot;:&quot;%s(filter)&quot;
+    }
+    ```</body>
+</html>

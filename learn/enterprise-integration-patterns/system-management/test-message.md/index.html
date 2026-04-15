@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>test-message.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Test Message
+
+This section explains, through a sample scenario, how the Test Message EIP can be implemented using WSO2 ESB. 
+
+## Introduction to Test Message
+
+The Test Message EIP ensures the health of message processing components by preventing situations such as garbling outgoing messages due to an internal fault. 
+
+!!! info
+    For more information, see the [Test Message](http://www.eaipatterns.com/TestMessage.html) documentation.
+
+![Test message]({{base_path}}/assets/img/learn/enterprise-integration-patterns/system-management/test-message.gif)
+
+## Sample scenario
+
+This sample scenario demonstrates how to send a test message and determine the availability of a service. You can also see how the Scheduled triggers in WSO2 ESB are used.
+
+The diagram below depicts how to simulate the sample scenario using the WSO2 ESB.
+
+&lt;img src=&quot;{{base_path}}/assets/img/learn/enterprise-integration-patterns/system-management/test-message.png&quot; style=&quot;width: 70%;&quot; alt=&quot;Test Message&quot;&gt;
+
+Before digging into implementation details, let&#x27;s take a look at the relationship between the sample scenario and the Detour EIP by comparing their core components.
+
+| Test Message EIP (Figure 1)                   | Sample Scenario of the Test Message EIP (Figure 2) |
+|-----------------------------------------------|----------------------------------------------------|
+| Application Messages                          | Simple Stock Quote Client                                                    |
+| Test Data Generator                           | Test data generator role is played by the Task Scheduler in the ESB. It creates a message after a given interval and hands over the message to the main sequence.                                                   |
+| Test Message Injector                         | Main sequence injects messages it gets from Task scheduler into `sendSeq`, where the rest of the messages go.                                                   |
+| Test Message Separator and Test Data Verifier | An If Else mediator inside `receiveSeq` filters out the test messages and prints the outcome of the test. There&#x27;s another filter in fault c to monitor any failures in sending test messages.                                                   |
+
+### Environment setup
+
+1. Download and install WSO2 ESB from http://wso2.com/products/enterprise-service-bus. For a list of prerequisites and step-by-step installation instructions, refer to Getting Started in the WSO2 ESB documentation.
+
+2. Start a sample Axis2 server instance on port 9000. For instructions, see ESB Samples Setup - Starting Sample Back-End Services in the WSO2 ESB documentation.
+
+## ESB configuration
+
+Start the ESB server and log into its management console UI (`https://localhost:9443/carbon`). In the management console, navigate to the Main menu and click Source View in the Service Bus section. Next, copy and paste the following configuration, which helps you explore the sample scenario, to the source view.
+
+```xml
+&lt;definitions xmlns=&quot;http://ws.apache.org/ns/synapse&quot;&gt;
+    &lt;!-- Proxy for normal message flow --&gt;
+    &lt;taskManager provider=&quot;org.wso2.carbon.mediation.ntask.NTaskTaskManager&quot;/&gt;
+    &lt;proxy name=&quot;ServiceProxy&quot; transports=&quot;https http&quot; startOnLoad=&quot;true&quot; trace=&quot;disable&quot;&gt;
+        &lt;target inSequence=&quot;sendSeq&quot;/&gt;
+    &lt;/proxy&gt; 
+    &lt;!-- Normal flow of the messages --&gt;
+    &lt;sequence name=&quot;sendSeq&quot;&gt;
+        &lt;send receive=&quot;receiveSeq&quot;&gt;
+            &lt;endpoint&gt;
+                &lt;address uri=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+            &lt;/endpoint&gt;
+        &lt;/send&gt;
+    &lt;/sequence&gt;
+
+    &lt;!-- Fault sequence handles failures --&gt;
+   &lt;sequence name=&quot;fault&quot;&gt;
+      &lt;log level=&quot;full&quot;&gt;
+         &lt;property name=&quot;MESSAGE&quot; value=&quot;Executing default &#x27;fault&#x27; sequence&quot;/&gt;
+         &lt;property xmlns:ns=&quot;http://org.apache.synapse/xsd&quot;
+                   name=&quot;ERROR_CODE&quot;
+                   expression=&quot;get-property(&#x27;ERROR_CODE&#x27;)&quot;/&gt;
+         &lt;property xmlns:ns=&quot;http://org.apache.synapse/xsd&quot;
+                   name=&quot;ERROR_MESSAGE&quot;
+                   expression=&quot;get-property(&#x27;ERROR_MESSAGE&#x27;)&quot;/&gt;
+      &lt;/log&gt;
+
+        &lt;!-- Filter the failed Test Messages --&gt;
+        &lt;filter xmlns:ns=&quot;http://org.apache.synapse/xsd&quot;
+              xmlns:m0=&quot;http://services.samples&quot;
+              source=&quot;//m0:getQuote/m0:request/m0:symbol&quot;
+              regex=&quot;TEST&quot;&gt;
+            &lt;then&gt;
+                &lt;log&gt;
+                    &lt;property name=&quot;FAILURE&quot; value=&quot;*** Test Message Failed ***&quot;/&gt;
+                    &lt;property name=&quot;FAILED SERVICE&quot; value=&quot;*** localhost:9000/services/SimpleStockQuoteService ***&quot;/&gt;
+                &lt;/log&gt;
+            &lt;/then&gt;
+            &lt;else/&gt;
+        &lt;/filter&gt;
+        &lt;drop/&gt;
+    &lt;/sequence&gt;
+ 
+    &lt;!-- Receiving messages from service --&gt;
+    &lt;sequence name=&quot;receiveSeq&quot;&gt;
+        &lt;log/&gt;
+        &lt;!-- Filter the Test Messages --&gt;
+        &lt;filter xmlns:ax21=&quot;http://services.samples/xsd&quot;
+                xmlns:ns=&quot;http://org.apache.synapse/xsd&quot;
+                source=&quot;//ax21:symbol&quot;
+                regex=&quot;TEST&quot;&gt;
+        &lt;then&gt;
+            &lt;log&gt;
+               &lt;property name=&quot;TEST PASSED&quot; value=&quot;*** Test Message Passed ***&quot;/&gt;
+               &lt;property name=&quot;TESTED SERVICE&quot; value=&quot;*** localhost:9000/services/SimpleStockQuoteService ***&quot;/&gt;
+            &lt;/log&gt;
+            &lt;drop/&gt;
+         &lt;/then&gt;
+         &lt;else&gt;
+            &lt;send/&gt;
+         &lt;/else&gt;
+        &lt;/filter&gt;
+    &lt;/sequence&gt;
+
+&lt;!-- main sequence used as the test Message injector --&gt;
+    &lt;sequence name=&quot;main&quot;&gt;
+      &lt;in&gt;
+         &lt;sequence key=&quot;sendSeq&quot;/&gt;
+      &lt;/in&gt;
+      &lt;out&gt;
+         &lt;send/&gt;
+      &lt;/out&gt;     
+   &lt;/sequence&gt;
+
+    &lt;!-- Task Scheduler act as Test data generator --&gt;
+    &lt;task name=&quot;Testing&quot;
+        class=&quot;org.apache.synapse.startup.tasks.MessageInjector&quot;
+        group=&quot;synapse.simple.quartz&quot;&gt;
+         
+        &lt;!-- Interval between generating test messages, Cron Expression are also allowed to use --&gt;     
+        &lt;trigger interval=&quot;25&quot;/&gt;
+       
+        &lt;property xmlns:task=&quot;http://www.wso2.org/products/wso2commons/tasks&quot; name=&quot;message&quot;&gt;
+            &lt;m0:getQuote xmlns:m0=&quot;http://services.samples&quot;&gt;
+            &lt;m0:request&gt;
+               &lt;m0:symbol&gt;TEST&lt;/m0:symbol&gt;
+            &lt;/m0:request&gt;
+            &lt;/m0:getQuote&gt;
+        &lt;/property&gt;
+        &lt;property xmlns:task=&quot;http://www.wso2.org/products/wso2commons/tasks&quot;
+                name=&quot;soapAction&quot;
+                value=&quot;urn:getQuote&quot;/&gt;
+        &lt;property xmlns:task=&quot;http://www.wso2.org/products/wso2commons/tasks&quot;
+                name=&quot;to&quot;
+                value=&quot;http://localhost:9000/services/SimpleStockQuoteService&quot;/&gt;
+    &lt;/task&gt;
+&lt;/definitions&gt;
+```
+
+## Set up the sample scenario
+
+After setting this configuration, note that the Axis2 server is invoked every 25 seconds, and the following message on the WSO2 ESB console indicates that the test has passed.
+
+```
+INFO - LogMediator To: http://www.w3.org/2005/08/addressing/anonymous, WSAction: , SOAPAction: , MessageID: urn:uuid:fa29b7c1-98cb-48a2-87b3-54dc96b9c817, Direction: response, TEST PASSED = *** Test Message Passed ***, TESTED SERVICE = *** localhost:9000/services/SimpleStockQuoteService ***
+```
+
+If you stop the Axis2 server, you will get the following message indicating that the test has failed.
+
+```
+INFO - LogMediator To: http://localhost:9000/services/SimpleStockQuoteService, WSAction: urn:getQuote, SOAPAction: urn:getQuote, MessageID: urn:uuid:008c1cf5-a13b-44ec-8e1c-566a39275f67, Direction: request, FAILURE = *** Test Message Failed ***, FAILED SERVICE = *** localhost:9000/services/SimpleStockQuoteService ***
+```
+
+### How the implementation works
+
+Let&#x27;s investigate the elements of the ESB configuration in detail. The line numbers below refer to the ESB configuration shown above.
+
+- **sequence** [line 8 in ESB config] -  The sequence with key sendSeq defines the endpoint where messages will be sent and defines the sequence (receiveSeq) that will receive responses.
+- **fault sequence** [line 17 in ESB config] - The fault sequence provides a channel for handling faults.
+- **filter** [line 29 in ESB config] - An If Else mediator is used within the fault sequence to determine whether the symbol property of the message passing through this filter contains TEST. If it does, it will be logged, and no fault message is passed onto the requesting client. If TEST does not exist, a fault message is passed as usual.
+- **sequence** [line 68 in ESB config] - This is the main sequence invoked by default when a request is made to the ESB. This sequence calls the sendSeq sequence (line 8 in ESB config).
+- **task** [line 78 in ESB config] - A task in the ESB runs periodically based on a given timer. This timer is specified using the trigger element. In this case, the task is set to run every 25 seconds. This task uses the Synapse MessageInjector class to inject a message into the Synapse environment.
+- **property** [line 85 in ESB config] - This property, defined inside the task, specifies the message body.
+- **property** [line 92 in ESB config] - This property, defined inside the task, sets the SOAP Action to getQuote.
+- **property** [line 95 in ESB config] - This property, defined inside the task, specifies the address where the message generated by the task is sent.
+</body>
+</html>

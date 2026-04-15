@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>google-firebase-setup.md</title>
+<style>
+  body {
+    font-family: monospace;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-word;
+    padding: 1.5rem;
+    margin: 0;
+    color: #24292f;
+    background: #ffffff;
+  }
+</style>
+</head>
+<body># Setting up Google Firebase Environment 
+
+1. Open up [Firebase Console](https://console.firebase.google.com/) and log in.
+2. Add a Firebase project. The **Add project** dialog also gives you the option to add Firebase to an existing Google Cloud Platform project.
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/add-firebase-project.jpg&quot; title=&quot;Add Firebase project&quot; width=&quot;400&quot; alt=&quot;Add Firebase project&quot;/&gt;
+3. Navigate to the [Service Accounts](https://console.firebase.google.com/project/teststatusapp/settings/serviceaccounts/adminsdk) tab in your project&#x27;s settings page.
+4. Click the **Generate New Private Key** button at the bottom of the **Firebase Admin SDK** section of the **Service Accounts** tab.
+    &lt;img src=&quot;{{base_path}}/assets/img/integrate/connectors/get-firebase-credentials.png&quot; title=&quot;Get Firebase credentials&quot; width=&quot;600&quot; alt=&quot;Get Firebase credentials&quot;/&gt;
+
+    After you click the button, a JSON file containing your service account&#x27;s credentials will be downloaded. You&#x27;ll need information in this file to initialize the Google Firebase Connector in the [integration scenario]({{base_path}}/reference/connectors/google-firebase-connector/google-firebase-connector-example/) you are going to build next. 
+  
+</body>
+</html>
