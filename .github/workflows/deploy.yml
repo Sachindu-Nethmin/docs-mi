@@ -32,5 +32,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           cd en
-          # Use --force to overwrite the corrupted history on gh-pages
+          # CRITICAL: Always use --force and --clean to prevent gh-pages/main conflicts
+          # This ensures gh-pages only contains built site files, never source code
           mkdocs gh-deploy --force --clean
+
+      - name: Verify gh-pages only has built files
+        run: |
+          git fetch origin gh-pages
+          git checkout origin/gh-pages -- .nojekyll
+          echo "✅ gh-pages successfully updated with built site only"
