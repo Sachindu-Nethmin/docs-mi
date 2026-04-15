@@ -162,9 +162,22 @@
             try {
                 const markdown = await fetchFlattenedMarkdownForCurrentPage();
                 await navigator.clipboard.writeText(markdown);
+
+                // Show "Copied!" feedback on the button
+                const copyButton = menu.querySelector('.cp-copy');
+                const titleElement = copyButton.querySelector('.copy-page-item-title');
+                const originalText = titleElement.textContent;
+                titleElement.textContent = 'Copied!';
+
+                // Also show in button title attribute
                 const originalTitle = button.getAttribute('title');
                 button.setAttribute('title', 'Copied!');
-                setTimeout(() => button.setAttribute('title', originalTitle), 2000);
+
+                // Revert after 2 seconds
+                setTimeout(() => {
+                    titleElement.textContent = originalText;
+                    button.setAttribute('title', originalTitle);
+                }, 2000);
             } catch (err) {
                 console.error('Failed to copy:', err);
             }
@@ -200,12 +213,16 @@
         const cleanPath = u.pathname.replace(/\/index\.html$/, '/').replace(/\.html$/, '').replace(/\/$/, '');
         const segments = cleanPath.split('/').filter(Boolean);
         
-        // Remove button from home page
+        // Don't show copy-page button on home page
+        const pathname = window.location.pathname;
         const folderName = segments.length > 0 ? segments[segments.length - 1] : '';
         const isVersion = /^\d+\.\d+\.\d+$/.test(folderName);
         const isLangOrVersion = isVersion || ['en', 'next', 'latest'].includes(folderName) || segments.length === 0;
-        
-        if (isLangOrVersion) return;
+        const isHomePagePath = pathname === '/' ||
+                              pathname === '/docs-mi/' ||
+                              pathname.endsWith('/index.html');
+
+        if (isLangOrVersion || isHomePagePath) return;
 
         const editButton = document.querySelector('.md-content__button.md-icon[href*="/edit/"]');
         const viewButton = document.querySelector('.md-content__button.md-icon[href*="/raw/"]') ||
