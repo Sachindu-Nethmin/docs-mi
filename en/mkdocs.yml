@@ -1109,6 +1109,8 @@ nav:
               - Setup: mi-analytics/mi-elk-installation-guide.md
               - Access the Dashboard: mi-analytics/mi-elk-dashboards.md
               - Publish Custom Analytics Events Data: mi-analytics/mi-custom-analytics.md
+          - Other Analytics:
+              - Datadog Analytics Installation Guide: mi-analytics/datadog-analytics-installation-guide.md
       - Administer:
           - Administer Overview: administer/admin-overview.md
           - Manage Users and Roles: install-and-setup/setup/user-stores/managing-users.md
@@ -1238,6 +1240,7 @@ plugins:
 extra_css:
   - assets/lib/highlightjs/styles/custom-highlight-styles.css
   - assets/css/theme.css
+  - assets/css/custom.css
   - assets/css/copy-page.css
   - assets/lib/json-formatter/json-formatter.css
   - assets/css/config-catalog.css
