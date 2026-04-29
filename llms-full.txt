@@ -401,6 +401,7 @@
 - [Synapse Expressions](./learn/samples/synapse-expressions.md)
 - [Unit Test Tutorial](./learn/samples/unit-testing.md)
 - [XML To JSON Transformation](./learn/samples/xml-to-json-transformation.md)
+- [Datadog Analytics Installation Guide](./mi-analytics/datadog-analytics-installation-guide.md)
 - [Publish Custom Analytics Events Data](./mi-analytics/mi-custom-analytics.md)
 - [Access the Dashboard](./mi-analytics/mi-elk-dashboards.md)
 - [Setup](./mi-analytics/mi-elk-installation-guide.md)
